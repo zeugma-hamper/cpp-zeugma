@@ -63,9 +63,14 @@ State Animation::get_state () const
   return m_state;
 }
 
+void Animation::set_finished ()
+{
+  m_state = State::Finished;
+}
+
 State Animation::update (double _timestamp, double _delta, AnimationSystem::step _step)
 {
-  if (m_last_step == _step)
+  if (m_state == State::Finished || m_last_step == _step)
     return m_state;
 
   return (m_state = do_update (_timestamp, _delta));

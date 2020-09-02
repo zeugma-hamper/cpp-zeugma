@@ -2,6 +2,10 @@
 #ifndef THIRD_TIME
 #define THIRD_TIME
 
+#include "base_types.hpp"
+#include "SoftValue.hpp"
+#include "AnimationSystem.hpp"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
@@ -37,18 +41,20 @@ namespace charm
 
 struct TransformComponents
 {
-  glm::vec3 translation;
-  glm::quat rotation;
-  glm::vec3 scale;
-  bool dirty = false;
+  glm::vec3 translation{0.0f};
+  glm::quat rotation {1.0f, 0.0f, 0.0f, 0.0f};
+  glm::vec3 scale{1.0f};
 };
+
+using TransformComponentsSoftValue = AnimSoftValue<TransformComponents, Animation>;
 
 struct Transformation
 {
   glm::mat4 model{1.0f};
   glm::mat4 normal{1.0f};
-  bool dirty = false;
 };
+
+using TransformationSoftValue = SoftValue<Transformation>;
 
 class Renderable;
 class Node;
@@ -94,7 +100,7 @@ class Node
   CHARM_DEFAULT_MOVE (Node);
 
   void update_transformations ();
-  void update_transformations (Transformation const &_parent_tx);
+  void update_transformations (TransformationSoftValue const &_parent_tx);
 
   void enumerate_renderables ();
   void enumerate_renderables (Renderable::graph_id &_id);
@@ -117,9 +123,9 @@ class Node
   Node *m_parent;
   std::vector<Node *> m_children;
   std::vector<Renderable *> m_renderables;
-  TransformComponents m_tx_components;
-  Transformation m_tx;
-  Transformation m_absolute_tx;
+  TransformComponentsSoftValue m_tx_components;
+  TransformationSoftValue m_tx;
+  TransformationSoftValue m_absolute_tx;
 };
 
 class Layer

@@ -7,7 +7,9 @@ cpp = meson.get_compiler ('cpp')
 
 ##### build arguments
 
-lib_sources = ['src/SceneGraph.cpp', 'src/AnimationSystem.cpp']
+lib_sources = ['src/SceneGraph.cpp',
+               'src/AnimationSystem.cpp']
+
 
 charm_lib = shared_library ('charm', lib_sources,
                             dependencies : [],

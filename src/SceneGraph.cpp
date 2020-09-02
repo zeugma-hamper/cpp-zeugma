@@ -6,6 +6,8 @@
 
 #include <algorithm>
 
+namespace charm {
+
 Renderable::Renderable ()
   : m_sort_key {0u},
     m_graph_id {0u},
@@ -61,31 +63,34 @@ Node::~Node ()
 
 void Node::update_transformations ()
 {
-  Transformation tx;
-  update_transformations (tx);
+  TransformationSoftValue tsv {{glm::mat4{1.0}, glm::mat4{1.0f}}};
+  update_transformations (tsv);
 }
 
-void Node::update_transformations (Transformation const &_parent_tx)
+void Node::update_transformations (TransformationSoftValue const &_parent_tx)
 {
-  m_absolute_tx.dirty = false;
+  m_absolute_tx.clear_dirty ();
 
-  if (m_tx_components.dirty)
+  if (m_tx_components.is_dirty ())
     {
       //the inconsistency here drives me bonkers
-      m_tx_components.dirty = false;
-      m_tx.dirty = true;
-      glm::mat4 const rs = glm::mat4_cast(m_tx_components.rotation) *
-        glm::scale (glm::mat4{1.0f}, m_tx_components.scale);
-      m_tx.model = glm::translate (rs, m_tx_components.translation);
-      m_tx.normal = glm::inverseTranspose(rs);
+      m_tx_components.clear_dirty ();
+      m_tx.set_dirty (true);
+      TransformComponents &txc = m_tx_components.get_value ();
+      Transformation &tx = m_tx.get_value ();
+      glm::mat4 const rs = glm::mat4_cast(txc.rotation) *
+        glm::scale (glm::mat4{1.0f}, txc.scale);
+      tx.model = glm::translate (rs, txc.translation);
+      tx.normal = glm::inverseTranspose(rs);
     }
 
-  if (m_tx.dirty || _parent_tx.dirty)
+  if (m_tx.is_dirty() || _parent_tx.is_dirty ())
     {
-      m_absolute_tx.model = _parent_tx.model * m_tx.model;
-      m_absolute_tx.normal = _parent_tx.normal * m_tx.normal;
-      m_absolute_tx.dirty = true;
-      m_tx.dirty = false;
+      Transformation &abs_tx = m_absolute_tx.get_value ();
+      abs_tx.model = _parent_tx.get_value ().model * m_tx.get_value ().model;
+      abs_tx.normal = _parent_tx.get_value ().normal * m_tx.get_value ().normal;
+      m_absolute_tx.set_dirty(true);
+      m_tx.clear_dirty ();
     }
 
   size_t const child_count = m_children.size ();
@@ -188,4 +193,5 @@ void Layer::remove_renderables (std::vector<Renderable *> const &_rends)
 
   m_renderables.erase (std::remove_if (m_renderables.begin (), m_renderables.end (), pred),
                        m_renderables.end ());
+}
 }

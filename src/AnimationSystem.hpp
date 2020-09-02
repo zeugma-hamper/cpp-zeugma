@@ -42,7 +42,10 @@ class Animation
   virtual ~Animation ();
 
   id get_id () const;
+
   State get_state () const;
+
+  void set_finished ();
 
   State update (double timestamp, double delta, AnimationSystem::step _step);
 
@@ -53,6 +56,44 @@ class Animation
   id m_id;
   State m_state;
   AnimationSystem::step m_last_step;
+};
+
+template<typename SV>
+class SoftAnimation : public Animation
+{
+ public:
+  using SoftVal = SV;
+
+  SoftAnimation ()
+    : SoftAnimation {nullptr}
+  { }
+
+  SoftAnimation (SoftVal *_sv)
+    : Animation {},
+      m_value {_sv}
+  {
+  }
+
+  ~SoftAnimation () override
+  {
+    if (m_value)
+      m_value->set_animation (nullptr);
+
+    m_value = nullptr;
+  }
+
+  SoftVal *get_soft_value () const
+  {
+    return m_value;
+  }
+
+  void set_soft_value (SoftVal *_sv)
+  {
+    m_value = _sv;
+  }
+
+ protected:
+  SoftVal *m_value;
 };
 
 }
