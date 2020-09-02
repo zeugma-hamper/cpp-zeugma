@@ -259,6 +259,12 @@ class intrusive_ptr
   T *m_pointer;
 };
 
+template<typename T, typename... Args>
+intrusive_ptr<T> make_intrusive (Args &&..._args)
+{
+  return intrusive_ptr<T> (new T (std::forward<Args> (_args)...));
+}
+
 template<typename T>
 class intrusive_weak_ptr
 {
