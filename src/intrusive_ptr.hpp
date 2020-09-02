@@ -188,6 +188,8 @@ class intrusive_ptr
     m_pointer = _t.m_pointer;
     if (m_pointer)
       m_pointer->add_reference ();
+
+    return *this;
   }
 
   intrusive_ptr &operator=(intrusive_ptr &&_t) noexcept
@@ -196,6 +198,8 @@ class intrusive_ptr
 
     m_pointer = _t.m_pointer;
     _t.m_pointer = nullptr;
+
+    return *this;
   }
 
   template<typename U>
@@ -207,6 +211,8 @@ class intrusive_ptr
     m_pointer = static_cast<T *> (_t.m_pointer);
     if (m_pointer)
       m_pointer->add_reference ();
+
+    return *this;
   }
 
   template<typename U>
@@ -217,6 +223,8 @@ class intrusive_ptr
 
     m_pointer = static_cast<T *> (_t.m_pointer);
     _t.m_pointer = nullptr;
+
+    return *this;
   }
 
   T *get () const noexcept
@@ -312,6 +320,8 @@ class intrusive_weak_ptr
     m_pointer = _ipt.get ();
     if (m_pointer)
       m_pointer->add_weak_reference ();
+
+    return *this;
   }
 
   template<typename U>
@@ -322,6 +332,8 @@ class intrusive_weak_ptr
     m_pointer = static_cast<T *> (_ipt.get ());
     if (m_pointer)
       m_pointer->add_weak_reference ();
+
+    return *this;
   }
 
   ~intrusive_weak_ptr ()
@@ -339,6 +351,8 @@ class intrusive_weak_ptr
     m_pointer = _t.get ();
     if (m_pointer)
       m_pointer->add_weak_reference ();
+
+    return *this;
   }
 
   intrusive_weak_ptr &operator=(intrusive_weak_ptr &&_t)
@@ -347,6 +361,8 @@ class intrusive_weak_ptr
 
     m_pointer = _t.m_pointer;
     _t.m_pointer = nullptr;
+
+    return *this;
   }
 
   template<typename U>
@@ -359,6 +375,8 @@ class intrusive_weak_ptr
     m_pointer = static_cast<T *> (_t.get ());
     if (m_pointer)
       m_pointer->add_weak_reference ();
+
+    return *this;
   }
 
   template<typename U>
@@ -369,6 +387,8 @@ class intrusive_weak_ptr
 
     m_pointer = static_cast<T *> (_t.m_pointer);
     _t.m_pointer = nullptr;
+
+    return *this;
   }
 
   operator bool () const noexcept
