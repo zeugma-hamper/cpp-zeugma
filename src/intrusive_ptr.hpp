@@ -273,7 +273,8 @@ class intrusive_weak_ptr
 
   // move version accesses pointer directly, copy uses get
   // so copy of expired weak pointer doesn't copy expired pointer
-  // but move of expired weak pointer does copy pointer
+  // but move of expired weak pointer does copy pointer.
+  // i'm not entirely sure about point.
   intrusive_weak_ptr (intrusive_weak_ptr &&_t) noexcept
     : m_pointer {_t.m_pointer}
   {
