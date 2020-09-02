@@ -1,5 +1,8 @@
 #include "AnimationSystem.hpp"
 
+namespace charm
+{
+
 AnimationSystem::AnimationSystem ()
   : m_current_step {0u}
 {
@@ -66,4 +69,6 @@ State Animation::update (double _timestamp, double _delta, AnimationSystem::step
     return m_state;
 
   return (m_state = do_update (_timestamp, _delta));
+}
+
 }

@@ -32,6 +32,8 @@
   CHARM_DEFAULT_MOVE(KLASS); \
   CHARM_DEFAULT_COPY(KLASS)
 
+namespace charm
+{
 
 struct TransformComponents
 {
@@ -143,5 +145,5 @@ class Layer
   std::vector<Renderable *> m_renderables;
 };
 
-
+}
 #endif //THIRD_TIME

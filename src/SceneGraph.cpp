@@ -39,13 +39,6 @@ Renderable::graph_id Renderable::get_graph_id () const
   return m_graph_id;
 }
 
-  // Layer *m_layer;
-  // Node *m_parent;
-  // std::vector<Node *> m_children;
-  // std::vector<Renderable *> m_renderables;
-  // TransformComponents m_tx_components;
-  // Transformation m_tx;
-  // Transformation m_absolute_tx;
 Node::Node ()
   : m_layer {nullptr},
     m_parent {nullptr}

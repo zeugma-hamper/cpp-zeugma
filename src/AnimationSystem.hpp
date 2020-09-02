@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <vector>
 
+namespace charm
+{
 
 class Animation;
 class AnimationSystem;
@@ -53,5 +55,5 @@ class Animation
   AnimationSystem::step m_last_step;
 };
 
-
+}
 #endif //NO_TIME_NO_TIME
