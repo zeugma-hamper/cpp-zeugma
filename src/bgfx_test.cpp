@@ -4,10 +4,13 @@
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
 #define GLFW_EXPOSE_NATIVE_X11
+#define GLFW_EXPOSE_NATIVE_GLX
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
 #include <stdio.h>
+
+using namespace charm;
 
 //borrowing from example:
 //https://github.com/jpcy/bgfx-minimal-example/blob/master/helloworld.cpp
@@ -19,6 +22,8 @@
   }
 
 #define ERROR_RETURN(MSG) ERROR_RETURN_VAL(MSG, 1)
+
+bool s_should_continue = true;
 
 void glfw_error_callback (int, const char *_msg)
 {
@@ -56,12 +61,30 @@ int main (int, char **)
 
   glfwSetKeyCallback(window, glfw_key_callback);
 
-  while (! glfwWindowShouldClose(window))
+  bgfx::renderFrame();
+  bgfx::Init init;
+
+  init.type = bgfx::RendererType::OpenGL;
+  init.platformData.ndt = glfwGetX11Display();
+  init.platformData.nwh = (void *)glfwGetX11Window(window);
+  init.platformData.context = glfwGetGLXContext(window);
+  int glfw_width, glfw_height;
+  glfwGetWindowSize(window, &glfw_width, &glfw_height);
+  init.resolution.width = glfw_width;
+  init.resolution.height = glfw_height;
+  init.resolution.reset = BGFX_RESET_VSYNC;
+  init.resolution.numBackBuffers = 1;
+
+  if (! bgfx::init (init))
+    ERROR_RETURN("couldn't initialize bgfx");
+
+  while (! glfwWindowShouldClose(window) || ! s_should_continue)
     {
       glfwPollEvents();
-      glfwSwapBuffers(window);
+      bgfx::frame();
     }
 
+  bgfx::shutdown();
   glfwTerminate();
 
   return 0;
