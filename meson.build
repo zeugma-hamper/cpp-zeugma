@@ -1,3 +1,5 @@
+# NOTE: jump to bottom for charm library and executable definitions
+
 project ('charm', ['cpp', 'c'],
          default_options : ['cpp_std=c++17',
                             'warning_level=2'])
@@ -554,7 +556,9 @@ shaderc_bin = executable ('shaderc',
                           include_directories : shaderc_include_dirs,
                           dependencies : [bx_dep, bimg_dep])
 
+#### GLFW
 
+glfw_dep = dependency ('glfw3', required : true)
 
 ##### build arguments
 
@@ -562,6 +566,15 @@ lib_sources = ['src/SceneGraph.cpp',
                'src/AnimationSystem.cpp']
 
 charm_lib = shared_library ('charm', lib_sources,
-                            dependencies : [bx_dep, bimg_dep, bgfx_dep],
+                            dependencies : [bx_dep, bimg_dep, bgfx_dep, glfw_dep],
                             version : '0.5',
                             install : true)
+
+charm_inc = include_directories ('src')
+
+charm_dep = declare_dependency (include_directories : [charm_inc],
+                                dependencies : [bx_dep, bimg_dep, bgfx_dep, glfw_dep])
+
+bgfx_test_exec = executable ('bgfx_test',
+                             sources : ['src/bgfx_test.cpp'],
+                             dependencies : [charm_dep])
