@@ -151,9 +151,10 @@ struct Rectangle
 
   void draw ()
   {
-    bgfx::setState (BGFX_STATE_WRITE_RGB);
-    bgfx::setState (BGFX_STATE_PT_TRISTRIP);
     bgfx::setVertexBuffer(0, vbh, 0, 4);
+    bgfx::setState (BGFX_STATE_WRITE_RGB |
+                    BGFX_STATE_PT_TRISTRIP |
+                    BGFX_STATE_WRITE_Z);
     bgfx::submit(0, program);
   }
 
@@ -208,10 +209,11 @@ int main (int, char **)
   bgfx::setViewRect(0, 0, 0, glfw_width, glfw_height);
   fprintf (stderr, "wid x hei: %d x %d\n", glfw_width, glfw_height);
   bgfx::setViewScissor(0);
+  bgfx::setViewClear (0, BGFX_CLEAR_COLOR, 0x808080FF);
   while (! glfwWindowShouldClose(window) || ! s_should_continue)
     {
       glfwPollEvents();
-      bgfx::setViewClear (0, BGFX_CLEAR_COLOR, 0x808080FF);
+      bgfx::touch (0);
 
       rectangle.draw ();
 
