@@ -135,6 +135,8 @@ bgfx_include_dirs = ['bgfx/include',
 bgfx_sources = ['bgfx/src/amalgamated.cpp']
 
 bgfx_lib = static_library ('bgfx', bgfx_sources,
+                           #definition for GL is gl version to use, definition for vulkan is on/off switch
+                           cpp_args : ['-DBGFX_CONFIG_RENDERER_OPENGL=46', '-DBGFX_CONFIG_RENDERER_VULKAN=1'],
                            include_directories : bgfx_include_dirs,
                            dependencies : [bx_dep, bimg_dep, x11_dep, opengl_dep, vulkan_dep])
 
