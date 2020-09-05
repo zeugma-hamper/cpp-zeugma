@@ -133,9 +133,9 @@ struct Rectangle
 
     // see note about building shaders above
     bx::FilePath shader_path = "vs_quad.bin";
-    bgfx::ShaderHandle vs = create_shader(shader_path);
+    bgfx::ShaderHandle vs = create_shader (shader_path);
     shader_path = bx::StringView("fs_quad.bin");
-    bgfx::ShaderHandle fs = create_shader(shader_path);
+    bgfx::ShaderHandle fs = create_shader (shader_path);
 
     if (bgfx::isValid(vs) && bgfx::isValid (fs))
       {
@@ -171,21 +171,20 @@ int main (int, char **)
   if (! glfwInit())
     ERROR_RETURN ("error initializing glfw");
 
-  // glfwWindowHint (GLFW_RED_BITS, 8);
-  // glfwWindowHint (GLFW_GREEN_BITS, 8);
-  // glfwWindowHint (GLFW_BLUE_BITS, 8);
-  // glfwWindowHint (GLFW_DEPTH_BITS, 24);
-  // glfwWindowHint (GLFW_STENCIL_BITS, 8);
-  // glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3);
-  // glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 2);
-  glfwWindowHint (GLFW_CLIENT_API, GLFW_NO_API);
+  glfwWindowHint (GLFW_RED_BITS, 8);
+  glfwWindowHint (GLFW_GREEN_BITS, 8);
+  glfwWindowHint (GLFW_BLUE_BITS, 8);
+  glfwWindowHint (GLFW_DEPTH_BITS, 24);
+  glfwWindowHint (GLFW_STENCIL_BITS, 8);
+  glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 6);
+  glfwWindowHint (GLFW_CLIENT_API, GLFW_OPENGL_API);
 
   GLFWwindow *window = glfwCreateWindow (1920, 1080, "bgfx test", nullptr, nullptr);
   if (! window)
     ERROR_RETURN ("couldn't create window");
 
   glfwSetKeyCallback(window, glfw_key_callback);
-  //glfwMakeContextCurrent(window);
 
   bgfx::renderFrame();
   bgfx::Init init;
@@ -193,7 +192,7 @@ int main (int, char **)
   init.type = bgfx::RendererType::OpenGL;
   init.platformData.ndt = glfwGetX11Display();
   init.platformData.nwh = (void *)glfwGetX11Window(window);
-  init.platformData.context = nullptr;//glfwGetGLXContext(window);
+  init.platformData.context = glfwGetGLXContext(window);
   int glfw_width, glfw_height;
   glfwGetWindowSize(window, &glfw_width, &glfw_height);
   init.resolution.width = glfw_width;
