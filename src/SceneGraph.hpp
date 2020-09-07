@@ -5,6 +5,7 @@
 #include "base_types.hpp"
 #include "SoftValue.hpp"
 #include "AnimationSystem.hpp"
+#include "utils.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -12,29 +13,6 @@
 #include <cstdint>
 #include <vector>
 
-#define CHARM_DELETE_MOVE(KLASS) \
-  KLASS(KLASS &&) = delete; \
-  KLASS &operator=(KLASS &&) = delete
-
-#define CHARM_DEFAULT_MOVE(KLASS)  \
-  KLASS(KLASS &&) = default; \
-  KLASS &operator=(KLASS &&) = default
-
-#define CHARM_DELETE_COPY(KLASS) \
-  KLASS(KLASS const &) = delete; \
-  KLASS &operator=(KLASS const &) = delete
-
-#define CHARM_DEFAULT_COPY(KLASS)       \
-  KLASS(KLASS const &) = default; \
-  KLASS &operator=(KLASS const &) = default
-
-#define CHARM_DELETE_MOVE_COPY(KLASS) \
-  CHARM_DELETE_MOVE(KLASS); \
-  CHARM_DELETE_COPY(KLASS)
-
-#define CHARM_DEFAULT_MOVE_COPY(KLASS) \
-  CHARM_DEFAULT_MOVE(KLASS); \
-  CHARM_DEFAULT_COPY(KLASS)
 
 namespace charm
 {

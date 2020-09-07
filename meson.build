@@ -567,16 +567,23 @@ glfw_dep = dependency ('glfw3', required : true)
 lib_sources = ['src/SceneGraph.cpp',
                'src/AnimationSystem.cpp']
 
-charm_lib = shared_library ('charm', lib_sources,
+charm_lib = static_library ('charm', lib_sources,
                             dependencies : [bx_dep, bimg_dep, bgfx_dep, glfw_dep],
-                            version : '0.5',
+                            #version : '0.5',
                             install : true)
 
 charm_inc = include_directories ('src')
 
 charm_dep = declare_dependency (include_directories : [charm_inc],
+                                link_with : [charm_lib],
                                 dependencies : [bx_dep, bimg_dep, bgfx_dep, glfw_dep])
 
 bgfx_test_exec = executable ('bgfx_test',
                              sources : ['src/bgfx_test.cpp'],
+                             dependencies : [charm_dep])
+
+dead_zone_exec = executable ('dead_zone',
+                             sources : ['src/dead_zone.cpp',
+                                        'src/application.cpp',
+                                        'src/FrameTime.cpp'],
                              dependencies : [charm_dep])

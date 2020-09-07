@@ -9,7 +9,6 @@ namespace charm
 {
 
 class Animation;
-class AnimationSystem;
 
 enum class State
 {
