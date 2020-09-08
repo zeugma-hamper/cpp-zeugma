@@ -4,6 +4,9 @@
 
 #include <AnimationSystem.hpp>
 #include <FrameTime.hpp>
+#include <SceneGraph.hpp>
+
+#include <bgfx_utils.hpp>
 
 #include <bx/bx.h>
 #include <bgfx/bgfx.h>
@@ -32,6 +35,9 @@ class dead_zone final : public charm::application
 
   bool init_windowing_and_graphics ();
   void shut_down_graphics ();
+  void render ();
+
+  void update_scene_graph ();
 
   FrameTime &get_frame_time ();
   AnimationSystem &get_animation_system ();
@@ -41,8 +47,72 @@ class dead_zone final : public charm::application
   AnimationSystem m_animation_system;
 
   GLFWwindow *window;
+
+  Layer m_scene_graph_layer;
 };
 
+class RectangleRenderable final : public Renderable
+{
+ public:
+  RectangleRenderable ()
+    : Renderable (),
+      program {BGFX_INVALID_HANDLE},
+      vbh {BGFX_INVALID_HANDLE}
+  {
+    struct vvertex
+    {
+      glm::vec3 position;
+      glm::vec4 uv;
+    };
+
+    const vvertex combined[] = {
+      {{-0.5f,  0.5, 0.0f}, {0.0f, 0.0f, 1.0f, 1.0f}},
+      {{-0.5f, -0.5, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},
+      {{ 0.5f,  0.5, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+      {{ 0.5f, -0.5, 0.0f}, {1.0f, 1.0f, 0.0f, 1.0f}},
+    };
+
+    bgfx::VertexLayout layout;
+    layout.begin ()
+      .add (bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+      .add (bgfx::Attrib::Color0,   4, bgfx::AttribType::Float)
+      .end ();
+
+    const bgfx::Memory *vb_mem = bgfx::copy (combined, 4 * sizeof (vvertex));
+    vbh = bgfx::createVertexBuffer(vb_mem, layout);
+
+    // see note about building shaders above
+    bx::FilePath shader_path = "vs_quad.bin";
+    bgfx::ShaderHandle vs = create_shader (shader_path);
+    shader_path = bx::StringView("fs_quad.bin");
+    bgfx::ShaderHandle fs = create_shader (shader_path);
+
+    if (bgfx::isValid(vs) && bgfx::isValid (fs))
+      {
+        fprintf (stderr, "creating shader\n");
+        program = bgfx::createProgram(vs, fs, true);
+      }
+    else
+      {
+        bgfx::destroy (vs);
+        bgfx::destroy (fs);
+      }
+  }
+
+  void draw (Node *_node)
+  {
+    bgfx::setTransform(&_node->get_absolute_model_transformation());
+    bgfx::setVertexBuffer(0, vbh, 0, 4);
+    bgfx::setState (BGFX_STATE_WRITE_RGB |
+                    BGFX_STATE_PT_TRISTRIP |
+                    BGFX_STATE_WRITE_Z);
+    bgfx::submit(0, program, m_graph_id);
+  }
+
+ protected:
+  bgfx::ProgramHandle program;
+  bgfx::VertexBufferHandle vbh;
+};
 
 #define ERROR_RETURN_VAL(MSG, VAL)                 \
   {                                                \
@@ -70,7 +140,6 @@ static void glfw_key_callback(GLFWwindow *window, int key, int, int action, int)
   if ((key == GLFW_KEY_Q || key == GLFW_KEY_ESCAPE)
       && action == GLFW_RELEASE)
     {
-      fprintf (stderr, "glfw key callback\n");
       glfwSetWindowShouldClose (window, GLFW_TRUE);
       application::stop_running();
     }
@@ -117,6 +186,10 @@ bool dead_zone::init_windowing_and_graphics ()
   bgfx::setViewRect(0, 0, 0, glfw_width, glfw_height);
   bgfx::setViewScissor(0);
   bgfx::setViewClear (0, BGFX_CLEAR_COLOR, 0x808080FF);
+  // use depth integer to order GPU draw submission
+  // drawables are enumerated by order in scene graph,
+  // so that id number is used as the depth.
+  bgfx::setViewMode (0, bgfx::ViewMode::DepthAscending);
 
   return true;
 }
@@ -125,6 +198,16 @@ void dead_zone::shut_down_graphics ()
 {
   bgfx::shutdown();
   glfwTerminate();
+}
+
+void dead_zone::render ()
+{
+  bgfx::touch (0);
+
+  for (Renderable *r : m_scene_graph_layer.get_renderables())
+    r->draw();
+
+  bgfx::frame ();
 }
 
 dead_zone::dead_zone ()
@@ -143,8 +226,6 @@ bool dead_zone::start_up ()
 
 bool dead_zone::update ()
 {
-  fprintf (stderr, "update\n");
-
   m_frame_time.update_time ();
 
   glfwPollEvents();
@@ -152,11 +233,15 @@ bool dead_zone::update ()
   m_animation_system.update_animations(m_frame_time.current_time(),
                                        m_frame_time.current_delta());
 
-  bgfx::touch (0);
-
-  bgfx::frame ();
+  render ();
 
   return true;
+}
+
+void dead_zone::update_scene_graph()
+{
+  m_scene_graph_layer.root_node()->update_transformations();
+  m_scene_graph_layer.root_node()->enumerate_renderables();
 }
 
 bool dead_zone::shut_down ()

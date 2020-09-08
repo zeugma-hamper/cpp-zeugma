@@ -564,6 +564,12 @@ glfw_dep = dependency ('glfw3', required : true)
 
 ##### build arguments
 
+gst_dep = dependency ('gstreamer-1.0')
+gst_app_dep = dependency ('gstreamer-app-1.0')
+gst_video_dep = dependency ('gstreamer-video-1.0')
+
+gstreamer_deps = [gst_dep, gst_app_dep, gst_video_dep]
+
 lib_sources = ['src/SceneGraph.cpp',
                'src/AnimationSystem.cpp']
 
@@ -585,5 +591,7 @@ bgfx_test_exec = executable ('bgfx_test',
 dead_zone_exec = executable ('dead_zone',
                              sources : ['src/dead_zone.cpp',
                                         'src/application.cpp',
-                                        'src/FrameTime.cpp'],
-                             dependencies : [charm_dep])
+                                        'src/FrameTime.cpp',
+                                        'src/DecodePipeline.cpp',
+                                        'src/PipelineTerminus.cpp'],
+                             dependencies : [charm_dep] + gstreamer_deps)

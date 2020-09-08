@@ -47,12 +47,13 @@ class Renderable
   using graph_id = std::uint64_t;
 
   Renderable ();
+  Renderable (Node *_node);
   virtual ~Renderable ();
 
   CHARM_DELETE_MOVE_COPY (Renderable);
 
-  virtual void update (Node *node);
-  virtual void draw (Node *node) = 0;
+  virtual void update ();
+  virtual void draw () = 0;
 
   bool should_draw () const;
 
@@ -62,6 +63,7 @@ class Renderable
   graph_id get_graph_id () const;
 
  protected:
+  Node *m_node;
   sort_key m_sort_key;
   graph_id m_graph_id;
   bool m_should_draw;
@@ -95,6 +97,16 @@ class Node
   void remove_renderable (Renderable *_render);
   Renderable *excise_renderable (Renderable *_render);
 
+  TransformationSoftValue &get_absolute_transformation_soft ();
+  glm::mat4 const &get_absolute_model_transformation () const;
+  glm::mat4 const &get_absolute_normal_transformation () const;
+
+  TransformationSoftValue &get_transformation_soft ();
+  glm::mat4 const &get_model_transformation () const;
+  glm::mat4 const &get_normal_transformation () const;
+
+
+
  private:
 
   Layer *m_layer;
@@ -114,12 +126,18 @@ class Layer
   Layer ();
   ~Layer ();
 
-  CHARM_DELETE_COPY (Layer);
+  CHARM_DELETE_COPY  (Layer);
   CHARM_DEFAULT_MOVE (Layer);
 
   Node *root_node ();
 
   std::vector<Renderable *> &get_renderables ();
+
+  glm::mat4 const &get_projection_matrix () const;
+  void set_projection_matrix (glm::mat4 const &_proj);
+
+  glm::mat4 const &get_camera_matrix () const;
+  void set_camera_matrix (glm::mat4 const &_cam);
 
  protected:
 
@@ -127,6 +145,8 @@ class Layer
 
   Node m_root_node;
   std::vector<Renderable *> m_renderables;
+  glm::mat4 m_projection_matrix;
+  glm::mat4 m_camera_matrix;
 };
 
 }

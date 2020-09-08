@@ -9,7 +9,12 @@
 namespace charm {
 
 Renderable::Renderable ()
-  : m_sort_key {0u},
+  : Renderable {nullptr}
+{ }
+
+Renderable::Renderable (Node *_node)
+  : m_node {_node},
+    m_sort_key {0u},
     m_graph_id {0u},
     m_should_draw {true}
 {}
@@ -17,7 +22,7 @@ Renderable::Renderable ()
 Renderable::~Renderable ()
 { }
 
-void Renderable::update (Node *)
+void Renderable::update ()
 {
 }
 
@@ -166,7 +171,39 @@ Renderable *Node::excise_renderable (Renderable *_render)
   return r;
 }
 
+TransformationSoftValue &Node::get_absolute_transformation_soft ()
+{
+  return m_absolute_tx;
+}
+
+glm::mat4 const &Node::get_absolute_model_transformation () const
+{
+  return m_absolute_tx.get_value ().model;
+}
+
+glm::mat4 const &Node::get_absolute_normal_transformation () const
+{
+  return m_absolute_tx.get_value ().model;
+}
+
+TransformationSoftValue &Node::get_transformation_soft ()
+{
+  return m_tx;
+}
+
+glm::mat4 const &Node::get_model_transformation () const
+{
+  return m_tx.get_value ().model;
+}
+
+glm::mat4 const &Node::get_normal_transformation () const
+{
+  return m_tx.get_value ().model;
+}
+
 Layer::Layer ()
+  : m_projection_matrix {1.0f},
+    m_camera_matrix {1.0f}
 { }
 
 Layer::~Layer ()
@@ -182,6 +219,26 @@ Node *Layer::root_node ()
 std::vector<Renderable *> &Layer::get_renderables ()
 {
   return m_renderables;
+}
+
+glm::mat4 const &Layer::get_projection_matrix () const
+{
+  return m_projection_matrix;
+}
+
+void Layer::set_projection_matrix (glm::mat4 const &_proj)
+{
+  m_projection_matrix = _proj;
+}
+
+glm::mat4 const &Layer::get_camera_matrix () const
+{
+  return m_camera_matrix;
+}
+
+void Layer::set_camera_matrix (glm::mat4 const &_cam)
+{
+  m_camera_matrix = _cam;
 }
 
 void Layer::remove_renderables (std::vector<Renderable *> const &_rends)
