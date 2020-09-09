@@ -97,6 +97,9 @@ class Node
   void remove_renderable (Renderable *_render);
   Renderable *excise_renderable (Renderable *_render);
 
+  void set_layer (Layer *_layer);
+  Layer *get_layer () const;
+
   TransformationSoftValue &get_absolute_transformation_soft ();
   glm::mat4 const &get_absolute_model_transformation () const;
   glm::mat4 const &get_absolute_normal_transformation () const;
@@ -104,8 +107,6 @@ class Node
   TransformationSoftValue &get_transformation_soft ();
   glm::mat4 const &get_model_transformation () const;
   glm::mat4 const &get_normal_transformation () const;
-
-
 
  private:
 
@@ -141,6 +142,7 @@ class Layer
 
  protected:
 
+  void remove_renderable (Renderable *_rend);
   void remove_renderables (std::vector<Renderable *> const &_rends);
 
   Node m_root_node;

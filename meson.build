@@ -593,5 +593,6 @@ dead_zone_exec = executable ('dead_zone',
                                         'src/application.cpp',
                                         'src/FrameTime.cpp',
                                         'src/DecodePipeline.cpp',
-                                        'src/PipelineTerminus.cpp'],
+                                        'src/PipelineTerminus.cpp',
+                                        'src/bgfx_utils.cpp'],
                              dependencies : [charm_dep] + gstreamer_deps)

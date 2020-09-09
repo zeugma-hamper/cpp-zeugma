@@ -15,7 +15,6 @@ class application
 
   static void stop_running ();
 
-  //empty, but provided to avoid abstract class
   virtual bool start_up ();
   //empty, but provided to avoid abstract class
   virtual bool update ();

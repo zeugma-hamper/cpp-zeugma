@@ -35,6 +35,7 @@ class dead_zone final : public charm::application
 
   bool init_windowing_and_graphics ();
   void shut_down_graphics ();
+  void shut_down_scene_graph ();
   void render ();
 
   void update_scene_graph ();
@@ -42,13 +43,63 @@ class dead_zone final : public charm::application
   FrameTime &get_frame_time ();
   AnimationSystem &get_animation_system ();
 
+  Layer &get_scene_layer ();
+
  protected:
   FrameTime m_frame_time;
   AnimationSystem m_animation_system;
 
   GLFWwindow *window;
 
-  Layer m_scene_graph_layer;
+  Layer *m_scene_graph_layer;
+};
+
+class VideoRenderable final : public Renderable
+{
+ public:
+  VideoRenderable ()
+    : Renderable (),
+      m_program {BGFX_INVALID_HANDLE},
+      m_texture {BGFX_INVALID_HANDLE}
+  {
+    // see note about building shaders above
+    bx::FilePath shader_path = "vs_quad.bin";
+    bgfx::ShaderHandle vs = create_shader (shader_path);
+    shader_path = bx::StringView("fs_quad.bin");
+    bgfx::ShaderHandle fs = create_shader (shader_path);
+
+    if (bgfx::isValid(vs) && bgfx::isValid (fs))
+      {
+        fprintf (stderr, "creating shader\n");
+        m_program = bgfx::createProgram(vs, fs, true);
+      }
+    else
+      {
+        bgfx::destroy (vs);
+        bgfx::destroy (fs);
+      }
+  }
+
+  void update () override
+  {
+  }
+
+  void draw () override
+  {
+    //later: BGFX_STATE_WRITE_A |
+    //       BGFX_ uhhh... blending
+    u64 const state = BGFX_STATE_WRITE_RGB |
+      BGFX_STATE_PT_TRISTRIP |
+      BGFX_STATE_WRITE_Z;
+
+    bgfx::setVertexCount(4);
+    bgfx::submit(0, m_program);
+  }
+
+ private:
+  bgfx::ProgramHandle m_program;
+  bgfx::TextureHandle m_texture;
+  std::vector<bgfx::UniformHandle *> m_uniforms;
 };
 
 class RectangleRenderable final : public Renderable
@@ -99,9 +150,17 @@ class RectangleRenderable final : public Renderable
       }
   }
 
-  void draw (Node *_node)
+  ~RectangleRenderable () override
   {
-    bgfx::setTransform(&_node->get_absolute_model_transformation());
+    bgfx::destroy(vbh);
+    bgfx::destroy(program);
+  }
+
+  void draw () override
+  {
+    fprintf (stderr, "rr draw\n");
+
+    bgfx::setTransform(&m_node->get_absolute_model_transformation());
     bgfx::setVertexBuffer(0, vbh, 0, 4);
     bgfx::setState (BGFX_STATE_WRITE_RGB |
                     BGFX_STATE_PT_TRISTRIP |
@@ -204,19 +263,21 @@ void dead_zone::render ()
 {
   bgfx::touch (0);
 
-  for (Renderable *r : m_scene_graph_layer.get_renderables())
+  for (Renderable *r : m_scene_graph_layer->get_renderables())
     r->draw();
 
   bgfx::frame ();
 }
 
 dead_zone::dead_zone ()
-  : window {nullptr}
+  : window {nullptr},
+    m_scene_graph_layer {new Layer}
 {
 }
 
 dead_zone::~dead_zone ()
 {
+  delete m_scene_graph_layer;
 }
 
 bool dead_zone::start_up ()
@@ -233,6 +294,8 @@ bool dead_zone::update ()
   m_animation_system.update_animations(m_frame_time.current_time(),
                                        m_frame_time.current_delta());
 
+  update_scene_graph ();
+
   render ();
 
   return true;
@@ -240,12 +303,19 @@ bool dead_zone::update ()
 
 void dead_zone::update_scene_graph()
 {
-  m_scene_graph_layer.root_node()->update_transformations();
-  m_scene_graph_layer.root_node()->enumerate_renderables();
+  m_scene_graph_layer->root_node()->update_transformations();
+  m_scene_graph_layer->root_node()->enumerate_renderables();
+}
+
+void dead_zone::shut_down_scene_graph()
+{
+  delete m_scene_graph_layer;
+  m_scene_graph_layer = nullptr;
 }
 
 bool dead_zone::shut_down ()
 {
+  shut_down_scene_graph ();
   shut_down_graphics ();
 
   return true;
@@ -261,10 +331,23 @@ AnimationSystem &dead_zone::get_animation_system ()
   return m_animation_system;
 }
 
+Layer &dead_zone::get_scene_layer ()
+{
+  return *m_scene_graph_layer;
+}
+
 int main (int, char **)
 {
-
   dead_zone zone;
+  if (! zone.start_up ())
+    return -1;
+
+  Layer &layer = zone.get_scene_layer();
+
+  Node *node = new Node ();
+  node->append_renderable(new RectangleRenderable ());
+  layer.root_node()->append_child(node);
+
   zone.run ();
 
   return 0;

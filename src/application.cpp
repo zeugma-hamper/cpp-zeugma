@@ -10,6 +10,8 @@ static bool s_keep_running = true;
 
 bool application::start_up ()
 {
+  install_default_signal_handlers ();
+
   return true;
 }
 
@@ -25,11 +27,7 @@ bool application::shut_down ()
 
 void application::run ()
 {
-  if (! install_default_signal_handlers() ||
-      ! start_up())
-    return;
-
-  while (s_keep_running)
+  while (update () && s_keep_running)
     s_keep_running = update () && s_keep_running;
 
   shut_down ();

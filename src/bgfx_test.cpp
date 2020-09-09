@@ -25,11 +25,14 @@ using namespace charm;
 // BUILDING SHADERS
 // i haven't automated building shaders yet, so here is the command i
 // used from the root of the project directory:
-// bld/shaderc -i bgfx/src -f src/vs_quad.sc -o bld/vs_quad.bin --type vertex --varyingdef src/quad_varying.def.sc
-// bld/shaderc -i bgfx/src -f src/fs_quad.sc -o bld/fs_quad.bin --type fragment --varyingdef src/quad_varying.def.sc
+// bld/shaderc -i bgfx/src -f src/vs_quad.sc -o bld/vs_quad.bin --type vertex --varyingdef src/quad_varying.def.sc --profile 460
+// bld/shaderc -i bgfx/src -f src/fs_quad.sc -o bld/fs_quad.bin --type fragment --varyingdef src/quad_varying.def.sc --profile 460
 // -i: include directory
 // -f: shader file
 // --varyingdef: file defining inputs and outputs from shaders
+// --platform: which shader language to compile. to specify GLSL version,
+//   use version number with decimal shifted right two places.
+// for other questions, peruse shaderc.cpp
 
 //borrowing from example:
 //https://github.com/jpcy/bgfx-minimal-example/blob/master/helloworld.cpp

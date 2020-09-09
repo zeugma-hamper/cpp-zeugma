@@ -127,7 +127,7 @@ void Node::append_child (Node *_node)
     _node->m_parent->excise_child (_node);
 
   _node->m_parent = this;
-  _node->m_layer = m_layer;
+  _node->set_layer (m_layer);
 
   m_children.push_back (_node);
 }
@@ -146,12 +146,20 @@ Node *Node::excise_child (Node *_node)
 
   Node *n = *it;
   m_children.erase (it);
+  n->set_layer (nullptr);
   return n;
 }
 
 void Node::append_renderable (Renderable *_render)
 {
+  if (! _render)
+    return;
+
   m_renderables.push_back (_render);
+  _render->m_node = this;
+
+  if (m_layer)
+    m_layer->get_renderables().push_back(_render);
 }
 
 void Node::remove_renderable (Renderable *_render)
@@ -168,8 +176,32 @@ Renderable *Node::excise_renderable (Renderable *_render)
 
   Renderable *r = *it;
   m_renderables.erase (it);
+  if (m_layer)
+    m_layer->remove_renderable (r);
+
   return r;
 }
+
+void Node::set_layer (Layer *_layer)
+{
+  if (m_layer)
+    m_layer->remove_renderables(m_renderables);
+
+  m_layer = _layer;
+  if (m_layer)
+    m_layer->m_renderables.insert(m_layer->m_renderables.end (),
+                                  m_renderables.begin (),
+                                  m_renderables.end ());
+
+  for (Node *child : m_children)
+    child->set_layer (_layer);
+}
+
+Layer *Node::get_layer () const
+{
+  return m_layer;
+}
+
 
 TransformationSoftValue &Node::get_absolute_transformation_soft ()
 {
@@ -202,9 +234,12 @@ glm::mat4 const &Node::get_normal_transformation () const
 }
 
 Layer::Layer ()
-  : m_projection_matrix {1.0f},
+  : m_root_node {},
+    m_projection_matrix {1.0f},
     m_camera_matrix {1.0f}
-{ }
+{
+  m_root_node.set_layer(this);
+}
 
 Layer::~Layer ()
 {
@@ -239,6 +274,11 @@ glm::mat4 const &Layer::get_camera_matrix () const
 void Layer::set_camera_matrix (glm::mat4 const &_cam)
 {
   m_camera_matrix = _cam;
+}
+
+void Layer::remove_renderable (Renderable *_rend)
+{
+  m_renderables.erase (std::remove (m_renderables.begin (), m_renderables.end (), _rend));
 }
 
 void Layer::remove_renderables (std::vector<Renderable *> const &_rends)
