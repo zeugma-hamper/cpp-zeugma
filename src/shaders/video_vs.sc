@@ -2,7 +2,7 @@ $output v_uv
 
 #include <bgfx_shader.sh>
 
-uniform float u_aspect_ratio;
+uniform vec4 u_aspect_ratio;
 
 void main()
 {
@@ -16,6 +16,6 @@ void main()
                                vec2 (1.0, 0.0),
                                vec2 (1.0, 1.0));
  
-  gl_Position = mul (u_modelViewProj, positions[gl_VertexID] * vec4 (1.0, 1.0/u_aspect_ratio, 1.0, 1.0));
+  gl_Position = mul (u_modelViewProj, positions[gl_VertexID] * u_aspect_ratio);
   v_uv = uvs[gl_VertexID];  
 } 

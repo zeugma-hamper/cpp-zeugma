@@ -21,6 +21,8 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include <string_view>
 
 #include <stdio.h>
@@ -58,10 +60,6 @@ class dead_zone final : public charm::application
   Layer *m_scene_graph_layer;
 };
 
-void release_gst_sample (void *_ptr, void *_user)
-{
-}
-
 class VideoRenderable final : public Renderable
 {
  public:
@@ -73,25 +71,28 @@ class VideoRenderable final : public Renderable
       m_video_pipeline {nullptr},
       m_terminus {nullptr}
   {
+    m_uni_vid_texture = bgfx::createUniform("u_video_texture", bgfx::UniformType::Sampler);
+    m_uni_aspect_ratio = bgfx::createUniform("u_aspect_ratio", bgfx::UniformType::Vec4);
+
     // see compile_shader.sh in project root
     ProgramResiduals ps = create_program ("video_vs.bin", "video_fs.bin", true);
     m_program = ps.program;
 
-    m_uni_vid_texture = bgfx::createUniform("u_video_texture", bgfx::UniformType::Sampler);
-
     m_terminus = new BasicPipelineTerminus (false);
     m_video_pipeline = new DecodePipeline;
     m_video_pipeline->open (_uri, m_terminus);
+    m_video_pipeline->play();
   }
 
   ~VideoRenderable () override
   {
-    delete m_video_pipeline;
-    m_terminus = nullptr;
-
+    bgfx::destroy (m_uni_aspect_ratio);
     bgfx::destroy (m_uni_vid_texture);
     bgfx::destroy (m_program);
     bgfx::destroy (m_texture);
+
+    delete m_video_pipeline;
+    m_terminus = nullptr;
   }
 
   // static int calculate_alignment (int _stride)
@@ -136,7 +137,7 @@ class VideoRenderable final : public Renderable
   {
     GstCaps *sample_caps = gst_sample_get_caps(_sample.get ());
     GstVideoInfo video_info;
-    int width, height, components, stride, align;
+    int width, height, components, stride;
 
     if (! sample_caps)
       return;
@@ -158,11 +159,13 @@ class VideoRenderable final : public Renderable
 
     if (! bgfx::isValid(m_texture))
       {
-        bgfx::TextureFormat::Enum const formats[4]
-          { bgfx::TextureFormat::R8U,
-            bgfx::TextureFormat::RG8U,
-            bgfx::TextureFormat::RGB8U,
-            bgfx::TextureFormat::RGBA8U };
+        fprintf (stderr, "create video texture\n");
+        bgfx::TextureFormat::Enum const formats[5]
+          { bgfx::TextureFormat::Unknown, //shouldn't happen
+            bgfx::TextureFormat::R8,
+            bgfx::TextureFormat::RG8,
+            bgfx::TextureFormat::RGB8,
+            bgfx::TextureFormat::RGBA8 };
 
         m_texture = bgfx::createTexture2D(width, height, false, 1,
                                           formats[components],
@@ -181,10 +184,15 @@ class VideoRenderable final : public Renderable
 
   void update () override
   {
+    // static int count = 0;
+    // if (++count % 10 == 0)
+    //   fprintf (stderr, "v.r. update\n");
+
     if (m_video_pipeline)
       {
+
         m_video_pipeline->poll_messages ();
-        gst_ptr<GstSample> new_sample = m_terminus->fetch_sample();
+        gst_ptr<GstSample> new_sample = m_terminus->fetch_clear_sample();
 
         if (new_sample)
           upload_sample(new_sample);
@@ -195,15 +203,19 @@ class VideoRenderable final : public Renderable
   {
     if (! bgfx::isValid(m_texture))
       return;
+
     //later: BGFX_STATE_WRITE_A |
     //       BGFX_ uhhh... blending
     u64 const state = BGFX_STATE_WRITE_RGB |
       BGFX_STATE_PT_TRISTRIP |
       BGFX_STATE_WRITE_Z;
 
+    bgfx::setTransform(&m_node->get_absolute_model_transformation());
     bgfx::setState(state);
     bgfx::setVertexCount(4);
     bgfx::setTexture(0, m_uni_vid_texture, m_texture);
+    glm::vec4 unity {1.0f};
+    bgfx::setUniform(m_uni_aspect_ratio, glm::value_ptr (unity));
     bgfx::submit(0, m_program);
   }
 
@@ -211,6 +223,7 @@ class VideoRenderable final : public Renderable
   bgfx::ProgramHandle m_program;
   bgfx::TextureHandle m_texture;
   bgfx::UniformHandle m_uni_vid_texture;
+  bgfx::UniformHandle m_uni_aspect_ratio;
   DecodePipeline *m_video_pipeline;
   BasicPipelineTerminus *m_terminus;
 };
@@ -331,6 +344,7 @@ bool dead_zone::init_windowing_and_graphics ()
   glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint (GLFW_CLIENT_API, GLFW_OPENGL_API);
+  glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   GLFWwindow *window = glfwCreateWindow (1920, 1080, "dead zone", nullptr, nullptr);
   if (! window)
@@ -363,6 +377,9 @@ bool dead_zone::init_windowing_and_graphics ()
   // so that id number is used as the depth.
   bgfx::setViewMode (0, bgfx::ViewMode::DepthAscending);
 
+  glm::mat4 ident{1.0f};
+  bgfx::setViewTransform(0, glm::value_ptr (ident), glm::value_ptr (ident));
+
   return true;
 }
 
@@ -378,6 +395,9 @@ void dead_zone::render ()
     r->update ();
 
   bgfx::touch (0);
+
+  glm::mat4 ident{1.0f};
+  bgfx::setViewTransform(0, glm::value_ptr (ident), glm::value_ptr (ident));
 
   for (Renderable *r : m_scene_graph_layer->get_renderables())
     r->draw();
