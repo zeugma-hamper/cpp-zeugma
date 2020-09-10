@@ -128,7 +128,7 @@ class gst_ptr
   { }
 
   gst_ptr (gst_ptr &&_ptr)
-    : object {ref_funcs::ref (_ptr.get ())}
+    : object {_ptr.get ()}
   {
     _ptr.object = nullptr;
   }
@@ -173,7 +173,17 @@ class gst_ptr
     return object != nullptr;
   }
 
-  gst_ptr ref ()
+  bool operator== (gst_ptr const &_ptr) const noexcept
+  {
+    return object == _ptr.object;
+  }
+
+  bool operator!= (gst_ptr const &_ptr) const noexcept
+  {
+    return object != _ptr.object;
+  }
+
+  gst_ptr ref () const
   {
     return gst_ptr {*this};
   }
