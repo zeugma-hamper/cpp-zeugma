@@ -4,7 +4,7 @@
 
 #include "DecodePipeline.hpp"
 
-namespace literal {
+namespace charm {
 
 PipelineTerminus::PipelineTerminus ()
 { }

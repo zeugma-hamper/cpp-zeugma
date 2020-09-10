@@ -8,7 +8,7 @@
 
 #include <mutex>
 
-namespace literal {
+namespace charm {
 
 class DecodePipeline;
 

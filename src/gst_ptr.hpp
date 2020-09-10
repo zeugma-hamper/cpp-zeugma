@@ -3,7 +3,7 @@
 
 #include <gst/gst.h>
 
-namespace literal {
+namespace charm {
 
 template<typename T>
 struct gst_ref_functions;

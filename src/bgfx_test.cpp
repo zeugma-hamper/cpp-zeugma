@@ -135,9 +135,9 @@ struct Rectangle
     vbh = bgfx::createVertexBuffer(vb_mem, layout);
 
     // see note about building shaders above
-    bx::FilePath shader_path = "vs_quad.bin";
+    bx::FilePath shader_path = "quad_vs.bin";
     bgfx::ShaderHandle vs = create_shader (shader_path);
-    shader_path = bx::StringView("fs_quad.bin");
+    shader_path = bx::StringView("quad_fs.bin");
     bgfx::ShaderHandle fs = create_shader (shader_path);
 
     if (bgfx::isValid(vs) && bgfx::isValid (fs))
@@ -182,6 +182,8 @@ int main (int, char **)
   glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint (GLFW_CLIENT_API, GLFW_OPENGL_API);
+  glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+  glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GLFW_FALSE);
 
   GLFWwindow *window = glfwCreateWindow (1920, 1080, "bgfx test", nullptr, nullptr);
   if (! window)

@@ -3,7 +3,9 @@
 #include <utils.hpp>
 
 #include <AnimationSystem.hpp>
+#include <DecodePipeline.hpp>
 #include <FrameTime.hpp>
+#include <PipelineTerminus.hpp>
 #include <SceneGraph.hpp>
 
 #include <bgfx_utils.hpp>
@@ -18,6 +20,8 @@
 #define GLFW_EXPOSE_NATIVE_GLX
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
+
+#include <string_view>
 
 #include <stdio.h>
 
@@ -54,52 +58,161 @@ class dead_zone final : public charm::application
   Layer *m_scene_graph_layer;
 };
 
+void release_gst_sample (void *_ptr, void *_user)
+{
+}
+
 class VideoRenderable final : public Renderable
 {
  public:
-  VideoRenderable ()
+  VideoRenderable (std::string_view _uri)
     : Renderable (),
       m_program {BGFX_INVALID_HANDLE},
-      m_texture {BGFX_INVALID_HANDLE}
+      m_texture {BGFX_INVALID_HANDLE},
+      m_uni_vid_texture {BGFX_INVALID_HANDLE},
+      m_video_pipeline {nullptr},
+      m_terminus {nullptr}
   {
-    // see note about building shaders above
-    bx::FilePath shader_path = "vs_quad.bin";
-    bgfx::ShaderHandle vs = create_shader (shader_path);
-    shader_path = bx::StringView("fs_quad.bin");
-    bgfx::ShaderHandle fs = create_shader (shader_path);
+    // see compile_shader.sh in project root
+    ProgramResiduals ps = create_program ("video_vs.bin", "video_fs.bin", true);
+    m_program = ps.program;
 
-    if (bgfx::isValid(vs) && bgfx::isValid (fs))
+    m_uni_vid_texture = bgfx::createUniform("u_video_texture", bgfx::UniformType::Sampler);
+
+    m_terminus = new BasicPipelineTerminus (false);
+    m_video_pipeline = new DecodePipeline;
+    m_video_pipeline->open (_uri, m_terminus);
+  }
+
+  ~VideoRenderable () override
+  {
+    delete m_video_pipeline;
+    m_terminus = nullptr;
+
+    bgfx::destroy (m_uni_vid_texture);
+    bgfx::destroy (m_program);
+    bgfx::destroy (m_texture);
+  }
+
+  // static int calculate_alignment (int _stride)
+  // {
+  //   assert (_stride > 0);
+
+  //   if (! (_stride & 7))
+  //     return 8;
+  //   else if (! (_stride & 3))
+  //     return 4;
+  //   else if (! (_stride & 1))
+  //     return 2;
+
+  //   return 1;
+  // }
+
+  struct video_frame_holder
+  {
+    gst_ptr<GstSample> sample;
+    GstVideoFrame video_frame;
+
+    video_frame_holder (gst_ptr<GstSample> const &_sample, GstVideoInfo *_info)
+      : sample {_sample}
+    {
+      GstBuffer *buffer = gst_sample_get_buffer(_sample.get ());
+      gst_video_frame_map (&video_frame, _info, buffer, GST_MAP_READ);
+    }
+
+    ~video_frame_holder ()
+    {
+      gst_video_frame_unmap(&video_frame);
+    }
+  };
+
+  static void free_video_holder (void *, void *_user_data)
+  {
+    video_frame_holder *holder = (video_frame_holder *)_user_data;
+    delete holder;
+  }
+
+  void upload_sample (gst_ptr<GstSample> const &_sample)
+  {
+    GstCaps *sample_caps = gst_sample_get_caps(_sample.get ());
+    GstVideoInfo video_info;
+    int width, height, components, stride, align;
+
+    if (! sample_caps)
+      return;
+
+    gst_video_info_init(&video_info);
+    if (! gst_video_info_from_caps (&video_info, sample_caps))
+      return;
+
+    if (! GST_VIDEO_INFO_IS_RGB (&video_info))
+      return;
+
+    width = GST_VIDEO_INFO_WIDTH (&video_info);
+    height = GST_VIDEO_INFO_HEIGHT (&video_info);
+    components = GST_VIDEO_INFO_N_COMPONENTS (&video_info);
+    //RGB is all one plane
+    stride = GST_VIDEO_INFO_PLANE_STRIDE(&video_info, 0);
+    // align = calculate_alignment (stride);
+    (void)components;
+
+    if (! bgfx::isValid(m_texture))
       {
-        fprintf (stderr, "creating shader\n");
-        m_program = bgfx::createProgram(vs, fs, true);
+        bgfx::TextureFormat::Enum const formats[4]
+          { bgfx::TextureFormat::R8U,
+            bgfx::TextureFormat::RG8U,
+            bgfx::TextureFormat::RGB8U,
+            bgfx::TextureFormat::RGBA8U };
+
+        m_texture = bgfx::createTexture2D(width, height, false, 1,
+                                          formats[components],
+                                          BGFX_SAMPLER_UVW_CLAMP |
+                                          BGFX_SAMPLER_POINT);
       }
-    else
-      {
-        bgfx::destroy (vs);
-        bgfx::destroy (fs);
-      }
+
+    video_frame_holder *frame_holder = new video_frame_holder (_sample, &video_info);
+
+    const bgfx::Memory *mem = bgfx::makeRef (GST_VIDEO_FRAME_PLANE_DATA(&frame_holder->video_frame, 0),
+                                             GST_VIDEO_FRAME_SIZE(&frame_holder->video_frame),
+                                             free_video_holder, frame_holder);
+
+    bgfx::updateTexture2D(m_texture, 0, 0, 0, 0, width, height, mem, stride);
   }
 
   void update () override
   {
+    if (m_video_pipeline)
+      {
+        m_video_pipeline->poll_messages ();
+        gst_ptr<GstSample> new_sample = m_terminus->fetch_sample();
+
+        if (new_sample)
+          upload_sample(new_sample);
+      }
   }
 
   void draw () override
   {
+    if (! bgfx::isValid(m_texture))
+      return;
     //later: BGFX_STATE_WRITE_A |
     //       BGFX_ uhhh... blending
     u64 const state = BGFX_STATE_WRITE_RGB |
       BGFX_STATE_PT_TRISTRIP |
       BGFX_STATE_WRITE_Z;
 
+    bgfx::setState(state);
     bgfx::setVertexCount(4);
+    bgfx::setTexture(0, m_uni_vid_texture, m_texture);
     bgfx::submit(0, m_program);
   }
 
  private:
   bgfx::ProgramHandle m_program;
   bgfx::TextureHandle m_texture;
-  std::vector<bgfx::UniformHandle *> m_uniforms;
+  bgfx::UniformHandle m_uni_vid_texture;
+  DecodePipeline *m_video_pipeline;
+  BasicPipelineTerminus *m_terminus;
 };
 
 class RectangleRenderable final : public Renderable
@@ -113,7 +226,7 @@ class RectangleRenderable final : public Renderable
     struct vvertex
     {
       glm::vec3 position;
-      glm::vec4 uv;
+      glm::vec4 color;
     };
 
     const vvertex combined[] = {
@@ -133,9 +246,9 @@ class RectangleRenderable final : public Renderable
     vbh = bgfx::createVertexBuffer(vb_mem, layout);
 
     // see note about building shaders above
-    bx::FilePath shader_path = "vs_quad.bin";
+    bx::FilePath shader_path = "quad_vs.bin";
     bgfx::ShaderHandle vs = create_shader (shader_path);
-    shader_path = bx::StringView("fs_quad.bin");
+    shader_path = bx::StringView("quad_fs.bin");
     bgfx::ShaderHandle fs = create_shader (shader_path);
 
     if (bgfx::isValid(vs) && bgfx::isValid (fs))
@@ -261,6 +374,9 @@ void dead_zone::shut_down_graphics ()
 
 void dead_zone::render ()
 {
+  for (Renderable *r : m_scene_graph_layer->get_renderables())
+    r->update ();
+
   bgfx::touch (0);
 
   for (Renderable *r : m_scene_graph_layer->get_renderables())
@@ -277,7 +393,6 @@ dead_zone::dead_zone ()
 
 dead_zone::~dead_zone ()
 {
-  delete m_scene_graph_layer;
 }
 
 bool dead_zone::start_up ()
@@ -345,7 +460,10 @@ int main (int, char **)
   Layer &layer = zone.get_scene_layer();
 
   Node *node = new Node ();
-  node->append_renderable(new RectangleRenderable ());
+  VideoRenderable *renderable
+    = new VideoRenderable ("file:///home/blake/tlp/tamper-blu-mkv/The Fall_t00.mkv");
+
+  node->append_renderable(renderable);
   layer.root_node()->append_child(node);
 
   zone.run ();

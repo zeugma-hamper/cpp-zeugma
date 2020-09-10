@@ -36,7 +36,40 @@ bgfx::ShaderHandle create_shader (bx::FilePath const &_path)
   if (! memory)
     return BGFX_INVALID_HANDLE;
 
-  return bgfx::createShader (memory);
+  bgfx::ShaderHandle handle = bgfx::createShader (memory);
+  if (! bgfx::isValid(handle))
+    bgfx::setName (handle, _path.getFileName().getPtr(), _path.getFileName().getLength());
+
+  return handle;
+}
+
+ProgramResiduals create_program (bx::FilePath const &_vert_path,
+                                 bx::FilePath const &_frag_path,
+                                 bool _destroy_shaders)
+{
+  bgfx::ShaderHandle vs = create_shader (_vert_path);
+  if (! bgfx::isValid(vs))
+    return {};
+
+  bgfx::ShaderHandle fs = create_shader (_frag_path);
+  if (! bgfx::isValid(fs))
+    {
+      bgfx::destroy (vs);
+      return {};
+    }
+
+  bgfx::ProgramHandle prog = bgfx::createProgram(vs, fs, _destroy_shaders);
+  if (! bgfx::isValid(prog))
+    {
+      bgfx::destroy (vs);
+      bgfx::destroy (fs);
+      return {};
+    }
+
+  if (_destroy_shaders)
+    return {prog, BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE};
+  else
+    return {prog, vs, fs};
 }
 
 std::vector<bgfx::UniformHandle> get_shader_uniforms (bgfx::ShaderHandle _sh)

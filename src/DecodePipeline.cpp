@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-namespace literal {
+namespace charm {
 
 DecodePipeline::DecodePipeline ()
   : m_terminus {nullptr},
@@ -189,7 +189,7 @@ static void db_pad_added_handler (GstElement *src, GstPad *new_pad, DecodePipeli
 }
 
 static gboolean db_autoplug_continue_handler (GstElement *, GstPad *,
-                                              GstCaps *caps, DecodePipeline *)
+                                              GstCaps *, DecodePipeline *)
 {
   // TODO: here later select the hardware decoder
   // GstStructure *structure = gst_caps_get_structure (caps, 0);
