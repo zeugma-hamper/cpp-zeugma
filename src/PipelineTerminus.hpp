@@ -39,6 +39,8 @@ class BasicPipelineTerminus : public PipelineTerminus
   bool on_shutdown     (DecodePipeline *) override;
 
   gst_ptr<GstSample> fetch_sample ();
+  gst_ptr<GstSample> fetch_clear_sample ();
+
 
   bool handle_audio_pad (DecodePipeline *, GstElement *, GstPad *, const char *);
   bool handle_video_pad (DecodePipeline *, GstElement *, GstPad *, const char *);

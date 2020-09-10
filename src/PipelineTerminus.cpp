@@ -74,6 +74,19 @@ gst_ptr<GstSample> BasicPipelineTerminus::fetch_sample ()
   return {};
 }
 
+gst_ptr<GstSample> BasicPipelineTerminus::fetch_clear_sample ()
+{
+  std::unique_lock lock (m_sample_mutex);
+  if (m_sample)
+    {
+      gst_ptr<GstSample> ret {std::move (m_sample)};
+      m_sample.reset ();
+      return ret;
+    }
+
+  return {};
+}
+
 bool
 BasicPipelineTerminus::handle_audio_pad (DecodePipeline *_pipe, GstElement *, GstPad *_src_pad, const char *)
 {
