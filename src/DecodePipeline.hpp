@@ -3,7 +3,7 @@
 
 #include <base_types.hpp>
 
-#include <utils.hpp>
+#include <class_utils.hpp>
 
 #include <gst/gst.h>
 #include <gst/video/video-info.h>

@@ -18,6 +18,9 @@ namespace charm
   using f64 = double;
 
   using szt = size_t;
+
+  using sort_key = u64;
+  using graph_id = u64;
 }
 
 #endif

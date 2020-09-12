@@ -1,7 +1,7 @@
 #ifndef ALL_ABOARD_NIGHT_TRAIN
 #define ALL_ABOARD_NIGHT_TRAIN
 
-#include "utils.hpp"
+#include "class_utils.hpp"
 #include "gst_ptr.hpp"
 
 #include <gst/gst.h>

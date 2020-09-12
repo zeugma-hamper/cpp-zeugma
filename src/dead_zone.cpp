@@ -1,12 +1,14 @@
 #include <application.hpp>
 #include <base_types.hpp>
-#include <utils.hpp>
+#include <class_utils.hpp>
 
 #include <AnimationSystem.hpp>
 #include <DecodePipeline.hpp>
 #include <FrameTime.hpp>
 #include <PipelineTerminus.hpp>
-#include <SceneGraph.hpp>
+#include <Layer.hpp>
+#include <Node.hpp>
+#include <Renderable.hpp>
 
 #include <bgfx_utils.hpp>
 
@@ -21,6 +23,7 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <string_view>
@@ -94,20 +97,6 @@ class VideoRenderable final : public Renderable
     delete m_video_pipeline;
     m_terminus = nullptr;
   }
-
-  // static int calculate_alignment (int _stride)
-  // {
-  //   assert (_stride > 0);
-
-  //   if (! (_stride & 7))
-  //     return 8;
-  //   else if (! (_stride & 3))
-  //     return 4;
-  //   else if (! (_stride & 1))
-  //     return 2;
-
-  //   return 1;
-  // }
 
   struct video_frame_holder
   {
@@ -184,13 +173,8 @@ class VideoRenderable final : public Renderable
 
   void update () override
   {
-    // static int count = 0;
-    // if (++count % 10 == 0)
-    //   fprintf (stderr, "v.r. update\n");
-
     if (m_video_pipeline)
       {
-
         m_video_pipeline->poll_messages ();
         gst_ptr<GstSample> new_sample = m_terminus->fetch_clear_sample();
 
@@ -215,6 +199,7 @@ class VideoRenderable final : public Renderable
     bgfx::setVertexCount(4);
     bgfx::setTexture(0, m_uni_vid_texture, m_texture);
     glm::vec4 unity {1.0f};
+    unity.y = 1080.0f/1920.0f;
     bgfx::setUniform(m_uni_aspect_ratio, glm::value_ptr (unity));
     bgfx::submit(0, m_program);
   }
@@ -377,8 +362,13 @@ bool dead_zone::init_windowing_and_graphics ()
   // so that id number is used as the depth.
   bgfx::setViewMode (0, bgfx::ViewMode::DepthAscending);
 
-  glm::mat4 ident{1.0f};
-  bgfx::setViewTransform(0, glm::value_ptr (ident), glm::value_ptr (ident));
+  glm::mat4 view_transform = glm::lookAt (glm::vec3 {0.0f, 0.0f, 10.0f},
+                                          glm::vec3 {0.0f, 0.0f, 2.0f},
+                                          glm::vec3 {0.0f, 1.0f, 0.0f});
+  glm::mat4 proj_transform = glm::perspectiveFov (glm::pi<float> ()/4.0f,
+                                                  1920.0f, 1080.0f, 0.5f, 10.0f);
+  bgfx::setViewTransform(0, glm::value_ptr (view_transform),
+                         glm::value_ptr (proj_transform));
 
   return true;
 }
@@ -396,8 +386,12 @@ void dead_zone::render ()
 
   bgfx::touch (0);
 
-  glm::mat4 ident{1.0f};
-  bgfx::setViewTransform(0, glm::value_ptr (ident), glm::value_ptr (ident));
+  glm::mat4 view_transform = glm::lookAt (glm::vec3 {0.0f, 0.0f, 10.0f},
+                                          glm::vec3 {0.0f, 0.0f, 2.0f},
+                                          glm::vec3 {0.0f, 1.0f, 0.0f});
+  glm::mat4 proj_transform = glm::perspective (47.0f, 1920.0f/1080.0f, 0.5f, 10.0f);
+  bgfx::setViewTransform(0, glm::value_ptr (view_transform),
+                         glm::value_ptr (proj_transform));
 
   for (Renderable *r : m_scene_graph_layer->get_renderables())
     r->draw();
@@ -480,6 +474,10 @@ int main (int, char **)
   Layer &layer = zone.get_scene_layer();
 
   Node *node = new Node ();
+
+  node->get_transform_components_soft().get_value().translation = glm::vec3 {0.0f, 0.0f, 9.0f};
+  node->get_transform_components_soft().get_value().scale = glm::vec3 {20.0f};
+  node->get_transform_components_soft().set_dirty(true);
   VideoRenderable *renderable
     = new VideoRenderable ("file:///home/blake/tlp/tamper-blu-mkv/The Fall_t00.mkv");
 

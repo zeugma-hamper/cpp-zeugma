@@ -1,21 +1,20 @@
-
-#ifndef THIRD_TIME
-#define THIRD_TIME
+#ifndef NODULAR_BITS
+#define NODULAR_BITS
 
 #include "base_types.hpp"
 #include "SoftValue.hpp"
-#include "AnimationSystem.hpp"
-#include "utils.hpp"
+#include "class_utils.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include <cstdint>
 #include <vector>
-
 
 namespace charm
 {
+
+class Layer;
+class Renderable;
 
 struct TransformComponents
 {
@@ -34,41 +33,6 @@ struct Transformation
 
 using TransformationSoftValue = SoftValue<Transformation>;
 
-class Renderable;
-class Node;
-class Layer;
-
-class Renderable
-{
- public:
-  friend Node;
-
-  using sort_key = std::uint64_t;
-  using graph_id = std::uint64_t;
-
-  Renderable ();
-  Renderable (Node *_node);
-  virtual ~Renderable ();
-
-  CHARM_DELETE_MOVE_COPY (Renderable);
-
-  virtual void update ();
-  virtual void draw () = 0;
-
-  bool should_draw () const;
-
-  void set_should_draw (bool _tf);
-
-  sort_key get_sort_key () const;
-  graph_id get_graph_id () const;
-
- protected:
-  Node *m_node;
-  sort_key m_sort_key;
-  graph_id m_graph_id;
-  bool m_should_draw;
-};
-
 class Node
 {
  public:
@@ -83,7 +47,7 @@ class Node
   void update_transformations (TransformationSoftValue const &_parent_tx);
 
   void enumerate_renderables ();
-  void enumerate_renderables (Renderable::graph_id &_id);
+  void enumerate_renderables (graph_id &_id);
 
   // node takes ownership of child nodes
   void append_child (Node *_node);
@@ -99,6 +63,8 @@ class Node
 
   void set_layer (Layer *_layer);
   Layer *get_layer () const;
+
+  TransformComponentsSoftValue &get_transform_components_soft ();
 
   TransformationSoftValue &get_absolute_transformation_soft ();
   glm::mat4 const &get_absolute_model_transformation () const;
@@ -119,37 +85,6 @@ class Node
   TransformationSoftValue m_absolute_tx;
 };
 
-class Layer
-{
- public:
-  friend Node;
-
-  Layer ();
-  ~Layer ();
-
-  CHARM_DELETE_COPY  (Layer);
-  CHARM_DEFAULT_MOVE (Layer);
-
-  Node *root_node ();
-
-  std::vector<Renderable *> &get_renderables ();
-
-  glm::mat4 const &get_projection_matrix () const;
-  void set_projection_matrix (glm::mat4 const &_proj);
-
-  glm::mat4 const &get_camera_matrix () const;
-  void set_camera_matrix (glm::mat4 const &_cam);
-
- protected:
-
-  void remove_renderable (Renderable *_rend);
-  void remove_renderables (std::vector<Renderable *> const &_rends);
-
-  Node m_root_node;
-  std::vector<Renderable *> m_renderables;
-  glm::mat4 m_projection_matrix;
-  glm::mat4 m_camera_matrix;
-};
-
 }
-#endif //THIRD_TIME
+
+#endif //NODULAR_BITS

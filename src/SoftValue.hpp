@@ -1,3 +1,6 @@
+#ifndef NOT_FIRM_BUT_NOT_HARD
+#define NOT_FIRM_BUT_NOT_HARD
+
 #include "base_types.hpp"
 #include <glm/glm.hpp>
 
@@ -111,3 +114,5 @@ struct AnimSoftValue : public SoftValue<V>
 };
 
 }
+
+#endif //NOT_FIRM_BUT_NOT_HARD

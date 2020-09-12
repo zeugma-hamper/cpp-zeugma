@@ -1,5 +1,5 @@
 
-#include <utils.hpp>
+#include <class_utils.hpp>
 #include <bx/bx.h>
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
