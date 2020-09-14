@@ -1,7 +1,11 @@
 #include "AnimationSystem.hpp"
 
+#include "Animation.hpp"
+
 namespace charm
 {
+
+static AnimationSystem *s_animation_system {nullptr};
 
 AnimationSystem::AnimationSystem ()
   : m_current_step {0u}
@@ -44,36 +48,25 @@ void AnimationSystem::update_animations (double timestamp, double delta)
     }
 }
 
-Animation::Animation ()
-  : m_id {0u},
-    m_state {State::Start},
-    m_last_step {0u}
-{ }
-
-Animation::~Animation ()
-{ }
-
-Animation::id Animation::get_id () const
+void AnimationSystem::add_animation(Animation *_animation)
 {
-  return m_id;
+  m_animations.push_back(_animation);
 }
 
-State Animation::get_state () const
+void AnimationSystem::initialize ()
 {
-  return m_state;
+  s_animation_system = new AnimationSystem;
 }
 
-void Animation::set_finished ()
+void AnimationSystem::shut_down ()
 {
-  m_state = State::Finished;
+  delete s_animation_system;
+  s_animation_system = nullptr;
 }
 
-State Animation::update (double _timestamp, double _delta, AnimationSystem::step _step)
+AnimationSystem *AnimationSystem::get_system ()
 {
-  if (m_state == State::Finished || m_last_step == _step)
-    return m_state;
-
-  return (m_state = do_update (_timestamp, _delta));
+  return s_animation_system;
 }
 
 }

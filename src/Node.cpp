@@ -34,7 +34,7 @@ Node::~Node ()
 
 void Node::update_transformations ()
 {
-  TransformationSoftValue tsv {{glm::mat4{1.0}, glm::mat4{1.0f}}};
+  TransformationSoftValue tsv;
   update_transformations (tsv);
 }
 
@@ -49,8 +49,7 @@ void Node::update_transformations (TransformationSoftValue const &_parent_tx)
       m_tx.set_dirty (true);
       TransformComponents &txc = m_tx_components.get_value ();
       Transformation &tx = m_tx.get_value ();
-      glm::mat4 const rs = glm::mat4_cast(txc.rotation) *
-        glm::scale (txc.scale);
+      glm::mat4 const rs = glm::mat4_cast(txc.rotation) * glm::scale (txc.scale);
 
       tx.model = glm::translate (txc.translation) * rs;
       tx.normal = glm::inverseTranspose (rs);
@@ -174,6 +173,20 @@ TransformComponentsSoftValue &Node::get_transform_components_soft ()
   return m_tx_components;
 }
 
+glm::vec3 const &Node::get_translation () const
+{
+  return m_tx_components.get_translation();
+}
+
+glm::quat const &Node::get_rotation () const
+{
+  return m_tx_components.get_rotation();
+}
+
+glm::vec3 const &Node::get_scale () const
+{
+  return m_tx_components.get_scale();
+}
 
 TransformationSoftValue &Node::get_absolute_transformation_soft ()
 {
@@ -182,29 +195,60 @@ TransformationSoftValue &Node::get_absolute_transformation_soft ()
 
 glm::mat4 const &Node::get_absolute_model_transformation () const
 {
-  return m_absolute_tx.get_value().model;
+  return m_absolute_tx.get_model();
 }
 
 glm::mat4 const &Node::get_absolute_normal_transformation () const
 {
-  return m_absolute_tx.get_value().normal;
+  return m_absolute_tx.get_normal();
 }
 
-
-TransformationSoftValue &Node::get_transformation_soft ()
+TransformationAnimSoftValue &Node::get_transformation_soft ()
 {
   return m_tx;
 }
 
 glm::mat4 const &Node::get_model_transformation () const
 {
-  return m_tx.get_value().model;
+  return m_tx.get_model();
 }
 
 glm::mat4 const &Node::get_normal_transformation () const
 {
-  return m_tx.get_value().normal;
+  return m_tx.get_normal();
 }
 
+void Node::install_component_animation (ComponentAnimation *_animation)
+{
+  if (_animation)
+    {
+      _animation->set_soft_value(&m_tx_components);
+      m_tx_components.set_animation(_animation);
+      m_tx_components.set_dirty(true);
+      AnimationSystem::get_system()->add_animation(_animation);
+    }
+}
+
+Animation *Node::get_component_animation () const
+{
+  return m_tx_components.get_animation();
+}
+
+
+void Node::install_transform_animation (TransformationAnimation *_animation)
+{
+  if (_animation)
+    {
+      _animation->set_soft_value(&m_tx);
+      m_tx.set_animation(_animation);
+      m_tx.set_dirty(true);
+      AnimationSystem::get_system()->add_animation(_animation);
+    }
+}
+
+Animation *Node::get_transformation_animation () const
+{
+  return m_tx.get_animation();
+}
 
 }

@@ -1,8 +1,10 @@
-#ifndef NOT_FIRM_BUT_NOT_HARD
-#define NOT_FIRM_BUT_NOT_HARD
+#ifndef NOT_FIRM_AND_NOT_HARD
+#define NOT_FIRM_AND_NOT_HARD
 
+#include "Animation.hpp"
 #include "base_types.hpp"
-#include <glm/glm.hpp>
+
+#include <utility>
 
 // dislike the names? me too!
 
@@ -21,9 +23,9 @@ struct SoftValue
       m_dirty_flag {false}
   {}
 
-  SoftValue (V const &_v)
+  explicit SoftValue (V const &_v)
     : m_value {_v},
-      m_dirty_flag {false}
+      m_dirty_flag {true}
   { }
 
   SoftValue &operator= (V const &_v)
@@ -57,6 +59,18 @@ struct SoftValue
     return m_value;
   }
 
+  void set (ValueType const &_v)
+  {
+    m_value = _v;
+    set_dirty (true);
+  }
+
+  void set (ValueType &&_v)
+  {
+    m_value = std::move (_v);
+    set_dirty (true);
+  }
+
   void clear_dirty ()
   {
     m_dirty_flag = false;
@@ -84,12 +98,12 @@ struct AnimSoftValue : public SoftValue<V>
 
   AnimSoftValue ()
     : SoftValue<V> {},
-      m_animation {nullptr}
+      m_animation  {nullptr}
   {}
 
-  AnimSoftValue (V const &_v)
+  explicit AnimSoftValue (V const &_v)
     : SoftValue<V> {_v},
-      m_animation {nullptr}
+      m_animation  {nullptr}
   { }
 
   ~AnimSoftValue ()
@@ -102,6 +116,12 @@ struct AnimSoftValue : public SoftValue<V>
 
   void set_animation (AnimationType *_anim)
   {
+    if (m_animation)
+      {
+        m_animation->set_finished ();
+        m_animation = nullptr;
+      }
+    
     m_animation = _anim;
   }
 
@@ -115,4 +135,4 @@ struct AnimSoftValue : public SoftValue<V>
 
 }
 
-#endif //NOT_FIRM_BUT_NOT_HARD
+#endif //NOT_FIRM_AND_NOT_HARD

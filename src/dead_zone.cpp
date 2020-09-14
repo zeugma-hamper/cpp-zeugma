@@ -23,6 +23,7 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
+#include <glm/ext/quaternion_transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -31,6 +32,34 @@
 #include <stdio.h>
 
 using namespace charm;
+
+class TXCAnimation : public SoftAnimation<TransformComponentsSoftValue>
+{
+ public:
+
+  TXCAnimation ()
+    : SoftAnimation<TransformComponentsSoftValue> {}
+  {
+  }
+
+  State do_update (f64, f64 _delta, animation_step _step) override
+  {
+    assert (m_value);
+    fprintf (stderr, "update animation %lu\n", _step);
+
+    const f32 rads_per_sec = glm::pi<float> () / 5.0f;
+    const glm::vec3 rot_axis{0.0f, 1.0f, 0.0f};
+
+    const glm::quat rot = glm::rotate (m_value->get_rotation(),
+                                       f32 (rads_per_sec * _delta),
+                                       rot_axis);
+    m_value->set_rotation(rot);
+    return State::Continuing;
+  }
+
+ protected:
+};
+
 
 class dead_zone final : public charm::application
 {
@@ -50,13 +79,11 @@ class dead_zone final : public charm::application
   void update_scene_graph ();
 
   FrameTime &get_frame_time ();
-  AnimationSystem &get_animation_system ();
 
   Layer &get_scene_layer ();
 
  protected:
   FrameTime m_frame_time;
-  AnimationSystem m_animation_system;
 
   GLFWwindow *window;
 
@@ -403,6 +430,7 @@ dead_zone::dead_zone ()
   : window {nullptr},
     m_scene_graph_layer {new Layer}
 {
+  AnimationSystem::initialize();
 }
 
 dead_zone::~dead_zone ()
@@ -420,8 +448,9 @@ bool dead_zone::update ()
 
   glfwPollEvents();
 
-  m_animation_system.update_animations(m_frame_time.current_time(),
-                                       m_frame_time.current_delta());
+  AnimationSystem::get_system()->
+    update_animations(m_frame_time.current_time(),
+                      m_frame_time.current_delta());
 
   update_scene_graph ();
 
@@ -455,11 +484,6 @@ FrameTime &dead_zone::get_frame_time ()
   return m_frame_time;
 }
 
-AnimationSystem &dead_zone::get_animation_system ()
-{
-  return m_animation_system;
-}
-
 Layer &dead_zone::get_scene_layer ()
 {
   return *m_scene_graph_layer;
@@ -475,13 +499,14 @@ int main (int, char **)
 
   Node *node = new Node ();
 
-  node->get_transform_components_soft().get_value().translation = glm::vec3 {0.0f, 0.0f, 9.0f};
-  node->get_transform_components_soft().get_value().scale = glm::vec3 {20.0f};
-  node->get_transform_components_soft().set_dirty(true);
+  node->get_transform_components_soft().set_translation (glm::vec3 {0.0f, 0.0f, 9.0f});
+  node->get_transform_components_soft().set_scale (glm::vec3 {20.0f});
+
   VideoRenderable *renderable
     = new VideoRenderable ("file:///home/blake/tlp/tamper-blu-mkv/The Fall_t00.mkv");
 
   node->append_renderable(renderable);
+  node->install_component_animation(new TXCAnimation);
   layer.root_node()->append_child(node);
 
   zone.run ();

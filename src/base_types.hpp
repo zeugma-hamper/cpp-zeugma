@@ -21,6 +21,7 @@ namespace charm
 
   using sort_key = u64;
   using graph_id = u64;
+  using animation_step = u64;
 }
 
 #endif

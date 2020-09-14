@@ -570,22 +570,28 @@ gst_video_dep = dependency ('gstreamer-video-1.0')
 
 gstreamer_deps = [gst_dep, gst_app_dep, gst_video_dep]
 
-lib_sources = ['src/Layer.cpp',
+lib_sources = ['src/Animation.cpp',
                'src/AnimationSystem.cpp',
+               'src/Layer.cpp',
                'src/Node.cpp',
-               'src/Renderable.cpp']
+               'src/Renderable.cpp',
+               'src/TransformationValues.cpp',
+               'src/DecodePipeline.cpp',
+               'src/PipelineTerminus.cpp',
+               'src/bgfx_utils.cpp']
+
 
 charm_inc = include_directories ('src')
 
 charm_lib = static_library ('charm', lib_sources,
                             include_directories : charm_inc,
-                            dependencies : [bx_dep, bimg_dep, bgfx_dep, glfw_dep],
+                            dependencies : [bx_dep, bimg_dep, bgfx_dep, glfw_dep] + gstreamer_deps,
                             #version : '0.5',
                             install : true)
 
 charm_dep = declare_dependency (include_directories : [charm_inc],
                                 link_with : [charm_lib],
-                                dependencies : [bx_dep, bimg_dep, bgfx_dep, glfw_dep])
+                                dependencies : [bx_dep, bimg_dep, bgfx_dep, glfw_dep] + gstreamer_deps)
 
 bgfx_test_exec = executable ('bgfx_test',
                              sources : ['src/bgfx_test.cpp'],
@@ -594,8 +600,5 @@ bgfx_test_exec = executable ('bgfx_test',
 dead_zone_exec = executable ('dead_zone',
                              sources : ['src/dead_zone.cpp',
                                         'src/application.cpp',
-                                        'src/FrameTime.cpp',
-                                        'src/DecodePipeline.cpp',
-                                        'src/PipelineTerminus.cpp',
-                                        'src/bgfx_utils.cpp'],
-                             dependencies : [charm_dep] + gstreamer_deps)
+                                        'src/FrameTime.cpp'],
+                             dependencies : [charm_dep])
