@@ -42,10 +42,9 @@ class TXCAnimation : public SoftAnimation<TransformComponentsSoftValue>
   {
   }
 
-  State do_update (f64, f64 _delta, animation_step _step) override
+  State do_update (f64, f64 _delta, animation_step) override
   {
     assert (m_value);
-    fprintf (stderr, "update animation %lu\n", _step);
 
     const f32 rads_per_sec = glm::pi<float> () / 5.0f;
     const glm::vec3 rot_axis{0.0f, 1.0f, 0.0f};
@@ -54,10 +53,9 @@ class TXCAnimation : public SoftAnimation<TransformComponentsSoftValue>
                                        f32 (rads_per_sec * _delta),
                                        rot_axis);
     m_value->set_rotation(rot);
+
     return State::Continuing;
   }
-
- protected:
 };
 
 
@@ -78,12 +76,11 @@ class dead_zone final : public charm::application
 
   void update_scene_graph ();
 
-  FrameTime &get_frame_time ();
+  static FrameTime *get_frame_time ();
 
   Layer &get_scene_layer ();
 
  protected:
-  FrameTime m_frame_time;
 
   GLFWwindow *window;
 
@@ -426,6 +423,8 @@ void dead_zone::render ()
   bgfx::frame ();
 }
 
+FrameTime *s_dead_zone_frame_time{nullptr};
+
 dead_zone::dead_zone ()
   : window {nullptr},
     m_scene_graph_layer {new Layer}
@@ -439,18 +438,19 @@ dead_zone::~dead_zone ()
 
 bool dead_zone::start_up ()
 {
+  s_dead_zone_frame_time = new FrameTime;
   return init_windowing_and_graphics();
 }
 
 bool dead_zone::update ()
 {
-  m_frame_time.update_time ();
+  get_frame_time()->update_time();
 
   glfwPollEvents();
 
   AnimationSystem::get_system()->
-    update_animations(m_frame_time.current_time(),
-                      m_frame_time.current_delta());
+    update_animations(get_frame_time()->current_time(),
+                      get_frame_time()->current_delta());
 
   update_scene_graph ();
 
@@ -476,12 +476,15 @@ bool dead_zone::shut_down ()
   shut_down_scene_graph ();
   shut_down_graphics ();
 
+  delete s_dead_zone_frame_time;
+  s_dead_zone_frame_time = nullptr;
+
   return true;
 }
 
-FrameTime &dead_zone::get_frame_time ()
+FrameTime *dead_zone::get_frame_time ()
 {
-  return m_frame_time;
+  return s_dead_zone_frame_time;
 }
 
 Layer &dead_zone::get_scene_layer ()
