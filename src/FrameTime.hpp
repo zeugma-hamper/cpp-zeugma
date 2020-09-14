@@ -5,29 +5,31 @@
 
 namespace charm
 {
-  class FrameTime
-  {
-   public:
 
-    FrameTime ();
+class FrameTime
+{
+ public:
 
-    void update_time ();
-    void advance_time (u64 _dt);
+  FrameTime ();
 
-    f64 current_time ()  const;
-    f64 current_delta () const;
-    f64 reset_time ()    const;
+  void update_time ();
+  void advance_time (u64 _dt);
 
-    u64 current_time_ns ()  const;
-    u64 current_delta_ns () const;
-    u64 reset_time_ns ()    const;
+  f64 current_time ()  const;
+  f64 current_delta () const;
+  f64 reset_time ()    const;
 
-   protected:
+  u64 current_time_ns ()  const;
+  u64 current_delta_ns () const;
+  u64 reset_time_ns ()    const;
 
-    u64 m_current_time;
-    u64 m_reset_time;
-    u64 m_frame_delta;
-  };
+ protected:
+
+  u64 m_current_time;
+  u64 m_reset_time;
+  u64 m_frame_delta;
+};
+
 }
 
 #endif //WANT_TO_USE_MOTHER_TIME
