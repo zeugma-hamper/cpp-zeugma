@@ -16,26 +16,26 @@ Renderable::Renderable (Node *_node)
 Renderable::~Renderable ()
 { }
 
-void Renderable::update ()
+void Renderable::Update ()
 {
 }
 
-bool Renderable::should_draw () const
+bool Renderable::ShouldDraw () const
 {
   return m_should_draw;
 }
 
-void Renderable::set_should_draw (bool _tf)
+void Renderable::SetShouldDraw (bool _tf)
 {
   m_should_draw = _tf;
 }
 
-sort_key Renderable::get_sort_key () const
+sort_key Renderable::GetSortKey () const
 {
   return m_sort_key;
 }
 
-graph_id Renderable::get_graph_id () const
+graph_id Renderable::GetGraphId () const
 {
   return m_graph_id;
 }

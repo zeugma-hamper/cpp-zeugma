@@ -22,7 +22,7 @@ AnimationSystem::~AnimationSystem ()
   m_animations.clear ();
 }
 
-void AnimationSystem::update_animations (double timestamp, double delta)
+void AnimationSystem::UpdateAnimations (double timestamp, double delta)
 {
   using anim_iterator = std::vector<Animation *>::iterator;
 
@@ -35,7 +35,7 @@ void AnimationSystem::update_animations (double timestamp, double delta)
   auto end = m_animations.end ();
   for (auto cur = m_animations.begin (); cur != end; ++cur)
   {
-    if (State::Finished == (*cur)->update (timestamp, delta, m_current_step))
+    if (State::Finished == (*cur)->Update (timestamp, delta, m_current_step))
       finished_animations.push_back (cur);
   }
 
@@ -48,23 +48,23 @@ void AnimationSystem::update_animations (double timestamp, double delta)
     }
 }
 
-void AnimationSystem::add_animation(Animation *_animation)
+void AnimationSystem::AddAnimation(Animation *_animation)
 {
   m_animations.push_back(_animation);
 }
 
-void AnimationSystem::initialize ()
+void AnimationSystem::Initialize ()
 {
   s_animation_system = new AnimationSystem;
 }
 
-void AnimationSystem::shut_down ()
+void AnimationSystem::ShutDown ()
 {
   delete s_animation_system;
   s_animation_system = nullptr;
 }
 
-AnimationSystem *AnimationSystem::get_system ()
+AnimationSystem *AnimationSystem::GetSystem ()
 {
   return s_animation_system;
 }

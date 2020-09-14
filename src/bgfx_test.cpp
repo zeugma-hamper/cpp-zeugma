@@ -62,7 +62,7 @@ void glfw_key_callback(GLFWwindow *window, int key, int, int action, int)
     glfwSetWindowShouldClose (window, GLFW_TRUE);
 }
 
-const bgfx::Memory *read_whole_file (bx::FilePath const &_path)
+const bgfx::Memory *ReadWholeFile (bx::FilePath const &_path)
 {
   bx::Error error;
   bx::FileReader reader;
@@ -83,16 +83,16 @@ const bgfx::Memory *read_whole_file (bx::FilePath const &_path)
   return mem;
 }
 
-bgfx::ShaderHandle create_shader (bx::FilePath const &_path)
+bgfx::ShaderHandle CreateShader (bx::FilePath const &_path)
 {
-  const bgfx::Memory *memory = read_whole_file (_path);
+  const bgfx::Memory *memory = ReadWholeFile (_path);
   if (! memory)
     return BGFX_INVALID_HANDLE;
 
   return bgfx::createShader (memory);
 }
 
-std::vector<bgfx::UniformHandle> get_shader_uniforms (bgfx::ShaderHandle _sh)
+std::vector<bgfx::UniformHandle> GetShaderUniforms (bgfx::ShaderHandle _sh)
 {
   u16 uni_count = bgfx::getShaderUniforms(_sh);
   std::vector<bgfx::UniformHandle> handles{uni_count};
@@ -136,9 +136,9 @@ struct Rectangle
 
     // see note about building shaders above
     bx::FilePath shader_path = "quad_vs.bin";
-    bgfx::ShaderHandle vs = create_shader (shader_path);
+    bgfx::ShaderHandle vs = CreateShader (shader_path);
     shader_path = bx::StringView("quad_fs.bin");
-    bgfx::ShaderHandle fs = create_shader (shader_path);
+    bgfx::ShaderHandle fs = CreateShader (shader_path);
 
     if (bgfx::isValid(vs) && bgfx::isValid (fs))
       {
@@ -152,7 +152,7 @@ struct Rectangle
       }
   }
 
-  void draw ()
+  void Draw ()
   {
     bgfx::setVertexBuffer(0, vbh, 0, 4);
     bgfx::setState (BGFX_STATE_WRITE_RGB |
@@ -161,7 +161,7 @@ struct Rectangle
     bgfx::submit(0, program);
   }
 
-  void clean_up ()
+  void CleanUp ()
   {
     bgfx::destroy(program);
     bgfx::destroy(vbh);
@@ -219,12 +219,12 @@ int main (int, char **)
       glfwPollEvents();
       bgfx::touch (0);
 
-      rectangle.draw ();
+      rectangle.Draw ();
 
       bgfx::frame();
     }
 
-  rectangle.clean_up();
+  rectangle.CleanUp();
   bgfx::shutdown();
   glfwTerminate();
 

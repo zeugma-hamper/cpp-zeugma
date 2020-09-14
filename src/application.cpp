@@ -8,29 +8,28 @@ namespace charm
 {
 static bool s_keep_running = true;
 
-bool application::start_up ()
+bool Application::StartUp ()
 {
-  install_default_signal_handlers ();
+  InstallDefaultSignalHandlers ();
 
   return true;
 }
 
-bool application::update ()
+bool Application::Update ()
 {
   return true;
 }
 
-bool application::shut_down ()
+bool Application::ShutDown ()
 {
   return true;
 }
 
-void application::run ()
+void Application::Run ()
 {
-  while (update () && s_keep_running)
-    s_keep_running = update () && s_keep_running;
+  while (Update () && s_keep_running);
 
-  shut_down ();
+  ShutDown ();
 }
 
 static void s_term_int_handler (int, siginfo_t *, void *)
@@ -38,7 +37,7 @@ static void s_term_int_handler (int, siginfo_t *, void *)
   s_keep_running = false;
 }
 
-bool application::install_default_signal_handlers ()
+bool Application::InstallDefaultSignalHandlers ()
 {
   s_keep_running = true;
 
@@ -56,7 +55,7 @@ bool application::install_default_signal_handlers ()
   return true;
 }
 
-void application::stop_running ()
+void Application::StopRunning ()
 {
   s_keep_running = false;
 }

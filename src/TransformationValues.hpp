@@ -19,15 +19,15 @@ struct TransformComponents
 
 struct TransformComponentsSoftValue : public AnimSoftValue<TransformComponents, Animation>
 {
-  void set_translation (glm::vec3 const &_translation);
-  glm::vec3 const &get_translation () const;
+  void SetTranslation (glm::vec3 const &_translation);
+  glm::vec3 const &GetTranslation () const;
 
-  void set_rotation (glm::quat const &_rot);
-  glm::quat const &get_rotation () const;
+  void SetRotation (glm::quat const &_rot);
+  glm::quat const &GetRotation () const;
 
-  void set_scale (f32 _scale);
-  void set_scale (glm::vec3 const &_scale);
-  glm::vec3 const &get_scale () const;
+  void SetScale (f32 _scale);
+  void SetScale (glm::vec3 const &_scale);
+  glm::vec3 const &GetScale () const;
 };
 
 struct Transformation
@@ -38,20 +38,20 @@ struct Transformation
 
 struct TransformationSoftValue : public SoftValue<Transformation>
 {
-  void set_model (glm::mat4 const &_mod);
-  glm::mat4 const &get_model () const;
+  void SetModel (glm::mat4 const &_mod);
+  glm::mat4 const &GetModel () const;
 
-  void set_normal (glm::mat4 const &_norm);
-  glm::mat4 const &get_normal () const;
+  void SetNormal (glm::mat4 const &_norm);
+  glm::mat4 const &GetNormal () const;
 };
 
 struct TransformationAnimSoftValue : public AnimSoftValue<Transformation, Animation>
 {
-  void set_model (glm::mat4 const &_mod);
-  glm::mat4 const &get_model () const;
+  void SetModel (glm::mat4 const &_mod);
+  glm::mat4 const &GetModel () const;
 
-  void set_normal (glm::mat4 const &_norm);
-  glm::mat4 const &get_normal () const;
+  void SetNormal (glm::mat4 const &_norm);
+  glm::mat4 const &GetNormal () const;
 };
 
 }

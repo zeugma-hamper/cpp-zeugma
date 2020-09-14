@@ -21,9 +21,9 @@ class PipelineTerminus
 
   CHARM_DELETE_MOVE_COPY(PipelineTerminus);
 
-  virtual bool on_start        (DecodePipeline *) = 0;
-  virtual bool new_decoded_pad (DecodePipeline *, GstElement *, GstPad *) = 0;
-  virtual bool on_shutdown     (DecodePipeline *) = 0;
+  virtual bool OnStart       (DecodePipeline *) = 0;
+  virtual bool NewDecodedPad (DecodePipeline *, GstElement *, GstPad *) = 0;
+  virtual bool OnShutdown    (DecodePipeline *) = 0;
 };
 
 
@@ -34,18 +34,18 @@ class BasicPipelineTerminus : public PipelineTerminus
   BasicPipelineTerminus (bool _enable_audio);
   ~BasicPipelineTerminus () override;
 
-  bool on_start        (DecodePipeline *) override;
-  bool new_decoded_pad (DecodePipeline *, GstElement *, GstPad *) override;
-  bool on_shutdown     (DecodePipeline *) override;
+  bool OnStart       (DecodePipeline *) override;
+  bool NewDecodedPad (DecodePipeline *, GstElement *, GstPad *) override;
+  bool OnShutdown    (DecodePipeline *) override;
 
-  gst_ptr<GstSample> fetch_sample ();
-  gst_ptr<GstSample> fetch_clear_sample ();
+  gst_ptr<GstSample> FetchSample ();
+  gst_ptr<GstSample> FetchClearSample ();
 
 
-  bool handle_audio_pad (DecodePipeline *, GstElement *, GstPad *, const char *);
-  bool handle_video_pad (DecodePipeline *, GstElement *, GstPad *, const char *);
+  bool HandleAudioPad (DecodePipeline *, GstElement *, GstPad *, const char *);
+  bool HandleVideoPad (DecodePipeline *, GstElement *, GstPad *, const char *);
 
-  void handoff_sample (GstSample *_sample);
+  void HandoffSample (GstSample *_sample);
 
   GstElement *m_video_sink;
   GstElement *m_audio_sink;

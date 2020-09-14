@@ -16,15 +16,15 @@ class Renderable
 
   CHARM_DELETE_MOVE_COPY (Renderable);
 
-  virtual void update ();
-  virtual void draw () = 0;
+  virtual void Update ();
+  virtual void Draw () = 0;
 
-  bool should_draw () const;
+  bool ShouldDraw () const;
 
-  void set_should_draw (bool _tf);
+  void SetShouldDraw (bool _tf);
 
-  sort_key get_sort_key () const;
-  graph_id get_graph_id () const;
+  sort_key GetSortKey () const;
+  graph_id GetGraphId () const;
 
  protected:
   Node *m_node;

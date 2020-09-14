@@ -29,20 +29,20 @@ class Layer
   CHARM_DELETE_COPY  (Layer);
   CHARM_DEFAULT_MOVE (Layer);
 
-  Node *root_node ();
+  Node *GetRootNode ();
 
-  std::vector<Renderable *> &get_renderables ();
+  std::vector<Renderable *> &GetRenderables ();
 
-  glm::mat4 const &get_projection_matrix () const;
-  void set_projection_matrix (glm::mat4 const &_proj);
+  glm::mat4 const &GetProjectionMatrix () const;
+  void SetProjectionMatrix (glm::mat4 const &_proj);
 
-  glm::mat4 const &get_camera_matrix () const;
-  void set_camera_matrix (glm::mat4 const &_cam);
+  glm::mat4 const &GetCameraMatrix () const;
+  void SetCameraMatrix (glm::mat4 const &_cam);
 
  protected:
 
-  void remove_renderable (Renderable *_rend);
-  void remove_renderables (std::vector<Renderable *> const &_rends);
+  void RemoveRenderable (Renderable *_rend);
+  void RemoveRenderables (std::vector<Renderable *> const &_rends);
 
   Node m_root_node;
   std::vector<Renderable *> m_renderables;

@@ -12,27 +12,27 @@ Animation::Animation ()
 Animation::~Animation ()
 { }
 
-Animation::id Animation::get_id () const
+Animation::id Animation::GetId () const
 {
   return m_id;
 }
 
-State Animation::get_state () const
+State Animation::GetState () const
 {
   return m_state;
 }
 
-void Animation::set_finished ()
+void Animation::SetFinished ()
 {
   m_state = State::Finished;
 }
 
-State Animation::update (f64 _timestamp, f64 _delta, animation_step _step)
+State Animation::Update (f64 _timestamp, f64 _delta, animation_step _step)
 {
   if (m_state == State::Finished || m_last_step == _step)
     return m_state;
 
-  return (m_state = do_update (_timestamp, _delta, _step));
+  return (m_state = DoUpdate (_timestamp, _delta, _step));
 }
 
 }

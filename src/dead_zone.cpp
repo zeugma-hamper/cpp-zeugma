@@ -42,43 +42,43 @@ class TXCAnimation : public SoftAnimation<TransformComponentsSoftValue>
   {
   }
 
-  State do_update (f64, f64 _delta, animation_step) override
+  State DoUpdate (f64, f64 _delta, animation_step) override
   {
     assert (m_value);
 
     const f32 rads_per_sec = glm::pi<float> () / 5.0f;
     const glm::vec3 rot_axis{0.0f, 1.0f, 0.0f};
 
-    const glm::quat rot = glm::rotate (m_value->get_rotation(),
+    const glm::quat rot = glm::rotate (m_value->GetRotation(),
                                        f32 (rads_per_sec * _delta),
                                        rot_axis);
-    m_value->set_rotation(rot);
+    m_value->SetRotation(rot);
 
     return State::Continuing;
   }
 };
 
 
-class dead_zone final : public charm::application
+class dead_zone final : public charm::Application
 {
  public:
   dead_zone ();
   ~dead_zone () override final;
 
-  bool start_up ()  override final;
-  bool update ()    override final;
-  bool shut_down () override final;
+  bool StartUp ()  override final;
+  bool Update ()    override final;
+  bool ShutDown () override final;
 
-  bool init_windowing_and_graphics ();
-  void shut_down_graphics ();
-  void shut_down_scene_graph ();
-  void render ();
+  bool InitWindowingAndGraphics ();
+  void ShutDownGraphics ();
+  void ShutDownSceneGraph ();
+  void Render ();
 
-  void update_scene_graph ();
+  void UpdateSceneGraph ();
 
-  static FrameTime *get_frame_time ();
+  static FrameTime *GetFrameTime ();
 
-  Layer &get_scene_layer ();
+  Layer &GetSceneLayer ();
 
  protected:
 
@@ -102,13 +102,13 @@ class VideoRenderable final : public Renderable
     m_uni_aspect_ratio = bgfx::createUniform("u_aspect_ratio", bgfx::UniformType::Vec4);
 
     // see compile_shader.sh in project root
-    ProgramResiduals ps = create_program ("video_vs.bin", "video_fs.bin", true);
+    ProgramResiduals ps = CreateProgram ("video_vs.bin", "video_fs.bin", true);
     m_program = ps.program;
 
     m_terminus = new BasicPipelineTerminus (false);
     m_video_pipeline = new DecodePipeline;
-    m_video_pipeline->open (_uri, m_terminus);
-    m_video_pipeline->play();
+    m_video_pipeline->Open (_uri, m_terminus);
+    m_video_pipeline->Play();
   }
 
   ~VideoRenderable () override
@@ -146,7 +146,7 @@ class VideoRenderable final : public Renderable
     delete holder;
   }
 
-  void upload_sample (gst_ptr<GstSample> const &_sample)
+  void UploadSample (gst_ptr<GstSample> const &_sample)
   {
     GstCaps *sample_caps = gst_sample_get_caps(_sample.get ());
     GstVideoInfo video_info;
@@ -195,19 +195,19 @@ class VideoRenderable final : public Renderable
     bgfx::updateTexture2D(m_texture, 0, 0, 0, 0, width, height, mem, stride);
   }
 
-  void update () override
+  void Update () override
   {
     if (m_video_pipeline)
       {
-        m_video_pipeline->poll_messages ();
-        gst_ptr<GstSample> new_sample = m_terminus->fetch_clear_sample();
+        m_video_pipeline->PollMessages ();
+        gst_ptr<GstSample> new_sample = m_terminus->FetchClearSample();
 
         if (new_sample)
-          upload_sample(new_sample);
+          UploadSample(new_sample);
       }
   }
 
-  void draw () override
+  void Draw () override
   {
     if (! bgfx::isValid(m_texture))
       return;
@@ -218,7 +218,7 @@ class VideoRenderable final : public Renderable
       BGFX_STATE_PT_TRISTRIP |
       BGFX_STATE_WRITE_Z;
 
-    bgfx::setTransform(&m_node->get_absolute_model_transformation());
+    bgfx::setTransform(&m_node->GetAbsoluteModelTransformation());
     bgfx::setState(state);
     bgfx::setVertexCount(4);
     bgfx::setTexture(0, m_uni_vid_texture, m_texture);
@@ -269,9 +269,9 @@ class RectangleRenderable final : public Renderable
 
     // see note about building shaders above
     bx::FilePath shader_path = "quad_vs.bin";
-    bgfx::ShaderHandle vs = create_shader (shader_path);
+    bgfx::ShaderHandle vs = CreateShader (shader_path);
     shader_path = bx::StringView("quad_fs.bin");
-    bgfx::ShaderHandle fs = create_shader (shader_path);
+    bgfx::ShaderHandle fs = CreateShader (shader_path);
 
     if (bgfx::isValid(vs) && bgfx::isValid (fs))
       {
@@ -291,11 +291,11 @@ class RectangleRenderable final : public Renderable
     bgfx::destroy(program);
   }
 
-  void draw () override
+  void Draw () override
   {
     fprintf (stderr, "rr draw\n");
 
-    bgfx::setTransform(&m_node->get_absolute_model_transformation());
+    bgfx::setTransform(&m_node->GetAbsoluteModelTransformation());
     bgfx::setVertexBuffer(0, vbh, 0, 4);
     bgfx::setState (BGFX_STATE_WRITE_RGB |
                     BGFX_STATE_PT_TRISTRIP |
@@ -323,7 +323,7 @@ class RectangleRenderable final : public Renderable
 
 static void glfw_error_callback (int, const char *_msg)
 {
-  application::stop_running();
+  Application::StopRunning();
 
   fprintf (stderr, "glfw error: %s\n", _msg);
 }
@@ -335,11 +335,11 @@ static void glfw_key_callback(GLFWwindow *window, int key, int, int action, int)
       && action == GLFW_RELEASE)
     {
       glfwSetWindowShouldClose (window, GLFW_TRUE);
-      application::stop_running();
+      Application::StopRunning();
     }
 }
 
-bool dead_zone::init_windowing_and_graphics ()
+bool dead_zone::InitWindowingAndGraphics ()
 {
   glfwSetErrorCallback(glfw_error_callback);
   if (! glfwInit())
@@ -397,16 +397,16 @@ bool dead_zone::init_windowing_and_graphics ()
   return true;
 }
 
-void dead_zone::shut_down_graphics ()
+void dead_zone::ShutDownGraphics ()
 {
   bgfx::shutdown();
   glfwTerminate();
 }
 
-void dead_zone::render ()
+void dead_zone::Render ()
 {
-  for (Renderable *r : m_scene_graph_layer->get_renderables())
-    r->update ();
+  for (Renderable *r : m_scene_graph_layer->GetRenderables())
+    r->Update ();
 
   bgfx::touch (0);
 
@@ -417,8 +417,8 @@ void dead_zone::render ()
   bgfx::setViewTransform(0, glm::value_ptr (view_transform),
                          glm::value_ptr (proj_transform));
 
-  for (Renderable *r : m_scene_graph_layer->get_renderables())
-    r->draw();
+  for (Renderable *r : m_scene_graph_layer->GetRenderables())
+    r->Draw();
 
   bgfx::frame ();
 }
@@ -429,52 +429,52 @@ dead_zone::dead_zone ()
   : window {nullptr},
     m_scene_graph_layer {new Layer}
 {
-  AnimationSystem::initialize();
+  AnimationSystem::Initialize();
 }
 
 dead_zone::~dead_zone ()
 {
 }
 
-bool dead_zone::start_up ()
+bool dead_zone::StartUp ()
 {
   s_dead_zone_frame_time = new FrameTime;
-  return init_windowing_and_graphics();
+  return InitWindowingAndGraphics();
 }
 
-bool dead_zone::update ()
+bool dead_zone::Update ()
 {
-  get_frame_time()->update_time();
+  GetFrameTime()->UpdateTime();
 
   glfwPollEvents();
 
-  AnimationSystem::get_system()->
-    update_animations(get_frame_time()->current_time(),
-                      get_frame_time()->current_delta());
+  AnimationSystem::GetSystem()->
+    UpdateAnimations(GetFrameTime()->GetCurrentTime(),
+                     GetFrameTime()->GetCurrentDelta());
 
-  update_scene_graph ();
+  UpdateSceneGraph ();
 
-  render ();
+  Render ();
 
   return true;
 }
 
-void dead_zone::update_scene_graph()
+void dead_zone::UpdateSceneGraph()
 {
-  m_scene_graph_layer->root_node()->update_transformations();
-  m_scene_graph_layer->root_node()->enumerate_renderables();
+  m_scene_graph_layer->GetRootNode()->UpdateTransformations();
+  m_scene_graph_layer->GetRootNode()->EnumerateRenderables();
 }
 
-void dead_zone::shut_down_scene_graph()
+void dead_zone::ShutDownSceneGraph()
 {
   delete m_scene_graph_layer;
   m_scene_graph_layer = nullptr;
 }
 
-bool dead_zone::shut_down ()
+bool dead_zone::ShutDown ()
 {
-  shut_down_scene_graph ();
-  shut_down_graphics ();
+  ShutDownSceneGraph ();
+  ShutDownGraphics ();
 
   delete s_dead_zone_frame_time;
   s_dead_zone_frame_time = nullptr;
@@ -482,12 +482,12 @@ bool dead_zone::shut_down ()
   return true;
 }
 
-FrameTime *dead_zone::get_frame_time ()
+FrameTime *dead_zone::GetFrameTime ()
 {
   return s_dead_zone_frame_time;
 }
 
-Layer &dead_zone::get_scene_layer ()
+Layer &dead_zone::GetSceneLayer ()
 {
   return *m_scene_graph_layer;
 }
@@ -495,24 +495,24 @@ Layer &dead_zone::get_scene_layer ()
 int main (int, char **)
 {
   dead_zone zone;
-  if (! zone.start_up ())
+  if (! zone.StartUp ())
     return -1;
 
-  Layer &layer = zone.get_scene_layer();
+  Layer &layer = zone.GetSceneLayer();
 
   Node *node = new Node ();
 
-  node->get_transform_components_soft().set_translation (glm::vec3 {0.0f, 0.0f, 9.0f});
-  node->get_transform_components_soft().set_scale (glm::vec3 {20.0f});
+  node->GetTransformComponentsSoft().SetTranslation (glm::vec3 {0.0f, 0.0f, 9.0f});
+  node->GetTransformComponentsSoft().SetScale (glm::vec3 {20.0f});
 
   VideoRenderable *renderable
     = new VideoRenderable ("file:///home/blake/tlp/tamper-blu-mkv/The Fall_t00.mkv");
 
-  node->append_renderable(renderable);
-  node->install_component_animation(new TXCAnimation);
-  layer.root_node()->append_child(node);
+  node->AppendRenderable(renderable);
+  node->InstallComponentAnimation(new TXCAnimation);
+  layer.GetRootNode()->AppendChild(node);
 
-  zone.run ();
+  zone.Run ();
 
   return 0;
 }

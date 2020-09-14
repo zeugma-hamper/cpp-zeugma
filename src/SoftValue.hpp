@@ -49,39 +49,39 @@ struct SoftValue
     return m_value;
   }
 
-  ValueType &get_value ()
+  ValueType &GetValue ()
   {
     return m_value;
   }
 
-  ValueType const &get_value () const
+  ValueType const &GetValue () const
   {
     return m_value;
   }
 
-  void set (ValueType const &_v)
+  void Set (ValueType const &_v)
   {
     m_value = _v;
-    set_dirty (true);
+    SetDirty (true);
   }
 
-  void set (ValueType &&_v)
+  void Set (ValueType &&_v)
   {
     m_value = std::move (_v);
-    set_dirty (true);
+    SetDirty (true);
   }
 
-  void clear_dirty ()
+  void ClearDirty ()
   {
     m_dirty_flag = false;
   }
 
-  void set_dirty (bool _tf)
+  void SetDirty (bool _tf)
   {
     m_dirty_flag = _tf;
   }
 
-  bool is_dirty () const noexcept
+  bool IsDirty () const noexcept
   {
     return m_dirty_flag;
   }
@@ -109,23 +109,23 @@ struct AnimSoftValue : public SoftValue<V>
   ~AnimSoftValue ()
   {
     if (m_animation)
-      m_animation->set_finished ();
+      m_animation->SetFinished ();
 
     m_animation = nullptr;
   }
 
-  void set_animation (AnimationType *_anim)
+  void SetAnimation (AnimationType *_anim)
   {
     if (m_animation)
       {
-        m_animation->set_finished ();
+        m_animation->SetFinished ();
         m_animation = nullptr;
       }
-    
+
     m_animation = _anim;
   }
 
-  AnimationType *get_animation () const
+  AnimationType *GetAnimation () const
   {
     return m_animation;
   }

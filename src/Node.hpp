@@ -28,45 +28,45 @@ class Node
   CHARM_DELETE_COPY (Node);
   CHARM_DEFAULT_MOVE (Node);
 
-  void update_transformations ();
-  void update_transformations (TransformationSoftValue const &_parent_tx);
+  void UpdateTransformations ();
+  void UpdateTransformations (TransformationSoftValue const &_parent_tx);
 
-  void enumerate_renderables ();
-  void enumerate_renderables (graph_id &_id);
+  void EnumerateRenderables ();
+  void EnumerateRenderables (graph_id &_id);
 
   // node takes ownership of child nodes
-  void  append_child (Node *_node);
+  void  AppendChild (Node *_node);
   // excise with feeling (deletes)
-  void  remove_child (Node *_node);
-  Node *excise_child (Node *_node);
+  void  RemoveChild (Node *_node);
+  Node *ExciseChild (Node *_node);
 
   // node takes ownership of renderables
-  void        append_renderable (Renderable *_render);
+  void        AppendRenderable (Renderable *_render);
   //excise with feeling (deletes)
-  void        remove_renderable (Renderable *_render);
-  Renderable *excise_renderable (Renderable *_render);
+  void        RemoveRenderable (Renderable *_render);
+  Renderable *ExciseRenderable (Renderable *_render);
 
-  void   set_layer (Layer *_layer);
-  Layer *get_layer () const;
+  void   SetLayer (Layer *_layer);
+  Layer *GetLayer () const;
 
-  TransformComponentsSoftValue &get_transform_components_soft ();
-  glm::vec3 const &get_translation () const;
-  glm::quat const &get_rotation () const;
-  glm::vec3 const &get_scale () const;
+  TransformComponentsSoftValue &GetTransformComponentsSoft ();
+  glm::vec3 const &GetTranslation () const;
+  glm::quat const &GetRotation () const;
+  glm::vec3 const &GetScale () const;
 
-  TransformationSoftValue &get_absolute_transformation_soft ();
-  glm::mat4 const &get_absolute_model_transformation  () const;
-  glm::mat4 const &get_absolute_normal_transformation () const;
+  TransformationSoftValue &GetAbsoluteTransformationSoft ();
+  glm::mat4 const &GetAbsoluteModelTransformation  () const;
+  glm::mat4 const &GetAbsoluteNormalTransformation () const;
 
-  TransformationAnimSoftValue &get_transformation_soft ();
-  glm::mat4 const &get_model_transformation  () const;
-  glm::mat4 const &get_normal_transformation () const;
+  TransformationAnimSoftValue &GetTransformationSoft ();
+  glm::mat4 const &GetModelTransformation  () const;
+  glm::mat4 const &GetNormalTransformation () const;
 
-  void install_component_animation (ComponentAnimation *_animation);
-  Animation *get_component_animation () const;
+  void InstallComponentAnimation (ComponentAnimation *_animation);
+  Animation *GetComponentAnimation () const;
 
-  void install_transform_animation (TransformationAnimation *_animation);
-  Animation *get_transformation_animation () const;
+  void InstallTransformAnimation (TransformationAnimation *_animation);
+  Animation *GetTransformationAnimation () const;
 
  private:
   Layer *m_layer;

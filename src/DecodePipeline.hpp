@@ -35,19 +35,19 @@ struct DecodePipeline
 
   CHARM_DELETE_COPY(DecodePipeline);
 
-  void poll_messages ();
+  void PollMessages ();
 
-  bool open (std::string_view uri, PipelineTerminus *terminus);
+  bool Open (std::string_view uri, PipelineTerminus *terminus);
 
-  void play ();
-  void seek (double _ts);
-  void pause ();
+  void Play ();
+  void Seek (double _ts);
+  void Pause ();
 
-  void clean_up ();
+  void CleanUp ();
 
-  void handle_error_message (GstMessage *);
-  void handle_eos_message (GstMessage *);
-  void handle_state_changed_message (GstMessage *);
+  void HandleErrorMessage (GstMessage *);
+  void HandleEosMessage (GstMessage *);
+  void HandleStateChangedMessage (GstMessage *);
 
   std::unique_ptr<PipelineTerminus> m_terminus;
   GstElement *m_pipeline;

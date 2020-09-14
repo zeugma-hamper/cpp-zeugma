@@ -23,15 +23,15 @@ class Animation
   Animation ();
   virtual ~Animation ();
 
-  id get_id () const;
+  id GetId () const;
 
-  State get_state () const;
+  State GetState () const;
 
-  void set_finished ();
+  void SetFinished ();
 
-  State update (f64 timestamp, f64 delta, animation_step _step);
+  State Update (f64 timestamp, f64 delta, animation_step _step);
 
-  virtual State do_update (f64 timestamp, f64 delta, animation_step _step) = 0;
+  virtual State DoUpdate (f64 timestamp, f64 delta, animation_step _step) = 0;
 
  protected:
   AnimationSystem *m_system; //non-owning
@@ -58,17 +58,17 @@ class SoftAnimation : public Animation
   ~SoftAnimation () override
   {
     if (m_value)
-      m_value->set_animation (nullptr);
+      m_value->SetAnimation (nullptr);
 
     m_value = nullptr;
   }
 
-  SoftValType *get_soft_value () const
+  SoftValType *GetSoftValue () const
   {
     return m_value;
   }
 
-  void set_soft_value (SoftValType *_sv)
+  void SetSoftValue (SoftValType *_sv)
   {
     m_value = _sv;
   }

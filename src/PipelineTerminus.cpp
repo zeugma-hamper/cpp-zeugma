@@ -26,13 +26,13 @@ BasicPipelineTerminus::~BasicPipelineTerminus ()
 }
 
 bool
-BasicPipelineTerminus::on_start (DecodePipeline *)
+BasicPipelineTerminus::OnStart (DecodePipeline *)
 {
   return true;
 }
 
 bool
-BasicPipelineTerminus::new_decoded_pad (DecodePipeline *_pipe,
+BasicPipelineTerminus::NewDecodedPad (DecodePipeline *_pipe,
                                         GstElement *_elem,
                                         GstPad *_src_pad)
 {
@@ -44,9 +44,9 @@ BasicPipelineTerminus::new_decoded_pad (DecodePipeline *_pipe,
   const char *caps_string = gst_structure_get_name(caps_structure);
 
   if (g_str_has_prefix (caps_string, "audio/x-raw"))
-    handle_audio_pad (_pipe, _elem, _src_pad, caps_string);
+    HandleAudioPad (_pipe, _elem, _src_pad, caps_string);
   else if (g_str_has_prefix (caps_string, "video/x-raw"))
-    handle_video_pad (_pipe, _elem, _src_pad, caps_string);
+    HandleVideoPad (_pipe, _elem, _src_pad, caps_string);
 
   gst_caps_unref (pad_caps);
 
@@ -54,7 +54,7 @@ BasicPipelineTerminus::new_decoded_pad (DecodePipeline *_pipe,
 }
 
 bool
-BasicPipelineTerminus::on_shutdown (DecodePipeline *)
+BasicPipelineTerminus::OnShutdown (DecodePipeline *)
 {
   {
     std::unique_lock {m_sample_mutex};
@@ -65,7 +65,7 @@ BasicPipelineTerminus::on_shutdown (DecodePipeline *)
   return true;
 }
 
-gst_ptr<GstSample> BasicPipelineTerminus::fetch_sample ()
+gst_ptr<GstSample> BasicPipelineTerminus::FetchSample ()
 {
   std::unique_lock lock (m_sample_mutex);
   if (m_sample)
@@ -74,7 +74,7 @@ gst_ptr<GstSample> BasicPipelineTerminus::fetch_sample ()
   return {};
 }
 
-gst_ptr<GstSample> BasicPipelineTerminus::fetch_clear_sample ()
+gst_ptr<GstSample> BasicPipelineTerminus::FetchClearSample ()
 {
   std::unique_lock lock (m_sample_mutex);
   if (m_sample)
@@ -88,7 +88,8 @@ gst_ptr<GstSample> BasicPipelineTerminus::fetch_clear_sample ()
 }
 
 bool
-BasicPipelineTerminus::handle_audio_pad (DecodePipeline *_pipe, GstElement *, GstPad *_src_pad, const char *)
+BasicPipelineTerminus::HandleAudioPad
+(DecodePipeline *_pipe, GstElement *, GstPad *_src_pad, const char *)
 {
   // TODO: check returns
   if (! m_enable_audio || m_audio_sink != nullptr)
@@ -127,7 +128,7 @@ static GstFlowReturn handle_new_preroll (GstAppSink *_sink, gpointer _pipeline);
 static GstFlowReturn handle_new_sample (GstAppSink *_sink, gpointer _pipeline);
 
 bool
-BasicPipelineTerminus::handle_video_pad (DecodePipeline *_pipe, GstElement *,
+BasicPipelineTerminus::HandleVideoPad (DecodePipeline *_pipe, GstElement *,
                                          GstPad *_src_pad, const char *)
 {
   GstAppSinkCallbacks callbacks {};
@@ -187,7 +188,7 @@ remove_sink:
   return false;
 }
 
-void BasicPipelineTerminus::handoff_sample (GstSample *_sample)
+void BasicPipelineTerminus::HandoffSample (GstSample *_sample)
 {
   std::unique_lock lock {m_sample_mutex};
   m_sample = gst_ptr<GstSample> {_sample};
@@ -203,7 +204,7 @@ static GstFlowReturn handle_new_preroll (GstAppSink *_sink, gpointer _terminus)
 
   GstSample *sample = gst_app_sink_try_pull_preroll (_sink, GST_CLOCK_TIME_NONE);
   if (sample)
-    terminus->handoff_sample (sample);
+    terminus->HandoffSample (sample);
 
   return GST_FLOW_OK;
 }
@@ -214,7 +215,7 @@ static GstFlowReturn handle_new_sample (GstAppSink *_sink, gpointer _terminus)
 
   GstSample *sample = gst_app_sink_try_pull_sample (_sink, GST_CLOCK_TIME_NONE);
   if (sample)
-    terminus->handoff_sample (sample);
+    terminus->HandoffSample (sample);
   return GST_FLOW_OK;
 }
 

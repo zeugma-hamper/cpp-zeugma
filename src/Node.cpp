@@ -32,50 +32,50 @@ Node::~Node ()
   m_layer = nullptr;
 }
 
-void Node::update_transformations ()
+void Node::UpdateTransformations ()
 {
   TransformationSoftValue tsv;
-  update_transformations (tsv);
+  UpdateTransformations (tsv);
 }
 
-void Node::update_transformations (TransformationSoftValue const &_parent_tx)
+void Node::UpdateTransformations (TransformationSoftValue const &_parent_tx)
 {
-  m_absolute_tx.clear_dirty ();
+  m_absolute_tx.ClearDirty ();
 
-  if (m_tx_components.is_dirty ())
+  if (m_tx_components.IsDirty ())
     {
       //the inconsistency here drives me bonkers
-      m_tx_components.clear_dirty ();
-      m_tx.set_dirty (true);
-      TransformComponents &txc = m_tx_components.get_value ();
-      Transformation &tx = m_tx.get_value ();
+      m_tx_components.ClearDirty ();
+      m_tx.SetDirty (true);
+      TransformComponents &txc = m_tx_components.GetValue ();
+      Transformation &tx = m_tx.GetValue ();
       glm::mat4 const rs = glm::mat4_cast(txc.rotation) * glm::scale (txc.scale);
 
       tx.model = glm::translate (txc.translation) * rs;
       tx.normal = glm::inverseTranspose (rs);
     }
 
-  if (m_tx.is_dirty() || _parent_tx.is_dirty ())
+  if (m_tx.IsDirty() || _parent_tx.IsDirty ())
     {
-      Transformation &abs_tx = m_absolute_tx.get_value ();
-      abs_tx.model = _parent_tx.get_value ().model * m_tx.get_value ().model;
-      abs_tx.normal = _parent_tx.get_value ().normal * m_tx.get_value ().normal;
-      m_absolute_tx.set_dirty(true);
-      m_tx.clear_dirty ();
+      Transformation &abs_tx = m_absolute_tx.GetValue ();
+      abs_tx.model = _parent_tx.GetValue ().model * m_tx.GetValue ().model;
+      abs_tx.normal = _parent_tx.GetValue ().normal * m_tx.GetValue ().normal;
+      m_absolute_tx.SetDirty(true);
+      m_tx.ClearDirty ();
     }
 
   size_t const child_count = m_children.size ();
   for (size_t i = 0u; i < child_count; ++i)
-    m_children[i]->update_transformations (m_absolute_tx);
+    m_children[i]->UpdateTransformations (m_absolute_tx);
 }
 
-void Node::enumerate_renderables()
+void Node::EnumerateRenderables()
 {
   graph_id id = 0u;
-  enumerate_renderables(id);
+  EnumerateRenderables(id);
 }
 
-void Node::enumerate_renderables (graph_id &_id)
+void Node::EnumerateRenderables (graph_id &_id)
 {
   size_t const rend_count = m_renderables.size ();
   for (size_t i = 0; i < rend_count; ++i)
@@ -83,28 +83,28 @@ void Node::enumerate_renderables (graph_id &_id)
 
   size_t const child_count = m_children.size ();
   for (size_t i = 0; i < child_count; ++i)
-    m_children[i]->enumerate_renderables (_id);
+    m_children[i]->EnumerateRenderables (_id);
 }
 
 //node takes ownership of child nodes
-void Node::append_child (Node *_node)
+void Node::AppendChild (Node *_node)
 {
   if (_node->m_parent)
-    _node->m_parent->excise_child (_node);
+    _node->m_parent->ExciseChild (_node);
 
   _node->m_parent = this;
-  _node->set_layer (m_layer);
+  _node->SetLayer (m_layer);
 
   m_children.push_back (_node);
 }
 
-void Node::remove_child (Node *_node)
+void Node::RemoveChild (Node *_node)
 {
-  if (excise_child (_node))
+  if (ExciseChild (_node))
     delete _node;
 }
 
-Node *Node::excise_child (Node *_node)
+Node *Node::ExciseChild (Node *_node)
 {
   auto it = std::find (m_children.begin (), m_children.end (), _node);
   if (it == m_children.end ())
@@ -112,11 +112,11 @@ Node *Node::excise_child (Node *_node)
 
   Node *n = *it;
   m_children.erase (it);
-  n->set_layer (nullptr);
+  n->SetLayer (nullptr);
   return n;
 }
 
-void Node::append_renderable (Renderable *_render)
+void Node::AppendRenderable (Renderable *_render)
 {
   if (! _render)
     return;
@@ -125,16 +125,16 @@ void Node::append_renderable (Renderable *_render)
   _render->m_node = this;
 
   if (m_layer)
-    m_layer->get_renderables().push_back(_render);
+    m_layer->GetRenderables().push_back(_render);
 }
 
-void Node::remove_renderable (Renderable *_render)
+void Node::RemoveRenderable (Renderable *_render)
 {
-  if (excise_renderable(_render))
+  if (ExciseRenderable(_render))
     delete _render;
 }
 
-Renderable *Node::excise_renderable (Renderable *_render)
+Renderable *Node::ExciseRenderable (Renderable *_render)
 {
   auto it = std::find (m_renderables.begin (), m_renderables.end (), _render);
   if (it == m_renderables.end ())
@@ -143,15 +143,15 @@ Renderable *Node::excise_renderable (Renderable *_render)
   Renderable *r = *it;
   m_renderables.erase (it);
   if (m_layer)
-    m_layer->remove_renderable (r);
+    m_layer->RemoveRenderable (r);
 
   return r;
 }
 
-void Node::set_layer (Layer *_layer)
+void Node::SetLayer (Layer *_layer)
 {
   if (m_layer)
-    m_layer->remove_renderables(m_renderables);
+    m_layer->RemoveRenderables(m_renderables);
 
   m_layer = _layer;
   if (m_layer)
@@ -160,95 +160,95 @@ void Node::set_layer (Layer *_layer)
                                   m_renderables.end ());
 
   for (Node *child : m_children)
-    child->set_layer (_layer);
+    child->SetLayer (_layer);
 }
 
-Layer *Node::get_layer () const
+Layer *Node::GetLayer () const
 {
   return m_layer;
 }
 
-TransformComponentsSoftValue &Node::get_transform_components_soft ()
+TransformComponentsSoftValue &Node::GetTransformComponentsSoft ()
 {
   return m_tx_components;
 }
 
-glm::vec3 const &Node::get_translation () const
+glm::vec3 const &Node::GetTranslation () const
 {
-  return m_tx_components.get_translation();
+  return m_tx_components.GetTranslation();
 }
 
-glm::quat const &Node::get_rotation () const
+glm::quat const &Node::GetRotation () const
 {
-  return m_tx_components.get_rotation();
+  return m_tx_components.GetRotation();
 }
 
-glm::vec3 const &Node::get_scale () const
+glm::vec3 const &Node::GetScale () const
 {
-  return m_tx_components.get_scale();
+  return m_tx_components.GetScale();
 }
 
-TransformationSoftValue &Node::get_absolute_transformation_soft ()
+TransformationSoftValue &Node::GetAbsoluteTransformationSoft ()
 {
   return m_absolute_tx;
 }
 
-glm::mat4 const &Node::get_absolute_model_transformation () const
+glm::mat4 const &Node::GetAbsoluteModelTransformation () const
 {
-  return m_absolute_tx.get_model();
+  return m_absolute_tx.GetModel();
 }
 
-glm::mat4 const &Node::get_absolute_normal_transformation () const
+glm::mat4 const &Node::GetAbsoluteNormalTransformation () const
 {
-  return m_absolute_tx.get_normal();
+  return m_absolute_tx.GetNormal();
 }
 
-TransformationAnimSoftValue &Node::get_transformation_soft ()
+TransformationAnimSoftValue &Node::GetTransformationSoft ()
 {
   return m_tx;
 }
 
-glm::mat4 const &Node::get_model_transformation () const
+glm::mat4 const &Node::GetModelTransformation () const
 {
-  return m_tx.get_model();
+  return m_tx.GetModel();
 }
 
-glm::mat4 const &Node::get_normal_transformation () const
+glm::mat4 const &Node::GetNormalTransformation () const
 {
-  return m_tx.get_normal();
+  return m_tx.GetNormal();
 }
 
-void Node::install_component_animation (ComponentAnimation *_animation)
+void Node::InstallComponentAnimation (ComponentAnimation *_animation)
 {
   if (_animation)
     {
-      _animation->set_soft_value(&m_tx_components);
-      m_tx_components.set_animation(_animation);
-      m_tx_components.set_dirty(true);
-      AnimationSystem::get_system()->add_animation(_animation);
+      _animation->SetSoftValue(&m_tx_components);
+      m_tx_components.SetAnimation(_animation);
+      m_tx_components.SetDirty(true);
+      AnimationSystem::GetSystem()->AddAnimation(_animation);
     }
 }
 
-Animation *Node::get_component_animation () const
+Animation *Node::GetComponentAnimation () const
 {
-  return m_tx_components.get_animation();
+  return m_tx_components.GetAnimation();
 }
 
 
-void Node::install_transform_animation (TransformationAnimation *_animation)
+void Node::InstallTransformAnimation (TransformationAnimation *_animation)
 {
   if (_animation)
     {
-      _animation->set_soft_value(&m_tx);
-      m_tx.set_animation(_animation);
-      m_tx.set_dirty(true);
-      AnimationSystem::get_system()->add_animation(_animation);
+      _animation->SetSoftValue(&m_tx);
+      m_tx.SetAnimation(_animation);
+      m_tx.SetDirty(true);
+      AnimationSystem::GetSystem()->AddAnimation(_animation);
     }
 }
 
-Animation *Node::get_transformation_animation () const
+Animation *Node::GetTransformationAnimation () const
 {
-  return m_tx.get_animation();
+  return m_tx.GetAnimation();
 }
 
 }

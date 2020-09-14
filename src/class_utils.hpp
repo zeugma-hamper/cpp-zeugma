@@ -32,7 +32,7 @@ namespace charm
 {
 
 template<typename T>
-void zero_struct (T &_str)
+void ZeroStruct (T &_str)
 {
   memset (&_str, 0, sizeof (T));
 }

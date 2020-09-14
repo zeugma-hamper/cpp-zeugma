@@ -21,7 +21,7 @@ db_autoplug_continue_handler (GstElement *bin, GstPad *pad,
                               GstCaps *caps, DecodePipeline *data);
 
 
-void DecodePipeline::poll_messages ()
+void DecodePipeline::PollMessages ()
 {
   if (! m_bus)
     return;
@@ -33,13 +33,13 @@ void DecodePipeline::poll_messages ()
     {
       switch (GST_MESSAGE_TYPE (message)) {
       case GST_MESSAGE_EOS:
-        handle_eos_message(message);
+        HandleEosMessage(message);
         break;
       case GST_MESSAGE_ERROR:
-        handle_error_message(message);
+        HandleErrorMessage(message);
         break;
       case GST_MESSAGE_STATE_CHANGED:
-        handle_state_changed_message(message);
+        HandleStateChangedMessage(message);
         break;
       default:
         fprintf (stderr, "unexpected message %d\n", GST_MESSAGE_TYPE (message));
@@ -50,7 +50,7 @@ void DecodePipeline::poll_messages ()
     }
 }
 
-bool DecodePipeline::open (std::string_view uri, PipelineTerminus *term)
+bool DecodePipeline::Open (std::string_view uri, PipelineTerminus *term)
 {
   if (uri.empty() || ! term)
     return false;
@@ -78,10 +78,10 @@ bool DecodePipeline::open (std::string_view uri, PipelineTerminus *term)
   g_signal_connect (m_uridecodebin, "autoplug-continue",
                     G_CALLBACK (db_autoplug_continue_handler), this);
 
-  return m_terminus->on_start (this);
+  return m_terminus->OnStart (this);
 }
 
-void DecodePipeline::play ()
+void DecodePipeline::Play ()
 {
   if (! m_pipeline)
     return;
@@ -89,7 +89,7 @@ void DecodePipeline::play ()
   gst_element_set_state(m_pipeline, GST_STATE_PLAYING);
 }
 
-void DecodePipeline::seek (double _ts)
+void DecodePipeline::Seek (double _ts)
 {
   if (! m_pipeline)
     return;
@@ -102,7 +102,7 @@ void DecodePipeline::seek (double _ts)
                     GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
 }
 
-void DecodePipeline::pause ()
+void DecodePipeline::Pause ()
 {
   if (! m_pipeline)
     return;
@@ -110,11 +110,11 @@ void DecodePipeline::pause ()
   gst_element_set_state(m_pipeline, GST_STATE_PAUSED);
 }
 
-void DecodePipeline::clean_up ()
+void DecodePipeline::CleanUp ()
 {
   if (m_terminus)
     {
-      m_terminus->on_shutdown (this);
+      m_terminus->OnShutdown (this);
       m_terminus.reset();
     }
 
@@ -133,7 +133,7 @@ void DecodePipeline::clean_up ()
   m_pipeline = nullptr;
 }
 
-void DecodePipeline::handle_error_message (GstMessage *message)
+void DecodePipeline::HandleErrorMessage (GstMessage *message)
 {
   GError *error = nullptr;
   gchar *dbg_info = nullptr;
@@ -147,12 +147,12 @@ void DecodePipeline::handle_error_message (GstMessage *message)
   g_free (dbg_info);
 }
 
-void DecodePipeline::handle_eos_message (GstMessage *)
+void DecodePipeline::HandleEosMessage (GstMessage *)
 {
   m_media_state = MediaState::EOS;
 }
 
-static MediaState convert_gst_state (GstState _state)
+static MediaState ConvertGstState (GstState _state)
 {
   if (_state == GST_STATE_PLAYING)
     return MediaState::Playing;
@@ -166,26 +166,26 @@ static MediaState convert_gst_state (GstState _state)
   return MediaState::None;
 }
 
-void DecodePipeline::handle_state_changed_message (GstMessage *message)
+void DecodePipeline::HandleStateChangedMessage (GstMessage *message)
 {
   GstState old_state, new_state, pend_state;
   gst_message_parse_state_changed(message, &old_state, &new_state, &pend_state);
 
-  m_media_state = convert_gst_state (new_state);
-  m_pending_state = convert_gst_state (pend_state);
+  m_media_state = ConvertGstState (new_state);
+  m_pending_state = ConvertGstState (pend_state);
 }
 
 
 
 DecodePipeline::~DecodePipeline ()
 {
-  clean_up ();
+  CleanUp ();
 }
 
 /* This function will be called by the pad-added signal */
 static void db_pad_added_handler (GstElement *src, GstPad *new_pad, DecodePipeline *data)
 {
-  data->m_terminus->new_decoded_pad(data, src, new_pad);
+  data->m_terminus->NewDecodedPad (data, src, new_pad);
 }
 
 static gboolean db_autoplug_continue_handler (GstElement *, GstPad *,

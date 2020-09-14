@@ -12,16 +12,16 @@ class FrameTime
 
   FrameTime ();
 
-  void update_time ();
-  void advance_time (u64 _dt);
+  void UpdateTime  ();
+  void AdvanceTime (u64 _dt);
 
-  f64 current_time ()  const;
-  f64 current_delta () const;
-  f64 reset_time ()    const;
+  f64 GetCurrentTime  () const;
+  f64 GetCurrentDelta () const;
+  f64 ResetTime ()       const;
 
-  u64 current_time_ns ()  const;
-  u64 current_delta_ns () const;
-  u64 reset_time_ns ()    const;
+  u64 GetCurrentTimeNS  () const;
+  u64 GetCurrentDeltaNS () const;
+  u64 ResetTimeNS ()       const;
 
  protected:
 

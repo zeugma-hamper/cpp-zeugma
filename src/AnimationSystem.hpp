@@ -16,14 +16,14 @@ class AnimationSystem
   AnimationSystem ();
   ~AnimationSystem ();
 
-  void update_animations (f64 timestamp, f64 delta);
+  void UpdateAnimations (f64 timestamp, f64 delta);
 
-  void add_animation (Animation *_anim);
+  void AddAnimation (Animation *_anim);
 
-  static void initialize ();
-  static void shut_down ();
+  static void Initialize ();
+  static void ShutDown ();
 
-  static AnimationSystem *get_system ();
+  static AnimationSystem *GetSystem ();
 
  protected:
   std::vector<Animation *> m_animations;

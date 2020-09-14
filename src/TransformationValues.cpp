@@ -2,85 +2,86 @@
 
 namespace charm
 {
-  void TransformComponentsSoftValue::set_translation (glm::vec3 const &_translation)
+
+void TransformComponentsSoftValue::SetTranslation (glm::vec3 const &_translation)
 {
-  set_dirty (true);
+  SetDirty (true);
   m_value.translation = _translation;
 }
 
-glm::vec3 const &TransformComponentsSoftValue::get_translation () const
+glm::vec3 const &TransformComponentsSoftValue::GetTranslation () const
 {
   return m_value.translation;
 }
 
-void TransformComponentsSoftValue::set_rotation (glm::quat const &_rot)
+void TransformComponentsSoftValue::SetRotation (glm::quat const &_rot)
 {
-  set_dirty (true);
+  SetDirty (true);
   m_value.rotation = _rot;
 }
 
-glm::quat const &TransformComponentsSoftValue::get_rotation () const
+glm::quat const &TransformComponentsSoftValue::GetRotation () const
 {
   return m_value.rotation;
 }
 
-void TransformComponentsSoftValue::set_scale (f32 _scale)
+void TransformComponentsSoftValue::SetScale (f32 _scale)
 {
-  set_dirty (true);
+  SetDirty (true);
   m_value.scale = glm::vec3 (_scale);
 }
 
-void TransformComponentsSoftValue::set_scale (glm::vec3 const &_scale)
+void TransformComponentsSoftValue::SetScale (glm::vec3 const &_scale)
 {
-  set_dirty (true);
+  SetDirty (true);
   m_value.scale = _scale;
 }
 
-glm::vec3 const &TransformComponentsSoftValue::get_scale () const
+glm::vec3 const &TransformComponentsSoftValue::GetScale () const
 {
   return m_value.scale;
 }
 
-void TransformationSoftValue::set_model (glm::mat4 const &_mod)
+void TransformationSoftValue::SetModel (glm::mat4 const &_mod)
 {
-  set_dirty (true);
+  SetDirty (true);
   m_value.model = _mod;
 }
 
-glm::mat4 const &TransformationSoftValue::get_model () const
+glm::mat4 const &TransformationSoftValue::GetModel () const
 {
   return m_value.model;
 }
 
-void TransformationSoftValue::set_normal (glm::mat4 const &_norm)
+void TransformationSoftValue::SetNormal (glm::mat4 const &_norm)
 {
-  set_dirty (true);
+  SetDirty (true);
   m_value.normal = _norm;
 }
 
-glm::mat4 const &TransformationSoftValue::get_normal () const
+glm::mat4 const &TransformationSoftValue::GetNormal () const
 {
   return m_value.normal;
 }
 
-void TransformationAnimSoftValue::set_model (glm::mat4 const &_mod)
+void TransformationAnimSoftValue::SetModel (glm::mat4 const &_mod)
 {
-  set_dirty (true);
+  SetDirty (true);
   m_value.model = _mod;
 }
 
-glm::mat4 const &TransformationAnimSoftValue::get_model () const
+glm::mat4 const &TransformationAnimSoftValue::GetModel () const
 {
   return m_value.model;
 }
 
-void TransformationAnimSoftValue::set_normal (glm::mat4 const &_norm)
+void TransformationAnimSoftValue::SetNormal (glm::mat4 const &_norm)
 {
-  set_dirty (true);
+  SetDirty (true);
   m_value.normal = _norm;
 }
 
-glm::mat4 const &TransformationAnimSoftValue::get_normal () const
+glm::mat4 const &TransformationAnimSoftValue::GetNormal () const
 {
   return m_value.normal;
 }
