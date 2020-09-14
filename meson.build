@@ -151,11 +151,9 @@ glfw_dep = dependency ('glfw3', required : true)
 
 ##### build arguments
 
-gst_dep = dependency ('gstreamer-1.0')
-gst_app_dep = dependency ('gstreamer-app-1.0')
+gst_dep       = dependency ('gstreamer-1.0')
+gst_app_dep   = dependency ('gstreamer-app-1.0')
 gst_video_dep = dependency ('gstreamer-video-1.0')
-
-gstreamer_deps = [gst_dep, gst_app_dep, gst_video_dep]
 
 lib_sources = ['src/Animation.cpp',
                'src/AnimationSystem.cpp',
@@ -170,15 +168,17 @@ lib_sources = ['src/Animation.cpp',
 
 charm_inc = include_directories ('src')
 
+charm_definition_deps = [bx_dep, bimg_dep, bgfx_dep, glfw_dep,
+                         gst_dep, gst_app_dep, gst_video_dep]
+
 charm_lib = static_library ('charm', lib_sources,
                             include_directories : charm_inc,
-                            dependencies : [bx_dep, bimg_dep, bgfx_dep, glfw_dep] + gstreamer_deps,
-                            #version : '0.5',
+                            dependencies : charm_definition_deps,
                             install : true)
 
 charm_dep = declare_dependency (include_directories : [charm_inc],
                                 link_with : [charm_lib],
-                                dependencies : [bx_dep, bimg_dep, bgfx_dep, glfw_dep] + gstreamer_deps)
+                                dependencies : charm_definition_deps)
 
 bgfx_test_exec = executable ('bgfx_test',
                              sources : ['src/bgfx_test.cpp'],
