@@ -20,7 +20,10 @@ class Animation
  public:
   using id = u64;
 
+  // part of global animation system
   Animation ();
+  // part of animation system provided as parameter
+  Animation (AnimationSystem *_system);
   virtual ~Animation ();
 
   id GetId () const;
@@ -44,13 +47,13 @@ template<typename SV>
 class SoftAnimation : public Animation
 {
  public:
-  using SoftValType = SV;
+  using SoftValueType = SV;
 
   SoftAnimation ()
     : SoftAnimation {nullptr}
   { }
 
-  explicit SoftAnimation (SoftValType *_sv)
+  explicit SoftAnimation (SoftValueType *_sv)
     : Animation {},
       m_value {_sv}
   { }
@@ -63,18 +66,18 @@ class SoftAnimation : public Animation
     m_value = nullptr;
   }
 
-  SoftValType *GetSoftValue () const
+  SoftValueType *GetSoftValue () const
   {
     return m_value;
   }
 
-  void SetSoftValue (SoftValType *_sv)
+  void SetSoftValue (SoftValueType *_sv)
   {
     m_value = _sv;
   }
 
  protected:
-  SoftValType *m_value;
+  SoftValueType *m_value;
 };
 
 }

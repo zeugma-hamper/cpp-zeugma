@@ -1,10 +1,20 @@
 #include "Animation.hpp"
 
+#include <AnimationSystem.hpp>
+
 namespace charm
 {
 
 Animation::Animation ()
-  : m_id {0u},
+  : m_system {AnimationSystem::GetSystem ()},
+    m_id {0u},
+    m_state {State::Start},
+    m_last_step {0u}
+{ }
+
+Animation::Animation (AnimationSystem *_system)
+  : m_system {_system},
+    m_id {0u},
     m_state {State::Start},
     m_last_step {0u}
 { }
