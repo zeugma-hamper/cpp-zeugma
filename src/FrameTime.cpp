@@ -34,19 +34,19 @@ void FrameTime::AdvanceTime (u64 _dt)
 
 f64 FrameTime::GetCurrentTime () const
 {
-  f64 const  ooab = 1.0/1000000000.0;
+  f64 const ooab = 1.0/1000000000.0;
   return m_current_time * ooab;
 }
 
 f64 FrameTime::GetCurrentDelta () const
 {
-  f64 const  ooab = 1.0/1000000000.0;
+  f64 const ooab = 1.0/1000000000.0;
   return m_frame_delta * ooab;
 }
 
 f64 FrameTime::ResetTime () const
 {
-  f64 const  ooab = 1.0/1000000000.0;
+  f64 const ooab = 1.0/1000000000.0;
   return m_reset_time * ooab;
 }
 
