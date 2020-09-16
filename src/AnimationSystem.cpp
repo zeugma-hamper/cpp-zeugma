@@ -50,7 +50,8 @@ void AnimationSystem::UpdateAnimations (double timestamp, double delta)
 
 void AnimationSystem::AddAnimation(Animation *_animation)
 {
-  m_animations.push_back(_animation);
+  if (_animation)
+    m_animations.push_back(_animation);
 }
 
 void AnimationSystem::Initialize ()

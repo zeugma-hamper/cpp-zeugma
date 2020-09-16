@@ -11,17 +11,16 @@
 //Q: Why have Animation as a template parameter rather than
 //   a concrete component of the subclass?
 //A: I would like to have interpolation animations and values that
-//   know and expect that sort of interpolation.
+//   know and expect that sort of animation.
 
 namespace charm
 {
-class Animation;
-
 using FloatSoft = SoftValue<f32>;
 using FloatAnim = AnimSoftValue<f32, Animation>;
 
-using Vec3Soft = SoftValue<glm::vec3>;
-using Vec3Anim = AnimSoftValue<glm::vec3, Animation>;
+
+using VecSoft = SoftValue<glm::vec3>;
+using VecAnim = AnimSoftValue<glm::vec3, Animation>;
 
 using QuatSoft = SoftValue<glm::quat>;
 using QuatAnim = AnimSoftValue<glm::quat, Animation>;
@@ -31,7 +30,7 @@ class InterpolationAnimation : public SoftAnimation<SV>
 {
  public:
   using SoftValueType = SV;
-  using ValueType = typename SV::ValueType;
+  using ValueType  = typename SV::ValueType;
   using ParentType = SoftAnimation<SV>;
 
   InterpolationAnimation ()
@@ -80,7 +79,7 @@ class InterpolationAnimation : public SoftAnimation<SV>
     if (m_start_time < 0.0f || Animation::m_state == State::Start)
       {
         m_start_time = f32 (_timestamp);
-        ParentType::m_value->SetValue (m_start_val);
+        ParentType::m_value->Set (m_start_val);
         return State::Continuing;
       }
 
@@ -88,15 +87,15 @@ class InterpolationAnimation : public SoftAnimation<SV>
     f32 const time_smidge = 0.001f;
     if (_timestamp <= m_duration + m_start_time + time_smidge)
       {
-        ParentType::m_value->SetValue (m_goal_val);
+        ParentType::m_value->Set (m_goal_val);
         return State::Finished;
       }
 
     //just linear interpolation now, but you can see that
     //any of those interp functions would work
-    f64 const pct = (_timestamp - m_start_time) / m_duration;
-    ValueType const v ((1.0 - pct) * m_start_val + pct * m_goal_val);
-    ParentType::m_value->SetValue (v);
+    f32 const pct ((_timestamp - m_start_time) / m_duration);
+    ValueType const v ((1.0f - pct) * m_start_val + pct * m_goal_val);
+    ParentType::m_value->Set (v);
     return State::Continuing;
   }
 
@@ -115,6 +114,42 @@ f32 cs_distance (T const &, T const &);
 template<typename T>
 T cs_direction (T const &_from, T const &_to);
 
+template<>
+inline f32 cs_distance<f32> (f32 const &_a, f32 const &_b)
+{
+  return std::abs(_a - _b);
+}
+
+template<>
+inline f32 cs_distance<glm::vec3> (glm::vec3 const &_a, glm::vec3 const &_b)
+{
+  return glm::distance(_a, _b);
+}
+
+template<>
+inline f32 cs_distance<glm::vec4> (glm::vec4 const &_a, glm::vec4 const &_b)
+{
+  return glm::distance(_a, _b);
+}
+
+
+template<>
+inline f32 cs_direction<f32> (f32 const &_from, f32 const &_to)
+{
+  return _from > _to ? -1.0f : 1.0f;
+}
+
+template<>
+inline glm::vec3 cs_direction<glm::vec3> (glm::vec3 const &_from, glm::vec3 const &_to)
+{
+  return glm::normalize(_to - _from);
+}
+
+template<>
+inline glm::vec4 cs_direction<glm::vec4> (glm::vec4 const &_from, glm::vec4 const &_to)
+{
+  return glm::normalize(_to - _from);
+}
 
 
 template<typename SV>
@@ -184,42 +219,6 @@ class ConstantSpeedAnimation : public SoftAnimation<SV>
   f32 m_start_time;
 };
 
-template<>
-f32 cs_distance<f32> (f32 const &_a, f32 const &_b)
-{
-  return std::abs(_a - _b);
-}
-
-template<>
-f32 cs_distance<glm::vec3> (glm::vec3 const &_a, glm::vec3 const &_b)
-{
-  return glm::distance(_a, _b);
-}
-
-template<>
-f32 cs_distance<glm::vec4> (glm::vec4 const &_a, glm::vec4 const &_b)
-{
-  return glm::distance(_a, _b);
-}
-
-
-template<>
-f32 cs_direction<f32> (f32 const &_from, f32 const &_to)
-{
-  return _from > _to ? -1.0f : 1.0f;
-}
-
-template<>
-glm::vec3 cs_direction<glm::vec3> (glm::vec3 const &_from, glm::vec3 const &_to)
-{
-  return glm::normalize(_to - _from);
-}
-
-template<>
-glm::vec4 cs_direction<glm::vec4> (glm::vec4 const &_from, glm::vec4 const &_to)
-{
-  return glm::normalize(_to - _from);
-}
 
 }
 

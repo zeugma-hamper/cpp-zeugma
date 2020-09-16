@@ -442,11 +442,21 @@ bool dead_zone::StartUp ()
   return InitWindowingAndGraphics();
 }
 
+Node *s_nodal = nullptr;
+
 bool dead_zone::Update ()
 {
   GetFrameTime()->UpdateTime();
 
   glfwPollEvents();
+
+  // if (s_nodal && ! s_nodal->GetTranslationSoft().GetAnimation())
+  //   {
+  //     auto *anim = new InterpolationAnimation<VecAnim>;
+  //     anim->SetStartValue(glm::vec3 {-2.0f, 0.0f, 6.0f});
+  //     anim->SetGoalValue (glm::vec3 { 2.0f, 0.0f, 6.0f});
+  //     s_nodal->InstallTranslationAnimation(anim);
+  //   }
 
   AnimationSystem::GetSystem()->
     UpdateAnimations(GetFrameTime()->GetCurrentTime(),
@@ -500,17 +510,16 @@ int main (int, char **)
 
   Layer &layer = zone.GetSceneLayer();
 
-  Node *node = new Node ();
+  s_nodal = new Node ();
 
-  node->GetTransformComponentsSoft().SetTranslation (glm::vec3 {0.0f, 0.0f, 9.0f});
-  node->GetTransformComponentsSoft().SetScale (glm::vec3 {20.0f});
+  s_nodal->GetTranslationSoft ().Set (glm::vec3 {0.0f, 0.0f, 6.0f});
+  s_nodal->GetScaleSoft ().Set (glm::vec3 {10.0f});
 
   VideoRenderable *renderable
     = new VideoRenderable ("file:///home/blake/tlp/tamper-blu-mkv/The Fall_t00.mkv");
 
-  node->AppendRenderable(renderable);
-  node->InstallComponentAnimation(new TXCAnimation);
-  layer.GetRootNode()->AppendChild(node);
+  s_nodal->AppendRenderable(renderable);
+  layer.GetRootNode()->AppendChild(s_nodal);
 
   zone.Run ();
 

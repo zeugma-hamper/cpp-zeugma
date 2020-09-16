@@ -38,21 +38,82 @@ void Node::UpdateTransformations ()
   UpdateTransformations (tsv);
 }
 
+static void update_transformations_internal (Transformation &_tx,
+                                             u32 _order,
+                                             glm::vec3 const &_translation,
+                                             glm::quat const &_rotation,
+                                             glm::vec3 const &_scale)
+{
+  /*
+    000: TRS
+    001: TSR
+    002: STR
+    003: SRT
+    004: RTS
+    004: RST
+   */
+
+  auto make_inverse_transpose = [] (glm::mat4 const &_model) -> glm::mat3
+  {
+    return glm::inverseTranspose (glm::mat3 (_model));
+  };
+
+  //the inconsistency here drives me bonkers
+  switch (_order) {
+  case 0x000:
+     _tx.model = glm::translate (_translation) * glm::mat4_cast(_rotation) * glm::scale (_scale);
+     _tx.normal = glm::inverseTranspose (glm::mat4_cast(_rotation) * glm::scale (_scale));
+     break;
+
+  case 0x001:
+     _tx.model = glm::translate (_translation) * glm::scale (_scale) * glm::mat4_cast(_rotation);
+     _tx.normal = make_inverse_transpose(_tx.model);
+     break;
+
+  case 0x002:
+     _tx.model = glm::scale (_scale) * glm::translate (_translation) * glm::mat4_cast(_rotation);
+     _tx.normal = make_inverse_transpose (_tx.model);
+     break;
+
+  case 0x003:
+     _tx.model = glm::scale (_scale) * glm::mat4_cast(_rotation) * glm::translate (_translation);
+     _tx.normal = make_inverse_transpose (_tx.model);
+     break;
+
+  case 0x004:
+     _tx.model = glm::mat4_cast(_rotation) * glm::translate (_translation) * glm::scale (_scale);
+     _tx.normal = make_inverse_transpose (_tx.model);
+     break;
+
+  case 0x005:
+     _tx.model = glm::mat4_cast(_rotation) * glm::scale (_scale) * glm::translate (_translation);
+     _tx.normal = make_inverse_transpose (_tx.model);
+     break;
+
+  default:
+     _tx.model = glm::translate (_translation) * glm::mat4_cast(_rotation) * glm::scale (_scale);
+     _tx.normal = glm::inverseTranspose (glm::mat4_cast(_rotation) * glm::scale (_scale));
+     break;
+  }
+}
+
 void Node::UpdateTransformations (TransformationSoftValue const &_parent_tx)
 {
   m_absolute_tx.ClearDirty ();
 
-  if (m_tx_components.IsDirty ())
+  if (m_translation.IsDirty() ||
+      m_scale.IsDirty()       ||
+      m_rotation.IsDirty())
     {
-      //the inconsistency here drives me bonkers
-      m_tx_components.ClearDirty ();
-      m_tx.SetDirty (true);
-      TransformComponents &txc = m_tx_components.GetValue ();
-      Transformation &tx = m_tx.GetValue ();
-      glm::mat4 const rs = glm::mat4_cast(txc.rotation) * glm::scale (txc.scale);
+      m_translation.ClearDirty();
+      m_scale.ClearDirty();
+      m_rotation.ClearDirty();
+      m_tx.SetDirty(true);
 
-      tx.model = glm::translate (txc.translation) * rs;
-      tx.normal = glm::inverseTranspose (rs);
+      Transformation &tx = m_tx.GetValue ();
+      update_transformations_internal(tx, 0, m_translation.GetValue(),
+                                      m_rotation.GetValue(),
+                                      m_scale.GetValue());
     }
 
   if (m_tx.IsDirty() || _parent_tx.IsDirty ())
@@ -168,24 +229,70 @@ Layer *Node::GetLayer () const
   return m_layer;
 }
 
-TransformComponentsSoftValue &Node::GetTransformComponentsSoft ()
+VecAnim &Node::GetTranslationSoft ()
 {
-  return m_tx_components;
+  return m_translation;
 }
 
 glm::vec3 const &Node::GetTranslation () const
 {
-  return m_tx_components.GetTranslation();
+  return m_translation.GetValue();
+}
+
+void Node::InstallTranslationAnimation (SoftAnimation<VecAnim> *_anim)
+{
+  m_translation.SetAnimation(_anim);
+
+  if (_anim)
+    {
+      _anim->SetSoftValue(&m_translation);
+      m_translation.SetDirty(true);
+      AnimationSystem::GetSystem()->AddAnimation(_anim);
+    }
+}
+
+QuatAnim &Node::GetRotationSoft ()
+{
+  return m_rotation;
 }
 
 glm::quat const &Node::GetRotation () const
 {
-  return m_tx_components.GetRotation();
+  return m_rotation.GetValue();
+}
+
+void Node::InstallRotationAnimation (SoftAnimation<QuatAnim> *_anim)
+{
+  m_rotation.SetAnimation(_anim);
+
+  if (_anim)
+    {
+      _anim->SetSoftValue(&m_rotation);
+      m_rotation.SetDirty(true);
+      AnimationSystem::GetSystem()->AddAnimation(_anim);
+    }
+}
+
+VecAnim &Node::GetScaleSoft ()
+{
+  return m_scale;
 }
 
 glm::vec3 const &Node::GetScale () const
 {
-  return m_tx_components.GetScale();
+  return m_scale.GetValue();
+}
+
+void Node::InstallScaleAnimation (SoftAnimation<VecAnim> *_anim)
+{
+  m_scale.SetAnimation(_anim);
+
+  if (_anim)
+    {
+      _anim->SetSoftValue(&m_scale);
+      m_scale.SetDirty(true);
+      AnimationSystem::GetSystem()->AddAnimation(_anim);
+    }
 }
 
 TransformationSoftValue &Node::GetAbsoluteTransformationSoft ()
@@ -218,29 +325,13 @@ glm::mat4 const &Node::GetNormalTransformation () const
   return m_tx.GetNormal();
 }
 
-void Node::InstallComponentAnimation (ComponentAnimation *_animation)
-{
-  if (_animation)
-    {
-      _animation->SetSoftValue(&m_tx_components);
-      m_tx_components.SetAnimation(_animation);
-      m_tx_components.SetDirty(true);
-      AnimationSystem::GetSystem()->AddAnimation(_animation);
-    }
-}
-
-Animation *Node::GetComponentAnimation () const
-{
-  return m_tx_components.GetAnimation();
-}
-
-
 void Node::InstallTransformAnimation (TransformationAnimation *_animation)
 {
+  m_tx.SetAnimation(_animation);
+
   if (_animation)
     {
       _animation->SetSoftValue(&m_tx);
-      m_tx.SetAnimation(_animation);
       m_tx.SetDirty(true);
       AnimationSystem::GetSystem()->AddAnimation(_animation);
     }

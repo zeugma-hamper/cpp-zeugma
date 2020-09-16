@@ -5,6 +5,7 @@
 #include <class_utils.hpp>
 #include <Animation.hpp>
 #include <SoftValue.hpp>
+#include <SoftTypes.hpp>
 #include <TransformationValues.hpp>
 
 #include <vector>
@@ -49,21 +50,25 @@ class Node
   void   SetLayer (Layer *_layer);
   Layer *GetLayer () const;
 
-  TransformComponentsSoftValue &GetTransformComponentsSoft ();
+  VecAnim &GetTranslationSoft ();
   glm::vec3 const &GetTranslation () const;
-  glm::quat const &GetRotation () const;
-  glm::vec3 const &GetScale () const;
+  void InstallTranslationAnimation (SoftAnimation<VecAnim> *_anim);
 
-  TransformationSoftValue &GetAbsoluteTransformationSoft ();
-  glm::mat4 const &GetAbsoluteModelTransformation  () const;
-  glm::mat4 const &GetAbsoluteNormalTransformation () const;
+  QuatAnim &GetRotationSoft ();
+  glm::quat const &GetRotation () const;
+  void InstallRotationAnimation (SoftAnimation<QuatAnim> *_anim);
+
+  VecAnim &GetScaleSoft ();
+  glm::vec3 const &GetScale () const;
+  void InstallScaleAnimation (SoftAnimation<VecAnim> *_anim);
 
   TransformationAnimSoftValue &GetTransformationSoft ();
   glm::mat4 const &GetModelTransformation  () const;
   glm::mat4 const &GetNormalTransformation () const;
 
-  void InstallComponentAnimation (ComponentAnimation *_animation);
-  Animation *GetComponentAnimation () const;
+  TransformationSoftValue &GetAbsoluteTransformationSoft ();
+  glm::mat4 const &GetAbsoluteModelTransformation  () const;
+  glm::mat4 const &GetAbsoluteNormalTransformation () const;
 
   void InstallTransformAnimation (TransformationAnimation *_animation);
   Animation *GetTransformationAnimation () const;
@@ -75,9 +80,11 @@ class Node
   std::vector<Node *>       m_children;
   std::vector<Renderable *> m_renderables;
 
-  TransformComponentsSoftValue m_tx_components;
-  TransformationAnimSoftValue  m_tx;
-  TransformationSoftValue      m_absolute_tx;
+  VecAnim                     m_translation;
+  VecAnim                     m_scale;
+  QuatAnim                    m_rotation;
+  TransformationAnimSoftValue m_tx;
+  TransformationSoftValue     m_absolute_tx;
 };
 
 }
