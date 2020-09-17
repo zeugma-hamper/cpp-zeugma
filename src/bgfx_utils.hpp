@@ -1,7 +1,9 @@
 #ifndef BGFX_IS_AWFULLY_CLOSE_TO_BUGFIX
 #define BGFX_IS_AWFULLY_CLOSE_TO_BUGFIX
 
+#include <bx/bx.h>
 #include <bgfx/bgfx.h>
+#include <bgfx/platform.h>
 #include <bx/filepath.h>
 
 #include <vector>

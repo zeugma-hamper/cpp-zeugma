@@ -1,3 +1,6 @@
+#ifndef BASE_RENDERABLE_DOESNT_DO_MUCH
+#define BASE_RENDERABLE_DOESNT_DO_MUCH
+
 #include <base_types.hpp>
 #include <class_utils.hpp>
 
@@ -34,3 +37,5 @@ class Renderable
 };
 
 }
+
+#endif //BASE_RENDERABLE_DOESNT_DO_MUCH
