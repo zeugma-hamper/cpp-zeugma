@@ -12,22 +12,18 @@ there are some weird bits to bgfx's shader preprocessing / compiling. i'm going 
 - it's possible for shaderc to compile successfully and the GL implementation can still barf. bgfx sucks at reporting the actual error, but using gdb to stop at the shader error `assert`, you can go up four or so frames and `print log`. 
 
 ## building with shaderc
-i haven't automated building shaders yet, so here is the command i
-used from the root of the project directory:
+first, install bgfx's tools with the `install_bgfx_tools.sh` script. it expects one argument: the binary directory to install. it should be in your path or added to your path so meson can find `shaderc`. any new shaders you create should be added to `meson.build` similar to the below array:
 
-    bld/shaderc -i bgfx/src -f src/shaders/quad_vs.sc -o bld/quad_vs.bin --type vertex --varyingdef src/quad_varying.def.sc --profile 460
-    bld/shaderc -i bgfx/src -f src/shaders/quad_fs.sc -o bld/quad_fs.bin --type fragment --varyingdef src/shaders/quad_varying.def.sc --profile 460
+    # [type, input file, varying file, output file]
+    shaders = [
+      # video
+      ['vertex',   'src/shaders/video_vs.sc', 'src/shaders/video_varying.def.sc', 'video_vs.bin'],
+      ['fragment', 'src/shaders/video_fs.sc', 'src/shaders/video_varying.def.sc', 'video_fs.bin'],
+      # quad
+      ['vertex',   'src/shaders/quad_vs.sc', 'src/shaders/quad_varying.def.sc', 'quad_vs.bin'],
+      ['fragment', 'src/shaders/quad_fs.sc', 'src/shaders/quad_varying.def.sc', 'quad_fs.bin'],
+    ]
 
-where:
-
-    -i: include directory
-    -f: shader file
-    -o: output file
-    --varyingdef: file defining inputs and outputs from shaders
-    --platform: which shader language to compile. to specify GLSL version,
-      use version number with decimal shifted right two places.
-
-i made `compile_shader.sh`; see the top of the file for argument order.
 
 ## shader naming scheme
 
