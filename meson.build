@@ -36,7 +36,7 @@ bimg_sources = ['bimg/src/image.cpp',
                 'bimg/src/image_encode.cpp']
 
 
-# and a hearty fuck you to meson for not allowing *
+# blaaaaaaaaaaaaaaaaaaaaaaaaah i want to use '*' here
 bimg_third_party_sources = ['bimg/3rdparty/astc/astc_averages_and_directions.cpp',
                             'bimg/3rdparty/astc/astc_block_sizes2.cpp',
                             'bimg/3rdparty/astc/astc_color_quantize.cpp',
@@ -179,6 +179,33 @@ charm_lib = static_library ('charm', lib_sources,
 charm_dep = declare_dependency (include_directories : [charm_inc],
                                 link_with : [charm_lib],
                                 dependencies : charm_definition_deps)
+
+# be sure to run `./install_bgfx_tools.sh <BIN_DIR>` before building charm
+shaderc_prog = find_program ('shaderc')
+
+# [type, input file, varying file, output file]
+shaders = [
+  # video
+  ['vertex',   'src/shaders/video_vs.sc', 'src/shaders/video_varying.def.sc', 'video_vs.bin'],
+  ['fragment', 'src/shaders/video_fs.sc', 'src/shaders/video_varying.def.sc', 'video_fs.bin'],
+  # quad
+  ['vertex',   'src/shaders/quad_vs.sc', 'src/shaders/quad_varying.def.sc', 'quad_vs.bin'],
+  ['fragment', 'src/shaders/quad_fs.sc', 'src/shaders/quad_varying.def.sc', 'quad_fs.bin'],
+]
+
+foreach shader : shaders
+  custom_target (shader[3],
+                 input : [shader[1], shader[2]],
+                 output : [shader[3]],
+                 command : [shaderc_prog,
+                            '-i', meson.source_root () + '/bgfx/src',
+                            '-f', '@INPUT0@',
+                            '-o', '@OUTPUT0@',
+                            '--type', shader[0],
+                            '--varyingdef', '@INPUT1@',
+                            '--profile', '460'],
+                 build_by_default : true)
+endforeach
 
 bgfx_test_exec = executable ('bgfx_test',
                              sources : ['src/bgfx_test.cpp'],
