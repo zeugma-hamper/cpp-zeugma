@@ -215,5 +215,6 @@ dead_zone_exec = executable ('dead_zone',
                              sources : ['src/dead_zone.cpp',
                                         'src/application.cpp',
                                         'src/FrameTime.cpp',
+                                        'src/RectangleRenderable.cpp',
                                         'src/VideoRenderable.cpp'],
                              dependencies : [charm_dep])

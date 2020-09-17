@@ -42,7 +42,6 @@ RectangleRenderable::RectangleRenderable ()
 
     if (bgfx::isValid(vs) && bgfx::isValid (fs))
       {
-        fprintf (stderr, "creating shader\n");
         program = bgfx::createProgram(vs, fs, true);
       }
     else
