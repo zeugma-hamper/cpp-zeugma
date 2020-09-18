@@ -4,7 +4,7 @@
 
 using namespace charm;
 
-static void print_film_configuration (FilmConfiguration const &_fc)
+static void print_film_info (FilmInfo const &_fc)
 {
   printf ("%s (%s):\n", _fc.name.c_str (), _fc.abbreviation.c_str());
   printf (" path: %s\n", _fc.film_path.c_str());
@@ -12,7 +12,7 @@ static void print_film_configuration (FilmConfiguration const &_fc)
   printf (" clip count: %zu\n", _fc.clips.size ());
 }
 
-static void print_clip_information (ClipDirectory const &_cd, const char *_prefix = "")
+static void print_clip_information (ClipInfo const &_cd, const char *_prefix = "")
 {
   printf ("%sname: %s\n", _prefix, _cd.name.c_str());
   printf ("%spath: %s\n", _prefix, _cd.directory.c_str());
@@ -30,8 +30,8 @@ int main (int ac, char **av)
     }
 
   fprintf (stderr, "reading %s\n", av[1]);
-  std::vector<FilmConfiguration> configs =
-    ReadFilmConfiguration(av[1]);
+  std::vector<FilmInfo> configs =
+    ReadFilmInfo(av[1]);
 
   if (configs.size () == 0)
     {
@@ -39,11 +39,11 @@ int main (int ac, char **av)
       return 0;
     }
 
-  for (FilmConfiguration const &fc : configs)
-    print_film_configuration (fc);
+  for (FilmInfo const &fc : configs)
+    print_film_info (fc);
 
   printf ("\n");
-  for (ClipDirectory &cd : configs[0].clips)
+  for (ClipInfo &cd : configs[0].clips)
     {
       print_clip_information(cd);
       printf ("\n");

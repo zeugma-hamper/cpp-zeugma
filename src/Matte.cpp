@@ -8,46 +8,19 @@ namespace charm
 
 namespace fs = std::filesystem;
 
-/*
-  structure of film config file:
-
-  top-level - table containing all film details
-  root - string containing root path of film files. if not absolute, it is assumed the path is relative to the directory the file is in.
-  roto_root - string containing root path to rotoscope images. if not absolute, it is assumed path is relative to root path (see above).
-
-  [movieabbreviation]
-  name - display name of film
-  path - path to movie file. if not absolute, assumed to be relative to root
-  clip_path - path to directory containing directories of matte files. if not absolute, assumed to be relative to roto_root.
-
-  structure of directory of clip directories:
-  timestamp_duration_0000000000_descriptor
-  timestamp - from beginning of film in second, six digits before the decimal, 3 digits after,
-              zero-filled
-  duration - duration of clip covered by matte files,  six digits before the decimal, 3 digits after,
-             zero-filled
-  descriptor - one-word descriptor of matted element
-
-  structure of clip directory:
-  name_descriptor_index
-  name - name of film this clip is from, should be same as moviename in toml and directory of clip directories
-  descriptor - same descriptor as above
-  index - three-digit, zero-filled index of matte in this clip
-*/
-
-std::vector<FilmConfiguration>
-ReadFilmConfiguration (std::filesystem::path const &_path)
+std::vector<FilmInfo>
+ReadFilmInfo (std::filesystem::path const &_path)
 {
   std::error_code ec;
 
   if (! fs::exists (_path, ec))
     return {};
 
-  fs::path abs_path = fs::absolute(_path.parent_path(), ec);
+  fs::path abs_path = fs::canonical(_path.parent_path(), ec);
   if (ec)
     return {};
 
-  std::vector<FilmConfiguration> data;
+  std::vector<FilmInfo> data;
   fs::path root;
   fs::path roto_root;
 
@@ -60,9 +33,9 @@ ReadFilmConfiguration (std::filesystem::path const &_path)
         {
           fs::path p {toml::find<std::string> (config, "root")};
           if (p.is_relative())
-            root = abs_path / p;
+            root = fs::canonical (abs_path / p, ec);
           else
-            root = p;
+            root = fs::canonical (p, ec);
         }
       else
         {
@@ -74,9 +47,9 @@ ReadFilmConfiguration (std::filesystem::path const &_path)
         {
           fs::path p {toml::find<std::string> (config, "roto_root")};
           if (p.is_relative())
-            roto_root = root / p;
+            roto_root = fs::canonical (root / p, ec);
           else
-            roto_root = p;
+            roto_root = fs::canonical (p, ec);
         }
       else
         {
@@ -94,7 +67,7 @@ ReadFilmConfiguration (std::filesystem::path const &_path)
           if (! value.is_table())
             continue;
 
-          FilmConfiguration fc;
+          FilmInfo fc;
           fc.abbreviation = key;
           fc.name = value.at("name").as_string ();
 
@@ -136,7 +109,7 @@ ReadFilmConfiguration (std::filesystem::path const &_path)
   // aside: now i have two problems
   // example dir name: 001251.083_000004.750_0000000000_vomit
   std::regex const dir_name_ex{"(\\d+\\.\\d+)_(\\d+\\.\\d+)_\\d+_(\\w+)"};
-  for (FilmConfiguration &fc : data)
+  for (FilmInfo &fc : data)
     {
       if (fc.clip_path.empty() ||
           ! fs::is_directory(fc.clip_path, ec))
@@ -166,17 +139,17 @@ ReadFilmConfiguration (std::filesystem::path const &_path)
             }
 
           fc.clips.emplace_back();
-          ClipDirectory &cd = fc.clips.back ();
+          ClipInfo &cd = fc.clips.back ();
 
           cd.directory = de.path ();
           cd.name = captures[3].str ();
-          cd.start_time = std::stod (captures[1].str ());
-          cd.duration = std::stod (captures[2].str ());
+          cd.start_time  = std::stod (captures[1].str ());
+          cd.duration    = std::stod (captures[2].str ());
           cd.frame_count = std::distance (fs::directory_iterator {cd.directory},
                                           fs::directory_iterator {});
         }
 
-      auto less_start_time = [] (ClipDirectory const &l, ClipDirectory const &r)
+      auto less_start_time = [] (ClipInfo const &l, ClipInfo const &r)
         {
           return l.start_time < r.start_time ||
             (l.start_time == r.start_time && l.duration < l.duration);
