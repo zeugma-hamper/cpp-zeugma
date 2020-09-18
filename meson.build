@@ -158,6 +158,7 @@ gst_video_dep = dependency ('gstreamer-video-1.0')
 lib_sources = ['src/Animation.cpp',
                'src/AnimationSystem.cpp',
                'src/Layer.cpp',
+               'src/Matte.cpp',
                'src/Node.cpp',
                'src/Renderable.cpp',
                'src/TransformationValues.cpp',
@@ -167,16 +168,17 @@ lib_sources = ['src/Animation.cpp',
 
 
 charm_inc = include_directories ('src')
+toml_inc = include_directories ('toml11')
 
 charm_definition_deps = [bx_dep, bimg_dep, bgfx_dep, glfw_dep,
                          gst_dep, gst_app_dep, gst_video_dep]
 
 charm_lib = static_library ('charm', lib_sources,
-                            include_directories : charm_inc,
+                            include_directories : [charm_inc, toml_inc],
                             dependencies : charm_definition_deps,
                             install : true)
 
-charm_dep = declare_dependency (include_directories : [charm_inc],
+charm_dep = declare_dependency (include_directories : [charm_inc, toml_inc],
                                 link_with : [charm_lib],
                                 dependencies : charm_definition_deps)
 
@@ -218,3 +220,7 @@ dead_zone_exec = executable ('dead_zone',
                                         'src/RectangleRenderable.cpp',
                                         'src/VideoRenderable.cpp'],
                              dependencies : [charm_dep])
+
+config_parser_exec = executable ('config_parser',
+                                 sources : ['src/config_parser.cpp'],
+                                 dependencies : [charm_dep])

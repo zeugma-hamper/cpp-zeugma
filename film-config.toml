@@ -1,0 +1,7 @@
+root="/home/blake/tlp/tamper-dvd-orig"
+roto_root="rotopro/rotopro"
+
+[boaa]
+name="Belly of an Architect"
+path="boaa-mpeg4.mov"
+clip_path="boaa"
