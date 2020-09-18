@@ -28,32 +28,6 @@
 
 using namespace charm;
 
-class TXCAnimation : public SoftAnimation<TransformComponentsSoftValue>
-{
- public:
-
-  TXCAnimation ()
-    : SoftAnimation<TransformComponentsSoftValue> {}
-  {
-  }
-
-  State DoUpdate (f64, f64 _delta, animation_step) override
-  {
-    assert (m_value);
-
-    const f32 rads_per_sec = glm::pi<float> () / 5.0f;
-    const glm::vec3 rot_axis{0.0f, 1.0f, 0.0f};
-
-    const glm::quat rot = glm::rotate (m_value->GetRotation(),
-                                       f32 (rads_per_sec * _delta),
-                                       rot_axis);
-    m_value->SetRotation(rot);
-
-    return State::Continuing;
-  }
-};
-
-
 class dead_zone final : public charm::Application
 {
  public:
