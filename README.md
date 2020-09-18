@@ -8,7 +8,7 @@ there are some weird bits to bgfx's shader preprocessing / compiling. i'm going 
 
 - use `void main()`: it bails if you put a space as in `void main ()`
 - without specifying profile glsl version, it defaults to 1.2. 
-- all examples use `gl_FragColor` or `gl_FragData[n]`, but this causes problems on newer intel GL context versions. use `layout (location = 0) out vec4 out_color;` instead. see `quad_fs.sc` and `video_fs.sc` for examples.
+- all examples use `gl_FragColor` or `gl_FragData[n]`, but this causes problems on newer intel GL context versions (skull canyon, NUC). use `layout (location = 0) out vec4 out_color;` in the fragment shader instead. see `quad_fs.sc` and `video_fs.sc` for examples.
 - it's possible for shaderc to compile successfully and the GL implementation can still barf. bgfx sucks at reporting the actual error, but using gdb to stop at the shader error `assert`, you can go up four or so frames and `print log`. 
 
 ## building with shaderc
@@ -27,4 +27,4 @@ first, install bgfx's tools with the `install_bgfx_tools.sh` script. it expects 
 
 ## shader naming scheme
 
-i'm adopting the naming scheme `name_type.sc`, where `type` is `vertex`, `fragment`, or `varying.def` and `name` is whatever identifier you want. this has the benefit of keeping related shaders together in directory listings.
+i'm adopting the naming scheme `name_type.sc`, where `type` is `vs`, `fs`, or `varying.def` and `name` is whatever identifier you want. this has the benefit of keeping related shaders together in directory listings.
