@@ -187,12 +187,17 @@ shaderc_prog = find_program ('shaderc')
 
 # [type, input file, varying file, output file]
 shaders = [
-  # video
-  ['vertex',   'src/shaders/video_vs.sc', 'src/shaders/video_varying.def.sc', 'video_vs.bin'],
-  ['fragment', 'src/shaders/video_fs.sc', 'src/shaders/video_varying.def.sc', 'video_fs.bin'],
   # quad
   ['vertex',   'src/shaders/quad_vs.sc', 'src/shaders/quad_varying.def.sc', 'quad_vs.bin'],
   ['fragment', 'src/shaders/quad_fs.sc', 'src/shaders/quad_varying.def.sc', 'quad_fs.bin'],
+  # video
+  ['vertex',   'src/shaders/video_vs.sc', 'src/shaders/video_varying.def.sc', 'video_vs.bin'],
+  ['fragment', 'src/shaders/video_fs.sc', 'src/shaders/video_varying.def.sc', 'video_fs.bin'],
+  # matte video
+  ['vertex',   'src/shaders/matte_video_vs.sc',
+   'src/shaders/video_varying.def.sc', 'matte_video_vs.bin'],
+  ['fragment', 'src/shaders/matte_video_fs.sc',
+   'src/shaders/video_varying.def.sc', 'matte_video_fs.bin'],
 ]
 
 foreach shader : shaders

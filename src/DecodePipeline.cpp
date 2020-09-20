@@ -10,9 +10,18 @@ DecodePipeline::DecodePipeline ()
     m_pipeline {nullptr},
     m_uridecodebin {nullptr},
     m_bus {nullptr},
-    m_media_state {MediaState::None},
-    m_pending_state {MediaState::None}
+    m_media_state {GST_STATE_NULL},
+    m_pending_state {GST_STATE_NULL},
+    m_play_speed {1.0f},
+    m_awaiting_async_done {false},
+    m_has_eos {false},
+    m_has_queued_seek {false}
 { }
+
+DecodePipeline::~DecodePipeline ()
+{
+  CleanUp ();
+}
 
 static void
 db_pad_added_handler (GstElement *src, GstPad *pad, DecodePipeline *data);
@@ -20,26 +29,36 @@ static gboolean
 db_autoplug_continue_handler (GstElement *bin, GstPad *pad,
                               GstCaps *caps, DecodePipeline *data);
 
-
 void DecodePipeline::PollMessages ()
 {
   if (! m_bus)
     return;
 
+  GstMessageType const message_interest
+    = (GstMessageType) (GST_MESSAGE_EOS            |
+                        GST_MESSAGE_ERROR          |
+                        GST_MESSAGE_STATE_CHANGED  |
+                        GST_MESSAGE_SEGMENT_DONE   |
+                        GST_MESSAGE_ASYNC_DONE);
+
   GstMessage *message;
-  while ((message = gst_bus_pop_filtered(m_bus, GstMessageType (GST_MESSAGE_EOS |
-                                                              GST_MESSAGE_ERROR |
-                                                              GST_MESSAGE_STATE_CHANGED))))
+  while ((message = gst_bus_pop_filtered(m_bus, message_interest)))
     {
       switch (GST_MESSAGE_TYPE (message)) {
       case GST_MESSAGE_EOS:
-        HandleEosMessage(message);
+        HandleEosMessage (message);
         break;
       case GST_MESSAGE_ERROR:
-        HandleErrorMessage(message);
+        HandleErrorMessage (message);
         break;
       case GST_MESSAGE_STATE_CHANGED:
-        HandleStateChangedMessage(message);
+        HandleStateChangedMessage (message);
+        break;
+      case GST_MESSAGE_SEGMENT_DONE:
+        HandleSegmentDone (message);
+        break;
+      case GST_MESSAGE_ASYNC_DONE:
+        HandleAsyncDone (message);
         break;
       default:
         fprintf (stderr, "unexpected message %d\n", GST_MESSAGE_TYPE (message));
@@ -78,15 +97,14 @@ bool DecodePipeline::Open (std::string_view uri, PipelineTerminus *term)
   g_signal_connect (m_uridecodebin, "autoplug-continue",
                     G_CALLBACK (db_autoplug_continue_handler), this);
 
-  return m_terminus->OnStart (this);
+  bool ret = m_terminus->OnStart (this);
+  SetState(GST_STATE_PAUSED);
+  return ret;
 }
 
 void DecodePipeline::Play ()
 {
-  if (! m_pipeline)
-    return;
-
-  gst_element_set_state(m_pipeline, GST_STATE_PLAYING);
+  SetState (GST_STATE_PLAYING);
 }
 
 void DecodePipeline::Seek (double _ts)
@@ -94,7 +112,7 @@ void DecodePipeline::Seek (double _ts)
   if (! m_pipeline)
     return;
 
-  const gint64 seconds_to_ns = 1000000000;
+  gint64 const seconds_to_ns = 1000000000;
 
   gst_element_seek (m_pipeline, 1.0,
                     GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE),
@@ -104,10 +122,91 @@ void DecodePipeline::Seek (double _ts)
 
 void DecodePipeline::Pause ()
 {
+  SetState (GST_STATE_PAUSED);
+}
+
+// static void loop_seek (GstElement *_elem, gint64 _start_ts, gint64 _end_ts, bool _flush)
+// {
+//   GstSeekFlags const seek_flags = (GstSeekFlags)(GST_SEEK_FLAG_SEGMENT |
+//                                                  GST_SEEK_FLAG_ACCURATE);
+//                                                  //GST_SEEK_FLAG_KEY_UNIT  |
+//                                                  //GST_SEEK_FLAG_TRICKMODE |
+//                                                  //GST_SEEK_FLAG_TRICKMODE_NO_AUDIO);
+//   GstSeekFlags const flush_seek_flags
+//     = (GstSeekFlags)(GST_SEEK_FLAG_FLUSH | seek_flags);
+
+//   gst_element_seek (_elem, 1.0,
+//                     GST_FORMAT_TIME,
+//                     _flush ? flush_seek_flags : seek_flags,
+//                     GST_SEEK_TYPE_SET, _start_ts,
+//                     GST_SEEK_TYPE_SET, _end_ts);
+// }
+
+void DecodePipeline::Loop (f64 _from, f64 _to)
+{
   if (! m_pipeline)
     return;
 
-  gst_element_set_state(m_pipeline, GST_STATE_PAUSED);
+  gint64 const seconds_to_ns = 1000000000;
+
+  gint64 const from_ns = (gint64) _from * seconds_to_ns;
+  gint64 const to_ns = (gint64) _to * seconds_to_ns;
+
+  GstSeekFlags const seek_flags = (GstSeekFlags)(GST_SEEK_FLAG_SEGMENT |
+                                                 GST_SEEK_FLAG_ACCURATE |
+                                                 GST_SEEK_FLAG_FLUSH);
+
+  SeekFull(0.0f, GST_FORMAT_TIME, seek_flags,
+           GST_SEEK_TYPE_SET, from_ns,
+           GST_SEEK_TYPE_SET, to_ns);
+
+  m_loop_status.loop_start = from_ns;
+  m_loop_status.loop_end = to_ns;
+}
+
+void DecodePipeline::SetState (GstState _state)
+{
+  if (! m_pipeline)
+    return;
+
+  if (_state == m_media_state)
+    return;
+
+  GstStateChangeReturn ret = gst_element_set_state (m_pipeline, _state);
+  m_pending_state = _state;
+
+  if (ret == GST_STATE_CHANGE_ASYNC)
+    m_awaiting_async_done = true;
+}
+
+bool DecodePipeline::SeekFull (f64 _rate, GstFormat _format, GstSeekFlags _flags,
+                               GstSeekType _start_type, i64 _start,
+                               GstSeekType _stop_type, i64 _stop)
+{
+  if (m_media_state <= GST_STATE_READY || ! m_terminus->HasSink())
+    {
+      if (m_pending_state <= GST_STATE_READY)
+        return false;
+
+      m_queued_seek = {_rate, _format, _flags,
+        _start_type, _start, _stop_type, _stop};
+      m_has_queued_seek = true;
+      return false;
+    }
+
+  if (_rate != 0.0)
+    m_play_speed = _rate;
+
+  if (_flags & GST_SEEK_FLAG_FLUSH)
+    m_awaiting_async_done = true;
+
+  bool ret = gst_element_seek (m_pipeline, m_play_speed, _format, _flags,
+                               _start_type, _start, _stop_type, _stop);
+
+  if (ret)
+    m_has_queued_seek = false;
+
+  return ret;
 }
 
 void DecodePipeline::CleanUp ()
@@ -149,21 +248,7 @@ void DecodePipeline::HandleErrorMessage (GstMessage *message)
 
 void DecodePipeline::HandleEosMessage (GstMessage *)
 {
-  m_media_state = MediaState::EOS;
-}
-
-static MediaState ConvertGstState (GstState _state)
-{
-  if (_state == GST_STATE_PLAYING)
-    return MediaState::Playing;
-  else if (_state == GST_STATE_PAUSED)
-    return MediaState::Paused;
-  else if (_state == GST_STATE_READY)
-    return MediaState::Ready;
-  else if (_state == GST_STATE_NULL)
-    return MediaState::None;
-
-  return MediaState::None;
+  m_has_eos = true;
 }
 
 void DecodePipeline::HandleStateChangedMessage (GstMessage *message)
@@ -171,16 +256,38 @@ void DecodePipeline::HandleStateChangedMessage (GstMessage *message)
   GstState old_state, new_state, pend_state;
   gst_message_parse_state_changed(message, &old_state, &new_state, &pend_state);
 
-  m_media_state = ConvertGstState (new_state);
-  m_pending_state = ConvertGstState (pend_state);
+  m_media_state = new_state;
+
+  if (m_has_queued_seek)
+    {
+      SeekFull(m_queued_seek.rate, m_queued_seek.format, m_queued_seek.flags,
+               m_queued_seek.start_type, m_queued_seek.start,
+               m_queued_seek.stop_type, m_queued_seek.stop);
+
+    }
 }
 
-
-
-DecodePipeline::~DecodePipeline ()
+void DecodePipeline::HandleSegmentDone (GstMessage *)
 {
-  CleanUp ();
+  //looping got cancelled
+  if (m_loop_status.loop_start < 0 ||
+      m_loop_status.loop_end < 0)
+    return;
+
+  //continue looping
+  GstSeekFlags const seek_flags
+    = (GstSeekFlags)(GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE);
+
+  SeekFull (0.0f, GST_FORMAT_TIME, seek_flags,
+            GST_SEEK_TYPE_SET, m_loop_status.loop_start,
+            GST_SEEK_TYPE_SET, m_loop_status.loop_end);
 }
+
+void DecodePipeline::HandleAsyncDone (GstMessage *)
+{
+  m_awaiting_async_done = false;
+}
+
 
 /* This function will be called by the pad-added signal */
 static void db_pad_added_handler (GstElement *src, GstPad *new_pad, DecodePipeline *data)

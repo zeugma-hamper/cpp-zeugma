@@ -262,11 +262,14 @@ int main (int, char **)
 
   s_nodal = new Node ();
 
-  s_nodal->GetTranslationSoft ().Set (glm::vec3 {0.0f, 0.0f, 6.0f});
+  s_nodal->GetTranslationSoft ().Set (glm::vec3 {0.0f, 0.0f, 9.0f});
   s_nodal->GetScaleSoft ().Set (glm::vec3 {10.0f});
 
+  std::string file
+    = "file:///home/blake/tlp/tamper-blu-mkv/the-fall-blu.mov";
+
   VideoRenderable *renderable
-    = new VideoRenderable ("file:///home/blake/tlp/tamper-blu-mkv/The Fall_t00.mkv");
+    = new VideoRenderable (file);
 
   s_nodal->AppendRenderable(renderable);
   layer.GetRootNode()->AppendChild(s_nodal);

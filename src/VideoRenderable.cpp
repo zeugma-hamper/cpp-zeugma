@@ -5,8 +5,36 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <unistd.h>
+
+#include <chrono>
+#include <string>
+#include <string_view>
+
 namespace charm
 {
+
+struct BlockTimer
+{
+  using clock_t = std::chrono::high_resolution_clock;
+  using timepoint_t = clock_t::time_point;
+  using seconds_t = std::chrono::duration<f64>;
+
+  explicit BlockTimer (std::string_view _view)
+    : descriptor (_view),
+      start_time (clock_t::now ())
+  { }
+
+  ~BlockTimer ()
+  {
+    timepoint_t end_time = clock_t::now ();
+    printf ("%s: %0.4f\n", descriptor.c_str (),
+            seconds_t (end_time - start_time).count ());
+  }
+
+  std::string descriptor;
+  timepoint_t start_time;
+};
 
 VideoRenderable::VideoRenderable (std::string_view _uri)
   : Renderable (),
@@ -26,7 +54,12 @@ VideoRenderable::VideoRenderable (std::string_view _uri)
   m_terminus = new BasicPipelineTerminus (false);
   m_video_pipeline = new DecodePipeline;
   m_video_pipeline->Open (_uri, m_terminus);
-  m_video_pipeline->Play();
+  {
+    BlockTimer bt ("state change");
+    m_video_pipeline->Play ();
+    //sleep (1);
+    m_video_pipeline->Loop (600.0, 604.0);
+   }
 }
 
 VideoRenderable::~VideoRenderable ()

@@ -65,6 +65,11 @@ BasicPipelineTerminus::OnShutdown (DecodePipeline *)
   return true;
 }
 
+bool BasicPipelineTerminus::HasSink () const
+{
+  return m_video_sink || m_audio_sink;
+}
+
 gst_ptr<GstSample> BasicPipelineTerminus::FetchSample ()
 {
   std::unique_lock lock (m_sample_mutex);

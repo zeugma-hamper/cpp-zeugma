@@ -15,16 +15,24 @@
 
 namespace charm {
 
-enum class MediaState
-  {
-    None,
-    Ready,
-    Paused,
-    Playing,
-    EOS
-  };
-
 class PipelineTerminus;
+
+struct LoopStatus
+{
+  gint64 loop_start = -1;
+  gint64 loop_end = -1;
+};
+
+struct QueuedSeek
+{
+  f64 rate;
+  GstFormat format;
+  GstSeekFlags flags;
+  GstSeekType start_type;
+  i64 start;
+  GstSeekType stop_type;
+  i64 stop;
+};
 
 struct DecodePipeline
 {
@@ -40,21 +48,38 @@ struct DecodePipeline
   bool Open (std::string_view uri, PipelineTerminus *terminus);
 
   void Play ();
-  void Seek (double _ts);
+  void Seek (f64 _ts);
   void Pause ();
+
+  void Loop (f64 _from, f64 _to);
+
+  void SetState (GstState _state);
+  bool SeekFull (f64 rate, GstFormat format, GstSeekFlags flags,
+                 GstSeekType start_type, i64 start,
+                 GstSeekType stop_type, i64 stop);
 
   void CleanUp ();
 
   void HandleErrorMessage (GstMessage *);
   void HandleEosMessage (GstMessage *);
   void HandleStateChangedMessage (GstMessage *);
+  void HandleSegmentDone (GstMessage *);
+  void HandleAsyncDone (GstMessage *);
 
   std::unique_ptr<PipelineTerminus> m_terminus;
   GstElement *m_pipeline;
   GstElement *m_uridecodebin;
   GstBus *m_bus;
-  MediaState m_media_state;
-  MediaState m_pending_state;
+
+  GstState m_media_state;
+  GstState m_pending_state;
+
+  f32 m_play_speed;
+  bool m_awaiting_async_done;
+  bool m_has_eos;
+  bool m_has_queued_seek;
+  LoopStatus m_loop_status;
+  QueuedSeek m_queued_seek;
 };
 
 }

@@ -24,6 +24,8 @@ class PipelineTerminus
   virtual bool OnStart       (DecodePipeline *) = 0;
   virtual bool NewDecodedPad (DecodePipeline *, GstElement *, GstPad *) = 0;
   virtual bool OnShutdown    (DecodePipeline *) = 0;
+
+  virtual bool HasSink () const = 0;
 };
 
 
@@ -37,6 +39,8 @@ class BasicPipelineTerminus : public PipelineTerminus
   bool OnStart       (DecodePipeline *) override;
   bool NewDecodedPad (DecodePipeline *, GstElement *, GstPad *) override;
   bool OnShutdown    (DecodePipeline *) override;
+
+  bool HasSink () const override;
 
   gst_ptr<GstSample> FetchSample ();
   gst_ptr<GstSample> FetchClearSample ();
