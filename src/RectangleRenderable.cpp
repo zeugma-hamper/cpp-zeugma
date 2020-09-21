@@ -59,7 +59,7 @@ RectangleRenderable::RectangleRenderable ()
 
   void RectangleRenderable::Draw ()
   {
-    bgfx::setTransform(&m_node->GetAbsoluteModelTransformation());
+    bgfx::setTransform(&m_node->GetAbsoluteTransformation().model);
     bgfx::setVertexBuffer(0, vbh, 0, 4);
     bgfx::setState (BGFX_STATE_WRITE_RGB |
                     BGFX_STATE_PT_TRISTRIP |

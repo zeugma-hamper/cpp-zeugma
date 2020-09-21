@@ -2,12 +2,11 @@
 #include <base_types.hpp>
 #include <class_utils.hpp>
 
-#include <AnimationSystem.hpp>
 #include <DecodePipeline.hpp>
 #include <FrameTime.hpp>
-#include <PipelineTerminus.hpp>
 #include <Layer.hpp>
 #include <Node.hpp>
+#include <PipelineTerminus.hpp>
 #include <Renderable.hpp>
 #include <VideoRenderable.hpp>
 
@@ -19,6 +18,7 @@
 #include <GLFW/glfw3native.h>
 
 #include <glm/ext/quaternion_transform.hpp>
+#include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -179,7 +179,6 @@ dead_zone::dead_zone ()
   : window {nullptr},
     m_scene_graph_layer {new Layer}
 {
-  AnimationSystem::Initialize();
 }
 
 dead_zone::~dead_zone ()
@@ -200,18 +199,6 @@ bool dead_zone::Update ()
 
   glfwPollEvents();
 
-  // if (s_nodal && ! s_nodal->GetTranslationSoft().GetAnimation())
-  //   {
-  //     auto *anim = new InterpolationAnimation<VecAnim>;
-  //     anim->SetStartValue(glm::vec3 {-2.0f, 0.0f, 6.0f});
-  //     anim->SetGoalValue (glm::vec3 { 2.0f, 0.0f, 6.0f});
-  //     s_nodal->InstallTranslationAnimation(anim);
-  //   }
-
-  AnimationSystem::GetSystem()->
-    UpdateAnimations(GetFrameTime()->GetCurrentTime(),
-                     GetFrameTime()->GetCurrentDelta());
-
   UpdateSceneGraph ();
 
   Render ();
@@ -221,7 +208,7 @@ bool dead_zone::Update ()
 
 void dead_zone::UpdateSceneGraph()
 {
-  m_scene_graph_layer->GetRootNode()->UpdateTransformations();
+  m_scene_graph_layer->GetRootNode()->UpdateTransformsHierarchically();
   m_scene_graph_layer->GetRootNode()->EnumerateRenderables();
 }
 
@@ -262,8 +249,7 @@ int main (int, char **)
 
   s_nodal = new Node ();
 
-  s_nodal->GetTranslationSoft ().Set (glm::vec3 {0.0f, 0.0f, 9.0f});
-  s_nodal->GetScaleSoft ().Set (glm::vec3 {10.0f});
+  s_nodal->SetLocalTransformation(glm::translate(glm::vec3{0.0f, 0.0f, 9.0f}) * glm::scale (glm::vec3 {10.0f}));
 
   std::string file
     = "file:///home/blake/tlp/tamper-blu-mkv/the-fall-blu.mov";

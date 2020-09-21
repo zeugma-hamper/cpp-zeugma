@@ -2,8 +2,6 @@
 #define THIRD_TIME
 
 #include "base_types.hpp"
-#include "SoftValue.hpp"
-#include "AnimationSystem.hpp"
 #include "class_utils.hpp"
 #include "Node.hpp"
 
