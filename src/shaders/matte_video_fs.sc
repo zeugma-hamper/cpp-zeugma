@@ -9,6 +9,9 @@ layout(location = 0) out vec4 out_color;
 
 void main()
 {
-  out_color = vec4 (texture2D (u_video_texture, v_uv).rgb,
-                    texture2D (u_video_matte, v_uv).r);
+  float alpha = texture2D (u_video_matte, v_uv).r;
+  if (alpha < 0.01)
+    discard;
+
+  out_color = vec4 (texture2D (u_video_texture, v_uv).rgb, alpha);                    
 }
