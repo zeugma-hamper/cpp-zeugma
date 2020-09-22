@@ -22,12 +22,12 @@ class Renderable
   CHARM_DELETE_MOVE_COPY (Renderable);
 
   // assuming this is going to be updated once softs are installed
-  void SetOver (glm::vec3 const &_over);
-  glm::vec3 const &GetOver () const;
+  void SetOver (glm::vec4 const &_over);
+  glm::vec4 const &GetOver () const;
 
   // assuming this is going to be updated once softs are installed
-  void SetUp (glm::vec3 const &_up);
-  glm::vec3 const &GetUp () const;
+  void SetUp (glm::vec4 const &_up);
+  glm::vec4 const &GetUp () const;
 
   virtual void Update ();
   virtual void Draw () = 0;
@@ -41,8 +41,8 @@ class Renderable
 
  protected:
   Node *m_node;
-  glm::vec3 m_over;
-  glm::vec3 m_up;
+  glm::vec4 m_over;
+  glm::vec4 m_up;
   sort_key m_sort_key;
   graph_id m_graph_id;
   bool m_should_draw;
