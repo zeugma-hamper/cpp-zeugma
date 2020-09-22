@@ -37,6 +37,9 @@ class Node
   void UpdateTransformsHierarchically ();
   void UpdateTransformsHierarchically (Transformation const &_parent, bool _is_dirty);
 
+  template<typename Functor>
+  void VisitDepthFirst (Functor &&_func);
+
   Transformation const &GetAbsoluteTransformation () const;
 
   void SetLocalTransformation (Transformation const &_local);
@@ -71,6 +74,16 @@ class Node
   Transformation m_absolute_tx;
   bool m_local_tx_dirty_flag;
 };
+
+template<typename Functor>
+void Node::VisitDepthFirst (Functor &&_func)
+{
+  _func (*this);
+
+  szt const count = m_children.size ();
+  for (szt i = 0; i < count; ++i)
+    m_children[i]->VisitDepthFirst (_func);
+}
 
 }
 
