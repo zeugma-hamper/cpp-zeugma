@@ -17,10 +17,7 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
-#include <glm/ext/quaternion_transform.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <charm-glm.hpp>
 
 #include <string_view>
 
@@ -35,7 +32,7 @@ class dead_zone final : public charm::Application
   ~dead_zone () override final;
 
   bool StartUp ()  override final;
-  bool Update ()    override final;
+  bool Update ()   override final;
   bool ShutDown () override final;
 
   bool InitWindowingAndGraphics ();

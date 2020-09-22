@@ -161,6 +161,7 @@ lib_sources = ['src/Layer.cpp',
                'src/Renderable.cpp',
                'src/DecodePipeline.cpp',
                'src/PipelineTerminus.cpp',
+               'src/TwoDRenderable.cpp',
                'src/bgfx_utils.cpp']
 
 

@@ -8,6 +8,8 @@ Renderable::Renderable ()
 
 Renderable::Renderable (Node *_node)
   : m_node {_node},
+    m_over {1.0f, 0.0f, 0.0f},
+    m_up {0.0f, 1.0f, 0.0f},
     m_sort_key {0u},
     m_graph_id {0u},
     m_should_draw {true}
@@ -15,6 +17,26 @@ Renderable::Renderable (Node *_node)
 
 Renderable::~Renderable ()
 { }
+
+void Renderable::SetOver (glm::vec3 const &_over)
+{
+  m_over = _over;
+}
+
+glm::vec3 const &Renderable::GetOver () const
+{
+  return m_over;
+}
+
+void Renderable::SetUp (glm::vec3 const &_up)
+{
+  m_up = _up;
+}
+
+glm::vec3 const &Renderable::GetUp () const
+{
+  return m_up;
+}
 
 void Renderable::Update ()
 {

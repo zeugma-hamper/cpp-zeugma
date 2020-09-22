@@ -2,8 +2,7 @@
 
 #include <Node.hpp>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <charm-glm.hpp>
 
 #include <unistd.h>
 
@@ -295,6 +294,7 @@ void MattedVideoRenderable::UploadSample (gst_ptr<GstSample> const &_sample)
     / GST_VIDEO_INFO_FPS_D(&video_info);
 
   auto &matte = m_mattes[frame_num];
+
   (void)matte;
 }
 
@@ -315,11 +315,12 @@ void MattedVideoRenderable::Draw ()
   if (! bgfx::isValid(m_texture))
     return;
 
-  //later: BGFX_STATE_WRITE_A |
-  //       BGFX_ uhhh... blending
-  u64 const state = BGFX_STATE_WRITE_RGB |
+  u64 const state =
+    BGFX_STATE_WRITE_RGB |
+    BGFX_STATE_WRITE_A     |
     BGFX_STATE_PT_TRISTRIP |
-    BGFX_STATE_WRITE_Z;
+    BGFX_STATE_WRITE_Z     |
+    BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
 
   bgfx::setTransform(&m_node->GetAbsoluteTransformation().model);
   bgfx::setState(state);
