@@ -61,21 +61,23 @@ Transformation const &Node::GetAbsoluteTransformation () const
   return m_absolute_tx;
 }
 
+struct RenderableEnumerator
+{
+  void operator () (Node &_node)
+  {
+    std::vector<Renderable *> &rs = _node.GetRenderables();
+    size_t const rend_count = rs.size ();
+    for (size_t i = 0; i < rend_count; ++i)
+      rs[i]->SetGraphID (id++);
+  }
+
+  graph_id id = 0u;
+};
+
 void Node::EnumerateRenderables()
 {
-  graph_id id = 0u;
-  EnumerateRenderables(id);
-}
-
-void Node::EnumerateRenderables (graph_id &_id)
-{
-  size_t const rend_count = m_renderables.size ();
-  for (size_t i = 0; i < rend_count; ++i)
-    m_renderables[i]->m_graph_id = _id++;
-
-  size_t const child_count = m_children.size ();
-  for (size_t i = 0; i < child_count; ++i)
-    m_children[i]->EnumerateRenderables (_id);
+  RenderableEnumerator re;
+  VisitDepthFirst (re);
 }
 
 void Node::SetLocalTransformation (Transformation const &_local)
@@ -159,6 +161,16 @@ Renderable *Node::ExciseRenderable (Renderable *_render)
     m_layer->RemoveRenderable (r);
 
   return r;
+}
+
+std::vector<Renderable *> &Node::GetRenderables ()
+{
+  return m_renderables;
+}
+
+std::vector<Renderable *> const &Node::GetRenderables () const
+{
+  return m_renderables;
 }
 
 void Node::SetLayer (Layer *_layer)

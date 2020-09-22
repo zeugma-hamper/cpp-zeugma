@@ -62,4 +62,10 @@ graph_id Renderable::GetGraphId () const
   return m_graph_id;
 }
 
+void Renderable::SetGraphID (graph_id _id)
+{
+  m_graph_id = _id;
 }
+
+}
+

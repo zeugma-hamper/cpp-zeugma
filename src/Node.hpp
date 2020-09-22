@@ -32,11 +32,11 @@ class Node
   CHARM_DEFAULT_MOVE (Node);
 
   void EnumerateRenderables ();
-  void EnumerateRenderables (graph_id &_id);
 
   void UpdateTransformsHierarchically ();
   void UpdateTransformsHierarchically (Transformation const &_parent, bool _is_dirty);
 
+  // callable with one parameter 'Node &'
   template<typename Functor>
   void VisitDepthFirst (Functor &&_func);
 
@@ -58,6 +58,9 @@ class Node
   //excise with feeling (deletes)
   void        RemoveRenderable (Renderable *_render);
   Renderable *ExciseRenderable (Renderable *_render);
+
+  std::vector<Renderable *> &GetRenderables ();
+  std::vector<Renderable *> const &GetRenderables () const;
 
   void   SetLayer (Layer *_layer);
   Layer *GetLayer () const;

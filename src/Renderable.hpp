@@ -37,7 +37,9 @@ class Renderable
   void SetShouldDraw (bool _tf);
 
   sort_key GetSortKey () const;
+
   graph_id GetGraphId () const;
+  void SetGraphID (graph_id _id);
 
  protected:
   Node *m_node;
