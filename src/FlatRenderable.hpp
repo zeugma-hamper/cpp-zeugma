@@ -6,11 +6,11 @@
 namespace charm
 {
 
-class TwoDRenderable : public Renderable
+class FlatRenderable : public Renderable
 {
  public:
-  TwoDRenderable ();
-  TwoDRenderable (Node *_node);
+  FlatRenderable ();
+  FlatRenderable (Node *_node);
 
   // assuming this is going to be updated once softs are installed
   void SetWidth (f32 _width);

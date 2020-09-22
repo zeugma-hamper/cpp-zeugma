@@ -155,13 +155,13 @@ gst_dep       = dependency ('gstreamer-1.0')
 gst_app_dep   = dependency ('gstreamer-app-1.0')
 gst_video_dep = dependency ('gstreamer-video-1.0')
 
-lib_sources = ['src/Layer.cpp',
+lib_sources = ['src/DecodePipeline.cpp',
+               'src/FlatRenderable.cpp',
+               'src/Layer.cpp',
                'src/Matte.cpp',
                'src/Node.cpp',
-               'src/Renderable.cpp',
-               'src/DecodePipeline.cpp',
                'src/PipelineTerminus.cpp',
-               'src/TwoDRenderable.cpp',
+               'src/Renderable.cpp',
                'src/bgfx_utils.cpp']
 
 
