@@ -34,6 +34,7 @@ struct BlockTimer
 
   ~BlockTimer ()
   {
+    StopTimer ();
     printf ("%s: %0.4f\n", descriptor.c_str (),
             seconds_t (end_time - start_time).count ());
   }
@@ -49,7 +50,8 @@ VideoRenderable::VideoRenderable (std::string_view _uri)
     m_texture {BGFX_INVALID_HANDLE},
     m_uni_vid_texture {BGFX_INVALID_HANDLE},
     m_video_pipeline {nullptr},
-    m_terminus {nullptr}
+    m_terminus {nullptr},
+    m_aspect_ratio {1.0f}
 {
   m_uni_vid_texture = bgfx::createUniform("u_video_texture", bgfx::UniformType::Sampler);
   m_uni_aspect_ratio = bgfx::createUniform("u_aspect_ratio", bgfx::UniformType::Vec4);
@@ -98,10 +100,17 @@ struct video_frame_holder
   }
 };
 
-static void free_video_holder (void *, void *_user_data)
+// static void delete_video_holder (void *, void *_user_data)
+// {
+//   video_frame_holder *holder = (video_frame_holder *)_user_data;
+//   delete holder;
+// }
+
+template<typename T>
+void delete_image_left_overs (void *, void *_user_data)
 {
-  video_frame_holder *holder = (video_frame_holder *)_user_data;
-  delete holder;
+  T *left_overs = (T *)_user_data;
+  delete left_overs;
 }
 
 void VideoRenderable::UploadSample (gst_ptr<GstSample> const &_sample)
@@ -128,6 +137,8 @@ void VideoRenderable::UploadSample (gst_ptr<GstSample> const &_sample)
   // align = calculate_alignment (stride);
   (void)components;
 
+  m_aspect_ratio = width / (f32)height;
+
   if (! bgfx::isValid(m_texture))
     {
       fprintf (stderr, "create video texture\n");
@@ -148,7 +159,7 @@ void VideoRenderable::UploadSample (gst_ptr<GstSample> const &_sample)
 
   const bgfx::Memory *mem = bgfx::makeRef (GST_VIDEO_FRAME_PLANE_DATA(&frame_holder->video_frame, 0),
                                            GST_VIDEO_FRAME_SIZE(&frame_holder->video_frame),
-                                           free_video_holder, frame_holder);
+                                           delete_image_left_overs<video_frame_holder>, frame_holder);
 
   bgfx::updateTexture2D(m_texture, 0, 0, 0, 0, width, height, mem, stride);
 }
@@ -180,8 +191,7 @@ void VideoRenderable::Draw ()
   bgfx::setState(state);
   bgfx::setVertexCount(4);
   bgfx::setTexture(0, m_uni_vid_texture, m_texture);
-  glm::vec4 unity {1.0f};
-  unity.y = 1080.0f/1920.0f;
+  glm::vec4 unity {1.0f, 1.0f/m_aspect_ratio, 1.0f, 1.0f};
   bgfx::setUniform(m_uni_aspect_ratio, glm::value_ptr (unity));
   bgfx::submit(0, m_program);
 }
@@ -197,13 +207,14 @@ MattedVideoRenderable::MattedVideoRenderable (std::string_view _uri,
     m_uni_vid_texture {BGFX_INVALID_HANDLE},
     m_uni_matte_texture {BGFX_INVALID_HANDLE},
     m_video_pipeline {nullptr},
-    m_terminus {nullptr}
+    m_terminus {nullptr},
+    m_aspect_ratio {1.0f}
 {
   m_uni_vid_texture = bgfx::createUniform("u_video_texture", bgfx::UniformType::Sampler);
-  m_uni_matte_texture = bgfx::createUniform("u_matte_texture", bgfx::UniformType::Sampler);
+  m_uni_matte_texture = bgfx::createUniform("u_video_matte", bgfx::UniformType::Sampler);
   m_uni_aspect_ratio = bgfx::createUniform("u_aspect_ratio", bgfx::UniformType::Vec4);
 
-  ProgramResiduals ps = CreateProgram ("video_vs.bin", "video_fs.bin", true);
+  ProgramResiduals ps = CreateProgram ("matte_video_vs.bin", "matte_video_fs.bin", true);
   m_program = ps.program;
 
   m_terminus = new BasicPipelineTerminus (false);
@@ -261,6 +272,8 @@ void MattedVideoRenderable::UploadSample (gst_ptr<GstSample> const &_sample)
   // align = calculate_alignment (stride);
   (void)components;
 
+  m_aspect_ratio = width / (f32)height;
+
   if (! bgfx::isValid(m_texture))
     {
       fprintf (stderr, "create video texture\n");
@@ -281,21 +294,33 @@ void MattedVideoRenderable::UploadSample (gst_ptr<GstSample> const &_sample)
 
   const bgfx::Memory *mem = bgfx::makeRef (GST_VIDEO_FRAME_PLANE_DATA(&frame_holder->video_frame, 0),
                                            GST_VIDEO_FRAME_SIZE(&frame_holder->video_frame),
-                                           free_video_holder, frame_holder);
+                                           delete_image_left_overs<video_frame_holder>, frame_holder);
 
   bgfx::updateTexture2D(m_texture, 0, 0, 0, 0, width, height, mem, stride);
 
 
   GstBuffer *buffer = gst_sample_get_buffer (_sample.get ());
   guint64 pts = GST_BUFFER_PTS(buffer);
+
+  if (gint64(pts) < m_video_pipeline->m_loop_status.loop_start ||
+      gint64(pts) > m_video_pipeline->m_loop_status.loop_end)
+    return;
+
   //i expect looping here for now
-  guint64 offset_ns = m_video_pipeline->m_loop_status.loop_start - pts;
-  guint64 frame_num = offset_ns * GST_VIDEO_INFO_FPS_N(&video_info)
-    / GST_VIDEO_INFO_FPS_D(&video_info);
+  guint64 offset_ns = pts - m_video_pipeline->m_loop_status.loop_start;
+  guint64 frame_num = guint64 (offset_ns * GST_VIDEO_INFO_FPS_N(&video_info)
+                               / (GST_VIDEO_INFO_FPS_D(&video_info) * f64(1e9)));
+  printf ("pts: %.3f, now: %.3f\n", pts/f64(1e9), offset_ns/f64(1e9));
 
   auto &matte = m_mattes[frame_num];
+  assert (frame_num < m_mattes.size ());
 
   (void)matte;
+  if (bgfx::isValid(m_matte))
+    bgfx::destroy (m_matte);
+  m_matte = LoadTexture2D (matte.path().c_str(), BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE);
+  if (! bgfx::isValid(m_matte))
+    fprintf (stderr, "returned handle isn't valid\n");
 }
 
 void MattedVideoRenderable::Update ()
@@ -325,10 +350,13 @@ void MattedVideoRenderable::Draw ()
   bgfx::setTransform(&m_node->GetAbsoluteTransformation().model);
   bgfx::setState(state);
   bgfx::setVertexCount(4);
+
   bgfx::setTexture(0, m_uni_vid_texture, m_texture);
-  glm::vec4 unity {1.0f};
-  unity.y = 1080.0f/1920.0f;
+  bgfx::setTexture(1, m_uni_matte_texture, m_matte);
+
+  glm::vec4 unity {1.0f, 1.0f/m_aspect_ratio, 1.0f, 1.0f};
   bgfx::setUniform(m_uni_aspect_ratio, glm::value_ptr (unity));
+
   bgfx::submit(0, m_program);
 }
 

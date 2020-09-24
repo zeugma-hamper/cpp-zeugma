@@ -33,6 +33,7 @@ class VideoRenderable final : public Renderable
   bgfx::UniformHandle m_uni_aspect_ratio;
   DecodePipeline *m_video_pipeline;
   BasicPipelineTerminus *m_terminus;
+  f32 m_aspect_ratio;
 };
 
 class MattedVideoRenderable final : public Renderable
@@ -60,6 +61,7 @@ class MattedVideoRenderable final : public Renderable
 
   DecodePipeline *m_video_pipeline;
   BasicPipelineTerminus *m_terminus;
+  f32 m_aspect_ratio;
 
   std::filesystem::path m_matte_path;
   std::vector<std::filesystem::directory_entry> m_mattes;

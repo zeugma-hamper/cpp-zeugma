@@ -149,8 +149,8 @@ void DecodePipeline::Loop (f64 _from, f64 _to)
 
   gint64 const seconds_to_ns = 1000000000;
 
-  gint64 const from_ns = (gint64) _from * seconds_to_ns;
-  gint64 const to_ns = (gint64) _to * seconds_to_ns;
+  gint64 const from_ns = gint64(_from * seconds_to_ns);
+  gint64 const to_ns = gint64(_to * seconds_to_ns);
 
   GstSeekFlags const seek_flags = (GstSeekFlags)(GST_SEEK_FLAG_SEGMENT |
                                                  GST_SEEK_FLAG_ACCURATE |

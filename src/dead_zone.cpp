@@ -23,6 +23,8 @@
 
 #include <stdio.h>
 
+#include <Matte.hpp>
+
 using namespace charm;
 
 class dead_zone final : public charm::Application
@@ -246,15 +248,30 @@ int main (int, char **)
 
   s_nodal = new Node ();
 
-  s_nodal->SetLocalTransformation(glm::translate(glm::vec3{0.0f, 0.0f, 9.0f}) * glm::scale (glm::vec3 {10.0f}));
+  s_nodal->SetLocalTransformation(glm::translate(glm::vec3{0.0f, 0.0f, 9.0f})
+                                  * glm::scale (glm::vec3 {10.0f}));
 
-  std::string file
-    = "file:///home/blake/tlp/tamper-blu-mkv/the-fall-blu.mov";
+  std::vector<FilmInfo> configs = ReadFilmInfo ("../film-config.toml");
+  assert (configs.size () > 0);
 
-  VideoRenderable *renderable
-    = new VideoRenderable (file);
+  FilmInfo &film_info = configs[0];
+  assert (film_info.clips.size () > 0);
+  ClipInfo &clip_info = film_info.clips[0];
 
-  s_nodal->AppendRenderable(renderable);
+  // std::string file
+  //   = "file:///home/blake/tlp/tamper-blu-mkv/the-fall-blu.mov";
+
+  std::string uri = std::string ("file://") + film_info.film_path.c_str ();
+  MattedVideoRenderable *matte_renderable
+    = new MattedVideoRenderable (uri,
+                                 clip_info.start_time,
+                                 clip_info.start_time + clip_info.duration,
+                                 clip_info.directory);
+
+  // VideoRenderable *renderable
+  //   = new VideoRenderable (file);
+
+  s_nodal->AppendRenderable(matte_renderable);
   layer.GetRootNode()->AppendChild(s_nodal);
 
   zone.Run ();
