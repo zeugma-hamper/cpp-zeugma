@@ -1,41 +1,12 @@
 #include <MattedVideoRenderable.hpp>
 
+#include <BlockTimer.hpp>
 #include <Node.hpp>
 
 #include <algorithm>
 
 namespace charm
 {
-
-struct BlockTimer
-{
-  using clock_t = std::chrono::high_resolution_clock;
-  using timepoint_t = clock_t::time_point;
-  using seconds_t = std::chrono::duration<f64>;
-
-  explicit BlockTimer (std::string_view _view)
-    : descriptor (_view),
-      start_time (clock_t::now ()),
-      end_time (timepoint_t::min ())
-  { }
-
-  void StopTimer ()
-  {
-    if (end_time == timepoint_t::min ())
-      end_time = clock_t::now ();
-  }
-
-  ~BlockTimer ()
-  {
-    StopTimer ();
-    printf ("%s: %0.4f\n", descriptor.c_str (),
-            seconds_t (end_time - start_time).count ());
-  }
-
-  std::string descriptor;
-  timepoint_t start_time;
-  timepoint_t end_time;
-};
 
 namespace fs = std::filesystem;
 MattedVideoRenderable::MattedVideoRenderable (std::string_view _uri,
