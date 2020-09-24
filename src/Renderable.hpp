@@ -4,7 +4,7 @@
 #include <base_types.hpp>
 #include <class_utils.hpp>
 
-#include <charm-glm.hpp>
+#include <charm_glm.hpp>
 
 namespace charm {
 

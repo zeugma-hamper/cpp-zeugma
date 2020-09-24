@@ -2,7 +2,7 @@
 
 #include <Node.hpp>
 
-#include <charm-glm.hpp>
+#include <charm_glm.hpp>
 
 namespace charm
 {

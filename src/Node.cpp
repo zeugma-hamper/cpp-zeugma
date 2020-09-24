@@ -3,7 +3,7 @@
 #include <Layer.hpp>
 #include <Renderable.hpp>
 
-#include <charm-glm.hpp>
+#include <charm_glm.hpp>
 
 #include <algorithm>
 

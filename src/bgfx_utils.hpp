@@ -32,6 +32,14 @@ std::vector<bgfx::UniformHandle> GetShaderUniforms (bgfx::ShaderHandle _sh);
 
 bgfx::TextureHandle LoadTexture2D (bx::FilePath const &_path, u64 _bgfx_flags);
 
+// helper function to delete classes used with bgfx::makeRef
+template<typename T>
+void DeleteImageLeftOvers (void *, void *_user_data)
+{
+  T *left_overs = (T *)_user_data;
+  delete left_overs;
+}
+
 }
 
 #endif //BGFX_IS_AWFULLY_CLOSE_TO_BUGFIX

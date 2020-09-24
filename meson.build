@@ -226,7 +226,8 @@ dead_zone_exec = executable ('dead_zone',
                                         'src/application.cpp',
                                         'src/FrameTime.cpp',
                                         'src/RectangleRenderable.cpp',
-                                        'src/VideoRenderable.cpp'],
+                                        'src/VideoRenderable.cpp',
+                                        'src/MattedVideoRenderable.cpp'],
                              dependencies : [charm_dep])
 
 config_parser_exec = executable ('config_parser',

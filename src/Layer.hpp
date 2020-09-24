@@ -5,7 +5,7 @@
 #include "class_utils.hpp"
 #include "Node.hpp"
 
-#include <charm-glm.hpp>
+#include <charm_glm.hpp>
 
 #include <vector>
 

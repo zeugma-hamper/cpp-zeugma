@@ -9,6 +9,7 @@
 #include <PipelineTerminus.hpp>
 #include <Renderable.hpp>
 #include <VideoRenderable.hpp>
+#include <MattedVideoRenderable.hpp>
 
 #include <bgfx_utils.hpp>
 
@@ -17,7 +18,7 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
-#include <charm-glm.hpp>
+#include <charm_glm.hpp>
 
 #include <string_view>
 

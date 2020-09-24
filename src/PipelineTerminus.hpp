@@ -5,6 +5,7 @@
 #include "gst_ptr.hpp"
 
 #include <gst/gst.h>
+#include <gst/video/video-frame.h>
 
 #include <mutex>
 
@@ -56,6 +57,27 @@ class BasicPipelineTerminus : public PipelineTerminus
   std::mutex m_sample_mutex;
   gst_ptr<GstSample> m_sample;
   bool m_enable_audio;
+};
+
+//helper struct to hold onto GstSample's ref until after upload
+struct video_frame_holder
+{
+  gst_ptr<GstSample> sample;
+  GstVideoFrame video_frame;
+
+  CHARM_DELETE_MOVE_COPY(video_frame_holder);
+
+  video_frame_holder (gst_ptr<GstSample> const &_sample, GstVideoInfo *_info)
+    : sample {_sample}
+  {
+    GstBuffer *buffer = gst_sample_get_buffer(_sample.get ());
+    gst_video_frame_map (&video_frame, _info, buffer, GST_MAP_READ);
+  }
+
+  ~video_frame_holder ()
+  {
+    gst_video_frame_unmap(&video_frame);
+  }
 };
 
 
