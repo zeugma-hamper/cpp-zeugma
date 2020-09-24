@@ -1,4 +1,5 @@
 # NOTE: jump to bottom for charm library and executable definitions
+# NOTE: run `install_bgfx_tools.sh <BIN_DIR>` running meson, see README.md
 
 project ('charm', ['cpp', 'c'],
          default_options : ['cpp_std=c++17',
@@ -8,6 +9,9 @@ cpp = meson.get_compiler ('cpp')
 
 dl_dep = cpp.find_library('dl')
 threads_dep = dependency('threads')
+
+##### OpenImageIO
+oiio_dep = dependency ('OpenImageIO')
 
 ##### bx
 bx_include_dirs = ['bx/include', 'bx/3rdparty']
@@ -169,7 +173,8 @@ charm_inc = include_directories ('src')
 toml_inc = include_directories ('toml11')
 
 charm_definition_deps = [bx_dep, bimg_dep, bgfx_dep, glfw_dep,
-                         gst_dep, gst_app_dep, gst_video_dep]
+                         gst_dep, gst_app_dep, gst_video_dep,
+                         oiio_dep]
 
 charm_lib = static_library ('charm', lib_sources,
                             include_directories : [charm_inc, toml_inc],
