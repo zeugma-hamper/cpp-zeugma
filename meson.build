@@ -159,13 +159,19 @@ gst_dep       = dependency ('gstreamer-1.0')
 gst_app_dep   = dependency ('gstreamer-app-1.0')
 gst_video_dep = dependency ('gstreamer-video-1.0')
 
-lib_sources = ['src/DecodePipeline.cpp',
+lib_sources = ['src/application.cpp',
+               'src/DecodePipeline.cpp',
                'src/FlatRenderable.cpp',
+               'src/FrameTime.cpp',
+               'src/GraphicsApplication.cpp',
                'src/Layer.cpp',
                'src/Matte.cpp',
+               'src/MattedVideoRenderable.cpp',
                'src/Node.cpp',
                'src/PipelineTerminus.cpp',
                'src/Renderable.cpp',
+               'src/VideoSystem.cpp',
+               'src/VideoRenderable.cpp',
                'src/bgfx_utils.cpp']
 
 
@@ -223,11 +229,7 @@ bgfx_test_exec = executable ('bgfx_test',
 
 dead_zone_exec = executable ('dead_zone',
                              sources : ['src/dead_zone.cpp',
-                                        'src/application.cpp',
-                                        'src/FrameTime.cpp',
-                                        'src/RectangleRenderable.cpp',
-                                        'src/VideoRenderable.cpp',
-                                        'src/MattedVideoRenderable.cpp'],
+                                        'src/RectangleRenderable.cpp'],
                              dependencies : [charm_dep])
 
 config_parser_exec = executable ('config_parser',

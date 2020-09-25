@@ -21,7 +21,7 @@ class Application
   //empty, but provided to avoid abstract class
   virtual bool ShutDown ();
 
-  //installs signal handler, calls initialize, loops update, then calls shutdown
+  //loops update, then calls shutdown
   virtual void Run ();
 };
 
