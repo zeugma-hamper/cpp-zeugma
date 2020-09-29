@@ -7,9 +7,12 @@
 #include <PipelineTerminus.hpp>
 
 #include <bgfx_utils.hpp>
+#include <intrusive_ptr.hpp>
 
 namespace charm
 {
+
+struct VideoTexture;
 
 class VideoRenderable final : public Renderable
 {
@@ -18,20 +21,10 @@ class VideoRenderable final : public Renderable
   VideoRenderable (std::string_view _uri);
   ~VideoRenderable () override;
 
-  void UploadSample (gst_ptr<GstSample> const &_sample);
-
-  void Update () override;
-
   void Draw () override;
 
  private:
-  bgfx::ProgramHandle m_program;
-  bgfx::TextureHandle m_texture;
-  bgfx::UniformHandle m_uni_vid_texture;
-  bgfx::UniformHandle m_uni_aspect_ratio;
-  DecodePipeline *m_video_pipeline;
-  BasicPipelineTerminus *m_terminus;
-  f32 m_aspect_ratio;
+  intrusive_ptr<VideoTexture> m_video_texture;
 };
 
 }

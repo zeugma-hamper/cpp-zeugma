@@ -10,6 +10,7 @@
 #include <Renderable.hpp>
 #include <VideoRenderable.hpp>
 #include <MattedVideoRenderable.hpp>
+#include <VideoSystem.hpp>
 
 #include <bgfx_utils.hpp>
 
@@ -188,7 +189,10 @@ dead_zone::~dead_zone ()
 bool dead_zone::StartUp ()
 {
   s_dead_zone_frame_time = new FrameTime;
-  return InitWindowingAndGraphics();
+  bool ret = InitWindowingAndGraphics();
+  VideoSystem::Initialize();
+
+  return ret;
 }
 
 Node *s_nodal = nullptr;
@@ -198,6 +202,10 @@ bool dead_zone::Update ()
   GetFrameTime()->UpdateTime();
 
   glfwPollEvents();
+
+  VideoSystem *video_system = VideoSystem::GetSystem ();
+  video_system->PollMessages();
+  video_system->UploadFrames();
 
   UpdateSceneGraph ();
 
@@ -221,6 +229,7 @@ void dead_zone::ShutDownSceneGraph()
 bool dead_zone::ShutDown ()
 {
   ShutDownSceneGraph ();
+  VideoSystem::ShutDown();
   ShutDownGraphics ();
 
   delete s_dead_zone_frame_time;
@@ -257,22 +266,22 @@ int main (int, char **)
 
   FilmInfo &film_info = configs[0];
   assert (film_info.clips.size () > 0);
-  ClipInfo &clip_info = film_info.clips[0];
+  // ClipInfo &clip_info = film_info.clips[0];
 
   // std::string file
   //   = "file:///home/blake/tlp/tamper-blu-mkv/the-fall-blu.mov";
 
   std::string uri = std::string ("file://") + film_info.film_path.c_str ();
-  MattedVideoRenderable *matte_renderable
-    = new MattedVideoRenderable (uri,
-                                 clip_info.start_time,
-                                 clip_info.start_time + clip_info.duration,
-                                 clip_info.directory);
+  // MattedVideoRenderable *matte_renderable
+  //   = new MattedVideoRenderable (uri,
+  //                                clip_info.start_time,
+  //                                clip_info.start_time + clip_info.duration,
+  //                                clip_info.directory);
 
-  // VideoRenderable *renderable
-  //   = new VideoRenderable (file);
+  VideoRenderable *renderable
+    = new VideoRenderable (uri);
 
-  s_nodal->AppendRenderable(matte_renderable);
+  s_nodal->AppendRenderable(renderable);
   layer.GetRootNode()->AppendChild(s_nodal);
 
   zone.Run ();

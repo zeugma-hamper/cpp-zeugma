@@ -93,6 +93,8 @@ class IntrusiveBase
  public:
   template<typename U>
   friend class intrusive_ptr;
+  template<typename U>
+  friend class intrusive_weak_ptr;
 
   using Type = T;
   using RefOps = ReferenceOps;
@@ -132,6 +134,11 @@ template<typename T>
 class intrusive_ptr
 {
  public:
+
+  intrusive_ptr ()
+    : m_pointer {nullptr}
+  { }
+
   explicit intrusive_ptr (T *_t)
     : m_pointer {_t}
   { }
@@ -413,7 +420,7 @@ class intrusive_weak_ptr
 
   bool expired () const noexcept
   {
-    return !m_pointer || m_pointer->expired ();
+    return !m_pointer || m_pointer->m_counter.expired ();
   }
 
   // not for usage, just for equality check
@@ -439,7 +446,7 @@ class intrusive_weak_ptr
         return intrusive_ptr<T> {m_pointer};
       }
 
-    return {nullptr};
+    return {};
   }
 
  private:
