@@ -2,6 +2,7 @@
 
 #include <bgfx_utils.hpp>
 #include <Renderable.hpp>
+#include <VideoSystem.hpp>
 
 #include <stdio.h>
 
@@ -138,7 +139,12 @@ bool GraphicsApplication::StartUp ()
 {
   if (! s_app_frame_time)
     s_app_frame_time = new FrameTime;
-  return InitWindowingAndGraphics();
+
+
+  bool ret = InitWindowingAndGraphics();
+  VideoSystem::Initialize ();
+
+  return ret;
 }
 
 Node *s_nodal = nullptr;
@@ -148,6 +154,11 @@ bool GraphicsApplication::Update ()
   GetFrameTime()->UpdateTime();
 
   glfwPollEvents();
+
+  VideoSystem *vs = VideoSystem::GetSystem();
+  assert (vs);
+  vs->PollMessages();
+  vs->UploadFrames();
 
   UpdateSceneGraph ();
 
@@ -171,6 +182,7 @@ void GraphicsApplication::ShutDownSceneGraph()
 bool GraphicsApplication::ShutDown ()
 {
   ShutDownSceneGraph ();
+  VideoSystem::ShutDown();
   ShutDownGraphics ();
 
   delete s_app_frame_time;
