@@ -17,8 +17,12 @@ class Vect  :  public v3f64
     { x = eks;  y = wye;  z = zee; }
   Vect (f64 mono)
     { x = y = z = mono; }
-  Vect (const Vect &otra)
-    { x = otra.x;  y = otra.y;  z = otra.z; }
+
+  Vect (const Vect &otra) noexcept = default;
+  Vect (Vect &&otra) noexcept = default;
+
+  Vect &operator = (const Vect &otra) noexcept = default;
+  Vect &operator = (Vect &&otra) noexcept = default;
 
   Vect &Set (f64 eks, f64 wye, f64 zee)
     { x = eks;  y = wye;  z = zee;  return *this; }
