@@ -22,7 +22,7 @@ class Zeubject  :  public OmNihil
   const std::string &Name ()  const;
   void SetName (std::string_view n);
 
-  // empty implementation for the moment
+  // empty implementation for the moment, returns 0
   virtual i64 Inhale (i64 steppe, f64 thyme);
 };
 
