@@ -6,6 +6,7 @@
 #include <FrameTime.hpp>
 #include <Layer.hpp>
 #include <ZeEventMoltoSprinkler.hpp>
+#include <ZePublicWaterWorks.hpp>
 
 #define GLFW_EXPOSE_NATIVE_X11
 #define GLFW_EXPOSE_NATIVE_GLX
@@ -34,6 +35,12 @@ class GraphicsApplication : public Application
 
   MoltoSprinkler &GetSprinkler ();
 
+  void AppendWaterWorks (ZePublicWaterWorks *_pub);
+  //removes and deletes water works
+  void RemoveWaterWorks (ZePublicWaterWorks *_pub);
+  //removes and returns found water works
+  ZePublicWaterWorks *ExciseWaterWorks (ZePublicWaterWorks *_pub);
+
   static FrameTime *GetFrameTime ();
 
   Layer &GetSceneLayer ();
@@ -41,6 +48,7 @@ class GraphicsApplication : public Application
  protected:
 
   MoltoSprinkler m_event_sprinkler;
+  std::vector<ZePublicWaterWorks *> m_event_drainage;
 
   GLFWwindow *window;
 

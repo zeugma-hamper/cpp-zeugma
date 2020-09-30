@@ -155,6 +155,9 @@ bool GraphicsApplication::Update ()
 
   glfwPollEvents();
 
+  for (ZePublicWaterWorks *ww : m_event_drainage)
+    ww->Drain (&m_event_sprinkler);
+
   VideoSystem *vs = VideoSystem::GetSystem();
   assert (vs);
   vs->PollMessages();
@@ -173,8 +176,33 @@ void GraphicsApplication::UpdateSceneGraph()
   m_scene_graph_layer->GetRootNode()->EnumerateRenderables();
 }
 
-MoltoSprinkler &GetSprinkler ()
+MoltoSprinkler &GraphicsApplication::GetSprinkler ()
 {
+  return m_event_sprinkler;
+}
+
+void GraphicsApplication::AppendWaterWorks (ZePublicWaterWorks *_pub)
+{
+  if (_pub)
+    m_event_drainage.push_back(_pub);
+}
+
+void GraphicsApplication::RemoveWaterWorks (ZePublicWaterWorks *_pub)
+{
+  if (! _pub)
+    return;
+
+  m_event_drainage.erase (std::find (m_event_drainage.begin (), m_event_drainage.end (), _pub));
+  delete _pub;
+}
+
+ZePublicWaterWorks *GraphicsApplication::ExciseWaterWorks (ZePublicWaterWorks *_pub)
+{
+  auto const it = std::find (m_event_drainage.begin (), m_event_drainage.end (), _pub);
+  ZePublicWaterWorks *ww = it != m_event_drainage.end () ? *it : nullptr;
+  m_event_drainage.erase (it);
+
+  return ww;
 }
 
 void GraphicsApplication::ShutDownSceneGraph()
