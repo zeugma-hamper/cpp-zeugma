@@ -5,6 +5,7 @@
 #include <base_types.hpp>
 #include <FrameTime.hpp>
 #include <Layer.hpp>
+#include <ZeEventMoltoSprinkler.hpp>
 
 #define GLFW_EXPOSE_NATIVE_X11
 #define GLFW_EXPOSE_NATIVE_GLX
@@ -31,11 +32,15 @@ class GraphicsApplication : public Application
 
   void UpdateSceneGraph ();
 
+  MoltoSprinkler &GetSprinkler ();
+
   static FrameTime *GetFrameTime ();
 
   Layer &GetSceneLayer ();
 
  protected:
+
+  MoltoSprinkler m_event_sprinkler;
 
   GLFWwindow *window;
 

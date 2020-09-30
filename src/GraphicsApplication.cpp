@@ -173,6 +173,10 @@ void GraphicsApplication::UpdateSceneGraph()
   m_scene_graph_layer->GetRootNode()->EnumerateRenderables();
 }
 
+MoltoSprinkler &GetSprinkler ()
+{
+}
+
 void GraphicsApplication::ShutDownSceneGraph()
 {
   delete m_scene_graph_layer;
