@@ -170,10 +170,11 @@ lib_sources = ['src/application.cpp',
                'src/Node.cpp',
                'src/PipelineTerminus.cpp',
                'src/Renderable.cpp',
+               'src/Vect.cpp',
                'src/VideoSystem.cpp',
                'src/VideoRenderable.cpp',
                'src/Zeubject.cpp',
-               # 'src/ZeEvent.cpp',
+               'src/ZeEvent.cpp',
                'src/bgfx_utils.cpp']
 
 
