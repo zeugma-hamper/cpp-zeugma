@@ -3,7 +3,6 @@
 #define ZE_EVENT_IS_ALL_ZE_RAGE
 
 
-#include "Vect.h"
 //#include "MotherTime.h"
 #include "Zeubject.h"
 
@@ -56,13 +55,16 @@ class ZeEvent  :  public Zeubject
   class ProtoSprinkler  :  public Zeubject
     { public:
       typedef boost::signals2::connection HOOKUP;
-      virtual i64 Spray (ZeEvent *e)
+      // implementations send the event along to targets
+      virtual i64 Spray (ZeEvent *)
         { return -1; }
     };
 
   class ZEPhage
     { public:
-      virtual i64 ZE (ZeEvent *e)
+      virtual ~ZEPhage () { }
+      // implementations receive the event and do their bidness
+      virtual i64 ZE (ZeEvent *)
         { return -1; }
       virtual bool PassTheBuckUpPhageHierarchy ()
         { return false; }
