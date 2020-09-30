@@ -172,6 +172,8 @@ lib_sources = ['src/application.cpp',
                'src/Renderable.cpp',
                'src/VideoSystem.cpp',
                'src/VideoRenderable.cpp',
+               'src/Zeubject.cpp',
+               # 'src/ZeEvent.cpp',
                'src/bgfx_utils.cpp']
 
 
