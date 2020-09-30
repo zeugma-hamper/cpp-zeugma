@@ -10,6 +10,9 @@ cpp = meson.get_compiler ('cpp')
 dl_dep = cpp.find_library('dl')
 threads_dep = dependency('threads')
 
+##### boost
+boost_dep = dependency ('boost')
+
 ##### OpenImageIO
 oiio_dep = dependency ('OpenImageIO')
 
@@ -167,6 +170,7 @@ lib_sources = ['src/application.cpp',
                'src/Layer.cpp',
                'src/Matte.cpp',
                'src/MattedVideoRenderable.cpp',
+               'src/ZeEventMoltoSprinkler.cpp',
                'src/Node.cpp',
                'src/PipelineTerminus.cpp',
                'src/Renderable.cpp',
@@ -185,7 +189,7 @@ toml_inc = include_directories ('toml11')
 
 charm_definition_deps = [bx_dep, bimg_dep, bgfx_dep, glfw_dep,
                          gst_dep, gst_app_dep, gst_video_dep,
-                         oiio_dep]
+                         oiio_dep, boost_dep]
 
 charm_lib = static_library ('charm', lib_sources,
                             include_directories : [charm_inc, toml_inc],

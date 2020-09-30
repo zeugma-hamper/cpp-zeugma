@@ -12,7 +12,7 @@ namespace charm
 {
 
 class ZESpatialEvent  :  public ZeEvent
-{ ZE_EVT_TUMESCE (ZESpatial, ZE);
+{ ZE_EVT_TUMESCE (ZESpatial, Ze);
 
  public:
   Vect loc, aim, ovr;

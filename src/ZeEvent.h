@@ -7,6 +7,7 @@
 #include "Zeubject.h"
 
 #include <class_utils.hpp>
+#include <type_int.hpp>
 
 #include <string>
 #include <string_view>
@@ -52,31 +53,34 @@ class ZeEvent  :  public Zeubject
   virtual const std::string &EventIlk ();
   virtual const std::string &EventSuperIlk ();
 
+  virtual u32 EventTypeIndex () const;
+  virtual u32 EventSuperTypeIndex () const;
+
   class ProtoSprinkler  :  public Zeubject
     { public:
       typedef boost::signals2::connection HOOKUP;
       // implementations send the event along to targets
+      virtual ~ProtoSprinkler () { }
       virtual i64 Spray (ZeEvent *)
         { return -1; }
     };
 
-  class ZEPhage
+  class ZePhage
     { public:
-      virtual ~ZEPhage () { }
+      virtual ~ZePhage () { }
       // implementations receive the event and do their bidness
-      virtual i64 ZE (ZeEvent *)
+      virtual i64 Ze (ZeEvent *)
         { return -1; }
       virtual bool PassTheBuckUpPhageHierarchy ()
         { return false; }
     };
 
   virtual i64 ProfferAsSnackTo (OmNihil *om)
-    { if (ZEPhage *ph = dynamic_cast <ZEPhage *> (om))
-        return ph -> ZE (this);
+    { if (ZePhage *ph = dynamic_cast <ZePhage *> (om))
+        return ph -> Ze (this);
       return -1;
     }
 };
-
 
 
 class EventSprinklerGroup  :  public Zeubject
@@ -120,6 +124,10 @@ class EventSprinklerGroup  :  public Zeubject
     { static std::string ev_silk (#EV_SUPERILK);                        \
       return ev_silk;                                                   \
     }                                                                   \
+  u32 EventTypeIndex () const override                                  \
+    { return index<EV_ILK ## Event>::get (); }                            \
+  u32 EventSuperTypeIndex () const override                             \
+    { return index<EV_SUPERILK ## Event>::get ();  }                      \
   i64 ProfferAsSnackTo (OmNihil *om)  override                          \
     { if (EV_ILK##Phage *ph = dynamic_cast <EV_ILK##Phage *> (om))      \
         { i64 sult = ph -> EV_ILK (this);                               \

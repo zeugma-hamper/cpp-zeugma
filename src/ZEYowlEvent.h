@@ -9,7 +9,7 @@ namespace charm
 {
 
 class ZEYowlEvent  :  public ZeEvent
-{ ZE_EVT_TUMESCE (ZEYowl, ZE);
+{ ZE_EVT_TUMESCE (ZEYowl, Ze);
 
   std::string utt;
   i32 rept_ord;

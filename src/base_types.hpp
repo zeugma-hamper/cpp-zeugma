@@ -7,7 +7,7 @@
 namespace charm
 {
 
-  //basic numerics
+//basic numerics
 using i8  = int8_t;
 using u8  = uint8_t;
 using i16 = int16_t;
@@ -20,11 +20,12 @@ using u64 = uint64_t;
 using f64 = double;
 using szt = size_t;
 
-  //
+// convenience types
 using sort_key = u64;
 using graph_id = u64;
 using animation_step = u64;
 
+// vect base types
 typedef struct {
   union {
     struct { f32 x, y; };

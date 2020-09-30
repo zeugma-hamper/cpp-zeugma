@@ -1,6 +1,8 @@
 
 #include <ZeEvent.h>
 
+#include <type_int.hpp>
+
 namespace charm
 {
 
@@ -84,4 +86,13 @@ const std::string &EventSuperIlk ()
   return ev_silk;
 }
 
+u32 ZeEvent::EventTypeIndex () const
+{
+  return index<ZeEvent>::get ();
+}
+
+u32 ZeEvent::EventSuperTypeIndex () const
+{
+  return u32 (-1);
+}
 }
