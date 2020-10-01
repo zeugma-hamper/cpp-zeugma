@@ -7,7 +7,9 @@ namespace charm
 {
 
 //this is safe with clang and g++, would need to test with MSVC
-
+//references of references:
+//https://stackoverflow.com/questions/52851239/local-static-variable-linkage-in-a-template-class-static-member-function
+//https://stackoverflow.com/questions/32172137/local-static-thread-local-variables-of-inline-functions
 template<typename T>
 struct counter
 {
