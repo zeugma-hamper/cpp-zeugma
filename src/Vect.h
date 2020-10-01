@@ -2,13 +2,16 @@
 #ifndef VECTITUDINOUSNESS
 #define VECTITUDINOUSNESS
 
+
 #include <base_types.hpp>
 
 #include <math.h>
 #include <stdio.h>
 
+
 namespace charm
 {
+
 
 class Vect  :  public v3f64
 { public:
@@ -148,6 +151,8 @@ class Vect  :  public v3f64
 #define VEX2(v) (v).x, (v).y
 #define PVEX2(pv) (pv)->x, (pv)->y
 
-}
+
+}  // even though its ascii is dead, namespace charm's spirit lives on
+
 
 #endif

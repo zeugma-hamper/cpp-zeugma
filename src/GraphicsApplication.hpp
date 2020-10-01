@@ -22,9 +22,9 @@ class GraphicsApplication : public Application
   GraphicsApplication ();
   ~GraphicsApplication () override;
 
-  bool StartUp  () override;
-  bool Update   () override;
-  bool ShutDown () override;
+  bool StartUp     () override;
+  bool RunOneCycle () override;
+  bool ShutDown    () override;
 
   bool InitWindowingAndGraphics ();
   void ShutDownGraphics ();

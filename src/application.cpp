@@ -15,7 +15,7 @@ bool Application::StartUp ()
   return true;
 }
 
-bool Application::Update ()
+bool Application::RunOneCycle ()
 {
   return true;
 }
@@ -27,10 +27,13 @@ bool Application::ShutDown ()
 
 void Application::Run ()
 {
-  while (Update () && s_keep_running);
+  while (RunOneCycle () && s_keep_running);
 
   ShutDown ();
 }
+
+bool Application::DoWhatThouWilt (i64 ratch, f64 thyme)
+{ return true; }
 
 static void s_term_int_handler (int, siginfo_t *, void *)
 {

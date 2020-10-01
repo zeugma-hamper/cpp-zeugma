@@ -1,10 +1,69 @@
-#include <GraphicsApplication.hpp>
+#include <application.hpp>
+#include <base_types.hpp>
+#include <class_utils.hpp>
 
-#include <bgfx_utils.hpp>
+#include <DecodePipeline.hpp>
+#include <FrameTime.hpp>
+#include <Layer.hpp>
+#include <Node.hpp>
+#include <PipelineTerminus.hpp>
 #include <Renderable.hpp>
+#include <VideoRenderable.hpp>
+#include <MattedVideoRenderable.hpp>
 #include <VideoSystem.hpp>
 
+#include "ZoftThing.h"
+#include "LoopZoft.h"
+#include "InterpZoft.h"
+
+#include <bgfx_utils.hpp>
+
+#define GLFW_EXPOSE_NATIVE_X11
+#define GLFW_EXPOSE_NATIVE_GLX
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
+
+#include <charm_glm.hpp>
+
+#include <string_view>
+
 #include <stdio.h>
+
+#include <Matte.hpp>
+
+using namespace charm;
+
+class dead_zone final : public charm::Application
+{
+ public:
+  dead_zone ();
+  ~dead_zone () override final;
+
+  bool StartUp     () override final;
+  bool RunOneCycle () override final;
+  bool ShutDown    () override final;
+
+  bool DoWhatThouWilt (i64 ratch, f64 thyme)  override;
+
+  bool InitWindowingAndGraphics ();
+  void ShutDownGraphics ();
+  void ShutDownSceneGraph ();
+  void Render ();
+
+  void UpdateSceneGraph ();
+
+  static FrameTime *GetFrameTime ();
+
+  Layer &GetSceneLayer ();
+
+ protected:
+
+  GLFWwindow *window;
+
+  Layer *m_scene_graph_layer;
+};
+
+
 
 #define ERROR_RETURN_VAL(MSG, VAL)                 \
   {                                                \
@@ -18,8 +77,6 @@
     return;                                        \
   }
 
-namespace charm
-{
 
 static void glfw_error_callback (int, const char *_msg)
 {
@@ -39,7 +96,7 @@ static void glfw_key_callback(GLFWwindow *window, int key, int, int action, int)
     }
 }
 
-bool GraphicsApplication::InitWindowingAndGraphics ()
+bool dead_zone::InitWindowingAndGraphics ()
 {
   glfwSetErrorCallback(glfw_error_callback);
   if (! glfwInit())
@@ -97,13 +154,13 @@ bool GraphicsApplication::InitWindowingAndGraphics ()
   return true;
 }
 
-void GraphicsApplication::ShutDownGraphics ()
+void dead_zone::ShutDownGraphics ()
 {
   bgfx::shutdown();
   glfwTerminate();
 }
 
-void GraphicsApplication::Render ()
+void dead_zone::Render ()
 {
   for (Renderable *r : m_scene_graph_layer->GetRenderables())
     r->Update ();
@@ -123,45 +180,49 @@ void GraphicsApplication::Render ()
   bgfx::frame ();
 }
 
-FrameTime *s_app_frame_time{nullptr};
+FrameTime *s_dead_zone_frame_time{nullptr};
 
-GraphicsApplication::GraphicsApplication ()
+dead_zone::dead_zone ()
   : window {nullptr},
     m_scene_graph_layer {new Layer}
 {
 }
 
-GraphicsApplication::~GraphicsApplication ()
+dead_zone::~dead_zone ()
 {
 }
 
-bool GraphicsApplication::StartUp ()
+bool dead_zone::StartUp ()
 {
-  if (! s_app_frame_time)
-    s_app_frame_time = new FrameTime;
-
-
+  s_dead_zone_frame_time = new FrameTime;
   bool ret = InitWindowingAndGraphics();
-  VideoSystem::Initialize ();
+  VideoSystem::Initialize();
 
   return ret;
 }
 
 Node *s_nodal = nullptr;
 
-bool GraphicsApplication::RunOneCycle ()
+static i64 global_ratchet = 0;
+
+bool dead_zone::RunOneCycle ()
 {
   GetFrameTime()->UpdateTime();
+  f64 global_frame_thyme = GetFrameTime () -> GetCurrentTime ();
+
+  global_ratchet += 8;
 
   glfwPollEvents();
 
-  for (ZePublicWaterWorks *ww : m_event_drainage)
-    ww->Drain (&m_event_sprinkler);
+  if (ProtoZoftThingGuts::IsMassBreathing ())
+    ProtoZoftThingGuts::MassBreather ()
+      -> Inhale (global_ratchet, global_frame_thyme);
 
-  VideoSystem *vs = VideoSystem::GetSystem();
-  assert (vs);
-  vs->PollMessages();
-  vs->UploadFrames();
+  DoWhatThouWilt (global_ratchet, global_frame_thyme);
+
+  VideoSystem *video_system = VideoSystem::GetSystem ();
+  video_system->PollMessages();
+  video_system->UploadFrames();
 
   UpdateSceneGraph ();
 
@@ -170,67 +231,94 @@ bool GraphicsApplication::RunOneCycle ()
   return true;
 }
 
-void GraphicsApplication::UpdateSceneGraph()
+
+LoopFloat elzyeff { 22.2, 3.3, 4.5 };
+LoopVect elzyvee { Vect (0.0, 1.0, 2.0), Vect (1.0, -1.0, 3.0), 5.5 };
+InterpFloat ayezee { -1.0, 1.0, 4.7 };
+
+bool dead_zone::DoWhatThouWilt (i64 ratch, f64 thyme)
+{ if (ayezee.val > 0.993  &&  ayezee.val < 0.999)
+    elzyvee . Restart ();
+
+  elzyvee.val . SpewToStderr ();
+  fprintf (stderr, " is the vee of it, and interp is all <%.2lf>\n",
+           ayezee.val);
+
+  return true;
+}
+
+
+void dead_zone::UpdateSceneGraph()
 {
   m_scene_graph_layer->GetRootNode()->UpdateTransformsHierarchically();
   m_scene_graph_layer->GetRootNode()->EnumerateRenderables();
 }
 
-MoltoSprinkler &GraphicsApplication::GetSprinkler ()
-{
-  return m_event_sprinkler;
-}
-
-void GraphicsApplication::AppendWaterWorks (ZePublicWaterWorks *_pub)
-{
-  if (_pub)
-    m_event_drainage.push_back(_pub);
-}
-
-void GraphicsApplication::RemoveWaterWorks (ZePublicWaterWorks *_pub)
-{
-  if (! _pub)
-    return;
-
-  m_event_drainage.erase (std::find (m_event_drainage.begin (), m_event_drainage.end (), _pub));
-  delete _pub;
-}
-
-ZePublicWaterWorks *GraphicsApplication::ExciseWaterWorks (ZePublicWaterWorks *_pub)
-{
-  auto const it = std::find (m_event_drainage.begin (), m_event_drainage.end (), _pub);
-  ZePublicWaterWorks *ww = it != m_event_drainage.end () ? *it : nullptr;
-  m_event_drainage.erase (it);
-
-  return ww;
-}
-
-void GraphicsApplication::ShutDownSceneGraph()
+void dead_zone::ShutDownSceneGraph()
 {
   delete m_scene_graph_layer;
   m_scene_graph_layer = nullptr;
 }
 
-bool GraphicsApplication::ShutDown ()
+bool dead_zone::ShutDown ()
 {
   ShutDownSceneGraph ();
   VideoSystem::ShutDown();
   ShutDownGraphics ();
 
-  delete s_app_frame_time;
-  s_app_frame_time = nullptr;
+  delete s_dead_zone_frame_time;
+  s_dead_zone_frame_time = nullptr;
 
   return true;
 }
 
-FrameTime *GraphicsApplication::GetFrameTime ()
+FrameTime *dead_zone::GetFrameTime ()
 {
-  return s_app_frame_time;
+  return s_dead_zone_frame_time;
 }
 
-Layer &GraphicsApplication::GetSceneLayer ()
+Layer &dead_zone::GetSceneLayer ()
 {
   return *m_scene_graph_layer;
 }
 
+int main (int, char **)
+{
+  dead_zone zone;
+  if (! zone.StartUp ())
+    return -1;
+
+  Layer &layer = zone.GetSceneLayer();
+
+  s_nodal = new Node ();
+
+  s_nodal->SetLocalTransformation(glm::translate(glm::vec3{0.0f, 0.0f, 9.0f})
+                                  * glm::scale (glm::vec3 {10.0f}));
+
+  std::vector<FilmInfo> configs = ReadFilmInfo ("../jh-film-config.toml");
+  assert (configs.size () > 0);
+
+  FilmInfo &film_info = configs[0];
+  assert (film_info.clips.size () > 0);
+  // ClipInfo &clip_info = film_info.clips[0];
+
+  // std::string file
+  //   = "file:///home/blake/tlp/tamper-blu-mkv/the-fall-blu.mov";
+
+  std::string uri = std::string ("file://") + film_info.film_path.c_str ();
+  // MattedVideoRenderable *matte_renderable
+  //   = new MattedVideoRenderable (uri,
+  //                                clip_info.start_time,
+  //                                clip_info.start_time + clip_info.duration,
+  //                                clip_info.directory);
+
+  VideoRenderable *renderable
+    = new VideoRenderable (uri);
+
+  s_nodal->AppendRenderable(renderable);
+  layer.GetRootNode()->AppendChild(s_nodal);
+
+  zone.Run ();
+
+  return 0;
 }

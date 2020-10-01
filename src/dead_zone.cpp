@@ -35,9 +35,9 @@ class dead_zone final : public charm::Application
   dead_zone ();
   ~dead_zone () override final;
 
-  bool StartUp ()  override final;
-  bool Update ()   override final;
-  bool ShutDown () override final;
+  bool StartUp     () override final;
+  bool RunOneCycle () override final;
+  bool ShutDown    () override final;
 
   bool InitWindowingAndGraphics ();
   void ShutDownGraphics ();
@@ -197,7 +197,7 @@ bool dead_zone::StartUp ()
 
 Node *s_nodal = nullptr;
 
-bool dead_zone::Update ()
+bool dead_zone::RunOneCycle ()
 {
   GetFrameTime()->UpdateTime();
 

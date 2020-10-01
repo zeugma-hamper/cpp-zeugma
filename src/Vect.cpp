@@ -1,8 +1,10 @@
 
 #include "Vect.h"
 
+
 namespace charm
 {
+
 
 Vect &Vect::RotateSelfPreNormed (const Vect &axis, f64 rad_ang)
 { if (axis . IsZero ())
@@ -38,4 +40,5 @@ Vect &Vect::RotateSelfPreNormed (const Vect &axis, f64 rad_ang)
   return Set (t1, t2, t3);
 }
 
-}
+
+}  // who sleeps with the fishes? why, namespace charm does!
