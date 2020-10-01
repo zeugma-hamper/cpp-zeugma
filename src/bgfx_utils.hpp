@@ -29,8 +29,11 @@ ProgramResiduals CreateProgram (bx::FilePath const &_vert_path,
 
 std::vector<bgfx::UniformHandle> GetShaderUniforms (bgfx::ShaderHandle _sh);
 
-
-bgfx::TextureHandle LoadTexture2D (bx::FilePath const &_path, u64 _bgfx_flags);
+//Create a texture handle and decode image to texture, texture is mutable
+bgfx::TextureHandle CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags);
+//Updates texture from image file. Format, size, etc. must match.
+bgfx::TextureHandle UpdateWholeTexture2D (bgfx::TextureHandle _texture,
+                                          bx::FilePath const &_path);
 
 // helper function to delete classes used with bgfx::makeRef
 template<typename T>

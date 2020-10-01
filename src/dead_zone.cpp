@@ -27,6 +27,8 @@
 
 #include <Matte.hpp>
 
+#include <type_int.hpp>
+
 using namespace charm;
 
 class dead_zone final : public charm::Application
@@ -266,20 +268,27 @@ int main (int, char **)
 
   FilmInfo &film_info = configs[0];
   assert (film_info.clips.size () > 0);
-  // ClipInfo &clip_info = film_info.clips[0];
+  ClipInfo &clip_info = film_info.clips[0];
 
   // std::string file
   //   = "file:///home/blake/tlp/tamper-blu-mkv/the-fall-blu.mov";
 
-  std::string uri = std::string ("file://") + film_info.film_path.c_str ();
-  // MattedVideoRenderable *matte_renderable
-  //   = new MattedVideoRenderable (uri,
-  //                                clip_info.start_time,
-  //                                clip_info.start_time + clip_info.duration,
-  //                                clip_info.directory);
+  charm::index<FilmInfo>::get ();
+  charm::index<std::string>::get ();
 
-  VideoRenderable *renderable
-    = new VideoRenderable (uri);
+  fprintf (stderr, "dz's idea of renderable is %u\n", charm::index<Renderable>::get ());
+
+  charm::index<Layer>::get ();
+
+  std::string uri = std::string ("file://") + film_info.film_path.c_str ();
+  MattedVideoRenderable *renderable
+    = new MattedVideoRenderable (uri,
+                                 clip_info.start_time,
+                                 clip_info.start_time + clip_info.duration,
+                                 clip_info.directory);
+
+  // VideoRenderable *renderable
+  //   = new VideoRenderable (uri);
 
   s_nodal->AppendRenderable(renderable);
   layer.GetRootNode()->AppendChild(s_nodal);

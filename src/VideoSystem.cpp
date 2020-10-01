@@ -6,6 +6,8 @@
 #include <DecodePipeline.hpp>
 #include <PipelineTerminus.hpp>
 
+#include <algorithm>
+
 namespace charm
 {
 static VideoSystem *s_video_system_instance{nullptr};
@@ -55,13 +57,16 @@ void VideoTexture::BindGraphics (u64 _additional_state)
   else if (format == VideoFormat::I420)
     {
       bgfx::setTexture (0, uniforms[0], textures[0]);
-      bgfx::setTexture (1, uniforms[0], textures[0]);
-      bgfx::setTexture (2, uniforms[0], textures[0]);
+      bgfx::setTexture (1, uniforms[1], textures[1]);
+      bgfx::setTexture (2, uniforms[2], textures[2]);
     }
 
   // if matte is valid
   if (bgfx::isValid(textures[3]))
-    bgfx::setTexture (3, uniforms[3], textures[3]);
+    {
+      //fprintf (stderr, "binding matte\n");
+      bgfx::setTexture (3, uniforms[3], textures[3]);
+    }
 }
 
 void VideoTexture::SetNthTexture (size_t _index, bgfx::TextureHandle _handle)
@@ -201,6 +206,43 @@ void VideoSystem::UploadFrames ()
                          DeleteImageLeftOvers<video_frame_holder>, frame_holder);
 
       bgfx::updateTexture2D(rgb_handle, 0, 0, 0, 0, width, height, mem, stride);
+
+      if (pipe.matte_dir_path.empty())
+        continue;
+
+      GstBuffer *buffer = gst_sample_get_buffer (sample.get ());
+      guint64 pts = GST_BUFFER_PTS(buffer);
+
+      //TODO: set matte texture to pass through
+      if (gint64(pts) < pipe.pipeline->m_loop_status.loop_start ||
+          gint64(pts) > pipe.pipeline->m_loop_status.loop_end)
+        return;
+
+      //i expect looping here for now
+      guint64 offset_ns = pts - pipe.pipeline->m_loop_status.loop_start;
+      guint64 frame_num = guint64 (offset_ns * GST_VIDEO_INFO_FPS_N(&video_info)
+                                   / (GST_VIDEO_INFO_FPS_D(&video_info) * f64(1e9)));
+      //printf ("pts: %.3f, now: %.3f\n", pts/f64(1e9), offset_ns/f64(1e9));
+
+      assert (frame_num < pipe.matte_file_paths.size ());
+      auto &matte = pipe.matte_file_paths[frame_num];
+
+      (void)matte;
+      //3 is dedicated matte texture
+      if (! bgfx::isValid (texture->GetNthTexture(3)))
+        {
+          bgfx::TextureHandle txt_matte = CreateTexture2D (matte.path().c_str(),
+                                                           BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE);
+          if (! bgfx::isValid (txt_matte))
+            fprintf (stderr, "returned matte handle isn't valid\n");
+
+          texture->SetNthTexture(3, txt_matte);
+        }
+      else
+        {
+          UpdateWholeTexture2D(texture->GetNthTexture (3), matte.path().c_str());
+        }
+
     }
 }
 
@@ -221,8 +263,12 @@ intrusive_ptr<VideoTexture> VideoSystem::OpenVideo (std::string_view _uri)
     txt{new VideoTexture (VideoFormat::RGB, m_vgr.basic_state, m_vgr.basic_program,
                           m_vgr.uniforms, array_size (m_vgr.uniforms))};
 
-  m_pipelines.push_back (VideoPipeline{std::string (_uri), dec, term,
-                                       intrusive_weak_ptr{txt}});
+  m_pipelines.emplace_back();
+  VideoPipeline &pipe = m_pipelines.back ();
+  pipe.uri = _uri;
+  pipe.pipeline = dec;
+  pipe.terminus = term;
+  pipe.texture = txt;
 
   return txt;
 }
@@ -255,15 +301,30 @@ intrusive_ptr<VideoTexture> VideoSystem::OpenMatte (std::string_view _uri,
   DecodePipeline *dec = new DecodePipeline;
   dec->Open (_uri, term);
   dec->Play ();
+  dec->Loop (_loop_start_ts, _loop_end_ts);
 
   intrusive_ptr<VideoTexture>
-    txt{new VideoTexture (VideoFormat::RGB, m_vgr.basic_state, m_vgr.basic_program,
+    txt{new VideoTexture (VideoFormat::RGB, m_vgr.matte_state, m_vgr.matte_program,
                           m_vgr.uniforms, array_size (m_vgr.uniforms))};
 
-  m_pipelines.push_back (VideoPipeline{std::string (_uri), dec, term,
-                                       intrusive_weak_ptr{txt}});
+  m_pipelines.emplace_back();
+  VideoPipeline &pipe = m_pipelines.back ();
+  pipe.uri = _uri;
+  pipe.pipeline = dec;
+  pipe.terminus = term;
+  pipe.texture = txt;
+  pipe.loop_start_ts = _loop_start_ts;
+  pipe.loop_end_ts = _loop_end_ts;
+  pipe.matte_dir_path = _matte_dir;
+
+  pipe.matte_file_paths.insert (pipe.matte_file_paths.end (),
+                                fs::directory_iterator (_matte_dir),
+                                fs::directory_iterator ());
+
+  std::sort (pipe.matte_file_paths.begin (), pipe.matte_file_paths.end ());
 
   return txt;
+
 }
 
 

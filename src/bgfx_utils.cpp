@@ -147,7 +147,7 @@ std::vector<bgfx::UniformHandle> GetShaderUniforms (bgfx::ShaderHandle _sh)
 //   return handle;
 // }
 
-bgfx::TextureHandle LoadTexture2D (bx::FilePath const &_path, u64 _bgfx_flags)
+bgfx::TextureHandle CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags)
 {
   std::unique_ptr<OIIO::ImageInput> iinput = OIIO::ImageInput::open (_path.getCPtr());
   if (! iinput)
@@ -167,12 +167,33 @@ bgfx::TextureHandle LoadTexture2D (bx::FilePath const &_path, u64 _bgfx_flags)
       bgfx::TextureFormat::RGBA8
     };
 
+  // in bgfx, if texture is created with valid memory pointer, then the texture is immutable.
+  // here, create with null pointer, then upload so texture is mutable.
   bgfx::TextureHandle handle = bgfx::createTexture2D(ispec.width, ispec.height, false, 1,
                                                      formats[ispec.nchannels],
-                                                     _bgfx_flags, img_mem);
+                                                     _bgfx_flags, nullptr);
+
+  bgfx::updateTexture2D(handle, 0, 0, 0, 0, ispec.width, ispec.height, img_mem);
 
   return handle;
 }
 
+bgfx::TextureHandle UpdateWholeTexture2D (bgfx::TextureHandle _texture,
+                                          bx::FilePath const &_path)
+{
+  std::unique_ptr<OIIO::ImageInput> iinput = OIIO::ImageInput::open (_path.getCPtr());
+  if (! iinput)
+    return {};
+
+  OIIO::ImageSpec const &ispec = iinput->spec ();
+
+  bgfx::Memory const *img_mem = bgfx::alloc(ispec.width * ispec.height * ispec.nchannels);
+
+  iinput->read_image (OIIO::TypeDesc::UINT8, img_mem->data);
+
+  bgfx::updateTexture2D (_texture, 0, 0, 0, 0, ispec.width, ispec.height, img_mem);
+
+  return _texture;
+}
 
 }

@@ -1,0 +1,1 @@
+option('shaderc-path', type : 'string', value : '/usr/bin', description : 'shaderc binary')

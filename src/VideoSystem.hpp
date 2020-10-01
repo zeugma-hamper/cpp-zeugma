@@ -77,12 +77,19 @@ class VideoTexture : public IntrusiveBase<VideoTexture>
                                      BGFX_INVALID_HANDLE};
 };
 
+namespace fs = std::filesystem;
+
 struct VideoPipeline
 {
   std::string uri;
   DecodePipeline *pipeline = nullptr;
   BasicPipelineTerminus *terminus = nullptr;
   intrusive_weak_ptr<VideoTexture> texture;
+  //for mattes
+  f64 loop_start_ts = -1.0;
+  f64 loop_end_ts = -1.0;
+  fs::path matte_dir_path;
+  std::vector<fs::directory_entry> matte_file_paths;
 };
 
 

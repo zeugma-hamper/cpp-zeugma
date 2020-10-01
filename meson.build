@@ -206,7 +206,7 @@ charm_dep = declare_dependency (include_directories : [charm_inc, toml_inc],
                                 dependencies : charm_definition_deps)
 
 # be sure to run `./install_bgfx_tools.sh <BIN_DIR>` before building charm
-shaderc_prog = find_program ('shaderc')
+shaderc_prog = find_program ('shaderc', dirs : [get_option ('shaderc-path')])
 
 # [type, input file, varying file, output file]
 shaders = [
