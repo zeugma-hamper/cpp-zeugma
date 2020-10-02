@@ -88,21 +88,21 @@ class MTReferenceCounter
 };
 
 template<typename T, typename ReferenceOps = ReferenceCounter>
-class IntrusiveBase
+class CharmBase
 {
  public:
   template<typename U>
-  friend class intrusive_ptr;
+  friend class ch_ptr;
   template<typename U>
-  friend class intrusive_weak_ptr;
+  friend class ch_weak_ptr;
 
   using Type = T;
   using RefOps = ReferenceOps;
 
-  IntrusiveBase () = default;
+  CharmBase () = default;
 
-  IntrusiveBase (IntrusiveBase const &) = delete;
-  IntrusiveBase &operator= (IntrusiveBase const &) = delete;
+  CharmBase (CharmBase const &) = delete;
+  CharmBase &operator= (CharmBase const &) = delete;
 
   void add_reference ()
   {
@@ -131,45 +131,45 @@ protected:
 };
 
 template<typename T>
-class intrusive_ptr
+class ch_ptr
 {
  public:
 
-  intrusive_ptr ()
+  ch_ptr ()
     : m_pointer {nullptr}
   { }
 
-  explicit intrusive_ptr (T *_t)
+  explicit ch_ptr (T *_t)
     : m_pointer {_t}
   { }
 
   template<typename U>
-  explicit intrusive_ptr (U *_t)
+  explicit ch_ptr (U *_t)
     : m_pointer {static_cast<T *> (_t)}
   {
     static_assert (std::is_base_of_v<T, U>, "Argument must be derived class");
   }
 
-  ~intrusive_ptr ()
+  ~ch_ptr ()
   {
     reset ();
   }
 
-  intrusive_ptr (intrusive_ptr const &_t)
+  ch_ptr (ch_ptr const &_t)
     : m_pointer {_t.m_pointer}
   {
     if (m_pointer)
       m_pointer->add_reference ();
   }
 
-  intrusive_ptr (intrusive_ptr &&_t) noexcept
+  ch_ptr (ch_ptr &&_t) noexcept
     : m_pointer {_t.m_pointer}
   {
     _t.m_pointer = nullptr;
   }
 
   template<typename U>
-  intrusive_ptr (intrusive_ptr<U> const &_t)
+  ch_ptr (ch_ptr<U> const &_t)
     : m_pointer {static_cast<T *> (_t.get ())}
   {
     static_assert (std::is_base_of_v<T, U>, "Argument must be derived class");
@@ -178,14 +178,14 @@ class intrusive_ptr
   }
 
   template<typename U>
-  intrusive_ptr (intrusive_ptr<U> &&_t) noexcept
+  ch_ptr (ch_ptr<U> &&_t) noexcept
     : m_pointer {static_cast<T *> (_t.get ())}
   {
     static_assert (std::is_base_of_v<T, U>, "Argument must be derived class");
     _t.m_pointer = nullptr;
   }
 
-  intrusive_ptr &operator=(intrusive_ptr const &_t)
+  ch_ptr &operator=(ch_ptr const &_t)
   {
     if (this == &_t)
       return *this;
@@ -199,7 +199,7 @@ class intrusive_ptr
     return *this;
   }
 
-  intrusive_ptr &operator=(intrusive_ptr &&_t) noexcept
+  ch_ptr &operator=(ch_ptr &&_t) noexcept
   {
     reset ();
 
@@ -210,7 +210,7 @@ class intrusive_ptr
   }
 
   template<typename U>
-  intrusive_ptr &operator=(intrusive_ptr<U> const &_t)
+  ch_ptr &operator=(ch_ptr<U> const &_t)
   {
     static_assert (std::is_base_of_v<T, U>, "Argument must be derived class");
     reset ();
@@ -223,7 +223,7 @@ class intrusive_ptr
   }
 
   template<typename U>
-  intrusive_ptr &operator=(intrusive_ptr<U> &&_t) noexcept
+  ch_ptr &operator=(ch_ptr<U> &&_t) noexcept
   {
     static_assert (std::is_base_of_v<T, U>, "Argument must be derived class");
     reset ();
@@ -267,21 +267,21 @@ class intrusive_ptr
 };
 
 template<typename T, typename... Args>
-intrusive_ptr<T> make_intrusive (Args &&..._args)
+ch_ptr<T> make_ch (Args &&..._args)
 {
-  return intrusive_ptr<T> (new T (std::forward<Args> (_args)...));
+  return ch_ptr<T> (new T (std::forward<Args> (_args)...));
 }
 
 template<typename T>
-class intrusive_weak_ptr
+class ch_weak_ptr
 {
  public:
 
-  intrusive_weak_ptr () noexcept
+  ch_weak_ptr () noexcept
     : m_pointer {nullptr}
   { }
 
-  intrusive_weak_ptr (intrusive_weak_ptr const &_t)
+  ch_weak_ptr (ch_weak_ptr const &_t)
     : m_pointer {_t.get ()}
   {
     if (m_pointer)
@@ -292,14 +292,14 @@ class intrusive_weak_ptr
   // so copy of expired weak pointer doesn't copy expired pointer
   // but move of expired weak pointer does copy pointer.
   // i'm not entirely sure about point.
-  intrusive_weak_ptr (intrusive_weak_ptr &&_t) noexcept
+  ch_weak_ptr (ch_weak_ptr &&_t) noexcept
     : m_pointer {_t.m_pointer}
   {
     _t.m_pointer = nullptr;
   }
 
   template<typename U>
-  intrusive_weak_ptr (intrusive_weak_ptr<U> const &_t)
+  ch_weak_ptr (ch_weak_ptr<U> const &_t)
     : m_pointer {static_cast<T *> (_t.get ())}
   {
     static_assert (std::is_base_of_v<T, U>, "Argument must be derived class");
@@ -309,14 +309,14 @@ class intrusive_weak_ptr
   }
 
   template<typename U>
-  intrusive_weak_ptr (intrusive_weak_ptr<U> &&_t) noexcept
+  ch_weak_ptr (ch_weak_ptr<U> &&_t) noexcept
     : m_pointer {static_cast<T *> (_t.m_pointer)}
   {
     static_assert (std::is_base_of_v<T, U>, "Argument must be derived class");
     _t.m_pointer = nullptr;
   }
 
-  explicit intrusive_weak_ptr (intrusive_ptr<T> const &_ipt)
+  explicit ch_weak_ptr (ch_ptr<T> const &_ipt)
     : m_pointer {_ipt.get ()}
   {
     if (m_pointer)
@@ -324,7 +324,7 @@ class intrusive_weak_ptr
   }
 
   template<typename U>
-  explicit intrusive_weak_ptr (intrusive_ptr<U> const &_ipt)
+  explicit ch_weak_ptr (ch_ptr<U> const &_ipt)
     : m_pointer {static_cast<T *> (_ipt.get ())}
   {
     static_assert (std::is_base_of_v<T, U>, "Argument must be derived class");
@@ -332,7 +332,7 @@ class intrusive_weak_ptr
       m_pointer->add_weak_reference ();
   }
 
-  intrusive_weak_ptr &operator= (intrusive_ptr<T> const &_ipt)
+  ch_weak_ptr &operator= (ch_ptr<T> const &_ipt)
   {
     reset ();
     m_pointer = _ipt.get ();
@@ -343,7 +343,7 @@ class intrusive_weak_ptr
   }
 
   template<typename U>
-  intrusive_weak_ptr &operator= (intrusive_ptr<U> const &_ipt)
+  ch_weak_ptr &operator= (ch_ptr<U> const &_ipt)
   {
     static_assert (std::is_base_of_v<T, U>, "Argument must be derived class");
     reset ();
@@ -354,12 +354,12 @@ class intrusive_weak_ptr
     return *this;
   }
 
-  ~intrusive_weak_ptr ()
+  ~ch_weak_ptr ()
   {
     reset ();
   }
 
-  intrusive_weak_ptr &operator=(intrusive_weak_ptr const &_t)
+  ch_weak_ptr &operator=(ch_weak_ptr const &_t)
   {
     if (this == &_t)
       return *this;
@@ -373,7 +373,7 @@ class intrusive_weak_ptr
     return *this;
   }
 
-  intrusive_weak_ptr &operator=(intrusive_weak_ptr &&_t)
+  ch_weak_ptr &operator=(ch_weak_ptr &&_t)
   {
     reset ();
 
@@ -384,7 +384,7 @@ class intrusive_weak_ptr
   }
 
   template<typename U>
-  intrusive_weak_ptr &operator=(intrusive_weak_ptr<U> const &_t)
+  ch_weak_ptr &operator=(ch_weak_ptr<U> const &_t)
   {
     static_assert (std::is_base_of_v<T, U>, "Argument must be derived class");
 
@@ -398,7 +398,7 @@ class intrusive_weak_ptr
   }
 
   template<typename U>
-  intrusive_weak_ptr &operator=(intrusive_weak_ptr<U> &&_t)
+  ch_weak_ptr &operator=(ch_weak_ptr<U> &&_t)
   {
     static_assert (std::is_base_of_v<T, U>, "Argument must be derived class");
     reset ();
@@ -442,12 +442,12 @@ class intrusive_weak_ptr
     return m_pointer;
   }
 
-  intrusive_ptr<T> lock () const noexcept
+  ch_ptr<T> lock () const noexcept
   {
     if (! expired ())
       {
         m_pointer->add_reference ();
-        return intrusive_ptr<T> {m_pointer};
+        return ch_ptr<T> {m_pointer};
       }
 
     return {};
@@ -457,101 +457,101 @@ class intrusive_weak_ptr
   T *m_pointer;
 };
 
-//operator== and operator!= for intrusive_ptr on the left
+//operator== and operator!= for ch_ptr on the left
 template<typename T, typename U>
-inline bool operator== (intrusive_ptr<T> const &_left, intrusive_ptr<U> const &_right)
+inline bool operator== (ch_ptr<T> const &_left, ch_ptr<U> const &_right)
 {
   return _left.get () == _right.get ();
 }
 
 template<typename T, typename U>
-inline bool operator!= (intrusive_ptr<T> const &_left, intrusive_ptr<U> const &_right)
+inline bool operator!= (ch_ptr<T> const &_left, ch_ptr<U> const &_right)
 {
   return !(_left == _right);
 }
 
 template<typename T, typename U>
-inline bool operator== (intrusive_ptr<T> const &_left, intrusive_weak_ptr<U> const &_right)
+inline bool operator== (ch_ptr<T> const &_left, ch_weak_ptr<U> const &_right)
 {
   return _left.get () == _right.get ();
 }
 
 template<typename T, typename U>
-inline bool operator!= (intrusive_ptr<T> const &_left, intrusive_weak_ptr<U> const &_right)
+inline bool operator!= (ch_ptr<T> const &_left, ch_weak_ptr<U> const &_right)
 {
   return !(_left == _right);
 }
 
 template<typename T, typename U>
-inline bool operator== (intrusive_ptr<T> const &_left, U *_right)
+inline bool operator== (ch_ptr<T> const &_left, U *_right)
 {
   return _left.get () == _right;
 }
 
 template<typename T, typename U>
-inline bool operator!= (intrusive_ptr<T> const &_left, U *_right)
+inline bool operator!= (ch_ptr<T> const &_left, U *_right)
 {
   return !(_left.get () == _right);
 }
 
-//operator== and operator!= for intrusive_weak_ptr on the left
+//operator== and operator!= for ch_weak_ptr on the left
 template<typename T, typename U>
-inline bool operator== (intrusive_weak_ptr<T> const &_left, intrusive_weak_ptr<U> const &_right)
+inline bool operator== (ch_weak_ptr<T> const &_left, ch_weak_ptr<U> const &_right)
 {
   return _left.get () == _right.get ();
 }
 
 template<typename T, typename U>
-inline bool operator!= (intrusive_weak_ptr<T> const &_left, intrusive_weak_ptr<U> const &_right)
+inline bool operator!= (ch_weak_ptr<T> const &_left, ch_weak_ptr<U> const &_right)
 {
   return !(_left == _right);
 }
 
 template<typename T, typename U>
-inline bool operator== (intrusive_weak_ptr<T> const &_left, intrusive_ptr<U> const &_right)
+inline bool operator== (ch_weak_ptr<T> const &_left, ch_ptr<U> const &_right)
 {
   return _left.get () == _right.get ();
 }
 
 template<typename T, typename U>
-inline bool operator!= (intrusive_weak_ptr<T> const &_left, intrusive_ptr<U> const &_right)
+inline bool operator!= (ch_weak_ptr<T> const &_left, ch_ptr<U> const &_right)
 {
   return !(_left == _right);
 }
 
 template<typename T, typename U>
-inline bool operator== (intrusive_weak_ptr<T> const &_left, U *_right)
+inline bool operator== (ch_weak_ptr<T> const &_left, U *_right)
 {
   return _left.get () == _right;
 }
 
 template<typename T, typename U>
-inline bool operator!= (intrusive_weak_ptr<T> const &_left, U *_right)
+inline bool operator!= (ch_weak_ptr<T> const &_left, U *_right)
 {
   return !(_left.get () == _right);
 }
 
 //operator== and operator!= for bare pointer on the left
 template<typename T, typename U>
-inline bool operator== (T *_left, intrusive_weak_ptr<U> const &_right)
+inline bool operator== (T *_left, ch_weak_ptr<U> const &_right)
 {
   return _left == _right.get ();
 }
 
 template<typename T, typename U>
-inline bool operator!= (T *_left, intrusive_weak_ptr<U> const &_right)
+inline bool operator!= (T *_left, ch_weak_ptr<U> const &_right)
 {
   return !(_left == _right);
 }
 
 template<typename T, typename U>
-inline bool operator== (T *_left, intrusive_ptr<U> const &_right)
+inline bool operator== (T *_left, ch_ptr<U> const &_right)
 {
   return _left == _right.get ();
 }
 
 template<typename T, typename U>
-inline bool operator!= (T *_left, intrusive_ptr<U> const &_right)
+inline bool operator!= (T *_left, ch_ptr<U> const &_right)
 {
   return !(_left == _right);
 }

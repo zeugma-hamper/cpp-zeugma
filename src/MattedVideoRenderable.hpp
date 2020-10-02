@@ -14,6 +14,9 @@
 namespace charm
 {
 
+struct FilmInfo;
+struct ClipInfo;
+
 class MattedVideoRenderable final : public Renderable
 {
  public:
@@ -21,16 +24,13 @@ class MattedVideoRenderable final : public Renderable
   MattedVideoRenderable (std::string_view _uri,
                          f64 _loop_start_ts, f64 _loop_end_ts,
                          std::filesystem::path const &_matte_dir);
+  MattedVideoRenderable (FilmInfo const &_film, ClipInfo &_clip);
   ~MattedVideoRenderable () override;
-
-  // void UploadSample (gst_ptr<GstSample> const &_sample);
-
-  // void Update () override;
 
   void Draw () override;
 
  private:
-  intrusive_ptr<VideoTexture> m_video_texture;
+  ch_ptr<VideoTexture> m_video_texture;
 };
 
 

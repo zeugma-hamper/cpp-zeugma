@@ -24,7 +24,7 @@ class VideoRenderable final : public Renderable
   void Draw () override;
 
  private:
-  intrusive_ptr<VideoTexture> m_video_texture;
+  ch_ptr<VideoTexture> m_video_texture;
 };
 
 }
