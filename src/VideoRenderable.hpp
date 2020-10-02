@@ -7,7 +7,7 @@
 #include <PipelineTerminus.hpp>
 
 #include <bgfx_utils.hpp>
-#include <intrusive_ptr.hpp>
+#include <ch_ptr.hpp>
 
 namespace charm
 {

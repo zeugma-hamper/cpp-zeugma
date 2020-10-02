@@ -8,7 +8,7 @@
 
 #include <bgfx_utils.hpp>
 #include <class_utils.hpp>
-#include <intrusive_ptr.hpp>
+#include <ch_ptr.hpp>
 
 #include <filesystem>
 #include <string_view>
