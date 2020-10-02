@@ -8,7 +8,7 @@
 
 #include <bgfx_utils.hpp>
 #include <class_utils.hpp>
-#include <intrusive_ptr.hpp>
+#include <ch_ptr.hpp>
 
 #include <filesystem>
 #include <string_view>
@@ -42,7 +42,7 @@ enum class VideoFormat
   I420 = 1,
 };
 
-class VideoTexture : public IntrusiveBase<VideoTexture>
+class VideoTexture : public CharmBase<VideoTexture>
 {
  public:
   VideoTexture (VideoFormat _format, u64 _state, bgfx::ProgramHandle _program,
@@ -84,7 +84,7 @@ struct VideoPipeline
   std::string uri;
   DecodePipeline *pipeline = nullptr;
   BasicPipelineTerminus *terminus = nullptr;
-  intrusive_weak_ptr<VideoTexture> texture;
+  ch_weak_ptr<VideoTexture> texture;
   //for mattes
   f64 loop_start_ts = -1.0;
   f64 loop_end_ts = -1.0;
@@ -127,11 +127,10 @@ class VideoSystem
   // user/programmer and application will be interested in.
   void PollMessages ();
 
-  intrusive_ptr<VideoTexture> OpenVideo (std::string_view _uri);
+  ch_ptr<VideoTexture> OpenVideo (std::string_view _uri);
   void DestroyVideo (VideoTexture *_texture);
 
-  // same as OpenVideo right now
-  intrusive_ptr<VideoTexture> OpenMatte (std::string_view _uri,
+  ch_ptr<VideoTexture> OpenMatte (std::string_view _uri,
                                          f64 _loop_start_ts, f64 _loop_end_ts,
                                          std::filesystem::path const &_matte_dir);
 

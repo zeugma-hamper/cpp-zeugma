@@ -7,7 +7,7 @@
 #include <PipelineTerminus.hpp>
 
 #include <bgfx_utils.hpp>
-#include <intrusive_ptr.hpp>
+#include <ch_ptr.hpp>
 
 namespace charm
 {
@@ -24,7 +24,7 @@ class VideoRenderable final : public Renderable
   void Draw () override;
 
  private:
-  intrusive_ptr<VideoTexture> m_video_texture;
+  ch_ptr<VideoTexture> m_video_texture;
 };
 
 }

@@ -252,14 +252,14 @@ void VideoSystem::PollMessages()
     pipe.pipeline->PollMessages();
 }
 
-intrusive_ptr<VideoTexture> VideoSystem::OpenVideo (std::string_view _uri)
+ch_ptr<VideoTexture> VideoSystem::OpenVideo (std::string_view _uri)
 {
   BasicPipelineTerminus *term = new BasicPipelineTerminus (false);
   DecodePipeline *dec = new DecodePipeline;
   dec->Open (_uri, term);
   dec->Play ();
 
-  intrusive_ptr<VideoTexture>
+  ch_ptr<VideoTexture>
     txt{new VideoTexture (VideoFormat::RGB, m_vgr.basic_state, m_vgr.basic_program,
                           m_vgr.uniforms, array_size (m_vgr.uniforms))};
 
@@ -293,7 +293,7 @@ void VideoSystem::DestroyVideo (VideoTexture *_texture)
 }
 
 
-intrusive_ptr<VideoTexture> VideoSystem::OpenMatte (std::string_view _uri,
+ch_ptr<VideoTexture> VideoSystem::OpenMatte (std::string_view _uri,
                                                     f64 _loop_start_ts, f64 _loop_end_ts,
                                                     std::filesystem::path const &_matte_dir)
 {
@@ -303,7 +303,7 @@ intrusive_ptr<VideoTexture> VideoSystem::OpenMatte (std::string_view _uri,
   dec->Play ();
   dec->Loop (_loop_start_ts, _loop_end_ts);
 
-  intrusive_ptr<VideoTexture>
+  ch_ptr<VideoTexture>
     txt{new VideoTexture (VideoFormat::RGB, m_vgr.matte_state, m_vgr.matte_program,
                           m_vgr.uniforms, array_size (m_vgr.uniforms))};
 
