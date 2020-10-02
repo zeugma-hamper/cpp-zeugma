@@ -11,6 +11,7 @@
 #include <chrono>
 #include <string>
 #include <string_view>
+#include <type_int.hpp>
 
 namespace charm
 {
@@ -20,7 +21,10 @@ VideoRenderable::VideoRenderable (std::string_view _uri)
     m_video_texture {nullptr}
 {
   VideoSystem *system = VideoSystem::GetSystem();
-  m_video_texture = system->OpenVideo (_uri);
+
+  VideoBrace brace = system->OpenVideo (_uri);
+  m_video_texture = brace.video_texture;
+  fprintf (stderr, "renderable's index is %u\n", index<Renderable>::get ());
 }
 
 VideoRenderable::~VideoRenderable ()

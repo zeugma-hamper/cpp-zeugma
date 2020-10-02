@@ -82,7 +82,7 @@ namespace fs = std::filesystem;
 struct VideoPipeline
 {
   std::string uri;
-  DecodePipeline *pipeline = nullptr;
+  ch_ptr<DecodePipeline> pipeline;
   BasicPipelineTerminus *terminus = nullptr;
   ch_weak_ptr<VideoTexture> texture;
   //for mattes
@@ -92,6 +92,11 @@ struct VideoPipeline
   std::vector<fs::directory_entry> matte_file_paths;
 };
 
+struct VideoBrace
+{
+  ch_ptr<DecodePipeline> control_pipeline;
+  ch_ptr<VideoTexture> video_texture;
+};
 
 class VideoSystem
 {
@@ -127,12 +132,16 @@ class VideoSystem
   // user/programmer and application will be interested in.
   void PollMessages ();
 
-  ch_ptr<VideoTexture> OpenVideo (std::string_view _uri);
+  VideoBrace OpenVideo (std::string_view _uri);
+
+  ch_ptr<DecodePipeline> FindDecodePipeline (ch_ptr<VideoTexture> const &_texture);
+
+  //NOTE: this is internal. you shouldn't need to call this.
   void DestroyVideo (VideoTexture *_texture);
 
-  ch_ptr<VideoTexture> OpenMatte (std::string_view _uri,
-                                         f64 _loop_start_ts, f64 _loop_end_ts,
-                                         std::filesystem::path const &_matte_dir);
+  VideoBrace OpenMatte (std::string_view _uri,
+                        f64 _loop_start_ts, f64 _loop_end_ts,
+                        std::filesystem::path const &_matte_dir);
 
  protected:
   VideoSystem ();

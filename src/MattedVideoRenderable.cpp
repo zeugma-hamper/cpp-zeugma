@@ -15,19 +15,21 @@ MattedVideoRenderable::MattedVideoRenderable (std::string_view _uri,
                                               std::filesystem::path const &_matte_dir)
   : Renderable ()
 {
-  m_video_texture = VideoSystem::GetSystem ()
+  VideoBrace brace = VideoSystem::GetSystem ()
     ->OpenMatte (_uri, _loop_start_ts, _loop_end_ts, _matte_dir);
+  m_video_texture = brace.video_texture;
 }
 
 MattedVideoRenderable::MattedVideoRenderable (FilmInfo const &_film, ClipInfo &_clip)
   : Renderable ()
 {
-  m_video_texture = VideoSystem::GetSystem ()
+  VideoBrace brace = VideoSystem::GetSystem ()
     ->OpenMatte (std::string ("file://") + _film.film_path.string(),
                  _clip.start_time, _clip.start_time + _clip.duration,
                  _clip.directory);
 
 }
+
 MattedVideoRenderable::~MattedVideoRenderable ()
 {
 }
