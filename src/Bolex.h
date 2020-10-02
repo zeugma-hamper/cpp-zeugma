@@ -55,6 +55,10 @@ class Bolex  :  public SpaceThing
     { return view_hrz_ang_d; }
   f64 ViewVertAngleD ()  const
     { return view_vrt_ang_d; }
+  f64 ViewHorizAngle ()  const
+    { return M_PI / 180.0 * view_hrz_ang_d; }
+  f64 ViewVertAngle ()  const
+    { return M_PI / 180.0 * view_vrt_ang_d; }
   f64 ViewOrthoWid ()  const
     { return view_ortho_wid; }
   f64 ViewOrthoHei ()  const

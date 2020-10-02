@@ -15,6 +15,11 @@
 #include "ZoftThing.h"
 #include "LoopZoft.h"
 #include "InterpZoft.h"
+#include "Bolex.h"
+
+#include "Bolex.h"
+
+#include "vector_interop.hpp"
 
 #include <bgfx_utils.hpp>
 
@@ -57,6 +62,8 @@ class dead_zone final : public charm::Application
   Layer &GetSceneLayer ();
 
  protected:
+
+  Bolex *cam;
 
   GLFWwindow *window;
 
@@ -167,10 +174,23 @@ void dead_zone::Render ()
 
   bgfx::touch (0);
 
+/*
   glm::mat4 view_transform = glm::lookAt (glm::vec3 {0.0f, 0.0f, 10.0f},
                                           glm::vec3 {0.0f, 0.0f, 2.0f},
                                           glm::vec3 {0.0f, 1.0f, 0.0f});
   glm::mat4 proj_transform = glm::perspective (47.0f, 1920.0f/1080.0f, 0.5f, 10.0f);
+*/
+  glm::mat4 view_transform = glm::lookAt (as_glm (cam -> ViewLoc ()),
+                                          as_glm (cam -> ViewCOI ()),
+                                          as_glm (cam -> ViewUp ()));
+
+  glm::mat4 proj_transform
+    = glm::perspective ((float) cam -> ViewVertAngleD (),
+                        (float) (sin (0.5 * cam -> ViewHorizAngle ())
+                                 / sin (0.5 * cam -> ViewVertAngle ())),
+                        (float) cam -> NearClipDist (),
+                        (float) cam -> FarClipDist ());
+
   bgfx::setViewTransform(0, glm::value_ptr (view_transform),
                          glm::value_ptr (proj_transform));
 
@@ -185,7 +205,14 @@ FrameTime *s_dead_zone_frame_time{nullptr};
 dead_zone::dead_zone ()
   : window {nullptr},
     m_scene_graph_layer {new Layer}
-{
+{ (cam = new Bolex) -> SetViewLoc (Vect (0.0, 0.0, 10.0))
+    . SetViewCOI (Vect (0.0, 0.0, 2.0))
+    . SetViewUp (Vect (0.0, 1.0, 0.0))
+    . SetViewDist (8.0)
+    . SetProjectionType (Bolex::ProjType::PERSPECTIVE)
+    . SetViewVertAngleD (47.0)
+    . SetViewHorizAngleD (90.0)
+    . SetNearClipDist (0.5)  .  SetFarClipDist (10.0);
 }
 
 dead_zone::~dead_zone ()
@@ -225,6 +252,8 @@ bool dead_zone::RunOneCycle ()
   video_system->UploadFrames();
 
   UpdateSceneGraph ();
+
+  cam -> Inhale (global_ratchet, global_frame_thyme);
 
   Render ();
 
