@@ -2,8 +2,8 @@
 #define GIMME_THE_RAW_BITS_TIMELY
 
 #include <base_types.hpp>
-
 #include <class_utils.hpp>
+#include <ch_ptr.hpp>
 
 #include <gst/gst.h>
 #include <gst/video/video-info.h>
@@ -34,7 +34,7 @@ struct QueuedSeek
   i64 stop;
 };
 
-struct DecodePipeline
+struct DecodePipeline : public CharmBase<DecodePipeline>
 {
   friend PipelineTerminus;
 

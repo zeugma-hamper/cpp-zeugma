@@ -143,9 +143,6 @@ VideoSystem::~VideoSystem ()
   for (VideoPipeline &pipe : m_pipelines)
     pipe.pipeline->SetState (GST_STATE_NULL);
 
-  for (VideoPipeline &pipe : m_pipelines)
-    delete pipe.pipeline;
-
   m_pipelines.clear ();
 }
 
@@ -252,10 +249,10 @@ void VideoSystem::PollMessages()
     pipe.pipeline->PollMessages();
 }
 
-ch_ptr<VideoTexture> VideoSystem::OpenVideo (std::string_view _uri)
+VideoBrace VideoSystem::OpenVideo (std::string_view _uri)
 {
   BasicPipelineTerminus *term = new BasicPipelineTerminus (false);
-  DecodePipeline *dec = new DecodePipeline;
+  ch_ptr<DecodePipeline> dec {new DecodePipeline};
   dec->Open (_uri, term);
   dec->Play ();
 
@@ -270,8 +267,21 @@ ch_ptr<VideoTexture> VideoSystem::OpenVideo (std::string_view _uri)
   pipe.terminus = term;
   pipe.texture = txt;
 
-  return txt;
+  return {dec, txt};
 }
+
+ch_ptr<DecodePipeline>
+VideoSystem::FindDecodePipeline (ch_ptr<VideoTexture> const &_texture)
+{
+  for (auto cur : m_pipelines)
+    {
+      if (_texture == cur.texture)
+        return cur.pipeline;
+    }
+
+  return {};
+}
+
 
 //TODO: change this to not mutate vector of pipelines
 void VideoSystem::DestroyVideo (VideoTexture *_texture)
@@ -286,19 +296,18 @@ void VideoSystem::DestroyVideo (VideoTexture *_texture)
         _texture->SetNthTexture(0, BGFX_INVALID_HANDLE);
 
       cur->pipeline->SetState(GST_STATE_NULL);
-      delete cur->pipeline;
       m_pipelines.erase(cur);
       break;
     }
 }
 
 
-ch_ptr<VideoTexture> VideoSystem::OpenMatte (std::string_view _uri,
-                                                    f64 _loop_start_ts, f64 _loop_end_ts,
-                                                    std::filesystem::path const &_matte_dir)
+VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
+                                   f64 _loop_start_ts, f64 _loop_end_ts,
+                                   std::filesystem::path const &_matte_dir)
 {
   BasicPipelineTerminus *term = new BasicPipelineTerminus (false);
-  DecodePipeline *dec = new DecodePipeline;
+  ch_ptr<DecodePipeline> dec {new DecodePipeline};
   dec->Open (_uri, term);
   dec->Play ();
   dec->Loop (_loop_start_ts, _loop_end_ts);
@@ -323,8 +332,7 @@ ch_ptr<VideoTexture> VideoSystem::OpenMatte (std::string_view _uri,
 
   std::sort (pipe.matte_file_paths.begin (), pipe.matte_file_paths.end ());
 
-  return txt;
-
+  return {dec, txt};
 }
 
 
