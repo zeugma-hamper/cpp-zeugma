@@ -5,6 +5,10 @@
 
 #include "vector_interop.hpp"
 
+#include "RoGrappler.h"
+#include "ScGrappler.h"
+#include "TrGrappler.h"
+
 #include <charm_glm.hpp>
 
 #include <algorithm>
@@ -124,6 +128,26 @@ GrapplerPile *Node::AssuredGrapplerPile ()
 
 GrapplerPile *Node::UnsecuredGrapplerPile ()
 { return m_graps; }
+
+
+void Node::Translate (const Vect &tr)
+{ AssuredGrapplerPile () -> AppendGrappler (new TrGrappler (tr)); }
+
+void Node::Scale (const Vect &sc)
+{ AssuredGrapplerPile () -> AppendGrappler (new ScGrappler (sc)); }
+
+void Node::Rotate (const Vect &ax, f64 an)
+{ AssuredGrapplerPile () -> AppendGrappler (new RoGrappler (ax, an)); }
+
+void Node::RotateWithCenter (const Vect &ax, f64 an, const Vect &ce)
+{ AssuredGrapplerPile () -> AppendGrappler (new RoGrappler (ax, an, ce)); }
+
+
+void Node::ClearTransforms ()
+{ if (m_graps)
+    m_graps -> RemoveAllGrapplers ();
+}
+
 
 
 //node takes ownership of child nodes

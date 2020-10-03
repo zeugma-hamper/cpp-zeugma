@@ -53,6 +53,22 @@ class Node
   GrapplerPile *AssuredGrapplerPile ();
   GrapplerPile *UnsecuredGrapplerPile ();
 
+  void Translate (const Vect &tr);
+  inline void Translate (f64 dx, f64 dy, f64 dz)
+    { Translate (Vect (dx, dy, dz)); }
+
+  void Scale (const Vect &sc);
+  void Scale (f64 sx, f64 sy, f64 sz)  { Scale (Vect (sx, sy, sz)); }
+  void Scale (f64 s)  { Scale (s, s, s); }
+
+  void Rotate (const Vect &ax, f64 an);
+  void RotateD (const Vect &ax, f64 an)  { Rotate (ax, M_PI / 180.0 * an); }
+  void RotateWithCenter (const Vect &ax, f64 an, const Vect &ce);
+  void RotateWithCenterD (const Vect &ax, f64 an, const Vect &ce)
+    { RotateWithCenter (ax, M_PI / 180.0 * an, ce); }
+
+  void ClearTransforms ();
+
   // node takes ownership of child nodes
   void  AppendChild (Node *_node);
   // excise with feeling (deletes)

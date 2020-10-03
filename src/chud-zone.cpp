@@ -359,12 +359,15 @@ int main (int, char **)
   s_nodal -> AssuredGrapplerPile () -> AppendGrappler (rg);
   s_nodal -> AssuredGrapplerPile () -> AppendGrappler (tg);
 
-  SinuVect ss (Vect (0.8), 1.8, Vect (25.0));
+  SinuVect ss (Vect (0.1), 1.8, Vect (1.0));
   ScGrappler *esgy = new ScGrappler;
   esgy -> ScaleZoft () . BecomeLike (ss);
+  dr_no -> Scale (25.0);
   dr_no -> AssuredGrapplerPile () -> AppendGrappler (esgy);
-  dr_no -> AssuredGrapplerPile ()
-    -> AppendGrappler (new TrGrappler (Vect (36.0, 18.0, 8.0)));
+  dr_no -> RotateD (Vect (0.0, 0.0, 1.0), 30.0);
+  dr_no -> Translate (36.0, 18.0, 8.0);
+//  dr_no -> RotateWithCenterD (Vect (0.0, 0.0, 1.0), 30.0,
+//                              Vect (36.0, 18.0, 8.0));
 
   zone.Run ();
 

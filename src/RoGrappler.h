@@ -13,8 +13,8 @@ namespace charm  {
 class RoGrappler  :  public Grappler
 { public:
 
-  ZoftThing <Vect> axs, cnt;
-  ZoftThing <f64> ang, pha;
+  ZoftVect axs, cnt;
+  ZoftFloat ang, pha;
   Matrix44 pm, ipm, nm, inm;
 
   RoGrappler (const Vect &ax, f64 an = 0.0,
@@ -36,6 +36,8 @@ class RoGrappler  :  public Grappler
     { return cnt.val; }
   f64 Angle ()  const
     { return ang.val; }
+  f64 AngleD ()  const
+    { return 180.0 / M_PI * ang.val; }
   f64 Phase ()  const
     { return pha.val; }
 
