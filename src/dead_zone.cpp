@@ -12,6 +12,8 @@
 #include <MattedVideoRenderable.hpp>
 #include <VideoSystem.hpp>
 
+#include <BlockTimer.hpp>
+
 #include <bgfx_utils.hpp>
 
 #define GLFW_EXPOSE_NATIVE_X11
@@ -57,6 +59,9 @@ class dead_zone final : public charm::Application
   GLFWwindow *window;
 
   Layer *m_scene_graph_layer;
+
+  // std::unique_ptr<DecodePipeline> test_pipeline;
+  // BasicPipelineTerminus *terminus = nullptr;
 };
 
 
@@ -194,6 +199,14 @@ bool dead_zone::StartUp ()
   bool ret = InitWindowingAndGraphics();
   VideoSystem::Initialize();
 
+  // std::string const pattern
+  //   = "/home/blake/tlp/tamper-dvd-orig/rotopro/rotopro/boaa/"
+  //   "000073.791_000004.416_0000000000_violin/boaa_violin_%03d.tif";
+  // test_pipeline = std::make_unique<DecodePipeline> ();
+  // terminus = new BasicPipelineTerminus (false);
+  // test_pipeline->OpenMatteSequence(pattern, terminus);
+  //test_pipeline->Play();
+
   return ret;
 }
 
@@ -211,7 +224,20 @@ bool dead_zone::Update ()
 
   UpdateSceneGraph ();
 
-  Render ();
+  {
+    //BlockTimer ("render");
+    Render ();
+  }
+
+  // auto samp = terminus->FetchClearSample();
+  // if (samp)
+  //   {
+  //     fprintf (stderr, "has matte sample %f\n", GetFrameTime()->GetCurrentTime());
+  //     GstEvent *event = gst_event_new_step (GST_FORMAT_BUFFERS, 1, 1.0, TRUE, FALSE);
+  //     //bool ret = gst_element_send_event(terminus->m_video_sink, event);
+  //     bool ret = gst_element_send_event(test_pipeline->m_pipeline, event);
+  //     fprintf (stderr, "step returned %s\n", ret ? "true" : "false");
+  //   }
 
   return true;
 }
@@ -273,22 +299,10 @@ int main (int, char **)
   // std::string file
   //   = "file:///home/blake/tlp/tamper-blu-mkv/the-fall-blu.mov";
 
-  charm::index<FilmInfo>::get ();
-  charm::index<std::string>::get ();
-
-  fprintf (stderr, "dz's idea of renderable is %u\n", charm::index<Renderable>::get ());
-
-  charm::index<Layer>::get ();
-
   std::string uri = std::string ("file://") + film_info.film_path.c_str ();
   MattedVideoRenderable *renderable
-    = new MattedVideoRenderable (uri,
-                                 clip_info.start_time,
-                                 clip_info.start_time + clip_info.duration,
-                                 clip_info.directory);
+    = new MattedVideoRenderable (film_info, clip_info);
 
-  // VideoRenderable *renderable
-  //   = new VideoRenderable (uri);
 
   s_nodal->AppendRenderable(renderable);
   layer.GetRootNode()->AppendChild(s_nodal);

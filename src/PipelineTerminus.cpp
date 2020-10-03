@@ -33,10 +33,14 @@ BasicPipelineTerminus::OnStart (DecodePipeline *)
 
 bool
 BasicPipelineTerminus::NewDecodedPad (DecodePipeline *_pipe,
-                                        GstElement *_elem,
-                                        GstPad *_src_pad)
+                                      GstElement *_elem,
+                                      GstPad *_src_pad,
+                                      GstCaps *_pad_caps_override)
 {
-  GstCaps *pad_caps = gst_pad_get_current_caps(_src_pad);
+  GstCaps *pad_caps = _pad_caps_override;
+  if (! pad_caps)
+    pad_caps = gst_pad_get_current_caps(_src_pad);
+
   if (! pad_caps)
     return false;
 
@@ -134,7 +138,7 @@ static GstFlowReturn handle_new_sample (GstAppSink *_sink, gpointer _pipeline);
 
 bool
 BasicPipelineTerminus::HandleVideoPad (DecodePipeline *_pipe, GstElement *,
-                                         GstPad *_src_pad, const char *)
+                                       GstPad *_src_pad, const char *)
 {
   GstAppSinkCallbacks callbacks {};
   callbacks.eos = handle_eos;
@@ -155,6 +159,9 @@ BasicPipelineTerminus::HandleVideoPad (DecodePipeline *_pipe, GstElement *,
   // gst_caps_append (caps, gst_caps_new_simple ("video/x-raw", "format", G_TYPE_STRING, "NV12", NULL));
   // gst_caps_append (caps, gst_caps_new_simple ("video/x-raw", "format", G_TYPE_STRING, "I420", NULL));
   caps = gst_caps_new_simple ("video/x-raw", "format", G_TYPE_STRING, "RGB", NULL);
+  caps = gst_caps_merge (caps,
+                         gst_caps_new_simple ("video/x-raw",
+                                              "format", G_TYPE_STRING, "GRAY8", NULL));
   if (! caps)
     goto remove_sink;
 

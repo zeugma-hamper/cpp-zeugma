@@ -56,6 +56,7 @@ class VideoTexture : public CharmBase<VideoTexture>
 
   void SetNthTexture (size_t _index, bgfx::TextureHandle _handle);
   bgfx::TextureHandle GetNthTexture (size_t _index) const;
+  bgfx::TextureHandle &GetNthTexture (size_t _index);
 
   bgfx::UniformHandle const &GetAspectUniform () const;
   bgfx::ProgramHandle const &GetProgram () const;
@@ -89,7 +90,8 @@ struct VideoPipeline
   f64 loop_start_ts = -1.0;
   f64 loop_end_ts = -1.0;
   fs::path matte_dir_path;
-  std::vector<fs::directory_entry> matte_file_paths;
+  ch_ptr<DecodePipeline> matte_pipeline;
+  BasicPipelineTerminus *matte_terminus = nullptr;
 };
 
 struct VideoBrace
@@ -139,9 +141,10 @@ class VideoSystem
   //NOTE: this is internal. you shouldn't need to call this.
   void DestroyVideo (VideoTexture *_texture);
 
+  // see MattePathPattern in Matte.hpp
   VideoBrace OpenMatte (std::string_view _uri,
                         f64 _loop_start_ts, f64 _loop_end_ts,
-                        std::filesystem::path const &_matte_dir);
+                        std::string_view _matte_pattern);
 
  protected:
   VideoSystem ();

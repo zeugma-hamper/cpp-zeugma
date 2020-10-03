@@ -23,7 +23,7 @@ class MattedVideoRenderable final : public Renderable
 
   MattedVideoRenderable (std::string_view _uri,
                          f64 _loop_start_ts, f64 _loop_end_ts,
-                         std::filesystem::path const &_matte_dir);
+                         std::string_view _matte_pattern);
   MattedVideoRenderable (FilmInfo const &_film, ClipInfo &_clip);
   ~MattedVideoRenderable () override;
 

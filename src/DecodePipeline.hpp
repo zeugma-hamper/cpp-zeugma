@@ -45,7 +45,8 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
 
   void PollMessages ();
 
-  bool Open (std::string_view uri, PipelineTerminus *terminus);
+  bool OpenVideoFile (std::string_view _uri, PipelineTerminus *_terminus);
+  bool OpenMatteSequence (std::string_view _pattern, PipelineTerminus *_terminus);
 
   void Play ();
   void Seek (f64 _ts);

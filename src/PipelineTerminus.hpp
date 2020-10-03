@@ -23,7 +23,7 @@ class PipelineTerminus
   CHARM_DELETE_MOVE_COPY(PipelineTerminus);
 
   virtual bool OnStart       (DecodePipeline *) = 0;
-  virtual bool NewDecodedPad (DecodePipeline *, GstElement *, GstPad *) = 0;
+  virtual bool NewDecodedPad (DecodePipeline *, GstElement *, GstPad *, GstCaps *) = 0;
   virtual bool OnShutdown    (DecodePipeline *) = 0;
 
   virtual bool HasSink () const = 0;
@@ -38,7 +38,7 @@ class BasicPipelineTerminus : public PipelineTerminus
   ~BasicPipelineTerminus () override;
 
   bool OnStart       (DecodePipeline *) override;
-  bool NewDecodedPad (DecodePipeline *, GstElement *, GstPad *) override;
+  bool NewDecodedPad (DecodePipeline *, GstElement *, GstPad *, GstCaps *) override;
   bool OnShutdown    (DecodePipeline *) override;
 
   bool HasSink () const override;

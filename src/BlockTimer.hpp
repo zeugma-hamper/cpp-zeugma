@@ -41,8 +41,8 @@ struct BlockTimer
   ~BlockTimer ()
   {
     StopTimer ();
-    printf ("%s: %0.4f\n", descriptor.c_str (),
-            seconds_t (end_time - start_time).count ());
+    printf ("%s: %0.4f ms\n", descriptor.c_str (),
+            seconds_t (end_time - start_time).count () * 1000.0);
   }
 
   std::string descriptor;
