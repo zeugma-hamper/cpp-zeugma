@@ -5,6 +5,8 @@
 
 #include "SpaceThing.h"
 
+#include "ZoftThing.h"
+
 
 namespace charm  {
 
@@ -13,19 +15,22 @@ class Bolex  :  public SpaceThing
 { public:
   enum class ProjType : u32 { PERSPECTIVE, ORTHOGRAPHIC };
 
-  Vect view_loc;
-  Vect view_aim;
-  Vect view_upp;
+  ZoftVect view_loc;
+  ZoftVect view_aim;
+  ZoftVect view_upp;
 
-  f64 view_dist;
-  f64 view_hrz_ang_d, view_vrt_ang_d;
-  f64 view_ortho_wid, view_ortho_hei;
+  ZoftFloat view_dist;
+  ZoftFloat view_hrz_ang_d;
+  ZoftFloat view_vrt_ang_d;
+  ZoftFloat view_ortho_wid;
+  ZoftFloat view_ortho_hei;
 
   v2f64 view_pln_off;
 
   ProjType prj_typ;
 
-  f64 near_clip_dst, far_clip_dst;
+  ZoftFloat near_clip_dst;
+  ZoftFloat far_clip_dst;
 
   static Vect xax;
   static Vect yax;
@@ -41,28 +46,28 @@ class Bolex  :  public SpaceThing
     { }
 
   const Vect &ViewLoc ()  const
-    { return view_loc; }
+    { return view_loc.val; }
   const Vect &ViewAim ()  const
-    { return view_aim; }
+    { return view_aim.val; }
   Vect ViewCOI ()  const
-    { return view_loc + view_dist * view_aim; }
+    { return view_loc.val + view_dist.val * view_aim.val; }
   const Vect &ViewUp ()  const
-    { return view_upp; }
+    { return view_upp.val; }
 
   f64 ViewDist ()  const
-    { return view_dist; }
+    { return view_dist.val; }
   f64 ViewHorizAngleD ()  const
-    { return view_hrz_ang_d; }
+    { return view_hrz_ang_d.val; }
   f64 ViewVertAngleD ()  const
-    { return view_vrt_ang_d; }
+    { return view_vrt_ang_d.val; }
   f64 ViewHorizAngle ()  const
-    { return M_PI / 180.0 * view_hrz_ang_d; }
+    { return M_PI / 180.0 * view_hrz_ang_d.val; }
   f64 ViewVertAngle ()  const
-    { return M_PI / 180.0 * view_vrt_ang_d; }
+    { return M_PI / 180.0 * view_vrt_ang_d.val; }
   f64 ViewOrthoWid ()  const
-    { return view_ortho_wid; }
+    { return view_ortho_wid.val; }
   f64 ViewOrthoHei ()  const
-    { return view_ortho_hei; }
+    { return view_ortho_hei.val; }
 
   const v2f64 &ViewPlaneOffset ()  const
     { return view_pln_off; }
@@ -75,8 +80,34 @@ class Bolex  :  public SpaceThing
     { return prj_typ; }
 
   f64 NearClipDist ()  const
-    { return near_clip_dst; }
+    { return near_clip_dst.val; }
   f64 FarClipDist ()  const
+    { return far_clip_dst.val; }
+
+
+  ZoftVect &ViewLocZoft ()
+    { return view_loc; }
+  ZoftVect &ViewAimZoft ()
+    { return view_aim; }
+  ZoftVect &ViewUpZoft ()
+    { return view_upp; }
+
+  ZoftFloat &ViewDistZoft ()
+    { return view_dist; }
+
+  ZoftFloat &ViewHorizAngleDZoft ()
+    { return view_hrz_ang_d; }
+  ZoftFloat &ViewVertAngleDZoft ()
+    { return view_vrt_ang_d; }
+
+  ZoftFloat &ViewOrthoWidZoft ()
+    { return view_ortho_wid; }
+  ZoftFloat &ViewOrthoHeiZoft ()
+    { return view_ortho_hei; }
+
+  ZoftFloat &NearClipDistZoft ()
+    { return near_clip_dst; }
+  ZoftFloat &FarClipDistZoft ()
     { return far_clip_dst; }
 
 

@@ -24,18 +24,14 @@ class SinuZoft  :  public ZoftThing <T>
         ZGuts ()  :  ZoftThing<TT>::template ZGuts<TT> (),
            ampl (TT (1.0)), freq (1.0), cent (TT (0.0)), phas (0.0)
           { }
-        ZGuts (const TT &a)  :  ZoftThing<TT>::ZGuts (),
+        ZGuts (const TT &a)  :  ZoftThing<TT>::template ZGuts<TT> (),
            ampl (a), freq (1.0), cent (TT (0.0)), phas (0.0)
           { }
-        ZGuts (const TT &a, f64 f)  :  ZoftThing<TT>::ZGuts (),
+        ZGuts (const TT &a, f64 f)  :  ZoftThing<TT>::template ZGuts<TT> (),
            ampl (a), freq (f), cent (TT (0.0)), phas (0.0)
           { }
-        ZGuts (const TT &a, f64 f, const TT &c)
-           :  ZoftThing<TT>::ZGuts (),
-              ampl (a), freq (f), cent (c), phas (0.0)
-          { }
-        ZGuts (const TT &a, f64 f, const TT &c, f64 p)
-           :  ZoftThing<TT>::ZGuts (),
+        ZGuts (const TT &a, f64 f, const TT &c, f64 p = 0.0)
+           :  ZoftThing<TT>::template ZGuts<TT> (),
               ampl (a), freq (f), cent (c), phas (p)
           { }
 
@@ -117,7 +113,7 @@ using SinuFloat = SinuZoft <f64>;
 using SinuVect = SinuZoft <Vect>;
 
 
-//  so long; farewell; auf wiedersehen; goodbye... namespace charm
+}  //  so long; farewell; auf wiedersehen; goodbye... namespace charm
 
 
 #endif

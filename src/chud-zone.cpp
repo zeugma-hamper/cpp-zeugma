@@ -15,7 +15,7 @@
 #include "ZoftThing.h"
 #include "LoopZoft.h"
 #include "InterpZoft.h"
-#include "Bolex.h"
+#include "SinuZoft.h"
 
 #include "Bolex.h"
 
@@ -150,14 +150,6 @@ bool dead_zone::InitWindowingAndGraphics ()
   // so that id number is used as the depth.
   bgfx::setViewMode (0, bgfx::ViewMode::DepthAscending);
 
-  glm::mat4 view_transform = glm::lookAt (glm::vec3 {0.0f, 0.0f, 10.0f},
-                                          glm::vec3 {0.0f, 0.0f, 2.0f},
-                                          glm::vec3 {0.0f, 1.0f, 0.0f});
-  glm::mat4 proj_transform = glm::perspectiveFov (glm::pi<float> ()/4.0f,
-                                                  1920.0f, 1080.0f, 0.5f, 10.0f);
-  bgfx::setViewTransform(0, glm::value_ptr (view_transform),
-                         glm::value_ptr (proj_transform));
-
   return true;
 }
 
@@ -174,12 +166,6 @@ void dead_zone::Render ()
 
   bgfx::touch (0);
 
-/*
-  glm::mat4 view_transform = glm::lookAt (glm::vec3 {0.0f, 0.0f, 10.0f},
-                                          glm::vec3 {0.0f, 0.0f, 2.0f},
-                                          glm::vec3 {0.0f, 1.0f, 0.0f});
-  glm::mat4 proj_transform = glm::perspective (47.0f, 1920.0f/1080.0f, 0.5f, 10.0f);
-*/
   glm::mat4 view_transform = glm::lookAt (as_glm (cam -> ViewLoc ()),
                                           as_glm (cam -> ViewCOI ()),
                                           as_glm (cam -> ViewUp ()));
@@ -212,7 +198,10 @@ dead_zone::dead_zone ()
     . SetProjectionType (Bolex::ProjType::PERSPECTIVE)
     . SetViewVertAngleD (47.0)
     . SetViewHorizAngleD (90.0)
-    . SetNearClipDist (0.5)  .  SetFarClipDist (10.0);
+    . SetNearClipDist (0.005)  .  SetFarClipDist (20.0);
+
+  SinuVect sv (Vect (0.0, 0.0, 0.75), 1.0, Vect (0.0, 0.0, 10.0));
+  cam -> ViewLocZoft () . BecomeLike (sv);
 }
 
 dead_zone::~dead_zone ()
@@ -269,8 +258,8 @@ bool dead_zone::DoWhatThouWilt (i64 ratch, f64 thyme)
 { if (ayezee.val > 0.993  &&  ayezee.val < 0.999)
     elzyvee . Restart ();
 
-  elzyvee.val . SpewToStderr ();
-  fprintf (stderr, " is the vee of it, and interp is all <%.2lf>\n",
+  cam -> ViewLoc () . SpewToStderr ();
+  fprintf (stderr, " is cammy's loc, and interp is all <%.2lf>\n",
            ayezee.val);
 
   return true;
