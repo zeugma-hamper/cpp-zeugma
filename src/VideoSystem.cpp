@@ -83,8 +83,10 @@ void VideoTexture::SetNthTexture (size_t _index, bgfx::TextureHandle _handle)
 
 bgfx::TextureHandle &VideoTexture::GetNthTexture (size_t _index)
 {
+  //TODO: remove this
+  static bgfx::TextureHandle placeholder;
   if (_index >= array_size (textures))
-    return BGFX_INVALID_HANDLE;
+    return placeholder;
 
   return textures[_index];
 }
@@ -156,7 +158,7 @@ VideoSystem::~VideoSystem ()
   m_pipelines.clear ();
 }
 
-static void upload_or_create_texture (bgfx::TextureHandle &_handle, u16 _width, u16 _height,
+static void update_or_create_texture (bgfx::TextureHandle &_handle, u16 _width, u16 _height,
                                       u16 n_comp, u16 _stride, u64 _flags, bgfx::Memory const *_mem)
 {
   bgfx::TextureFormat::Enum const formats[5]
@@ -172,48 +174,60 @@ static void upload_or_create_texture (bgfx::TextureHandle &_handle, u16 _width, 
   bgfx::updateTexture2D(_handle, 0, 0, 0, 0, _width, _height, _mem, _stride);
 }
 
+static void upload_frame (gst_ptr<GstSample> const &_sample,
+                          ch_ptr<VideoTexture> const &_textures,
+                          GstVideoInfo *_video_info,
+                          bool _is_matte)
+{
+  GstCaps *sample_caps = gst_sample_get_caps(_sample.get ());
+  GstVideoInfo stack_video_info;
+  GstVideoInfo *video_info = _video_info ? _video_info : &stack_video_info;
+  int width, height, components, stride;
+
+  if (! sample_caps)
+    return;
+
+  gst_video_info_init(video_info);
+  if (! gst_video_info_from_caps (video_info, sample_caps))
+    return;
+
+  if (! (GST_VIDEO_INFO_IS_RGB (video_info) ||
+         GST_VIDEO_INFO_IS_GRAY(video_info)))
+    return;
+
+  width = GST_VIDEO_INFO_WIDTH (video_info);
+  height = GST_VIDEO_INFO_HEIGHT (video_info);
+  components = GST_VIDEO_INFO_N_COMPONENTS (video_info);
+  //RGB is all one plane
+  stride = GST_VIDEO_INFO_PLANE_STRIDE(video_info, 0);
+  // align = calculate_alignment (stride);
+
+  video_frame_holder *frame_holder = new video_frame_holder (_sample, video_info);
+  const bgfx::Memory *mem
+    = bgfx::makeRef (GST_VIDEO_FRAME_PLANE_DATA(&frame_holder->video_frame, 0),
+                     GST_VIDEO_FRAME_SIZE(&frame_holder->video_frame),
+                     DeleteImageLeftOvers<video_frame_holder>, frame_holder);
+
+  bgfx::TextureHandle &text_handle
+    = _is_matte ? _textures->GetNthTexture(3) : _textures->GetNthTexture(0);
+
+  update_or_create_texture(text_handle, width, height, components, stride,                                              BGFX_SAMPLER_UVW_CLAMP | BGFX_SAMPLER_POINT, mem);
+}
+
 void VideoSystem::UploadFrames ()
 {
   for (VideoPipeline &pipe : m_pipelines)
     {
+      GstVideoInfo video_info;
       gst_ptr<GstSample> sample = pipe.terminus->FetchClearSample();
       if (! sample)
         continue;
-
-      GstCaps *sample_caps = gst_sample_get_caps(sample.get ());
-      GstVideoInfo video_info;
-      int width, height, components, stride;
-
-      if (! sample_caps)
-        return;
-
-      gst_video_info_init(&video_info);
-      if (! gst_video_info_from_caps (&video_info, sample_caps))
-        return;
-
-      if (! GST_VIDEO_INFO_IS_RGB (&video_info))
-        return;
-
-      width = GST_VIDEO_INFO_WIDTH (&video_info);
-      height = GST_VIDEO_INFO_HEIGHT (&video_info);
-      components = GST_VIDEO_INFO_N_COMPONENTS (&video_info);
-      //RGB is all one plane
-      stride = GST_VIDEO_INFO_PLANE_STRIDE(&video_info, 0);
-      // align = calculate_alignment (stride);
 
       auto texture = pipe.texture.lock ();
       if (! texture)
         continue;
 
-      video_frame_holder *frame_holder = new video_frame_holder (sample, &video_info);
-      const bgfx::Memory *mem
-        = bgfx::makeRef (GST_VIDEO_FRAME_PLANE_DATA(&frame_holder->video_frame, 0),
-                         GST_VIDEO_FRAME_SIZE(&frame_holder->video_frame),
-                         DeleteImageLeftOvers<video_frame_holder>, frame_holder);
-
-      bgfx::TextureHandle &rgb_handle = texture->GetNthTexture(0);
-
-      upload_or_create_texture(rgb_handle, width, height, components, stride,                                              BGFX_SAMPLER_UVW_CLAMP | BGFX_SAMPLER_POINT, mem);
+      upload_frame(sample, texture, &video_info, false);
 
       if (pipe.matte_dir_path.empty())
         continue;
@@ -229,8 +243,8 @@ void VideoSystem::UploadFrames ()
       //i expect looping here for now
       guint64 offset_ns = pts - pipe.pipeline->m_loop_status.loop_start;
       guint64 frame_num = guint64 (offset_ns * GST_VIDEO_INFO_FPS_N(&video_info)
-                                   / (GST_VIDEO_INFO_FPS_D(&video_info) * f64(1e9)));
-      //printf ("pts: %.3f, now: %.3f\n", pts/f64(1e9), offset_ns/f64(1e9));
+                                   / GST_VIDEO_INFO_FPS_D(&video_info) / f64(1e9));
+      // printf ("pts: %f, now: %f\n", pts/f64(1e9), offset_ns/f64(1e9));
 
       //assert (frame_num < pipe.matte_file_paths.size ());
       gst_ptr<GstSample> matte = pipe.matte_terminus->FetchClearSample();
@@ -239,52 +253,24 @@ void VideoSystem::UploadFrames ()
           fprintf (stderr, "no matte which seems fishy\n");
           return;
         }
-      else
-        fprintf (stderr, "matte!\n");
+      // else
+      //   fprintf (stderr, "matte!\n");
 
       GstBuffer *matte_buffer = gst_sample_get_buffer (matte.get ());
       guint64 offset = GST_BUFFER_OFFSET (matte_buffer);
-      fprintf (stderr, "offset is %lu\n", offset);
+      // if (pipe.matte_frame_count > 0 &&
+      //     frame_num != offset % pipe.matte_frame_count)
+      //   fprintf (stderr, "frame num (%lu) and offset (%ld) don't match\n",
+      //            frame_num, offset % pipe.matte_frame_count);
+
+      // fprintf (stderr, "offset is %lu\n", offset);
       GstEvent *event = gst_event_new_step (GST_FORMAT_BUFFERS, 1, 1.0, TRUE, FALSE);
       //bool ret = gst_element_send_event(terminus->m_video_sink, event);
       gst_element_send_event(pipe.matte_pipeline->m_pipeline, event);
 
-      //3 is dedicated matte texture
-      if (! bgfx::isValid (texture->GetNthTexture(3)))
-        {
-          bgfx::TextureHandle txt_matte = CreateTexture2D (matte.path().c_str(),
-                                                           BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE);
-          if (! bgfx::isValid (txt_matte))
-            fprintf (stderr, "returned matte handle isn't valid\n");
-
-          texture->SetNthTexture(3, txt_matte);
-        }
-      else
-        {
-          UpdateWholeTexture2D(texture->GetNthTexture (3), matte.path().c_str());
-        }
-
+      upload_frame (matte, texture, nullptr, true);
     }
 
-    //   auto &matte = pipe.matte_file_paths[frame_num];
-
-    //   (void)matte;
-    //   //3 is dedicated matte texture
-    //   if (! bgfx::isValid (texture->GetNthTexture(3)))
-    //     {
-    //       bgfx::TextureHandle txt_matte = CreateTexture2D (matte.path().c_str(),
-    //                                                        BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE);
-    //       if (! bgfx::isValid (txt_matte))
-    //         fprintf (stderr, "returned matte handle isn't valid\n");
-
-    //       texture->SetNthTexture(3, txt_matte);
-    //     }
-    //   else
-    //     {
-    //       UpdateWholeTexture2D(texture->GetNthTexture (3), matte.path().c_str());
-    //     }
-
-    // }
 }
 
 void VideoSystem::PollMessages()
@@ -348,7 +334,7 @@ void VideoSystem::DestroyVideo (VideoTexture *_texture)
 
 VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
                                    f64 _loop_start_ts, f64 _loop_end_ts,
-                                   std::string_view _matte_path_pattern)
+                                   i32 _frame_count, std::string_view _matte_path_pattern)
 {
   BasicPipelineTerminus *term = new BasicPipelineTerminus (false);
   ch_ptr<DecodePipeline> dec {new DecodePipeline};
@@ -372,6 +358,7 @@ VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
   pipe.texture = txt;
   pipe.loop_start_ts = _loop_start_ts;
   pipe.loop_end_ts = _loop_end_ts;
+  pipe.matte_frame_count = _frame_count;
   pipe.matte_pipeline = matt_dec;
   pipe.matte_terminus = matt_term;
   pipe.matte_dir_path = _matte_path_pattern;

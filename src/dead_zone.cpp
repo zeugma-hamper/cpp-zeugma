@@ -59,9 +59,6 @@ class dead_zone final : public charm::Application
   GLFWwindow *window;
 
   Layer *m_scene_graph_layer;
-
-  // std::unique_ptr<DecodePipeline> test_pipeline;
-  // BasicPipelineTerminus *terminus = nullptr;
 };
 
 
@@ -199,14 +196,6 @@ bool dead_zone::StartUp ()
   bool ret = InitWindowingAndGraphics();
   VideoSystem::Initialize();
 
-  // std::string const pattern
-  //   = "/home/blake/tlp/tamper-dvd-orig/rotopro/rotopro/boaa/"
-  //   "000073.791_000004.416_0000000000_violin/boaa_violin_%03d.tif";
-  // test_pipeline = std::make_unique<DecodePipeline> ();
-  // terminus = new BasicPipelineTerminus (false);
-  // test_pipeline->OpenMatteSequence(pattern, terminus);
-  //test_pipeline->Play();
-
   return ret;
 }
 
@@ -228,16 +217,6 @@ bool dead_zone::Update ()
     //BlockTimer ("render");
     Render ();
   }
-
-  // auto samp = terminus->FetchClearSample();
-  // if (samp)
-  //   {
-  //     fprintf (stderr, "has matte sample %f\n", GetFrameTime()->GetCurrentTime());
-  //     GstEvent *event = gst_event_new_step (GST_FORMAT_BUFFERS, 1, 1.0, TRUE, FALSE);
-  //     //bool ret = gst_element_send_event(terminus->m_video_sink, event);
-  //     bool ret = gst_element_send_event(test_pipeline->m_pipeline, event);
-  //     fprintf (stderr, "step returned %s\n", ret ? "true" : "false");
-  //   }
 
   return true;
 }
