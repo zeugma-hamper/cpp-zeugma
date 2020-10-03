@@ -163,16 +163,17 @@ bool GraphicsApplication::RunOneCycle ()
   vs->PollMessages();
   vs->UploadFrames();
 
-  UpdateSceneGraph ();
+  UpdateSceneGraph (-1, 0.0);
 
   Render ();
 
   return true;
 }
 
-void GraphicsApplication::UpdateSceneGraph()
+void GraphicsApplication::UpdateSceneGraph(i64 ratch, f64 thyme)
 {
-  m_scene_graph_layer->GetRootNode()->UpdateTransformsHierarchically();
+  m_scene_graph_layer->GetRootNode()
+    -> UpdateTransformsHierarchically (ratch, thyme);
   m_scene_graph_layer->GetRootNode()->EnumerateRenderables();
 }
 

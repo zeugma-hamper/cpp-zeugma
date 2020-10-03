@@ -31,7 +31,7 @@ class GraphicsApplication : public Application
   void ShutDownSceneGraph ();
   void Render ();
 
-  void UpdateSceneGraph ();
+  void UpdateSceneGraph (i64 ratch, f64 thyme);
 
   MoltoSprinkler &GetSprinkler ();
 

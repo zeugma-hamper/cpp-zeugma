@@ -8,6 +8,7 @@
 #include <Node.hpp>
 #include <PipelineTerminus.hpp>
 #include <Renderable.hpp>
+#include <RectangleRenderable.hpp>
 #include <VideoRenderable.hpp>
 #include <MattedVideoRenderable.hpp>
 #include <VideoSystem.hpp>
@@ -16,6 +17,9 @@
 #include "LoopZoft.h"
 #include "InterpZoft.h"
 #include "SinuZoft.h"
+#include "RoGrappler.h"
+#include "ScGrappler.h"
+#include "TrGrappler.h"
 
 #include "Bolex.h"
 
@@ -55,7 +59,7 @@ class dead_zone final : public charm::Application
   void ShutDownSceneGraph ();
   void Render ();
 
-  void UpdateSceneGraph ();
+  void UpdateSceneGraph (i64 ratch, f64 thyme);
 
   static FrameTime *GetFrameTime ();
 
@@ -191,7 +195,8 @@ FrameTime *s_dead_zone_frame_time{nullptr};
 dead_zone::dead_zone ()
   : window {nullptr},
     m_scene_graph_layer {new Layer}
-{ (cam = new Bolex) -> SetViewLoc (Vect (0.0, 0.0, 10.0))
+{ cam = new Bolex;
+  cam -> SetViewLoc (Vect (0.0, 0.0, 10.0))
     . SetViewCOI (Vect (0.0, 0.0, 2.0))
     . SetViewUp (Vect (0.0, 1.0, 0.0))
     . SetViewDist (8.0)
@@ -200,8 +205,8 @@ dead_zone::dead_zone ()
     . SetViewHorizAngleD (90.0)
     . SetNearClipDist (0.005)  .  SetFarClipDist (20.0);
 
-  SinuVect sv (Vect (0.0, 0.0, 0.75), 1.0, Vect (0.0, 0.0, 10.0));
-  cam -> ViewLocZoft () . BecomeLike (sv);
+  SinuVect sv (Vect (0.0, 0.0, 0.175), 1.0, Vect (0.0, 0.0, 10.0));
+//  cam -> ViewLocZoft () . BecomeLike (sv);
 }
 
 dead_zone::~dead_zone ()
@@ -218,6 +223,7 @@ bool dead_zone::StartUp ()
 }
 
 Node *s_nodal = nullptr;
+Node *dr_no = nullptr;
 
 static i64 global_ratchet = 0;
 
@@ -240,7 +246,7 @@ bool dead_zone::RunOneCycle ()
   video_system->PollMessages();
   video_system->UploadFrames();
 
-  UpdateSceneGraph ();
+  UpdateSceneGraph (global_ratchet, global_frame_thyme);
 
   cam -> Inhale (global_ratchet, global_frame_thyme);
 
@@ -266,9 +272,10 @@ bool dead_zone::DoWhatThouWilt (i64 ratch, f64 thyme)
 }
 
 
-void dead_zone::UpdateSceneGraph()
+void dead_zone::UpdateSceneGraph(i64 ratch, f64 thyme)
 {
-  m_scene_graph_layer->GetRootNode()->UpdateTransformsHierarchically();
+  m_scene_graph_layer->GetRootNode()
+    -> UpdateTransformsHierarchically (ratch, thyme);
   m_scene_graph_layer->GetRootNode()->EnumerateRenderables();
 }
 
@@ -330,11 +337,34 @@ int main (int, char **)
   //                                clip_info.start_time + clip_info.duration,
   //                                clip_info.directory);
 
+  RectangleRenderable *rect_rend = new RectangleRenderable ();
+  (dr_no = new Node) -> AppendRenderable (rect_rend);
+  layer . GetRootNode () -> AppendChild (dr_no);
+
   VideoRenderable *renderable
     = new VideoRenderable (uri);
 
   s_nodal->AppendRenderable(renderable);
   layer.GetRootNode()->AppendChild(s_nodal);
+//  SinuVect sv (Vect (0.1), 1.0, Vect (10.0));
+  SinuVect sv (Vect (5.0, 0.0, 0.0), 1.0, Vect (0.0, 0.0, 9.0));
+  SinuFloat sf (0.5, 0.3772, 0.0);
+  ScGrappler *sg = new ScGrappler (25.0);
+  TrGrappler *tg = new TrGrappler;
+  RoGrappler *rg = new RoGrappler (Vect (0.0, 0.0, 1.0));
+//  sg -> ScaleZoft () . BecomeLike (sv);
+  rg -> AngleZoft () . BecomeLike (sf);
+  tg -> TranslationZoft () . BecomeLike (sv);
+  s_nodal -> AssuredGrapplerPile () -> AppendGrappler (sg);
+  s_nodal -> AssuredGrapplerPile () -> AppendGrappler (rg);
+  s_nodal -> AssuredGrapplerPile () -> AppendGrappler (tg);
+
+  SinuVect ss (Vect (0.8), 1.8, Vect (25.0));
+  ScGrappler *esgy = new ScGrappler;
+  esgy -> ScaleZoft () . BecomeLike (ss);
+  dr_no -> AssuredGrapplerPile () -> AppendGrappler (esgy);
+  dr_no -> AssuredGrapplerPile ()
+    -> AppendGrappler (new TrGrappler (Vect (36.0, 18.0, 8.0)));
 
   zone.Run ();
 

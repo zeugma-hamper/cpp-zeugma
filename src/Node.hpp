@@ -9,6 +9,8 @@
 
 #include <vector>
 
+#include "GrapplerPile.h"
+
 namespace charm
 {
 
@@ -33,8 +35,9 @@ class Node
 
   void EnumerateRenderables ();
 
-  void UpdateTransformsHierarchically ();
-  void UpdateTransformsHierarchically (Transformation const &_parent, bool _is_dirty);
+  void UpdateTransformsHierarchically (i64 ratch, f64 thyme);
+  void UpdateTransformsHierarchically (Transformation const &_parent,
+                                       bool _is_dirty, i64 ratch, f64 thyme);
 
   // callable with one parameter 'Node &'
   template<typename Functor>
@@ -46,6 +49,9 @@ class Node
   void SetLocalTransformation (glm::mat4 const &_vertex_tx);
   void SetLocalTransformation (glm::mat4 const &_vertex_tx,
                                glm::mat4 const &_normal_tx);
+
+  GrapplerPile *AssuredGrapplerPile ();
+  GrapplerPile *UnsecuredGrapplerPile ();
 
   // node takes ownership of child nodes
   void  AppendChild (Node *_node);
@@ -69,6 +75,7 @@ class Node
  private:
   Layer *m_layer;
   Node  *m_parent;
+  GrapplerPile *m_graps;
 
   std::vector<Node *>       m_children;
   std::vector<Renderable *> m_renderables;

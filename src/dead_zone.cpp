@@ -46,7 +46,7 @@ class dead_zone final : public charm::Application
   void ShutDownSceneGraph ();
   void Render ();
 
-  void UpdateSceneGraph ();
+  void UpdateSceneGraph (i64 ratch, f64 thyme);
 
   static FrameTime *GetFrameTime ();
 
@@ -209,16 +209,17 @@ bool dead_zone::RunOneCycle ()
   video_system->PollMessages();
   video_system->UploadFrames();
 
-  UpdateSceneGraph ();
+  UpdateSceneGraph (-1, 0.0);
 
   Render ();
 
   return true;
 }
 
-void dead_zone::UpdateSceneGraph()
+void dead_zone::UpdateSceneGraph(i64 ratch, f64 thyme)
 {
-  m_scene_graph_layer->GetRootNode()->UpdateTransformsHierarchically();
+  m_scene_graph_layer->GetRootNode()
+    -> UpdateTransformsHierarchically (ratch, thyme);
   m_scene_graph_layer->GetRootNode()->EnumerateRenderables();
 }
 
