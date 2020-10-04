@@ -26,16 +26,16 @@ class ZeEvent  :  public Zeubject
   i64 tratch;
   ZeEvent *fore_evt;
 
-  CHARM_DELETE_MOVE_COPY(ZeEvent);
-
   ZeEvent ();
   ZeEvent (std::string_view p,
            f64 ts = -1.0,
            // f64 ts = MotherTime::AbsoluteTime (),
            i64 tr = -1);
   ZeEvent (f64 ts, i64 tr = -1);
-
   ZeEvent (i64 tr);
+
+  ZeEvent (const ZeEvent &zee);
+
 
   const std::string &Provenance ()  const;
   void SetProvenance (std::string_view p);
@@ -148,6 +148,8 @@ class EventSprinklerGroup  :  public Zeubject
         { s (dynamic_cast <EV_ILK##Event *> (e));  return 0; }          \
     };
 
-}
+
+}  // namespace charm down there, gobbling all the pomegrantae seeds; no hermes
+
 
 #endif //ZE_EVENT_IS_ALL_ZE_RAGE
