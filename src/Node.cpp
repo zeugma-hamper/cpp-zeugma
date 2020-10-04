@@ -143,6 +143,29 @@ void Node::RotateWithCenter (const Vect &ax, f64 an, const Vect &ce)
 { AssuredGrapplerPile () -> AppendGrappler (new RoGrappler (ax, an, ce)); }
 
 
+void Node::Translate (const ZoftVect &tzo)
+{ TrGrappler *tgr = new TrGrappler;
+  tgr -> TranslationZoft () . BecomeLike (tzo);
+  AssuredGrapplerPile () -> AppendGrappler (tgr);
+}
+
+void Node::Scale (const ZoftVect &szo)
+{ ScGrappler *sgr = new ScGrappler;
+  sgr -> ScaleZoft () . BecomeLike (szo);
+  AssuredGrapplerPile () -> AppendGrappler (sgr);
+}
+
+void Node::Rotate (const ZoftVect &axzo, const ZoftFloat &anzo,
+                   const ZoftVect &cezo, const ZoftFloat &phzo)
+{ RoGrappler *rgr = new RoGrappler (Vect::zaxis);
+  rgr -> AxisZoft () . BecomeLike (axzo);
+  rgr -> AngleZoft () . BecomeLike (anzo);
+  rgr -> CenterZoft () . BecomeLike (cezo);
+  rgr -> PhaseZoft () . BecomeLike (phzo);
+  AssuredGrapplerPile () -> AppendGrappler (rgr);
+}
+
+
 void Node::ClearTransforms ()
 { if (m_graps)
     m_graps -> RemoveAllGrapplers ();

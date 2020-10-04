@@ -28,6 +28,8 @@ template <typename T>
 class ZoftThing
 { public:
 
+  using ThisHereZoftType = ZoftThing <T>;
+
   template <typename TT>
     class ZGuts  :  public ProtoZoftThingGuts
       { public:
@@ -191,12 +193,11 @@ class ZoftThing
 };
 
 
-#include "Vect.h"
-
-
 using ZoftFloat = ZoftThing <f64>;
 using ZoftVect = ZoftThing <Vect>;
 
+extern const ZoftFloat ZoftFloat_zero;
+extern const ZoftVect ZoftVect_zero;
 
 }  // no ashes; just dust for namespace charm
 

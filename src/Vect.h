@@ -142,6 +142,9 @@ class Vect  :  public v3f64
     { fprintf (unto, "V3<%.2lf %.2lf %.2lf>", x, y, z); }
   void SpewToStderr ()  const
     { Spew (stderr); }
+
+  static const Vect xaxis, yaxis, zaxis;
+  static const Vect zerov;
 };
 
 

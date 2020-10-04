@@ -22,12 +22,12 @@ class RoGrappler  :  public Grappler
      : Grappler (),
        axs (ax), cnt (ce), ang (an), pha (ph)
     { }
-  RoGrappler (ZoftVect &ax_sft,
-              ZoftFloat &an_sft = zero_zfloat,
-              ZoftVect &ce_sft = zax_zvect,
-              ZoftFloat &ph_sft = zero_zfloat)
+  RoGrappler (const ZoftVect &ax_zft,
+              const ZoftFloat &an_zft = zero_zfloat,
+              const ZoftVect &ce_zft = zax_zvect,
+              const ZoftFloat &ph_zft = zero_zfloat)
      :  Grappler (),
-        axs (ax_sft), cnt (ce_sft), ang (an_sft), pha (ph_sft)
+        axs (ax_zft), cnt (ce_zft), ang (an_zft), pha (ph_zft)
     { }
 
   const Vect &Axis ()  const

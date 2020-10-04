@@ -264,9 +264,9 @@ bool dead_zone::DoWhatThouWilt (i64 ratch, f64 thyme)
 { if (ayezee.val > 0.993  &&  ayezee.val < 0.999)
     elzyvee . Restart ();
 
-  cam -> ViewLoc () . SpewToStderr ();
-  fprintf (stderr, " is cammy's loc, and interp is all <%.2lf>\n",
-           ayezee.val);
+  // cam -> ViewLoc () . SpewToStderr ();
+  // fprintf (stderr, " is cammy's loc, and interp is all <%.2lf>\n",
+  //          ayezee.val);
 
   return true;
 }
@@ -346,28 +346,19 @@ int main (int, char **)
 
   s_nodal->AppendRenderable(renderable);
   layer.GetRootNode()->AppendChild(s_nodal);
-//  SinuVect sv (Vect (0.1), 1.0, Vect (10.0));
+
   SinuVect sv (Vect (5.0, 0.0, 0.0), 1.0, Vect (0.0, 0.0, 9.0));
   SinuFloat sf (0.5, 0.3772, 0.0);
-  ScGrappler *sg = new ScGrappler (25.0);
-  TrGrappler *tg = new TrGrappler;
-  RoGrappler *rg = new RoGrappler (Vect (0.0, 0.0, 1.0));
-//  sg -> ScaleZoft () . BecomeLike (sv);
-  rg -> AngleZoft () . BecomeLike (sf);
-  tg -> TranslationZoft () . BecomeLike (sv);
-  s_nodal -> AssuredGrapplerPile () -> AppendGrappler (sg);
-  s_nodal -> AssuredGrapplerPile () -> AppendGrappler (rg);
-  s_nodal -> AssuredGrapplerPile () -> AppendGrappler (tg);
+  s_nodal -> Scale (25.0);
+  s_nodal -> Rotate (ZoftVect (Vect::zaxis), sf);
+  s_nodal -> Translate (sv);
 
-  SinuVect ss (Vect (0.1), 1.8, Vect (1.0));
-  ScGrappler *esgy = new ScGrappler;
-  esgy -> ScaleZoft () . BecomeLike (ss);
   dr_no -> Scale (25.0);
-  dr_no -> AssuredGrapplerPile () -> AppendGrappler (esgy);
-  dr_no -> RotateD (Vect (0.0, 0.0, 1.0), 30.0);
+  SinuVect ss (Vect (0.1), 1.8, Vect (1.0));
+  dr_no -> Scale (ss);
   dr_no -> Translate (36.0, 18.0, 8.0);
-//  dr_no -> RotateWithCenterD (Vect (0.0, 0.0, 1.0), 30.0,
-//                              Vect (36.0, 18.0, 8.0));
+  dr_no -> RotateWithCenterD (Vect (0.0, 0.0, 1.0), 30.0,
+                              Vect (36.0, 18.0, 8.0));
 
   zone.Run ();
 

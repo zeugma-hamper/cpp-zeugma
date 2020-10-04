@@ -21,14 +21,14 @@ class ScGrappler  :  public Grappler
         sca (Vect (1.0, 1.0, 1.0)),
         pm (INITLESS), ipm (INITLESS), nm (INITLESS), inm (INITLESS)
     { }
-  ScGrappler (const ZoftVect &s_sft)
+  ScGrappler (const ZoftVect &s_zft)
      :  Grappler (),
-        sca (s_sft),
+        sca (s_zft),
         pm (INITLESS), ipm (INITLESS), nm (INITLESS), inm (INITLESS)
     { }
-  ScGrappler (const ZoftVect &s_sft, const ZoftVect &c_sft)
+  ScGrappler (const ZoftVect &s_zft, const ZoftVect &c_zft)
      :  Grappler (),
-        cnt (c_sft), sca (s_sft),
+        cnt (c_zft), sca (s_zft),
         pm (INITLESS), ipm (INITLESS), nm (INITLESS), inm (INITLESS)
     { }
   ScGrappler (f64 s)
@@ -62,10 +62,10 @@ class ScGrappler  :  public Grappler
   ZoftVect &CenterZoft ()
     { return cnt; }
 
-  ScGrappler &InstallScale (const ZoftVect &s_sft)
-    { sca . BecomeLike (s_sft);  return *this; }
-  ScGrappler &InstallCenter (const ZoftVect &c_sft)
-    { cnt . BecomeLike (c_sft);  return *this; }
+  ScGrappler &InstallScale (const ZoftVect &s_zft)
+    { sca . BecomeLike (s_zft);  return *this; }
+  ScGrappler &InstallCenter (const ZoftVect &c_zft)
+    { cnt . BecomeLike (c_zft);  return *this; }
 
   const Matrix44 &PntMat ()  const  override
     { return pm; }

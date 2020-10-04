@@ -58,14 +58,22 @@ class Node
     { Translate (Vect (dx, dy, dz)); }
 
   void Scale (const Vect &sc);
-  void Scale (f64 sx, f64 sy, f64 sz)  { Scale (Vect (sx, sy, sz)); }
-  void Scale (f64 s)  { Scale (s, s, s); }
+  inline void Scale (f64 sx, f64 sy, f64 sz)  { Scale (Vect (sx, sy, sz)); }
+  inline void Scale (f64 s)  { Scale (s, s, s); }
 
   void Rotate (const Vect &ax, f64 an);
-  void RotateD (const Vect &ax, f64 an)  { Rotate (ax, M_PI / 180.0 * an); }
+  inline void RotateD (const Vect &ax, f64 an)
+    { Rotate (ax, M_PI / 180.0 * an); }
   void RotateWithCenter (const Vect &ax, f64 an, const Vect &ce);
-  void RotateWithCenterD (const Vect &ax, f64 an, const Vect &ce)
+  inline void RotateWithCenterD (const Vect &ax, f64 an, const Vect &ce)
     { RotateWithCenter (ax, M_PI / 180.0 * an, ce); }
+
+  void Translate (const ZoftVect &tzo);
+  void Scale (const ZoftVect &szo);
+  void Rotate (const ZoftVect &ax_zft,
+               const ZoftFloat &an_zft,
+               const ZoftVect &ce_zft = Vect::zerov,
+               const ZoftFloat &ph_zft = ZoftFloat_zero);
 
   void ClearTransforms ();
 
