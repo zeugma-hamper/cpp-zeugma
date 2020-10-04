@@ -57,6 +57,19 @@ class PlatonicMaes  :  public SpaceThing
   ZoftFloat &HeightZoft ()
     { return hei; }
 
+
+  void SetLoc (const Vect &l)
+    { loc = l; }
+  void SetOver (const Vect &o)
+    { ovr = o; }
+  void SetUp (const Vect &u)
+    { upp = u; }
+  void SetWidth (f64 w)
+    { wid = w; }
+  void SetHeight (f64 h)
+    { hei = h; }
+
+
   i64 Inhale (i64 ratch, f64 thyme);
 };
 

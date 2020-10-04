@@ -23,6 +23,8 @@
 
 #include "Bolex.h"
 
+#include "conjure-from-toml.h"
+
 #include "vector_interop.hpp"
 
 #include <bgfx_utils.hpp>
@@ -312,6 +314,10 @@ int main (int, char **)
   dead_zone zone;
   if (! zone.StartUp ())
     return -1;
+
+  fprintf (stderr, "welp, we've got <%d> maeses to bray about...\n",
+           NumMaesesFromTOML ("../maes-config.toml"));
+  PlatonicMaes *main_maes = MaesFromTOML ("../maes-config.toml", 1);
 
   Layer &layer = zone.GetSceneLayer();
 
