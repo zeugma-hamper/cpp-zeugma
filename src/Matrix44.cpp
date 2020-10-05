@@ -259,8 +259,8 @@ Matrix44 &Matrix44::LoadRotationPreNormed (const Vect &axs, f64 ang)
 
   f64 t1 = axs.x * axs.y * omc;
   f64 t2 = axs.z * si;
-  f64 m10 = t1 + t2;
-  f64 m01 = t1 - t2;
+  f64 m10 = t1 - t2;
+  f64 m01 = t1 + t2;
 
   t1 = axs.x * axs.z * omc;
   t2 = axs.y * si;
@@ -269,8 +269,8 @@ Matrix44 &Matrix44::LoadRotationPreNormed (const Vect &axs, f64 ang)
 
   t1 = axs.y * axs.z * omc;
   t2 = axs.x * si;
-  f64 m21 = t1 + t2;
-  f64 m12 = t1 - t2;
+  f64 m21 = t1 - t2;
+  f64 m12 = t1 + t2;
 
   return Load (m00, m01, m02, 0.0,
                m10, m11, m12, 0.0,
