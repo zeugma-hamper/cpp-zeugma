@@ -57,14 +57,14 @@ RectangleRenderable::RectangleRenderable ()
     bgfx::destroy(program);
   }
 
-  void RectangleRenderable::Draw ()
+  void RectangleRenderable::Draw (u16 vyu_id)
   {
     bgfx::setTransform(&m_node->GetAbsoluteTransformation().model);
     bgfx::setVertexBuffer(0, vbh, 0, 4);
     bgfx::setState (BGFX_STATE_WRITE_RGB |
                     BGFX_STATE_PT_TRISTRIP |
                     BGFX_STATE_WRITE_Z);
-    bgfx::submit(0, program, m_graph_id);
+    bgfx::submit(vyu_id, program, m_graph_id);
   }
 
 }

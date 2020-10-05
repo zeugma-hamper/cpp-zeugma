@@ -48,13 +48,13 @@ Bolex &Bolex::SetViewVertAngleD (f64 vdeg)
   return *this;
 }
 
-Bolex &Bolex::SetViewHorizAngleR (f64 hrad)
-{ view_hrz_ang_d = hrad * M_PI / 180.0;
+Bolex &Bolex::SetViewHorizAngle (f64 hrad)
+{ view_hrz_ang_d = hrad * 180.0 / M_PI;
   return *this;
 }
 
-Bolex &Bolex::SetViewVertAngleR (f64 vrad)
-{ view_vrt_ang_d = vrad * M_PI / 180.0;
+Bolex &Bolex::SetViewVertAngle (f64 vrad)
+{ view_vrt_ang_d = vrad * 180.0 / M_PI;
   return *this;
 }
 
@@ -98,6 +98,12 @@ Bolex &Bolex::SetNearClipDist (f64 n_dst)
 
 Bolex &Bolex::SetFarClipDist (f64 f_dst)
 { far_clip_dst = f_dst;
+  return *this;
+}
+
+Bolex &Bolex::SetNearAndFarClipDist (f64 n_dst, f64 f_dst)
+{ near_clip_dst = n_dst;
+  far_clip_dst = f_dst;
   return *this;
 }
 

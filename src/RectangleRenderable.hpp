@@ -14,7 +14,7 @@ class RectangleRenderable final : public Renderable
   RectangleRenderable ();
   ~RectangleRenderable () override;
 
-  void Draw () override;
+  void Draw (u16 vyu_id) override;
 
  protected:
   bgfx::ProgramHandle program;

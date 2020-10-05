@@ -42,7 +42,51 @@
 
 #include <Matte.hpp>
 
+
 using namespace charm;
+
+
+class Whippletree  :  public Zeubject
+{ public:
+  Bolex *cam;
+  PlatonicMaes *maes;
+  struct BGFXView {
+    i32 view_id;  // bgfx's is u16, so we can rep't stuff in neg nos.
+    f64 botlef_x, botlef_y;
+    f64 wid_frac, hei_frac;  // these four norm'd [0,1] ref'ing window res
+    i32 fb_pix_w, fb_pix_h;
+    u16 ViewID ()  const  { return (u16)view_id; }
+  } *b_view;
+  Whippletree ()  :  Zeubject (), cam (NULL), maes (NULL), b_view (NULL)
+    { }
+  i64 Inhale (i64 ratch, f64 thyme)  override
+    { if (cam)  cam -> Inhale (ratch, thyme);
+      if (maes)  maes -> Inhale (ratch, thyme);
+      return 0;
+    }
+};
+
+
+Bolex *CameraFromMaes (const PlatonicMaes &m)
+{ Bolex *cam = new Bolex;
+
+  Vect nrm = m . Over () . Cross (m . Up ()) . Norm ();
+  f64 dst = 0.8 * m . Width ();
+
+  cam -> SetViewDist (dst);
+  cam -> SetViewLoc (m . Loc ()  +  dst * nrm);
+  cam -> SetViewCOI (m . Loc ());
+  cam -> SetViewUp (m . Up ());
+
+  cam -> SetProjectionType (Bolex::ProjType::PERSPECTIVE);
+
+  cam -> SetViewHorizAngle (2.0 * asin (0.5 * m . Width () / dst));
+  cam -> SetViewVertAngle (2.0 * asin (0.5 * m . Height () / dst));
+
+  cam -> SetNearAndFarClipDist (0.1, 10.0 * dst);
+  return cam;
+}
+
 
 class dead_zone final : public charm::Application
 {
@@ -62,18 +106,26 @@ class dead_zone final : public charm::Application
   void Render ();
 
   void UpdateSceneGraph (i64 ratch, f64 thyme);
+  void UpdateRenderLeaves (i64 ratch, f64 thyme);
 
   static FrameTime *GetFrameTime ();
 
   Layer &GetSceneLayer ();
 
+  i32 NumMaeses ()  const;
+  PlatonicMaes *NthMaes (i32 ind);
+  PlatonicMaes *FindMaesByName (const std::string &nm);
+
  protected:
 
-  Bolex *cam;
+//  Bolex *cam;
 
   GLFWwindow *window;
 
   Layer *m_scene_graph_layer;
+
+ public:
+  std::vector <Whippletree *> render_leaves;
 };
 
 
@@ -109,6 +161,8 @@ static void glfw_key_callback(GLFWwindow *window, int key, int, int action, int)
     }
 }
 
+static i32 WINWID = 1920;
+static i32 WINHEI = 540;
 bool dead_zone::InitWindowingAndGraphics ()
 {
   glfwSetErrorCallback(glfw_error_callback);
@@ -125,7 +179,8 @@ bool dead_zone::InitWindowingAndGraphics ()
   glfwWindowHint (GLFW_CLIENT_API, GLFW_OPENGL_API);
   glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  GLFWwindow *window = glfwCreateWindow (1920, 1080, "dead zone", nullptr, nullptr);
+  GLFWwindow *window = glfwCreateWindow (WINWID, WINHEI, "dead zone",
+                                         nullptr, nullptr);
   if (! window)
     ERROR_RETURN_VAL ("couldn't create window", false);
 
@@ -148,13 +203,27 @@ bool dead_zone::InitWindowingAndGraphics ()
   if (! bgfx::init (init))
     ERROR_RETURN_VAL ("couldn't initialize bgfx", false);
 
-  bgfx::setViewRect(0, 0, 0, glfw_width, glfw_height);
-  bgfx::setViewScissor(0);
-  bgfx::setViewClear (0, BGFX_CLEAR_COLOR, 0x808080FF);
-  // use depth integer to order GPU draw submission
-  // drawables are enumerated by order in scene graph,
-  // so that id number is used as the depth.
-  bgfx::setViewMode (0, bgfx::ViewMode::DepthAscending);
+  for (Whippletree *leaf  :  render_leaves)
+    { u16 vuid = leaf->b_view -> ViewID ();
+      leaf->b_view->fb_pix_w = glfw_width;
+      leaf->b_view->fb_pix_h = glfw_height;
+      bgfx::setViewRect (vuid,
+                         leaf->b_view->botlef_x * glfw_width,
+                         leaf->b_view->botlef_y * glfw_height,
+                         leaf->b_view->wid_frac * glfw_width,
+                         leaf->b_view->hei_frac * glfw_height);
+      bgfx::setViewScissor (vuid,
+                            leaf->b_view->botlef_x * glfw_width,
+                            leaf->b_view->botlef_y * glfw_height,
+                            leaf->b_view->wid_frac * glfw_width,
+                            leaf->b_view->hei_frac * glfw_height);
+      bgfx::setViewClear (vuid, BGFX_CLEAR_COLOR,
+                          0x808080FF + vuid * 0x00200000);
+      // use depth integer to order GPU draw submission
+      // drawables are enumerated by order in scene graph,
+      // so that id number is used as the depth.
+      bgfx::setViewMode (vuid, bgfx::ViewMode::DepthAscending);
+    }
 
   return true;
 }
@@ -170,25 +239,27 @@ void dead_zone::Render ()
   for (Renderable *r : m_scene_graph_layer->GetRenderables())
     r->Update ();
 
-  bgfx::touch (0);
+  for (Whippletree *leaf  :  render_leaves)
+    { u16 vu_id = leaf->b_view -> ViewID ();
+      bgfx::touch (vu_id);
 
-  glm::mat4 view_transform = glm::lookAt (as_glm (cam -> ViewLoc ()),
-                                          as_glm (cam -> ViewCOI ()),
-                                          as_glm (cam -> ViewUp ()));
+      Bolex *c = leaf->cam;
+      glm::mat4 view_transform = glm::lookAt (as_glm (c -> ViewLoc ()),
+                                              as_glm (c -> ViewCOI ()),
+                                              as_glm (c -> ViewUp ()));
+      glm::mat4 proj_transform
+        = glm::perspective ((float) c -> ViewVertAngle (),
+                            (float) (sin (0.5 * c -> ViewHorizAngle ())
+                                     / sin (0.5 * c -> ViewVertAngle ())),
+                            (float) c -> NearClipDist (),
+                            (float) c -> FarClipDist ());
 
-  glm::mat4 proj_transform
-    = glm::perspective ((float) cam -> ViewVertAngleD (),
-                        (float) (sin (0.5 * cam -> ViewHorizAngle ())
-                                 / sin (0.5 * cam -> ViewVertAngle ())),
-                        (float) cam -> NearClipDist (),
-                        (float) cam -> FarClipDist ());
+      bgfx::setViewTransform (vu_id, glm::value_ptr (view_transform),
+                              glm::value_ptr (proj_transform));
 
-  bgfx::setViewTransform(0, glm::value_ptr (view_transform),
-                         glm::value_ptr (proj_transform));
-
-  for (Renderable *r : m_scene_graph_layer->GetRenderables())
-    r->Draw();
-
+      for (Renderable *r  :  m_scene_graph_layer->GetRenderables())
+        r -> Draw (vu_id);
+    }
   bgfx::frame ();
 }
 
@@ -197,23 +268,10 @@ FrameTime *s_dead_zone_frame_time{nullptr};
 dead_zone::dead_zone ()
   : window {nullptr},
     m_scene_graph_layer {new Layer}
-{ cam = new Bolex;
-  cam -> SetViewLoc (Vect (0.0, 0.0, 10.0))
-    . SetViewCOI (Vect (0.0, 0.0, 2.0))
-    . SetViewUp (Vect (0.0, 1.0, 0.0))
-    . SetViewDist (8.0)
-    . SetProjectionType (Bolex::ProjType::PERSPECTIVE)
-    . SetViewVertAngleD (47.0)
-    . SetViewHorizAngleD (90.0)
-    . SetNearClipDist (0.005)  .  SetFarClipDist (20.0);
-
-  SinuVect sv (Vect (0.0, 0.0, 0.175), 1.0, Vect (0.0, 0.0, 10.0));
-//  cam -> ViewLocZoft () . BecomeLike (sv);
-}
+{ }
 
 dead_zone::~dead_zone ()
-{
-}
+{ }
 
 bool dead_zone::StartUp ()
 {
@@ -249,8 +307,9 @@ bool dead_zone::RunOneCycle ()
   video_system->UploadFrames();
 
   UpdateSceneGraph (global_ratchet, global_frame_thyme);
+  UpdateRenderLeaves (global_ratchet, global_frame_thyme);
 
-  cam -> Inhale (global_ratchet, global_frame_thyme);
+//  cam -> Inhale (global_ratchet, global_frame_thyme);
 
   Render ();
 
@@ -273,6 +332,11 @@ bool dead_zone::DoWhatThouWilt (i64 ratch, f64 thyme)
   return true;
 }
 
+
+void dead_zone::UpdateRenderLeaves (i64 ratch, f64 thyme)
+{ for (Whippletree *leaf  :  render_leaves)
+    leaf -> Inhale (ratch, thyme);
+}
 
 void dead_zone::UpdateSceneGraph(i64 ratch, f64 thyme)
 {
@@ -309,62 +373,84 @@ Layer &dead_zone::GetSceneLayer ()
   return *m_scene_graph_layer;
 }
 
+
+i32 dead_zone::NumMaeses ()  const
+{ return render_leaves . size (); }
+
+PlatonicMaes *dead_zone::NthMaes (i32 ind)
+{ if (ind < 0  ||  ind >= render_leaves . size ())
+    return NULL;
+  return render_leaves[ind]->maes;
+}
+
+PlatonicMaes *dead_zone::FindMaesByName (const std::string &nm)
+{ for (Whippletree *leaf  :  render_leaves)
+    if (leaf  &&  leaf->maes  &&  nm == leaf->maes -> Name ())
+      return leaf->maes;
+  return NULL;
+}
+
 int main (int, char **)
 {
   dead_zone zone;
+
+  i32 nm = NumMaesesFromTOML ("../maes-config.toml");
+  for (i32 q = 0  ;  q < nm  ;  ++q)
+    if (PlatonicMaes *m = MaesFromTOML ("../maes-config.toml", q))
+      { Whippletree *leaf = new Whippletree;
+        leaf->maes = m;
+        Bolex *c = CameraFromMaes (*m);
+        leaf->cam = c;
+        Whippletree::BGFXView *bv = new Whippletree::BGFXView;
+        leaf->b_view = bv;
+        bv->botlef_x = 0.5 * (f64)q;
+        bv->botlef_y = 0.0;
+        bv->wid_frac = 0.5;
+        bv->hei_frac = 1.0;
+        bv->view_id = q;
+        zone.render_leaves . push_back (leaf);
+      }
+
   if (! zone.StartUp ())
     return -1;
 
-  fprintf (stderr, "welp, we've got <%d> maeses to bray about...\n",
-           NumMaesesFromTOML ("../maes-config.toml"));
-  PlatonicMaes *main_maes = MaesFromTOML ("../maes-config.toml", 1);
-
   Layer &layer = zone.GetSceneLayer();
-
-  s_nodal = new Node ();
-
-  s_nodal->SetLocalTransformation(glm::translate(glm::vec3{0.0f, 0.0f, 9.0f})
-                                  * glm::scale (glm::vec3 {10.0f}));
 
   std::vector<FilmInfo> configs = ReadFilmInfo ("../jh-film-config.toml");
   assert (configs.size () > 0);
 
   FilmInfo &film_info = configs[0];
   assert (film_info.clips.size () > 0);
-  // ClipInfo &clip_info = film_info.clips[0];
-
-  // std::string file
-  //   = "file:///home/blake/tlp/tamper-blu-mkv/the-fall-blu.mov";
 
   std::string uri = std::string ("file://") + film_info.film_path.c_str ();
-  // MattedVideoRenderable *matte_renderable
-  //   = new MattedVideoRenderable (uri,
-  //                                clip_info.start_time,
-  //                                clip_info.start_time + clip_info.duration,
-  //                                clip_info.directory);
+
+  s_nodal = new Node ();
+  VideoRenderable *renderable = new VideoRenderable (uri);
+  s_nodal -> AppendRenderable (renderable);
+  layer . GetRootNode () -> AppendChild (s_nodal);
+
+  PlatonicMaes *maes = zone . FindMaesByName ("left");
+  if (maes)
+    { SinuVect sv (Vect (0.5, 0.0, 0.0), 1.0);
+      SinuFloat sf (0.5, 0.3772, 0.0);
+      s_nodal -> Rotate (ZoftVect (Vect::zaxis), sf);
+      s_nodal -> Translate (sv);
+      s_nodal -> RotateD (Vect (0.0, 1.0, 0.0), 90.0);
+      s_nodal -> Scale (0.4 * maes -> Width ());
+      s_nodal -> Translate (maes -> Loc ());
+    }
 
   RectangleRenderable *rect_rend = new RectangleRenderable ();
   (dr_no = new Node) -> AppendRenderable (rect_rend);
   layer . GetRootNode () -> AppendChild (dr_no);
 
-  VideoRenderable *renderable
-    = new VideoRenderable (uri);
-
-  s_nodal->AppendRenderable(renderable);
-  layer.GetRootNode()->AppendChild(s_nodal);
-
-  SinuVect sv (Vect (5.0, 0.0, 0.0), 1.0, Vect (0.0, 0.0, 9.0));
-  SinuFloat sf (0.5, 0.3772, 0.0);
-  s_nodal -> Scale (25.0);
-  s_nodal -> Rotate (ZoftVect (Vect::zaxis), sf);
-  s_nodal -> Translate (sv);
-
-  dr_no -> Scale (25.0);
-  SinuVect ss (Vect (0.1), 1.8, Vect (1.0));
-  dr_no -> Scale (ss);
-  dr_no -> Translate (36.0, 18.0, 8.0);
-  dr_no -> RotateWithCenterD (Vect (0.0, 0.0, 1.0), 30.0,
-                              Vect (36.0, 18.0, 8.0));
+  if (maes = zone . FindMaesByName ("front"))
+    { dr_no -> RotateD (Vect (0.0, 1.0, 0.0), -30.0);
+      dr_no -> Scale (1.0 * maes -> Height ());
+      SinuVect ss (Vect (0.1), 1.8, Vect (1.0));
+      dr_no -> Scale (ss);
+      dr_no -> Translate (maes -> Loc ());
+    }
 
   zone.Run ();
 

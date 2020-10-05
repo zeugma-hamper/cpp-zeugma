@@ -31,7 +31,7 @@ VideoRenderable::~VideoRenderable ()
 {
 }
 
-void VideoRenderable::Draw ()
+void VideoRenderable::Draw (u16 vyu_id)
 {
   if (! m_video_texture || ! bgfx::isValid(m_video_texture->GetNthTexture (0)))
     return;
@@ -46,7 +46,7 @@ void VideoRenderable::Draw ()
   // TODO: get a hold of this information
   glm::vec4 unity {1.0f, 1080.0f/1920.0f, 1.0f, 1.0f};
   bgfx::setUniform(m_video_texture->GetAspectUniform(), glm::value_ptr (unity));
-  bgfx::submit(0, m_video_texture->GetProgram ());
+  bgfx::submit(vyu_id, m_video_texture->GetProgram ());
 }
 
 }

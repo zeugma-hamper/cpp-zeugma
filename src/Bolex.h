@@ -71,9 +71,9 @@ class Bolex  :  public SpaceThing
 
   const v2f64 &ViewPlaneOffset ()  const
     { return view_pln_off; }
-  const f64 ViewPlaneHorizOffset ()  const
+  f64 ViewPlaneHorizOffset ()  const
     { return view_pln_off.x; }
-  const f64 ViewPlaneVertOffset ()  const
+  f64 ViewPlaneVertOffset ()  const
     { return view_pln_off.y; }
 
   ProjType ProjectionType ()  const
@@ -119,8 +119,8 @@ class Bolex  :  public SpaceThing
   Bolex &SetViewDist (f64 dst);
   Bolex &SetViewHorizAngleD (f64 hdeg);
   Bolex &SetViewVertAngleD (f64 vdeg);
-  Bolex &SetViewHorizAngleR (f64 hrad);
-  Bolex &SetViewVertAngleR (f64 vrad);
+  Bolex &SetViewHorizAngle (f64 hrad);
+  Bolex &SetViewVertAngle (f64 vrad);
   Bolex &SetViewOrthoWid (f64 owid);
   Bolex &SetViewOrthoHei (f64 ohei);
 
@@ -132,6 +132,7 @@ class Bolex  :  public SpaceThing
 
   Bolex &SetNearClipDist (f64 n_dst);
   Bolex &SetFarClipDist (f64 f_dst);
+  Bolex &SetNearAndFarClipDist (f64 n_dst, f64 f_dst);
 };
 
 

@@ -118,7 +118,7 @@ void GraphicsApplication::Render ()
                          glm::value_ptr (proj_transform));
 
   for (Renderable *r : m_scene_graph_layer->GetRenderables())
-    r->Draw();
+    r->Draw(0);
 
   bgfx::frame ();
 }
