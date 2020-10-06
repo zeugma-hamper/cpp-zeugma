@@ -161,8 +161,8 @@ static void glfw_key_callback(GLFWwindow *window, int key, int, int action, int)
     }
 }
 
-static i32 WINWID = 1920;
-static i32 WINHEI = 540;
+static i32 WINWID = 7680;
+static i32 WINHEI = 2160;
 bool dead_zone::InitWindowingAndGraphics ()
 {
   glfwSetErrorCallback(glfw_error_callback);
@@ -178,6 +178,7 @@ bool dead_zone::InitWindowingAndGraphics ()
   glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint (GLFW_CLIENT_API, GLFW_OPENGL_API);
   glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint (GLFW_DECORATED, GLFW_FALSE);
 
   GLFWwindow *window = glfwCreateWindow (WINWID, WINHEI, "dead zone",
                                          nullptr, nullptr);
@@ -185,6 +186,9 @@ bool dead_zone::InitWindowingAndGraphics ()
     ERROR_RETURN_VAL ("couldn't create window", false);
 
   glfwSetKeyCallback(window, glfw_key_callback);
+
+  glfwPollEvents ();
+  glfwSetWindowSize (window, WINWID, WINHEI);
 
   bgfx::renderFrame();
   bgfx::Init init;
@@ -450,6 +454,19 @@ int main (int, char **)
       SinuVect ss (Vect (0.1), 1.8, Vect (1.0));
       dr_no -> Scale (ss);
       dr_no -> Translate (maes -> Loc ());
+    }
+
+  for (int poot = 0  ;  poot < 9  ;  ++poot)
+    { Node *enn = new Node;
+      enn -> AppendRenderable (new RectangleRenderable);
+      //  enn -> Rotate (ZoftThing (Vect::zaxis), SinuFloat (0.5, 2.0));
+      enn -> RotateD (Vect::yaxis, 45.0);
+      enn -> Scale (0.025 * maes -> Height ());
+      enn -> Translate (maes -> Loc ()
+			-  0.5 * maes -> Width () * maes -> Over ()
+			+  (((f64)poot * 0.125  -  0.5) * maes -> Height ()
+			    * maes -> Up ()));
+      layer . GetRootNode () -> AppendChild (enn);
     }
 
   zone.Run ();
