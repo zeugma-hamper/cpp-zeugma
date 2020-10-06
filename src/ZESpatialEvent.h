@@ -8,8 +8,9 @@
 
 #include <map>
 
-namespace charm
-{
+
+namespace charm  {
+
 
 class ZESpatialEvent  :  public ZeEvent
 { ZE_EVT_TUMESCE (ZESpatial, Ze);
@@ -29,6 +30,8 @@ class ZESpatialEvent  :  public ZeEvent
                   const Vect &l,
                   const Vect &a = -zaxis,
                   const Vect &o = xaxis);
+
+  ZESpatialEvent (const ZESpatialEvent &spe);
 
   const Vect &Loc ()  const;
   void SetLoc (const Vect &l);
@@ -60,6 +63,13 @@ class ZESpatialMoveEvent  :  public ZESpatialEvent
                       const Vect &o = xaxis)
      :  ZESpatialEvent (prv, l, a, o)
     { }
+
+  // this following -- and all similar below -- is not (are not) copy
+  // constructors; rather, they're sort of 'promotion constructors':
+  // view with a penetrating gaze!
+  ZESpatialMoveEvent (const ZESpatialEvent &spe)
+     :  ZESpatialEvent (spe)
+    { }
 };
 
 
@@ -72,9 +82,12 @@ class ZESpatialAppearEvent  :  public ZESpatialEvent
                         const Vect &l,
                         const Vect &a = -zaxis,
                         const Vect &o = xaxis)
-    :  ZESpatialEvent (prv, l, a, o)
-  { }
+     :  ZESpatialEvent (prv, l, a, o)
+    { }
 
+  ZESpatialAppearEvent (const ZESpatialEvent &spe)
+     :  ZESpatialEvent (spe)
+    { }
 };
 
 
@@ -87,9 +100,12 @@ class ZESpatialVanishEvent  :  public ZESpatialEvent
                         const Vect &l,
                         const Vect &a = -zaxis,
                         const Vect &o = xaxis)
-    :  ZESpatialEvent (prv, l, a, o)
-  { }
+     :  ZESpatialEvent (prv, l, a, o)
+    { }
 
+  ZESpatialVanishEvent (const ZESpatialEvent &spe)
+     :  ZESpatialEvent (spe)
+    { }
 };
 
 
@@ -102,9 +118,12 @@ class ZESpatialPressureEvent  :  public ZESpatialEvent
   ZESpatialPressureEvent ()  :  ZESpatialEvent ()  { }
   ZESpatialPressureEvent (std::string_view prv)  :  ZESpatialEvent (prv)  { }
   ZESpatialPressureEvent (std::string_view prv, u64 prs_id, f64 prs_val)
-    :  ZESpatialEvent (prv), which_pressor (prs_id), updated_value (prs_val)
-  { }
+     :  ZESpatialEvent (prv), which_pressor (prs_id), updated_value (prs_val)
+    { }
 
+  ZESpatialPressureEvent (const ZESpatialEvent &spe, u64 prs_id, f64 prs_val)
+     :  ZESpatialEvent (spe), which_pressor (prs_id), updated_value (prs_val)
+    { }
 };
 
 
@@ -113,11 +132,16 @@ class ZESpatialHardenEvent  :  public ZESpatialPressureEvent
 
   ZESpatialHardenEvent ()  :  ZESpatialPressureEvent ()  { }
   ZESpatialHardenEvent (std::string_view prv)
-    :  ZESpatialPressureEvent (prv)
-  { }
+     :  ZESpatialPressureEvent (prv)
+    { }
   ZESpatialHardenEvent (std::string_view prv, u64 prs_id, f64 prs_val = 1.0)
-    :  ZESpatialPressureEvent (prv, prs_id, prs_val)
-  { }
+     :  ZESpatialPressureEvent (prv, prs_id, prs_val)
+    { }
+
+  ZESpatialHardenEvent (const ZESpatialEvent &spe,
+                        u64 prs_id, f64 prs_val = 1.0)
+     :  ZESpatialPressureEvent (spe, prs_id, prs_val)
+    { }
 };
 
 
@@ -126,25 +150,32 @@ class ZESpatialSoftenEvent  :  public ZESpatialPressureEvent
 
   ZESpatialSoftenEvent ()  :  ZESpatialPressureEvent ()  { }
   ZESpatialSoftenEvent (std::string_view prv)
-    :  ZESpatialPressureEvent (prv)
-  { }
+     :  ZESpatialPressureEvent (prv)
+    { }
   ZESpatialSoftenEvent (std::string_view prv, u64 prs_id, f64 prs_val = 0.0)
-    :  ZESpatialPressureEvent (prv, prs_id, prs_val)
-  { }
+     :  ZESpatialPressureEvent (prv, prs_id, prs_val)
+    { }
+
+  ZESpatialSoftenEvent (const ZESpatialEvent &spe,
+                        u64 prs_id, f64 prs_val = 0.0)
+     :  ZESpatialPressureEvent (spe, prs_id, prs_val)
+    { }
 };
 
 
 
 class ZESpatialPhagy
   :  //public ZESpatialEvent::ZESpatialPhage,
-  public ZESpatialMoveEvent::ZESpatialMovePhage,
-  public ZESpatialAppearEvent::ZESpatialAppearPhage,
-  public ZESpatialVanishEvent::ZESpatialVanishPhage,
-  //public ZESpatialPressureEvent::ZESpatialPressurePhage,
-  public ZESpatialHardenEvent::ZESpatialHardenPhage,
-  public ZESpatialSoftenEvent::ZESpatialSoftenPhage
+     public ZESpatialMoveEvent::ZESpatialMovePhage,
+     public ZESpatialAppearEvent::ZESpatialAppearPhage,
+     public ZESpatialVanishEvent::ZESpatialVanishPhage,
+     //public ZESpatialPressureEvent::ZESpatialPressurePhage,
+     public ZESpatialHardenEvent::ZESpatialHardenPhage,
+     public ZESpatialSoftenEvent::ZESpatialSoftenPhage
 { };
 
-}
+
+}  // snuffed it, did namespace charm, o me droogs...
+
 
 #endif //ZE_SPATIAL_EVENT_WITH_THREE_NITRO_BURNING_DIMENSIONS_AT_ZE_CENTRUM

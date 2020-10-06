@@ -27,7 +27,7 @@ class MattedVideoRenderable final : public Renderable
   MattedVideoRenderable (FilmInfo const &_film, ClipInfo &_clip);
   ~MattedVideoRenderable () override;
 
-  void Draw () override;
+  void Draw (u16 vyu_id) override;
 
  private:
   ch_ptr<VideoTexture> m_video_texture;

@@ -21,7 +21,7 @@ class VideoRenderable final : public Renderable
   VideoRenderable (std::string_view _uri);
   ~VideoRenderable () override;
 
-  void Draw () override;
+  void Draw (u16 vyu_id) override;
 
  private:
   ch_ptr<VideoTexture> m_video_texture;

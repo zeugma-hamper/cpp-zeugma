@@ -30,7 +30,7 @@ class Renderable
   glm::vec4 const &GetUp () const;
 
   virtual void Update ();
-  virtual void Draw () = 0;
+  virtual void Draw (u16 vyu_id) = 0;
 
   bool ShouldDraw () const;
 

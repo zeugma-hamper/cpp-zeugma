@@ -9,6 +9,8 @@
 
 #include <vector>
 
+#include "GrapplerPile.h"
+
 namespace charm
 {
 
@@ -33,8 +35,9 @@ class Node
 
   void EnumerateRenderables ();
 
-  void UpdateTransformsHierarchically ();
-  void UpdateTransformsHierarchically (Transformation const &_parent, bool _is_dirty);
+  void UpdateTransformsHierarchically (i64 ratch, f64 thyme);
+  void UpdateTransformsHierarchically (Transformation const &_parent,
+                                       bool _is_dirty, i64 ratch, f64 thyme);
 
   // callable with one parameter 'Node &'
   template<typename Functor>
@@ -46,6 +49,33 @@ class Node
   void SetLocalTransformation (glm::mat4 const &_vertex_tx);
   void SetLocalTransformation (glm::mat4 const &_vertex_tx,
                                glm::mat4 const &_normal_tx);
+
+  GrapplerPile *AssuredGrapplerPile ();
+  GrapplerPile *UnsecuredGrapplerPile ();
+
+  void Translate (const Vect &tr);
+  inline void Translate (f64 dx, f64 dy, f64 dz)
+    { Translate (Vect (dx, dy, dz)); }
+
+  void Scale (const Vect &sc);
+  inline void Scale (f64 sx, f64 sy, f64 sz)  { Scale (Vect (sx, sy, sz)); }
+  inline void Scale (f64 s)  { Scale (s, s, s); }
+
+  void Rotate (const Vect &ax, f64 an);
+  inline void RotateD (const Vect &ax, f64 an)
+    { Rotate (ax, M_PI / 180.0 * an); }
+  void RotateWithCenter (const Vect &ax, f64 an, const Vect &ce);
+  inline void RotateWithCenterD (const Vect &ax, f64 an, const Vect &ce)
+    { RotateWithCenter (ax, M_PI / 180.0 * an, ce); }
+
+  void Translate (const ZoftVect &tzo);
+  void Scale (const ZoftVect &szo);
+  void Rotate (const ZoftVect &ax_zft,
+               const ZoftFloat &an_zft,
+               const ZoftVect &ce_zft = Vect::zerov,
+               const ZoftFloat &ph_zft = ZoftFloat_zero);
+
+  void ClearTransforms ();
 
   // node takes ownership of child nodes
   void  AppendChild (Node *_node);
@@ -69,6 +99,7 @@ class Node
  private:
   Layer *m_layer;
   Node  *m_parent;
+  GrapplerPile *m_graps;
 
   std::vector<Node *>       m_children;
   std::vector<Renderable *> m_renderables;

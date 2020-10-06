@@ -1,0 +1,7 @@
+root="/home/jh/tlp2/tamper/cine/o-g"
+roto_root="rotopro"
+
+[boaa]
+name="Belly of an Architect"
+path="boaa-mpeg4.mov"
+clip_path="boaa"

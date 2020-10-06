@@ -22,16 +22,16 @@ class GraphicsApplication : public Application
   GraphicsApplication ();
   ~GraphicsApplication () override;
 
-  bool StartUp  () override;
-  bool Update   () override;
-  bool ShutDown () override;
+  bool StartUp     () override;
+  bool RunOneCycle () override;
+  bool ShutDown    () override;
 
   bool InitWindowingAndGraphics ();
   void ShutDownGraphics ();
   void ShutDownSceneGraph ();
   void Render ();
 
-  void UpdateSceneGraph ();
+  void UpdateSceneGraph (i64 ratch, f64 thyme);
 
   MoltoSprinkler &GetSprinkler ();
 

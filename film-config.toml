@@ -1,5 +1,5 @@
-root="/home/blake/tlp/tamper-dvd-orig"
-roto_root="rotopro/rotopro"
+root="/home/jh/tlp2/tamper/cine/o-g" #root="/home/blake/tlp/tamper-dvd-orig"
+roto_root="rotopro"
 
 [boaa]
 name="Belly of an Architect"

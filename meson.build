@@ -163,26 +163,43 @@ gst_app_dep   = dependency ('gstreamer-app-1.0')
 gst_video_dep = dependency ('gstreamer-video-1.0')
 
 lib_sources = ['src/application.cpp',
+               'src/Bolex.cpp',
                'src/DecodePipeline.cpp',
                'src/FlatRenderable.cpp',
                'src/FrameTime.cpp',
+               'src/GeomFumble.cpp',
                'src/GraphicsApplication.cpp',
+               'src/Grappler.cpp',
+               'src/GrapplerPile.cpp',
+               'src/interp-funcs.cpp',
+               'src/IronLung.cpp',
                'src/Layer.cpp',
+               'src/Matrix44.cpp',
                'src/Matte.cpp',
                'src/MatteLoader.cpp',
                'src/MattedVideoRenderable.cpp',
-               'src/ZeEventMoltoSprinkler.cpp',
+               'src/MotherTime.cpp',
                'src/Node.cpp',
                'src/PipelineTerminus.cpp',
+               'src/PlatonicMaes.cpp',
+               'src/RawEventParsing.cpp',
                'src/Renderable.cpp',
+               'src/RoGrappler.cpp',
+               'src/ProtoZoftThingGuts.cpp',
+               'src/ScGrappler.cpp',
+               'src/SpaceThing.cpp',
+               'src/TrGrappler.cpp',
                'src/Vect.cpp',
                'src/VideoSystem.cpp',
                'src/VideoRenderable.cpp',
                'src/Zeubject.cpp',
                'src/ZeEvent.cpp',
+               'src/ZeEventMoltoSprinkler.cpp',
                'src/ZESpatialEvent.cpp',
                'src/ZEYowlEvent.cpp',
-               'src/bgfx_utils.cpp']
+               'src/ZoftThing.cpp',
+               'src/bgfx_utils.cpp',
+               'src/conjure-from-toml.cpp']
 
 
 charm_inc = include_directories ('src')
@@ -245,3 +262,8 @@ dead_zone_exec = executable ('dead_zone',
 config_parser_exec = executable ('config_parser',
                                  sources : ['src/config_parser.cpp'],
                                  dependencies : [charm_dep])
+
+chud_zone_exec = executable ('chud-zone',
+                             sources : ['src/chud-zone.cpp',
+                                        'src/RectangleRenderable.cpp'],
+                             dependencies : [charm_dep])

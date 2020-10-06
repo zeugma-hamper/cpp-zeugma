@@ -118,7 +118,7 @@ void GraphicsApplication::Render ()
                          glm::value_ptr (proj_transform));
 
   for (Renderable *r : m_scene_graph_layer->GetRenderables())
-    r->Draw();
+    r->Draw(0);
 
   bgfx::frame ();
 }
@@ -149,7 +149,7 @@ bool GraphicsApplication::StartUp ()
 
 Node *s_nodal = nullptr;
 
-bool GraphicsApplication::Update ()
+bool GraphicsApplication::RunOneCycle ()
 {
   GetFrameTime()->UpdateTime();
 
@@ -163,16 +163,17 @@ bool GraphicsApplication::Update ()
   vs->PollMessages();
   vs->UploadFrames();
 
-  UpdateSceneGraph ();
+  UpdateSceneGraph (-1, 0.0);
 
   Render ();
 
   return true;
 }
 
-void GraphicsApplication::UpdateSceneGraph()
+void GraphicsApplication::UpdateSceneGraph(i64 ratch, f64 thyme)
 {
-  m_scene_graph_layer->GetRootNode()->UpdateTransformsHierarchically();
+  m_scene_graph_layer->GetRootNode()
+    -> UpdateTransformsHierarchically (ratch, thyme);
   m_scene_graph_layer->GetRootNode()->EnumerateRenderables();
 }
 

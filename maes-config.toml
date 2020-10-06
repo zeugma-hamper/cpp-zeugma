@@ -1,0 +1,16 @@
+
+[[maeses]]
+name = "left"
+location = [-3886.2, 1502.0, 0.0]
+over = [0.0, 0.0, -1.0]
+up = [0.0, 1.0, 0.0]
+width = 5340.0
+height = 3004.0
+
+[[maeses]]
+name = "front"
+location = [0.0, 2186.0, -2670.0]
+over = [1.0, 0.0, 0.0]
+up = [0.0, 1.0, 0.0]
+width = 7772.4
+height = 4372.0

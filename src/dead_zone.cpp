@@ -39,16 +39,16 @@ class dead_zone final : public charm::Application
   dead_zone ();
   ~dead_zone () override final;
 
-  bool StartUp ()  override final;
-  bool Update ()   override final;
-  bool ShutDown () override final;
+  bool StartUp     () override final;
+  bool RunOneCycle () override final;
+  bool ShutDown    () override final;
 
   bool InitWindowingAndGraphics ();
   void ShutDownGraphics ();
   void ShutDownSceneGraph ();
   void Render ();
 
-  void UpdateSceneGraph ();
+  void UpdateSceneGraph (i64 ratch, f64 thyme);
 
   static FrameTime *GetFrameTime ();
 
@@ -173,7 +173,7 @@ void dead_zone::Render ()
                          glm::value_ptr (proj_transform));
 
   for (Renderable *r : m_scene_graph_layer->GetRenderables())
-    r->Draw();
+    r->Draw(0);
 
   bgfx::frame ();
 }
@@ -201,7 +201,7 @@ bool dead_zone::StartUp ()
 
 Node *s_nodal = nullptr;
 
-bool dead_zone::Update ()
+bool dead_zone::RunOneCycle ()
 {
   GetFrameTime()->UpdateTime();
 
@@ -211,7 +211,7 @@ bool dead_zone::Update ()
   video_system->PollMessages();
   video_system->UploadFrames();
 
-  UpdateSceneGraph ();
+  UpdateSceneGraph (-1, 0.0);
 
   {
     //BlockTimer ("render");
@@ -221,9 +221,10 @@ bool dead_zone::Update ()
   return true;
 }
 
-void dead_zone::UpdateSceneGraph()
+void dead_zone::UpdateSceneGraph(i64 ratch, f64 thyme)
 {
-  m_scene_graph_layer->GetRootNode()->UpdateTransformsHierarchically();
+  m_scene_graph_layer->GetRootNode()
+    -> UpdateTransformsHierarchically (ratch, thyme);
   m_scene_graph_layer->GetRootNode()->EnumerateRenderables();
 }
 
