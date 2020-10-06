@@ -211,7 +211,8 @@ static void upload_frame (gst_ptr<GstSample> const &_sample,
   bgfx::TextureHandle &text_handle
     = _is_matte ? _textures->GetNthTexture(3) : _textures->GetNthTexture(0);
 
-  update_or_create_texture(text_handle, width, height, components, stride,                                              BGFX_SAMPLER_UVW_CLAMP | BGFX_SAMPLER_POINT, mem);
+  update_or_create_texture(text_handle, width, height, components, stride,
+                           BGFX_SAMPLER_UVW_CLAMP | BGFX_SAMPLER_POINT, mem);
 }
 
 void VideoSystem::UploadFrames ()
@@ -244,31 +245,26 @@ void VideoSystem::UploadFrames ()
       guint64 offset_ns = pts - pipe.pipeline->m_loop_status.loop_start;
       guint64 frame_num = guint64 (offset_ns * GST_VIDEO_INFO_FPS_N(&video_info)
                                    / GST_VIDEO_INFO_FPS_D(&video_info) / f64(1e9));
-      // printf ("pts: %f, now: %f\n", pts/f64(1e9), offset_ns/f64(1e9));
+      printf ("pts: %f, now: %f\n", pts/f64(1e9), offset_ns/f64(1e9));
 
       //assert (frame_num < pipe.matte_file_paths.size ());
-      gst_ptr<GstSample> matte = pipe.matte_terminus->FetchClearSample();
-      if (! matte)
+      MatteFrame mf = pipe.matte_loader->GetFrame(frame_num);
+      if (! mf.data)
         {
           fprintf (stderr, "no matte which seems fishy\n");
           return;
         }
-      // else
-      //   fprintf (stderr, "matte!\n");
+      else
+        {
+          fprintf (stderr, "got matte %u\n", mf.offset);
+        }
 
-      GstBuffer *matte_buffer = gst_sample_get_buffer (matte.get ());
-      guint64 offset = GST_BUFFER_OFFSET (matte_buffer);
-      // if (pipe.matte_frame_count > 0 &&
-      //     frame_num != offset % pipe.matte_frame_count)
-      //   fprintf (stderr, "frame num (%lu) and offset (%ld) don't match\n",
-      //            frame_num, offset % pipe.matte_frame_count);
+      bgfx::Memory const *memory = bgfx::makeRef(mf.data, mf.data_size, MatteLoader::MatteDataReleaseFn);
+      bgfx::TextureHandle &matte_texture = texture->GetNthTexture(3);
+      if (! bgfx::isValid(matte_texture))
+        matte_texture = bgfx::createTexture2D(mf.width, mf.height, false, 1, mf.format);
 
-      // fprintf (stderr, "offset is %lu\n", offset);
-      GstEvent *event = gst_event_new_step (GST_FORMAT_BUFFERS, 1, 1.0, TRUE, FALSE);
-      //bool ret = gst_element_send_event(terminus->m_video_sink, event);
-      gst_element_send_event(pipe.matte_pipeline->m_pipeline, event);
-
-      upload_frame (matte, texture, nullptr, true);
+      bgfx::updateTexture2D(matte_texture, 0, 0, 0, 0, mf.width, mf.height, memory);
     }
 
 }
@@ -303,10 +299,10 @@ VideoBrace VideoSystem::OpenVideo (std::string_view _uri)
 ch_ptr<DecodePipeline>
 VideoSystem::FindDecodePipeline (ch_ptr<VideoTexture> const &_texture)
 {
-  for (auto cur : m_pipelines)
+  for (VideoPipeline &pipe : m_pipelines)
     {
-      if (_texture == cur.texture)
-        return cur.pipeline;
+      if (_texture == pipe.texture)
+        return pipe.pipeline;
     }
 
   return {};
@@ -334,7 +330,7 @@ void VideoSystem::DestroyVideo (VideoTexture *_texture)
 
 VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
                                    f64 _loop_start_ts, f64 _loop_end_ts,
-                                   i32 _frame_count, std::string_view _matte_path_pattern)
+                                   i32 _frame_count, fs::path const &_matte_dir)
 {
   BasicPipelineTerminus *term = new BasicPipelineTerminus (false);
   ch_ptr<DecodePipeline> dec {new DecodePipeline};
@@ -346,10 +342,6 @@ VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
     txt{new VideoTexture (VideoFormat::RGB, m_vgr.matte_state, m_vgr.matte_program,
                           m_vgr.uniforms, array_size (m_vgr.uniforms))};
 
-  BasicPipelineTerminus *matt_term = new BasicPipelineTerminus (false);
-  ch_ptr<DecodePipeline> matt_dec {new DecodePipeline};
-  matt_dec->OpenMatteSequence(_matte_path_pattern, matt_term);
-
   m_pipelines.emplace_back();
   VideoPipeline &pipe = m_pipelines.back ();
   pipe.uri = _uri;
@@ -359,9 +351,9 @@ VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
   pipe.loop_start_ts = _loop_start_ts;
   pipe.loop_end_ts = _loop_end_ts;
   pipe.matte_frame_count = _frame_count;
-  pipe.matte_pipeline = matt_dec;
-  pipe.matte_terminus = matt_term;
-  pipe.matte_dir_path = _matte_path_pattern;
+  pipe.matte_loader = std::make_unique<MatteLoader> ();
+  pipe.matte_loader->StartLoading (_matte_dir);
+  pipe.matte_dir_path = _matte_dir;
 
   return {dec, txt};
 }

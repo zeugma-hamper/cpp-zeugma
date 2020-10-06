@@ -10,7 +10,10 @@
 #include <class_utils.hpp>
 #include <ch_ptr.hpp>
 
+#include <MatteLoader.hpp>
+
 #include <filesystem>
+#include <memory>
 #include <string_view>
 #include <string>
 #include <vector>
@@ -91,8 +94,7 @@ struct VideoPipeline
   f64 loop_end_ts = -1.0;
   fs::path matte_dir_path;
   i32 matte_frame_count;
-  ch_ptr<DecodePipeline> matte_pipeline;
-  BasicPipelineTerminus *matte_terminus = nullptr;
+  std::unique_ptr<MatteLoader> matte_loader;
 };
 
 struct VideoBrace
@@ -145,7 +147,7 @@ class VideoSystem
   // see MattePathPattern in Matte.hpp
   VideoBrace OpenMatte (std::string_view _uri,
                         f64 _loop_start_ts, f64 _loop_end_ts,
-                        i32 _frame_count, std::string_view _matte_pattern);
+                        i32 _frame_count, fs::path const &_matte_dir);
 
  protected:
   VideoSystem ();

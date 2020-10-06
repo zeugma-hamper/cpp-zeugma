@@ -24,11 +24,10 @@ MattedVideoRenderable::MattedVideoRenderable (FilmInfo const &_film, ClipInfo &_
   : Renderable ()
 {
 
-  std::string pattern = MattePathPattern(_film, _clip);
   VideoBrace brace = VideoSystem::GetSystem ()
     ->OpenMatte (std::string ("file://") + _film.film_path.string(),
                  _clip.start_time, _clip.start_time + _clip.duration,
-                 _clip.frame_count, pattern);
+                 _clip.frame_count, _clip.directory);
   m_video_texture = brace.video_texture;
 }
 
