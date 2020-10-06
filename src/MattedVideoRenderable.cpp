@@ -12,22 +12,24 @@ namespace charm
 namespace fs = std::filesystem;
 MattedVideoRenderable::MattedVideoRenderable (std::string_view _uri,
                                               f64 _loop_start_ts, f64 _loop_end_ts,
-                                              std::filesystem::path const &_matte_dir)
+                                              std::string_view _matte_pattern)
   : Renderable ()
 {
   VideoBrace brace = VideoSystem::GetSystem ()
-    ->OpenMatte (_uri, _loop_start_ts, _loop_end_ts, _matte_dir);
+    ->OpenMatte (_uri, _loop_start_ts, _loop_end_ts, -1, _matte_pattern);
   m_video_texture = brace.video_texture;
 }
 
 MattedVideoRenderable::MattedVideoRenderable (FilmInfo const &_film, ClipInfo &_clip)
   : Renderable ()
 {
+
+  std::string pattern = MattePathPattern(_film, _clip);
   VideoBrace brace = VideoSystem::GetSystem ()
     ->OpenMatte (std::string ("file://") + _film.film_path.string(),
                  _clip.start_time, _clip.start_time + _clip.duration,
-                 _clip.directory);
-
+                 _clip.frame_count, pattern);
+  m_video_texture = brace.video_texture;
 }
 
 MattedVideoRenderable::~MattedVideoRenderable ()

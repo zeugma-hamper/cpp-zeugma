@@ -160,4 +160,10 @@ ReadFilmInfo (std::filesystem::path const &_path)
   return data;
 }
 
+std::string
+MattePathPattern (FilmInfo const _film, ClipInfo const &_clip)
+{
+  return _clip.directory.string () + "/" + _film.abbreviation + "_" + _clip.name + "_" + "%03d.tif";
+}
+
 }

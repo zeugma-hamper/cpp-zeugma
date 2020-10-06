@@ -12,6 +12,8 @@
 #include <MattedVideoRenderable.hpp>
 #include <VideoSystem.hpp>
 
+#include <BlockTimer.hpp>
+
 #include <bgfx_utils.hpp>
 
 #define GLFW_EXPOSE_NATIVE_X11
@@ -211,7 +213,10 @@ bool dead_zone::RunOneCycle ()
 
   UpdateSceneGraph (-1, 0.0);
 
-  Render ();
+  {
+    //BlockTimer ("render");
+    Render ();
+  }
 
   return true;
 }
@@ -274,22 +279,10 @@ int main (int, char **)
   // std::string file
   //   = "file:///home/blake/tlp/tamper-blu-mkv/the-fall-blu.mov";
 
-  charm::index<FilmInfo>::get ();
-  charm::index<std::string>::get ();
-
-  fprintf (stderr, "dz's idea of renderable is %u\n", charm::index<Renderable>::get ());
-
-  charm::index<Layer>::get ();
-
   std::string uri = std::string ("file://") + film_info.film_path.c_str ();
   MattedVideoRenderable *renderable
-    = new MattedVideoRenderable (uri,
-                                 clip_info.start_time,
-                                 clip_info.start_time + clip_info.duration,
-                                 clip_info.directory);
+    = new MattedVideoRenderable (film_info, clip_info);
 
-  // VideoRenderable *renderable
-  //   = new VideoRenderable (uri);
 
   s_nodal->AppendRenderable(renderable);
   layer.GetRootNode()->AppendChild(s_nodal);

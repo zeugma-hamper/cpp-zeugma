@@ -69,12 +69,12 @@ void DecodePipeline::PollMessages ()
     }
 }
 
-bool DecodePipeline::Open (std::string_view uri, PipelineTerminus *term)
+bool DecodePipeline::OpenVideoFile (std::string_view _uri, PipelineTerminus *_term)
 {
-  if (uri.empty() || ! term)
+  if (_uri.empty() || ! _term)
     return false;
 
-  m_terminus = std::unique_ptr<PipelineTerminus> {term};
+  m_terminus = std::unique_ptr<PipelineTerminus> {_term};
   gst_init (NULL, NULL);
 
   m_pipeline = gst_pipeline_new ("decode-pipeline");
@@ -90,7 +90,7 @@ bool DecodePipeline::Open (std::string_view uri, PipelineTerminus *term)
   gst_bin_add (GST_BIN (m_pipeline), m_uridecodebin);
   gst_element_sync_state_with_parent(m_uridecodebin);
 
-  g_object_set (m_uridecodebin, "uri", uri.data (), NULL);
+  g_object_set (m_uridecodebin, "uri", _uri.data (), NULL);
 
   g_signal_connect (m_uridecodebin, "pad-added",
                     G_CALLBACK (db_pad_added_handler), this);
@@ -98,6 +98,50 @@ bool DecodePipeline::Open (std::string_view uri, PipelineTerminus *term)
                     G_CALLBACK (db_autoplug_continue_handler), this);
 
   bool ret = m_terminus->OnStart (this);
+  SetState(GST_STATE_PAUSED);
+  return ret;
+}
+
+bool DecodePipeline::OpenMatteSequence (std::string_view _pattern, PipelineTerminus *_term)
+{
+  if (_pattern.empty() || ! _term)
+    return false;
+
+  m_terminus = std::unique_ptr<PipelineTerminus> {_term};
+  gst_init (NULL, NULL);
+
+  m_pipeline = gst_pipeline_new("matte-pipeline");
+
+  GstElement *src = gst_element_factory_make("multifilesrc", "mf-src");
+  GstCaps *caps = gst_caps_from_string("image/tiff,framerate=(fraction)24/1");
+  g_object_set (G_OBJECT (src), "caps", caps, "index", 0,
+                "location", _pattern.data(),
+                "loop", TRUE, NULL);
+
+  //TODO: misleading naming
+  m_uridecodebin = gst_element_factory_make ("avdec_tiff", "dec-tiff");
+  gst_bin_add_many(GST_BIN (m_pipeline), src, m_uridecodebin, NULL);
+  gst_element_sync_state_with_parent(src);
+  gst_element_sync_state_with_parent(m_uridecodebin);
+
+  gst_element_link(src, m_uridecodebin);
+  GstElement *rate = gst_element_factory_make("videorate", "rater");
+  gst_bin_add (GST_BIN (m_pipeline), rate);
+  gst_element_sync_state_with_parent(rate);
+  gst_element_link(m_uridecodebin, rate);
+
+
+  GstPad *src_pad = gst_element_get_static_pad(rate, "src");
+  GstCaps *template_caps = gst_pad_get_pad_template_caps(src_pad);
+  bool ret = m_terminus->OnStart (this);
+  m_terminus->NewDecodedPad(this, m_uridecodebin, src_pad, template_caps);
+
+  // g_signal_connect (m_uridecodebin, "pad-added",
+  //                   G_CALLBACK (db_pad_added_handler), this);
+  // g_signal_connect (m_uridecodebin, "autoplug-continue",
+  //                   G_CALLBACK (db_autoplug_continue_handler), this);
+
+
   SetState(GST_STATE_PAUSED);
   return ret;
 }
@@ -119,6 +163,7 @@ void DecodePipeline::Seek (double _ts)
                     GST_SEEK_TYPE_SET, (gint64)(_ts * seconds_to_ns),
                     GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
 }
+
 
 void DecodePipeline::Pause ()
 {
@@ -292,7 +337,7 @@ void DecodePipeline::HandleAsyncDone (GstMessage *)
 /* This function will be called by the pad-added signal */
 static void db_pad_added_handler (GstElement *src, GstPad *new_pad, DecodePipeline *data)
 {
-  data->m_terminus->NewDecodedPad (data, src, new_pad);
+  data->m_terminus->NewDecodedPad (data, src, new_pad, nullptr);
 }
 
 static gboolean db_autoplug_continue_handler (GstElement *, GstPad *,

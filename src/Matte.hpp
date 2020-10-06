@@ -58,6 +58,9 @@ struct FilmInfo
 std::vector<FilmInfo>
 ReadFilmInfo (std::filesystem::path const &_path);
 
+std::string
+MattePathPattern (FilmInfo const _film, ClipInfo const &_clip);
+
 }
 
 #endif //MATTE_Y_MATT
