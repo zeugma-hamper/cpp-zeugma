@@ -236,28 +236,43 @@ void VideoSystem::UploadFrames ()
       GstBuffer *buffer = gst_sample_get_buffer (sample.get ());
       guint64 pts = GST_BUFFER_PTS(buffer);
 
+      auto calc_dur = [&video_info] (gint64 n_frames) -> gint64
+      { return n_frames * GST_VIDEO_INFO_FPS_D(&video_info) * 1e9 / GST_VIDEO_INFO_FPS_N(&video_info); };
+
+      gint64 const frame_dur = calc_dur (1);
+      if (pipe.adjusted_loop_start_ts == -1 &&
+          pipe.pipeline->m_loop_status.loop_start <= i64 (pts) &&
+          i64 (pts) <= pipe.pipeline->m_loop_status.loop_start + frame_dur)
+        {
+          pipe.adjusted_loop_start_ts = i64 (pts);
+          pipe.adjusted_loop_end_ts
+            = pipe.adjusted_loop_start_ts + calc_dur (pipe.matte_frame_count);
+        }
+
+      // fprintf (stderr, "loop from %ld to %ld\n", pipe.adjusted_loop_start_ts, pipe.adjusted_loop_end_ts);
+
       //TODO: set matte texture to pass through
-      if (gint64(pts) < pipe.pipeline->m_loop_status.loop_start ||
-          gint64(pts) > pipe.pipeline->m_loop_status.loop_end)
-        return;
+      if (gint64(pts) < pipe.adjusted_loop_start_ts ||
+          gint64(pts) > pipe.adjusted_loop_end_ts + (frame_dur / 2))
+        continue;
 
       //i expect looping here for now
-      guint64 offset_ns = pts - pipe.pipeline->m_loop_status.loop_start;
+      guint64 offset_ns = pts - pipe.adjusted_loop_start_ts;
       guint64 frame_num = guint64 (offset_ns * GST_VIDEO_INFO_FPS_N(&video_info)
                                    / GST_VIDEO_INFO_FPS_D(&video_info) / f64(1e9));
-      printf ("pts: %f, now: %f\n", pts/f64(1e9), offset_ns/f64(1e9));
+      //printf ("pts: %f, now: %f\n", pts/f64(1e9), offset_ns/f64(1e9));
 
       //assert (frame_num < pipe.matte_file_paths.size ());
       MatteFrame mf = pipe.matte_loader->GetFrame(frame_num);
       if (! mf.data)
         {
-          fprintf (stderr, "no matte which seems fishy\n");
-          return;
+          fprintf (stderr, "no matte for %lu which seems fishy\n", frame_num);
+          continue;
         }
-      else
-        {
-          fprintf (stderr, "got matte %u\n", mf.offset);
-        }
+      // else
+      //   {
+      //     fprintf (stderr, "got matte %u\n", mf.offset);
+      //   }
 
       bgfx::Memory const *memory = bgfx::makeRef(mf.data, mf.data_size, MatteLoader::MatteDataReleaseFn);
       bgfx::TextureHandle &matte_texture = texture->GetNthTexture(3);
@@ -348,8 +363,8 @@ VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
   pipe.pipeline = dec;
   pipe.terminus = term;
   pipe.texture = txt;
-  pipe.loop_start_ts = _loop_start_ts;
-  pipe.loop_end_ts = _loop_end_ts;
+  pipe.adjusted_loop_start_ts = -1;
+  pipe.adjusted_loop_end_ts = -1;
   pipe.matte_frame_count = _frame_count;
   pipe.matte_loader = std::make_unique<MatteLoader> ();
   pipe.matte_loader->StartLoading (_matte_dir);

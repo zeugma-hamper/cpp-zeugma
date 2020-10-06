@@ -90,8 +90,8 @@ struct VideoPipeline
   BasicPipelineTerminus *terminus = nullptr;
   ch_weak_ptr<VideoTexture> texture;
   //for mattes
-  f64 loop_start_ts = -1.0;
-  f64 loop_end_ts = -1.0;
+  i64 adjusted_loop_start_ts = -1;
+  i64 adjusted_loop_end_ts = -1;
   fs::path matte_dir_path;
   i32 matte_frame_count;
   std::unique_ptr<MatteLoader> matte_loader;

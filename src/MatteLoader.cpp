@@ -14,7 +14,8 @@ namespace fs = std::filesystem;
 MatteLoader::MatteLoader ()
   : m_matte_dir {},
     m_keep_running {false},
-    m_dir_frame_count {0}
+    m_dir_frame_count {0},
+    m_requested_offset {0}
 {
 }
 
@@ -152,7 +153,7 @@ void MatteLoader::LoadFrames (MatteLoader *_loader)
       MatteFrame frame {next, formats[ispec.nchannels], u32(ispec.width), u32(ispec.height), size, data};
       lock.lock ();
       _loader->m_frames.push_back (frame);
-      fprintf (stderr, "loaded %u\n", next);
+      //fprintf (stderr, "loaded %u\n", next);
     }
 }
 
