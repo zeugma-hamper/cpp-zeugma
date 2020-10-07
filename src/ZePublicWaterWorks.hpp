@@ -4,7 +4,7 @@
 namespace charm
 {
 
-class MoltoSprinkler;
+class MultiSprinkler;
 
 // Basically, an ZeEvent publisher
 class ZePublicWaterWorks
@@ -13,7 +13,7 @@ class ZePublicWaterWorks
 
   virtual ~ZePublicWaterWorks () { }
 
-  virtual void Drain (MoltoSprinkler *) {}
+  virtual void Drain (MultiSprinkler *) {}
 };
 
 }

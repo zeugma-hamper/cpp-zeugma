@@ -16,8 +16,10 @@
 
 #include <boost/signals2/signal.hpp>
 
+
 namespace charm
 {
+
 
 class ZeEvent  :  public Zeubject
 { public:
@@ -50,11 +52,11 @@ class ZeEvent  :  public Zeubject
   ZeEvent *ForebearEvent ()  const;
   void     SetForebearEvent (ZeEvent *fe);
 
-  virtual const std::string &EventIlk ();
-  virtual const std::string &EventSuperIlk ();
+  virtual const std::string &EventIlk ()  const;
+  virtual const std::string &EventSuperIlk ()  const;
 
-  virtual u32 EventTypeIndex () const;
-  virtual u32 EventSuperTypeIndex () const;
+  virtual u32 EventTypeIndex ()  const;
+  virtual u32 EventSuperTypeIndex ()  const;
 
   class ProtoSprinkler  :  public Zeubject
     { public:
@@ -116,18 +118,18 @@ class EventSprinklerGroup  :  public Zeubject
           return -1;                                                    \
         }                                                               \
     };                                                                  \
-  const std::string &EventIlk ()  override                              \
+  const std::string &EventIlk ()  const override                        \
     { static std::string ev_ilk (#EV_ILK);                              \
       return ev_ilk;                                                    \
     }                                                                   \
-  const std::string &EventSuperIlk ()  override                         \
+  const std::string &EventSuperIlk ()  const override                   \
     { static std::string ev_silk (#EV_SUPERILK);                        \
       return ev_silk;                                                   \
     }                                                                   \
   u32 EventTypeIndex () const override                                  \
-    { return index<EV_ILK ## Event>::get (); }                            \
+    { return index<EV_ILK ## Event>::get (); }                          \
   u32 EventSuperTypeIndex () const override                             \
-    { return index<EV_SUPERILK ## Event>::get ();  }                      \
+    { return index<EV_SUPERILK ## Event>::get ();}                      \
   i64 ProfferAsSnackTo (OmNihil *om)  override                          \
     { if (EV_ILK##Phage *ph = dynamic_cast <EV_ILK##Phage *> (om))      \
         { i64 sult = ph -> EV_ILK (this);                               \

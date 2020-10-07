@@ -27,6 +27,11 @@
 
 #include "vector_interop.hpp"
 
+#include "ZESpatialEvent.h"
+#include "RawEventParsing.h"
+
+#include <lo/lo_cpp.h>
+
 #include <bgfx_utils.hpp>
 
 #define GLFW_EXPOSE_NATIVE_X11
@@ -37,6 +42,8 @@
 #include <charm_glm.hpp>
 
 #include <string_view>
+
+#include <unordered_set>
 
 #include <stdio.h>
 
@@ -88,7 +95,113 @@ Bolex *CameraFromMaes (const PlatonicMaes &m)
 }
 
 
-class dead_zone final : public charm::Application
+
+class WandCatcher  :  public Zeubject, public ZESpatialPhagy
+{ public:
+  Vect just_now, accum;
+  Vect vee[3];
+  int phase, count;
+  std::unordered_set <std::string> trig_partic;
+  bool calibrating;
+  bool slurping;
+  f64 above_the_floor_ness, lateral_stretchy_metron;
+  Matrix44 geo_truth;
+
+  WandCatcher ()  :  Zeubject ()
+    { Reset (); }
+
+  void Reset ()
+    { above_the_floor_ness = 653.0;
+      lateral_stretchy_metron = 4000.0;
+      phase = -1;
+      calibrating = slurping = false;
+      accum . Zero ();
+      vee[0] . Zero ();  vee[1] . Zero ();  vee[2] . Zero ();
+    }
+
+  void SummonTheDemiurgeCalculon (Matrix44 &outmat)
+    { Vect e0 = vee[1] - vee[0];
+      f64 d = e0 . NormSelfReturningMag ();
+      Vect e1 = e0 . Cross (vee[2] - vee[0]) . Norm ();
+      Vect e2 = e0 . Cross (e1);
+
+      Matrix44 ma (INITLESS);
+      ma . LoadTranslation (-e0);
+      Matrix44 mb;
+      mb.m[0][0] = e0.x;  mb.m[0][1] = e1.x;  mb.m[0][2] = e2.x;
+      mb.m[1][0] = e0.y;  mb.m[1][1] = e1.y;  mb.m[1][2] = e2.y;
+      mb.m[2][0] = e0.z;  mb.m[2][1] = e1.z;  mb.m[2][2] = e2.z;
+      Matrix44 mc (INITLESS);
+      mc . LoadScale (lateral_stretchy_metron / d);
+      Matrix44 md (INITLESS);
+      md . LoadTranslation (-0.5 * d, above_the_floor_ness, 0.0);
+
+      outmat = ma * mb * mc * md;
+    }
+
+  i64 ZESpatialMove (ZESpatialMoveEvent *e)  override
+    { if (! calibrating  ||  trig_partic . size () > 0)
+        return 0;
+      if (e -> Provenance ()  !=  "wand-0")
+        return 0;
+      just_now = e -> Loc ();
+      if (! slurping)
+        { just_now . SpewToStderr ();  fprintf (stderr, "\n");
+          return 0;
+        }
+      accum += just_now;
+      ++count;
+      fprintf (stderr, "ACCUM [phase %d, count %d]: ", phase, count);
+      just_now . SpewToStderr ();
+      return 0;
+    }
+  i64 ZESpatialHarden (ZESpatialHardenEvent *e)  override
+    { if (! calibrating)
+        { if (e -> WhichPressor ()  !=  8)
+            return 0;
+          trig_partic . insert (e -> Provenance ());
+          if (trig_partic . size ()  >  1)
+            calibrating = true;
+          return 0;
+        }
+      if (e -> Provenance ()  ==  "wand-0")
+        return 0;
+      slurping = true;
+      accum = just_now;
+      count = 1;  // accum already has the most recent, see? already ahead!
+      ++phase;
+      fprintf (stderr, "\n\n\n--- COLLECTION PHASE %d%d%d ---\n", phase,
+               phase, phase);
+      return 0;
+    }
+  i64 ZESpatialSoften (ZESpatialSoftenEvent *e)  override
+    { if (trig_partic . size ()  >  0)
+        { if (e -> WhichPressor ()  ==  8)
+            { auto it = trig_partic . find (e -> Provenance ());
+              if (it  !=  trig_partic . end ())
+                trig_partic . erase (it);
+            }
+          return 0;
+        }
+      if (! calibrating)  // cain't hardly git here nohow...
+        return 0;
+      if (e -> Provenance ()  ==  "wand-0")
+        return 0;
+      vee[phase] = accum / (f64)count;
+      slurping = false;
+      if (phase < 2)
+        return 0;
+      SummonTheDemiurgeCalculon (geo_truth);
+      phase = -1;
+      calibrating = false;
+      return 0;
+    }
+};
+
+
+
+class dead_zone final : public charm::Application,
+                        public ZESpatialPhagy, public Zeubject
 {
  public:
   dead_zone ();
@@ -116,6 +229,8 @@ class dead_zone final : public charm::Application
   PlatonicMaes *NthMaes (i32 ind);
   PlatonicMaes *FindMaesByName (const std::string &nm);
 
+  i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
+
  protected:
 
 //  Bolex *cam;
@@ -126,8 +241,33 @@ class dead_zone final : public charm::Application
 
  public:
   std::vector <Whippletree *> render_leaves;
+  lo::Server *osc_srv;
+  WandCatcher wandy;
+
+  static RawOSCWandParser rowp;
 };
 
+
+RawOSCWandParser dead_zone::rowp;
+
+
+int eruct_handler (const char *pth, const char *typ, lo_arg **av, int ac,
+                   lo_message msg, void *udata)
+{ fprintf (stderr, "some other message: PTH=[%s]-TYP=[%s]-RGS[%d]\n",
+           pth, typ, ac);
+  return 1;
+}
+
+int osc_wandler (const char *pth, const char *typ, lo_arg **av, int ac,
+                 lo_message msg, void *udata)
+{ dead_zone::rowp . Parse (pth, lo::Message (msg), (OmNihil *)udata);
+  if (dynamic_cast <ZESpatialMoveEvent::ZESpatialMovePhage *>
+      ((OmNihil *)udata))
+    { int schlibble = 0;
+      schlibble++;
+    }
+  return 0;
+}
 
 
 #define ERROR_RETURN_VAL(MSG, VAL)                 \
@@ -152,12 +292,11 @@ static void glfw_error_callback (int, const char *_msg)
 
 //void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 static void glfw_key_callback(GLFWwindow *window, int key, int, int action, int)
-{
-  if ((key == GLFW_KEY_Q || key == GLFW_KEY_ESCAPE)
-      && action == GLFW_RELEASE)
-    {
-      glfwSetWindowShouldClose (window, GLFW_TRUE);
-      Application::StopRunning();
+{ if ((key == GLFW_KEY_Q  ||  key == GLFW_KEY_ESCAPE)
+      &&  action == GLFW_RELEASE)
+    { glfwSetWindowShouldClose (window, GLFW_TRUE);
+      Application::StopRunning ();
+      return;
     }
 }
 
@@ -239,13 +378,12 @@ void dead_zone::ShutDownGraphics ()
 }
 
 void dead_zone::Render ()
-{
-  for (Renderable *r : m_scene_graph_layer->GetRenderables())
-    r->Update ();
+{ for (Renderable *r : m_scene_graph_layer->GetRenderables())
+    r -> Update ();
 
   for (Whippletree *leaf  :  render_leaves)
-    { u16 vu_id = leaf->b_view -> ViewID ();
-      bgfx::touch (vu_id);
+    { u16 vuid = leaf->b_view -> ViewID ();
+      bgfx::touch (vuid);
 
       Bolex *c = leaf->cam;
       glm::mat4 view_transform = glm::lookAt (as_glm (c -> ViewLoc ()),
@@ -258,11 +396,11 @@ void dead_zone::Render ()
                             (float) c -> NearClipDist (),
                             (float) c -> FarClipDist ());
 
-      bgfx::setViewTransform (vu_id, glm::value_ptr (view_transform),
+      bgfx::setViewTransform (vuid, glm::value_ptr (view_transform),
                               glm::value_ptr (proj_transform));
 
       for (Renderable *r  :  m_scene_graph_layer->GetRenderables())
-        r -> Draw (vu_id);
+        r -> Draw (vuid);
     }
   bgfx::frame ();
 }
@@ -271,11 +409,24 @@ FrameTime *s_dead_zone_frame_time{nullptr};
 
 dead_zone::dead_zone ()
   : window {nullptr},
-    m_scene_graph_layer {new Layer}
-{ }
+    m_scene_graph_layer {new Layer},
+    osc_srv (NULL)
+{ lo_server los = lo_server_new ("54345", NULL);
+  if (! los)
+    fprintf (stderr, "Could not conjure an OSC server -- prob'ly the port.\n");
+  else
+    { osc_srv = new lo::Server (los);
+      //  osc_srv -> add_method ("/events/spatial", NULL, wandler, snarbs);
+      osc_srv -> add_method ("/events/spatial", NULL, osc_wandler, &wandy);
+      osc_srv -> add_method (NULL, NULL, eruct_handler, this);
+    }
+}
 
 dead_zone::~dead_zone ()
-{ }
+{ if (osc_srv)
+    delete osc_srv;
+}
+
 
 bool dead_zone::StartUp ()
 {
@@ -292,13 +443,16 @@ Node *dr_no = nullptr;
 static i64 global_ratchet = 0;
 
 bool dead_zone::RunOneCycle ()
-{
+{ int gotted;
   GetFrameTime()->UpdateTime();
   f64 global_frame_thyme = GetFrameTime () -> GetCurrentTime ();
 
   global_ratchet += 8;
 
   glfwPollEvents();
+  if (osc_srv)
+    while ((gotted = osc_srv -> recv (0))  >  0)
+      { }  // that is to say: as long as they're there, keep 'em moving!
 
   if (ProtoZoftThingGuts::IsMassBreathing ())
     ProtoZoftThingGuts::MassBreather ()
@@ -393,6 +547,13 @@ PlatonicMaes *dead_zone::FindMaesByName (const std::string &nm)
       return leaf->maes;
   return NULL;
 }
+
+
+i64 dead_zone::ZESpatialMove (ZESpatialMoveEvent *e)
+{ fprintf (stderr, "phoooooooooooot...\n");
+  return 0;
+}
+
 
 int main (int, char **)
 {

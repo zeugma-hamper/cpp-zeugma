@@ -21,7 +21,7 @@ bool VectFromTOMLThingy (const toml::value &thingy, Vect &into_v)
     { fprintf (stderr, "VectFromTOMLThingy: doesn't have 0/1/2 indices.\n");
       return false;
     }
-  catch (toml::type_error)
+  catch (toml::type_error &)
     { fprintf (stderr, "gobbledygook into VectFromTOMLThingy: ");
       return false;
     }

@@ -177,7 +177,7 @@ void GraphicsApplication::UpdateSceneGraph(i64 ratch, f64 thyme)
   m_scene_graph_layer->GetRootNode()->EnumerateRenderables();
 }
 
-MoltoSprinkler &GraphicsApplication::GetSprinkler ()
+MultiSprinkler &GraphicsApplication::GetSprinkler ()
 {
   return m_event_sprinkler;
 }

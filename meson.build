@@ -16,6 +16,9 @@ boost_dep = dependency ('boost')
 ##### OpenImageIO
 oiio_dep = dependency ('OpenImageIO')
 
+#### liblo -- you know, for kids! and for OSC
+lo_dep = dependency ('liblo')
+
 ##### bx
 bx_include_dirs = ['bx/include', 'bx/3rdparty']
 bx_sources = ['bx/src/amalgamated.cpp']
@@ -178,6 +181,7 @@ lib_sources = ['src/application.cpp',
                'src/Matte.cpp',
                'src/MattedVideoRenderable.cpp',
                'src/MotherTime.cpp',
+               'src/MultiSprinkler.cpp',
                'src/Node.cpp',
                'src/PipelineTerminus.cpp',
                'src/PlatonicMaes.cpp',
@@ -193,7 +197,6 @@ lib_sources = ['src/application.cpp',
                'src/VideoRenderable.cpp',
                'src/Zeubject.cpp',
                'src/ZeEvent.cpp',
-               'src/ZeEventMoltoSprinkler.cpp',
                'src/ZESpatialEvent.cpp',
                'src/ZEYowlEvent.cpp',
                'src/ZoftThing.cpp',
@@ -206,7 +209,7 @@ toml_inc = include_directories ('toml11')
 
 charm_definition_deps = [bx_dep, bimg_dep, bgfx_dep, glfw_dep,
                          gst_dep, gst_app_dep, gst_video_dep,
-                         oiio_dep, boost_dep]
+                         oiio_dep, boost_dep, lo_dep]
 
 charm_lib = static_library ('charm', lib_sources,
                             include_directories : [charm_inc, toml_inc],

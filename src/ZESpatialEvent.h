@@ -124,6 +124,11 @@ class ZESpatialPressureEvent  :  public ZESpatialEvent
   ZESpatialPressureEvent (const ZESpatialEvent &spe, u64 prs_id, f64 prs_val)
      :  ZESpatialEvent (spe), which_pressor (prs_id), updated_value (prs_val)
     { }
+
+  u64 WhichPressor ()  const
+    { return which_pressor; }
+  f64 UpdatedValue ()  const
+    { return updated_value; }
 };
 
 

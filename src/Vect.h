@@ -75,7 +75,7 @@ class Vect  :  public v3f64
     { x *= s;  y *= s;  z *= s;  return *this; }
 
   Vect operator / (f64 s)  const
-    { return Vect (s/x, s/y, s/z); }
+    { return Vect (x/s, y/s, z/s); }
   Vect operator /= (f64 s)
     { x /= s;  y /= s;  z /= s;  return *this; }
 
@@ -99,6 +99,14 @@ class Vect  :  public v3f64
       if (s != 0.0)
         { x *= (s = 1.0 / s);  y *= s;  z *= s; }
       return *this;
+    }
+  f64 NormSelfReturningMag ()
+    { f64 s = Mag ();
+      if (s != 0.0)
+        { f64 oos = 1.0 / s;
+          x *= oos;  y *= oos;  z *= oos;
+        }
+      return s;
     }
 
   f64 AngleWith (const Vect &v)  const

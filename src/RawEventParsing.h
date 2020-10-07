@@ -5,8 +5,9 @@
 
 
 #include "Zeubject.h"
-
 #include "ZeEvent.h"
+
+#include "MultiSprinkler.hpp"
 
 #include <lo/lo_cpp.h>
 
@@ -17,12 +18,17 @@ namespace charm  {
 class RawEventParser  :  public Zeubject
 { public:
   EventSprinklerGroup *esg;
+  MultiSprinkler *mulspri;
   RawEventParser ()  :  Zeubject (), esg (NULL)
     { }
   EventSprinklerGroup *SprinklerGroup ()
     { return esg; }
-  RawEventParser &InstallSprinklerGroup (EventSprinklerGroup *sprigrou)
-    { esg = sprigrou;  return *this; }
+  void InstallSprinklerGroup (EventSprinklerGroup *sprigrou)
+    { esg = sprigrou; }
+  MultiSprinkler *SoleMultiSprinkler ()
+    { return mulspri; }
+  void InstallMultiSprinkler (MultiSprinkler *ms)
+    { mulspri = ms; }
 };
 
 

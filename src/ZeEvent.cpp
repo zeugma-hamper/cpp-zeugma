@@ -73,20 +73,20 @@ void ZeEvent::SetForebearEvent (ZeEvent *fe)
 { fore_evt = fe; }
 
 
-const std::string &EventIlk ()
+const std::string &ZeEvent::EventIlk ()  const
 { static std::string ev_ilk ("ZeEvent");
   return ev_ilk;
 }
 
-const std::string &EventSuperIlk ()
+const std::string &ZeEvent::EventSuperIlk ()  const
 { static std::string ev_silk ("");
   return ev_silk;
 }
 
-u32 ZeEvent::EventTypeIndex () const
+u32 ZeEvent::EventTypeIndex ()  const
 { return index<ZeEvent>::get (); }
 
-u32 ZeEvent::EventSuperTypeIndex () const
+u32 ZeEvent::EventSuperTypeIndex ()  const
 { return u32 (-1); }
 
 
