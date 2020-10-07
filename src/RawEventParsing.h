@@ -81,6 +81,9 @@ class RawOSCWandParser  :  public RawEventParser
   RawOSCWandParser ()  :  RawEventParser ()
     { calibrex . SetGeoTruthMats (theirs_to_ours_pm, theirs_to_ours_dm); }
 
+  bool SlurpCoordTransform ();
+  bool SpewCoordTransform ();
+
   void Parse (const std::string &path, const lo::Message &m,
               OmNihil *phage = NULL);
 };

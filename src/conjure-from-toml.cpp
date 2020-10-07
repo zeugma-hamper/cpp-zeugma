@@ -65,6 +65,28 @@ static const toml::value &LoadOrRecallTOMLByFilename (const std::string &fname)
 }
 
 
+bool PointAndDirecTransformMatsFromTOML (const std::string &toml_fpath,
+                                         Matrix44 &pmat, Matrix44 &dmat)
+{ try
+    { const toml::value &tom = LoadOrRecallTOMLByFilename (toml_fpath);
+      Matrix44 pee_matty (INITLESS);
+      Matrix44 dee_matty (INITLESS);
+      const toml::value emm_p = toml::find (tom, "point_mat");
+      if (! Matrix44FromTOMLThingy (emm_p, pee_matty))
+        return false;
+      const toml::value emm_d = toml::find (tom, "direc_mat");
+      if (! Matrix44FromTOMLThingy (emm_d, dee_matty))
+        return false;
+      pmat . Load (pee_matty);
+      dmat . Load (dee_matty);
+      return true;
+    }
+  catch (...)
+    { }
+  return false;
+}
+
+
 i32 NumMaesesFromTOML (const std::string &toml_fpath)
 { try
     { const toml::value &tom = LoadOrRecallTOMLByFilename (toml_fpath);

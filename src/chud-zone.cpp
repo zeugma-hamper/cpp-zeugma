@@ -545,7 +545,7 @@ PlatonicMaes *dead_zone::FindMaesByName (const std::string &nm)
 
 void dead_zone::FlatulateCursor (ZESpatialMoveEvent *e)
 { PlatonicMaes *close_m = NULL;
-  Vect hit;
+  Vect close_p, hit;
   f64 close_d;
 
   i32 cnt = NumMaeses ();
@@ -557,6 +557,7 @@ void dead_zone::FlatulateCursor (ZESpatialMoveEvent *e)
         { f64 d = hit . DistFrom (e -> Loc ());
           if (! close_m  ||  d < close_d)
             { close_m = emm;
+              close_p = hit;
               close_d = d;
             }
         }
@@ -568,7 +569,7 @@ void dead_zone::FlatulateCursor (ZESpatialMoveEvent *e)
       cursoresque -> RotateD (ZoftVect (Vect::zaxis), loopiness);
       cursoresque -> Scale (0.025 * close_m -> Height ());
       cursoresque -> RotateD (Vect::yaxis, 45.0);
-      cursoresque -> Translate (hit);
+      cursoresque -> Translate (close_p);
     }
 }
 
