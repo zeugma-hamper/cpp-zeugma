@@ -23,6 +23,8 @@
 
 #include "Bolex.h"
 
+#include "GeomFumble.h"
+
 #include "conjure-from-toml.h"
 
 #include "vector_interop.hpp"
@@ -95,105 +97,67 @@ Bolex *CameraFromMaes (const PlatonicMaes &m)
 }
 
 
+class dead_zone;
+
+
+// oy. also: oy.
+static Node *cursoresque = NULL;
+static ZoftVect cursoresque_pos;
+// how about some more oy?
+dead_zone *sole_dead_zone = NULL;
+static LoopFloat loopiness (0.0, 720.0, 0.5);
+// don't forget: oy.
+
 
 class WandCatcher  :  public Zeubject, public ZESpatialPhagy
 { public:
-  Vect just_now, accum;
-  Vect vee[3];
-  int phase, count;
   std::unordered_set <std::string> trig_partic;
   bool calibrating;
-  bool slurping;
-  f64 above_the_floor_ness, lateral_stretchy_metron;
-  Matrix44 geo_truth;
+  ZESpatialPhagy *cally;
 
-  WandCatcher ()  :  Zeubject ()
-    { Reset (); }
+  WandCatcher ()  :  Zeubject (), calibrating (false), cally (NULL)
+    { }
 
-  void Reset ()
-    { above_the_floor_ness = 653.0;
-      lateral_stretchy_metron = 4000.0;
-      phase = -1;
-      calibrating = slurping = false;
-      accum . Zero ();
-      vee[0] . Zero ();  vee[1] . Zero ();  vee[2] . Zero ();
-    }
+  ZESpatialPhagy *Calibrista ()  const
+    { return cally; }
+  void SetCalibrista (ZESpatialPhagy *cal)
+    { cally = cal; }
 
-  void SummonTheDemiurgeCalculon (Matrix44 &outmat)
-    { Vect e0 = vee[1] - vee[0];
-      f64 d = e0 . NormSelfReturningMag ();
-      Vect e1 = e0 . Cross (vee[2] - vee[0]) . Norm ();
-      Vect e2 = e0 . Cross (e1);
-
-      Matrix44 ma (INITLESS);
-      ma . LoadTranslation (-e0);
-      Matrix44 mb;
-      mb.m[0][0] = e0.x;  mb.m[0][1] = e1.x;  mb.m[0][2] = e2.x;
-      mb.m[1][0] = e0.y;  mb.m[1][1] = e1.y;  mb.m[1][2] = e2.y;
-      mb.m[2][0] = e0.z;  mb.m[2][1] = e1.z;  mb.m[2][2] = e2.z;
-      Matrix44 mc (INITLESS);
-      mc . LoadScale (lateral_stretchy_metron / d);
-      Matrix44 md (INITLESS);
-      md . LoadTranslation (-0.5 * d, above_the_floor_ness, 0.0);
-
-      outmat = ma * mb * mc * md;
-    }
-
-  i64 ZESpatialMove (ZESpatialMoveEvent *e)  override
-    { if (! calibrating  ||  trig_partic . size () > 0)
-        return 0;
-      if (e -> Provenance ()  !=  "wand-0")
-        return 0;
-      just_now = e -> Loc ();
-      if (! slurping)
-        { just_now . SpewToStderr ();  fprintf (stderr, "\n");
+  i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
+  i64 ZESpatialHarden (ZESpatialHardenEvent *e)  override
+    { if (calibrating)
+        { // avanti!
+          if (cally)
+            cally -> ZESpatialHarden (e);
           return 0;
         }
-      accum += just_now;
-      ++count;
-      fprintf (stderr, "ACCUM [phase %d, count %d]: ", phase, count);
-      just_now . SpewToStderr ();
-      return 0;
-    }
-  i64 ZESpatialHarden (ZESpatialHardenEvent *e)  override
-    { if (! calibrating)
-        { if (e -> WhichPressor ()  !=  8)
-            return 0;
-          trig_partic . insert (e -> Provenance ());
+      if (e -> WhichPressor ()  ==  8)
+        { trig_partic . insert (e -> Provenance ());
           if (trig_partic . size ()  >  1)
             calibrating = true;
           return 0;
         }
-      if (e -> Provenance ()  ==  "wand-0")
-        return 0;
-      slurping = true;
-      accum = just_now;
-      count = 1;  // accum already has the most recent, see? already ahead!
-      ++phase;
-      fprintf (stderr, "\n\n\n--- COLLECTION PHASE %d%d%d ---\n", phase,
-               phase, phase);
       return 0;
     }
   i64 ZESpatialSoften (ZESpatialSoftenEvent *e)  override
-    { if (trig_partic . size ()  >  0)
-        { if (e -> WhichPressor ()  ==  8)
-            { auto it = trig_partic . find (e -> Provenance ());
-              if (it  !=  trig_partic . end ())
-                trig_partic . erase (it);
+    { if (calibrating  &&  trig_partic . size () == 0)
+        { // ymlaen!
+          if (cally)
+            { if (cally -> ZESpatialSoften (e)  ==  -666)
+                calibrating = false;
             }
           return 0;
         }
-      if (! calibrating)  // cain't hardly git here nohow...
-        return 0;
-      if (e -> Provenance ()  ==  "wand-0")
-        return 0;
-      vee[phase] = accum / (f64)count;
-      slurping = false;
-      if (phase < 2)
-        return 0;
-      SummonTheDemiurgeCalculon (geo_truth);
-      phase = -1;
-      calibrating = false;
+      if (e -> WhichPressor ()  ==  8)
+        { if (trig_partic . size ()  >  0)
+            { auto it = trig_partic . find (e -> Provenance ());
+              if (it  !=  trig_partic . end ())
+                trig_partic . erase (it);
+              if (calibrating  &&  trig_partic . size () == 0)
+                fprintf (stderr, "S T A R T I N G  CALIBRATION\n");
+            }
+          return 0;
+        }
       return 0;
     }
 };
@@ -229,6 +193,8 @@ class dead_zone final : public charm::Application,
   PlatonicMaes *NthMaes (i32 ind);
   PlatonicMaes *FindMaesByName (const std::string &nm);
 
+  void FlatulateCursor (ZESpatialMoveEvent *e);
+
   i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
 
  protected:
@@ -246,6 +212,20 @@ class dead_zone final : public charm::Application,
 
   static RawOSCWandParser rowp;
 };
+
+
+
+i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
+{ if (calibrating  &&  trig_partic . size () == 0)
+    { // forward!
+      if (cally)
+        cally -> ZESpatialMove (e);
+      return 0;
+    }
+  if (sole_dead_zone)
+    sole_dead_zone -> FlatulateCursor (e);
+  return 0;
+}
 
 
 RawOSCWandParser dead_zone::rowp;
@@ -420,6 +400,9 @@ dead_zone::dead_zone ()
       osc_srv -> add_method ("/events/spatial", NULL, osc_wandler, &wandy);
       osc_srv -> add_method (NULL, NULL, eruct_handler, this);
     }
+
+  wandy . SetCalibrista (&rowp.calibrex);
+  sole_dead_zone = this;
 }
 
 dead_zone::~dead_zone ()
@@ -549,6 +532,35 @@ PlatonicMaes *dead_zone::FindMaesByName (const std::string &nm)
 }
 
 
+void dead_zone::FlatulateCursor (ZESpatialMoveEvent *e)
+{ PlatonicMaes *close_m = NULL;
+  Vect hit;
+  f64 close_d;
+
+  i32 cnt = NumMaeses ();
+  for (i32 q = 0  ;  q < cnt  ;  ++q)
+    { PlatonicMaes *emm = NthMaes (q);
+      if (GeomFumble::RayPlaneIntersection (e -> Loc (), e -> Aim (),
+                                            emm -> Loc (), emm -> Norm (),
+                                            &hit))
+        { f64 d = hit . DistFrom (e -> Loc ());
+          if (! close_m  ||  d < close_d)
+            { close_m = emm;
+              close_d = d;
+            }
+        }
+    }
+
+  if (close_m)
+//    { cursoresque_pos = hit; }
+    { cursoresque -> ClearTransforms ();
+      cursoresque -> RotateD (ZoftVect (Vect::zaxis), loopiness);
+      cursoresque -> Scale (0.025 * close_m -> Height ());
+      cursoresque -> RotateD (Vect::yaxis, 45.0);
+      cursoresque -> Translate (hit);
+    }
+}
+
 i64 dead_zone::ZESpatialMove (ZESpatialMoveEvent *e)
 { fprintf (stderr, "phoooooooooooot...\n");
   return 0;
@@ -611,8 +623,8 @@ int main (int, char **)
 
   if (maes = zone . FindMaesByName ("front"))
     { dr_no -> RotateD (Vect (0.0, 1.0, 0.0), -30.0);
-      dr_no -> Scale (1.0 * maes -> Height ());
-      SinuVect ss (Vect (0.1), 1.8, Vect (1.0));
+      dr_no -> Scale (0.75 * maes -> Height ());
+      SinuVect ss (Vect (0.25), 1.8, Vect (1.0));
       dr_no -> Scale (ss);
       dr_no -> Translate (maes -> Loc ());
     }
@@ -629,6 +641,16 @@ int main (int, char **)
 			    * maes -> Up ()));
       layer . GetRootNode () -> AppendChild (enn);
     }
+
+  cursoresque = new Node;
+  cursoresque -> AppendRenderable (new RectangleRenderable);
+  cursoresque -> RotateD (ZoftVect (Vect::zaxis), loopiness);
+  cursoresque -> Scale (0.025 * maes -> Height ());
+  cursoresque -> RotateD (Vect::yaxis, 45.0);
+  cursoresque -> Translate (maes -> Loc ());//cursoresque_pos);
+  layer . GetRootNode () -> AppendChild (cursoresque);
+
+  cursoresque_pos = maes -> Loc ();
 
   zone.Run ();
 
