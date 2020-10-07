@@ -30,6 +30,27 @@ bool VectFromTOMLThingy (const toml::value &thingy, Vect &into_v)
 }
 
 
+bool Matrix44FromTOMLThingy (const toml::value &thingy, Matrix44 &into_m)
+{ Matrix44 mat;
+  f64 *mp = &mat.a_[0];
+  for (i32 q = 0  ;  q < 16  ;  ++q)
+    try
+      { auto val = thingy[q];
+        *mp++ = toml::get <f64> (val);
+      }
+    catch (std::out_of_range &e)
+      { fprintf (stderr, "VectFromTOMLThingy: doesn't have 0/1/2 indices.\n");
+        return false;
+      }
+    catch (toml::type_error &)
+      { fprintf (stderr, "gobbledygook into Matrix44FromTOMLThingy: ");
+        return false;
+      }
+  into_m . Load (mat);
+  return true;
+}
+
+
 static std::map <std::string, toml::value> toml_by_filename;
 
 

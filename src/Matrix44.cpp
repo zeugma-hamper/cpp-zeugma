@@ -5,16 +5,27 @@
 namespace charm  {
 
 
-const Matrix44 Matrix44::mIdent ( 1.0, 0.0, 0.0, 0.0,
-                                  0.0, 1.0, 0.0, 0.0,
-                                  0.0, 0.0, 1.0, 0.0,
-                                  0.0, 0.0, 0.0, 1.0 );
+const Matrix44 Matrix44::mIdent (INITLESS);
 
-const Matrix44 Matrix44::mZero ( 0.0, 0.0, 0.0, 0.0,
-                                 0.0, 0.0, 0.0, 0.0,
-                                 0.0, 0.0, 0.0, 0.0,
-                                 0.0, 0.0, 0.0, 0.0 );
+const Matrix44 Matrix44::mZero (INITLESS );
 
+bool _Matrix44_beget_static_items ()
+{ static bool well_and_truly_done = false;
+  if (! well_and_truly_done)
+    { Matrix44 *mi = const_cast <Matrix44 *> (&Matrix44::mIdent);
+      mi -> Load ( 1.0, 0.0, 0.0, 0.0,
+                   0.0, 1.0, 0.0, 0.0,
+                   0.0, 0.0, 1.0, 0.0,
+                   0.0, 0.0, 0.0, 1.0 );
+      Matrix44 *mz = const_cast <Matrix44 *> (&Matrix44::mZero);
+      mz -> Load  ( 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0 );
+      well_and_truly_done = true;
+    }
+  return well_and_truly_done;
+}
 
 InitFreeLiving INITLESS;
 
@@ -41,7 +52,9 @@ InitFreeLiving INITLESS;
 
 
 Matrix44::Matrix44 ()
-{ M_CPY (mIdent, *this); }
+{ static bool got_this_party_started = _Matrix44_beget_static_items ();
+  M_CPY (mIdent, *this);
+}
 
 
 Matrix44::Matrix44 (f64 *a)
@@ -69,12 +82,14 @@ Matrix44::Matrix44 (const Matrix44 &otra)
 
 
 Matrix44 &Matrix44::LoadZero ()
-{ M_CPY (mZero, *this);
+{ static bool got_this_party_started = _Matrix44_beget_static_items ();
+  M_CPY (mZero, *this);
   return *this;
 }
 
 Matrix44 &Matrix44::LoadIdent ()
-{ M_CPY (mIdent, *this);
+{ static bool got_this_party_started = _Matrix44_beget_static_items ();
+  M_CPY (mIdent, *this);
   return *this;
 }
 

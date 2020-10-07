@@ -1,3 +1,4 @@
+
 #include <application.hpp>
 #include <base_types.hpp>
 #include <class_utils.hpp>
@@ -55,7 +56,7 @@
 using namespace charm;
 
 
-class Whippletree  :  public Zeubject
+class CMVTrefoil  :  public Zeubject
 { public:
   Bolex *cam;
   PlatonicMaes *maes;
@@ -66,7 +67,7 @@ class Whippletree  :  public Zeubject
     i32 fb_pix_w, fb_pix_h;
     u16 ViewID ()  const  { return (u16)view_id; }
   } *b_view;
-  Whippletree ()  :  Zeubject (), cam (NULL), maes (NULL), b_view (NULL)
+  CMVTrefoil ()  :  Zeubject (), cam (NULL), maes (NULL), b_view (NULL)
     { }
   i64 Inhale (i64 ratch, f64 thyme)  override
     { if (cam)  cam -> Inhale (ratch, thyme);
@@ -111,12 +112,26 @@ static LoopFloat loopiness (0.0, 720.0, 0.5);
 
 class WandCatcher  :  public Zeubject, public ZESpatialPhagy
 { public:
+  i32 trig_butt_simulcount;
+  u64 trig_butt_ident;
   std::unordered_set <std::string> trig_partic;
   bool calibrating;
   ZESpatialPhagy *cally;
 
-  WandCatcher ()  :  Zeubject (), calibrating (false), cally (NULL)
+  WandCatcher ()  :  Zeubject (), trig_butt_simulcount (2),
+                     trig_butt_ident (8), calibrating (false), cally (NULL)
     { }
+
+
+  u64 TriggerButtonIdentifier ()  const
+    { return trig_butt_ident; }
+  void SetTriggerButtonIdentifier (u64 tr_butt)
+    { trig_butt_ident = tr_butt; }
+
+  i32 TiggerButtonSimulcount ()  const
+    { return trig_butt_simulcount; }
+  void SetTriggerButtonSimulcount (i32 cnt)
+    { trig_butt_simulcount = cnt; }
 
   ZESpatialPhagy *Calibrista ()  const
     { return cally; }
@@ -124,6 +139,7 @@ class WandCatcher  :  public Zeubject, public ZESpatialPhagy
     { cally = cal; }
 
   i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
+  // see below for the above... can't define inline because uses dead_zone...
   i64 ZESpatialHarden (ZESpatialHardenEvent *e)  override
     { if (calibrating)
         { // avanti!
@@ -131,9 +147,9 @@ class WandCatcher  :  public Zeubject, public ZESpatialPhagy
             cally -> ZESpatialHarden (e);
           return 0;
         }
-      if (e -> WhichPressor ()  ==  8)
+      if (e -> WhichPressor ()  ==  trig_butt_ident)
         { trig_partic . insert (e -> Provenance ());
-          if (trig_partic . size ()  >  1)
+          if (trig_partic . size ()  >=  trig_butt_simulcount)
             calibrating = true;
           return 0;
         }
@@ -148,11 +164,11 @@ class WandCatcher  :  public Zeubject, public ZESpatialPhagy
             }
           return 0;
         }
-      if (e -> WhichPressor ()  ==  8)
+      if (e -> WhichPressor ()  ==  trig_butt_ident)
         { if (trig_partic . size ()  >  0)
             { auto it = trig_partic . find (e -> Provenance ());
               if (it  !=  trig_partic . end ())
-                trig_partic . erase (it);
+                trig_partic . erase (it);  // three verbose lines to remove...
               if (calibrating  &&  trig_partic . size () == 0)
                 fprintf (stderr, "S T A R T I N G  CALIBRATION\n");
             }
@@ -198,15 +214,11 @@ class dead_zone final : public charm::Application,
   i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
 
  protected:
-
-//  Bolex *cam;
-
   GLFWwindow *window;
-
   Layer *m_scene_graph_layer;
 
  public:
-  std::vector <Whippletree *> render_leaves;
+  std::vector <CMVTrefoil *> render_leaves;
   lo::Server *osc_srv;
   WandCatcher wandy;
 
@@ -270,7 +282,6 @@ static void glfw_error_callback (int, const char *_msg)
   fprintf (stderr, "glfw error: %s\n", _msg);
 }
 
-//void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 static void glfw_key_callback(GLFWwindow *window, int key, int, int action, int)
 { if ((key == GLFW_KEY_Q  ||  key == GLFW_KEY_ESCAPE)
       &&  action == GLFW_RELEASE)
@@ -326,7 +337,7 @@ bool dead_zone::InitWindowingAndGraphics ()
   if (! bgfx::init (init))
     ERROR_RETURN_VAL ("couldn't initialize bgfx", false);
 
-  for (Whippletree *leaf  :  render_leaves)
+  for (CMVTrefoil *leaf  :  render_leaves)
     { u16 vuid = leaf->b_view -> ViewID ();
       leaf->b_view->fb_pix_w = glfw_width;
       leaf->b_view->fb_pix_h = glfw_height;
@@ -361,7 +372,7 @@ void dead_zone::Render ()
 { for (Renderable *r : m_scene_graph_layer->GetRenderables())
     r -> Update ();
 
-  for (Whippletree *leaf  :  render_leaves)
+  for (CMVTrefoil *leaf  :  render_leaves)
     { u16 vuid = leaf->b_view -> ViewID ();
       bgfx::touch (vuid);
 
@@ -475,7 +486,7 @@ bool dead_zone::DoWhatThouWilt (i64 ratch, f64 thyme)
 
 
 void dead_zone::UpdateRenderLeaves (i64 ratch, f64 thyme)
-{ for (Whippletree *leaf  :  render_leaves)
+{ for (CMVTrefoil *leaf  :  render_leaves)
     leaf -> Inhale (ratch, thyme);
 }
 
@@ -525,7 +536,7 @@ PlatonicMaes *dead_zone::NthMaes (i32 ind)
 }
 
 PlatonicMaes *dead_zone::FindMaesByName (const std::string &nm)
-{ for (Whippletree *leaf  :  render_leaves)
+{ for (CMVTrefoil *leaf  :  render_leaves)
     if (leaf  &&  leaf->maes  &&  nm == leaf->maes -> Name ())
       return leaf->maes;
   return NULL;
@@ -574,11 +585,11 @@ int main (int, char **)
   i32 nm = NumMaesesFromTOML ("../maes-config.toml");
   for (i32 q = 0  ;  q < nm  ;  ++q)
     if (PlatonicMaes *m = MaesFromTOML ("../maes-config.toml", q))
-      { Whippletree *leaf = new Whippletree;
+      { CMVTrefoil *leaf = new CMVTrefoil;
         leaf->maes = m;
         Bolex *c = CameraFromMaes (*m);
         leaf->cam = c;
-        Whippletree::BGFXView *bv = new Whippletree::BGFXView;
+        CMVTrefoil::BGFXView *bv = new CMVTrefoil::BGFXView;
         leaf->b_view = bv;
         bv->botlef_x = 0.5 * (f64)q;
         bv->botlef_y = 0.0;

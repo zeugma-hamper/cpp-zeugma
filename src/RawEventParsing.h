@@ -72,19 +72,13 @@ class Caliban  :  public Zeubject, public ZESpatialPhagy
 
 }  // lights out for namespace RawEventSupportHose
 
-#define IDENT_INIT 1.0, 0.0, 0.0, 0.0, \
-                   0.0, 1.0, 0.0, 0.0, \
-                   0.0, 0.0, 1.0, 0.0, \
-                   0.0, 0.0, 0.0, 1.0
 
 class RawOSCWandParser  :  public RawEventParser
 { public:
   Matrix44 theirs_to_ours_pm, theirs_to_ours_dm;
   RawEventSupportHose::Caliban calibrex;
 
-  RawOSCWandParser ()  :  RawEventParser (),
-                          theirs_to_ours_pm (IDENT_INIT),
-                          theirs_to_ours_dm (IDENT_INIT)
+  RawOSCWandParser ()  :  RawEventParser ()
     { calibrex . SetGeoTruthMats (theirs_to_ours_pm, theirs_to_ours_dm); }
 
   void Parse (const std::string &path, const lo::Message &m,
