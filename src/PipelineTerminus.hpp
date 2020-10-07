@@ -81,7 +81,8 @@ class CachingPipelineTerminus : public PipelineTerminus
 
   gst_ptr<GstSample> FetchSample ();
   gst_ptr<GstSample> FetchClearSample ();
-  gst_ptr<GstSample> FetchByOffset (u64 _offset);
+  gst_ptr<GstSample> FetchByOffset (u64 _offset, u64 _mod);
+  gst_ptr<GstSample> FetchClearByOffset (u64 _offset, u64 _mod);
 
   gst_ptr<GstSample> FetchNewest ();
   void ClearCache ();
@@ -91,6 +92,7 @@ class CachingPipelineTerminus : public PipelineTerminus
 
   void HandoffSample (GstSample *_sample);
 
+  DecodePipeline *m_pipeline;
   GstElement *m_video_sink;
   GstElement *m_audio_sink;
   std::mutex m_sample_mutex;

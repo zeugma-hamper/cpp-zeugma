@@ -1,7 +1,77 @@
-root="/home/jh/tlp2/tamper/cine/o-g" #root="/home/blake/tlp/tamper-dvd-orig"
+root="/home/blake/tlp/cine"
 roto_root="rotopro"
 
 [boaa]
 name="Belly of an Architect"
 path="boaa-mpeg4.mov"
 clip_path="boaa"
+
+[btk]
+name="Branded to Kill"
+path="btk-mpeg4.mov"
+clip_path="btk"
+
+[c]
+name="Carnosaur"
+path="c-mpeg4.mov"
+clip_path="c"
+
+[cs]
+name="Chameleon Street"
+path="cs-mpeg4.mov"
+clip_path="cs"
+
+[f]
+name="The Fall"
+path="f-mpeg4.mov"
+clip_path="f"
+
+[itmfl]
+name="In the Mood for Love"
+path="itmfl-mpeg4.mov"
+clip_path="itmfl"
+
+[mr]
+name="Minority Report"
+path="mr-mpeg4.mov"
+clip_path="mr"
+
+[ms]
+name="Mysterious Skin"
+path="ms-mpeg4.mov"
+clip_path="ms"
+
+[nk]
+name="Naked Kiss"
+path="nk-mpeg4.mov"
+clip_path="nk"
+
+[noth]
+name="Night of the Hunter"
+path="noth-mpeg4.mov"
+clip_path="noth"
+
+[notld]
+name="Night of the Living Dead"
+path="notld-mpeg4.mov"
+clip_path="notld-mpeg4.mov"
+
+[ouatitw]
+name="Once Upon a Time in the West"
+path="ouatitw-mpeg4.mov"
+clip_path="ouatitw"
+
+[pb]
+name="Point Blank"
+path="pb-mpeg4.mov"
+clip_path="pb"
+
+[pt]
+name="Playtime"
+path="pt-mpeg4.mov"
+clip_path="pt"
+
+[vp]
+name="Vanishing Point"
+path="vp-mpeg4.mov"
+clip_path="vp"

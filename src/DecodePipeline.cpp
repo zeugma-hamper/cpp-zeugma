@@ -186,6 +186,12 @@ void DecodePipeline::Pause ()
 //                     GST_SEEK_TYPE_SET, _start_ts,
 //                     GST_SEEK_TYPE_SET, _end_ts);
 // }
+void DecodePipeline::Step (u32 _distance)
+{
+  GstEvent *event = gst_event_new_step (GST_FORMAT_BUFFERS, _distance, 1.0, TRUE, FALSE);
+  gst_element_send_event(m_pipeline, event);
+}
+
 
 void DecodePipeline::Loop (f64 _from, f64 _to)
 {
@@ -243,7 +249,11 @@ bool DecodePipeline::SeekFull (f64 _rate, GstFormat _format, GstSeekFlags _flags
     m_play_speed = _rate;
 
   if (_flags & GST_SEEK_FLAG_FLUSH)
-    m_awaiting_async_done = true;
+    {
+      m_awaiting_async_done = true;
+      if (m_terminus)
+        m_terminus->FlushNotify();
+    }
 
   bool ret = gst_element_seek (m_pipeline, m_play_speed, _format, _flags,
                                _start_type, _start, _stop_type, _stop);

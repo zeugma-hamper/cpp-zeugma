@@ -249,8 +249,9 @@ CachingPipelineTerminus::~CachingPipelineTerminus ()
 }
 
 bool
-CachingPipelineTerminus::OnStart (DecodePipeline *)
+CachingPipelineTerminus::OnStart (DecodePipeline *_pipeline)
 {
+  m_pipeline = _pipeline;
   return true;
 }
 
@@ -293,8 +294,11 @@ CachingPipelineTerminus::OnShutdown (DecodePipeline *)
 
 void CachingPipelineTerminus::FlushNotify ()
 {
-  std::unique_lock lock {m_sample_mutex};
-  m_samples.clear ();
+  {
+    std::unique_lock lock {m_sample_mutex};
+    m_samples.clear ();
+  }
+  m_pipeline->Step (1);
 }
 
 
@@ -315,29 +319,65 @@ gst_ptr<GstSample> CachingPipelineTerminus::FetchSample ()
 
 gst_ptr<GstSample> CachingPipelineTerminus::FetchClearSample ()
 {
-  std::unique_lock lock (m_sample_mutex);
-  if (m_samples.size ())
-    {
-      gst_ptr<GstSample> ret {m_samples.front ()};
-      m_samples.erase (m_samples.begin ());
-      return ret;
-    }
+  bool should_issue_step = false;
+
+  {
+    std::unique_lock lock (m_sample_mutex);
+    if (m_samples.size () == m_max_cached_samples)
+      should_issue_step = true;
+    if (m_samples.size ())
+      {
+        gst_ptr<GstSample> ret {m_samples.front ()};
+        m_samples.erase (m_samples.begin ());
+        return ret;
+      }
+  }
+
+  if (should_issue_step)
+    m_pipeline->Step (1);
 
   return {};
 }
 
-gst_ptr<GstSample> CachingPipelineTerminus::FetchByOffset (u64 _offset)
+gst_ptr<GstSample> CachingPipelineTerminus::FetchByOffset (u64 _offset, u64 _mod)
 {
   std::unique_lock lock (m_sample_mutex);
   auto end = m_samples.end ();
   for (auto cur = m_samples.begin (); cur != end; ++cur)
     {
       GstBuffer *buffer = gst_sample_get_buffer (cur->get ());
-      u64 offset = GST_BUFFER_OFFSET (buffer);
+      u64 offset = GST_BUFFER_OFFSET (buffer) % _mod;
       if (offset == _offset)
         return *cur;
     }
 
+  return {};
+}
+
+gst_ptr<GstSample> CachingPipelineTerminus::FetchClearByOffset (u64 _offset, u64 _mod)
+{
+  bool should_issue_step = false;
+
+  {
+    std::unique_lock lock (m_sample_mutex);
+    if (m_samples.size () == m_max_cached_samples)
+      should_issue_step = true;
+    auto end = m_samples.end ();
+    for (auto cur = m_samples.begin (); cur != end; ++cur)
+      {
+        GstBuffer *buffer = gst_sample_get_buffer (cur->get ());
+        u64 offset = GST_BUFFER_OFFSET (buffer) % _mod;
+        if (offset == _offset)
+          {
+            gst_ptr<GstSample> ret = *cur;
+            m_samples.erase (m_samples.begin (), cur+1);
+            return ret;
+          }
+      }
+  }
+
+  if (should_issue_step)
+    m_pipeline->Step (1);
 
   return {};
 }
@@ -467,10 +507,20 @@ void CachingPipelineTerminus::HandoffSample (GstSample *_sample)
   if (! _sample || ! gst_sample_get_buffer (_sample))
     return;
 
-  std::unique_lock lock {m_sample_mutex};
-  if (m_samples.size () == m_max_cached_samples)
-    m_samples.erase(m_samples.begin ());
-  m_samples.emplace_back (gst_ptr<GstSample> {_sample});
+  bool room_to_grow = false;
+  {
+    std::unique_lock lock {m_sample_mutex};
+    if (m_samples.size () == m_max_cached_samples)
+      m_samples.erase(m_samples.begin ());
+
+    m_samples.emplace_back (gst_ptr<GstSample> {_sample});
+
+    if (m_samples.size () < m_max_cached_samples)
+      room_to_grow = true;
+  }
+
+  if (room_to_grow)
+    m_pipeline->Step (1);
 }
 
 static void caching_term_handle_eos (GstAppSink *, gpointer)

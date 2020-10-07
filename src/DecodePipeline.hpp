@@ -52,6 +52,8 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   void Seek (f64 _ts);
   void Pause ();
 
+  void Step (u32 _distance);
+
   void Loop (f64 _from, f64 _to);
 
   void SetState (GstState _state);
