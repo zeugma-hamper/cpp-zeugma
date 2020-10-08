@@ -4,6 +4,8 @@
 //#include <bgfx_utils.hpp>
 #include <base_types.hpp>
 
+#include <toml11/toml.hpp>
+
 #include <filesystem>
 #include <vector>
 
@@ -60,6 +62,81 @@ ReadFilmInfo (std::filesystem::path const &_path);
 
 std::string
 MattePathPattern (FilmInfo const _film, ClipInfo const &_clip);
+
+struct MatteGeometry
+{
+  u32 index = 0;
+  u32 width = 0;
+  u32 height = 0;
+  u32 min_x = u32(-1);
+  u32 max_x = 0;
+  u32 min_y = u32(-1);
+  u32 max_y = 0;
+
+  static const std::string s_index;
+  static const std::string s_dimensions;
+  static const std::string s_min;
+  static const std::string s_max;
+
+  bool IsValid () const;
+
+  v2f32 GetCenter () const;
+
+  void Print (const char *_prefix) const;
+
+  bool operator== (MatteGeometry const &_mg) const;
+
+  toml::table into_toml () const;
+  void from_toml (toml::value const &_v);
+};
+
+struct MatteDirGeometry
+{
+  std::string clip_path;
+  MatteGeometry dir_geometry;
+  std::vector<MatteGeometry> frame_geometry;
+
+  static const std::string s_path;
+  static const std::string s_dir_geometry;
+  static const std::string s_frame_geometry;
+
+  v2f32 GetCenter () const;
+
+  v2f32 GetCenter (szt _frame) const;
+
+  MatteGeometry const &GetNthFrame (szt _frame) const;
+
+  szt GetFrameCount () const;
+
+  void Sort ();
+
+  bool operator== (MatteDirGeometry const &_mdg) const;
+
+  toml::table into_toml () const;
+
+  void from_toml (toml::value const &_v);
+
+  void Print (bool _per_frame_geom = false) const;
+};
+
+struct FilmGeometry
+{
+  std::string name;
+  std::string abbreviation;
+  std::vector<MatteDirGeometry> directory_geometries;
+
+  static const std::string s_name;
+  static const std::string s_abbreviation;
+  static const std::string s_directory_geometries;
+
+  void Sort ();
+
+  bool operator== (FilmGeometry const &_fg) const;
+
+  toml::table into_toml () const;
+
+  void from_toml (toml::value const & _v);
+};
 
 }
 
