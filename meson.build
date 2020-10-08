@@ -162,6 +162,7 @@ gst_dep       = dependency ('gstreamer-1.0')
 gst_app_dep   = dependency ('gstreamer-app-1.0')
 gst_video_dep = dependency ('gstreamer-video-1.0')
 
+##### CHARM #####
 lib_sources = ['src/application.cpp',
                'src/Bolex.cpp',
                'src/DecodePipeline.cpp',
@@ -218,6 +219,8 @@ charm_dep = declare_dependency (include_directories : [charm_inc, toml_inc],
                                 link_with : [charm_lib],
                                 dependencies : charm_definition_deps)
 
+
+##### SHADERS #####
 # be sure to run `./install_bgfx_tools.sh <BIN_DIR>` before building charm
 shaderc_prog = find_program ('shaderc', dirs : [get_option ('shaderc-path')])
 
@@ -250,6 +253,7 @@ foreach shader : shaders
                  build_by_default : true)
 endforeach
 
+##### EXECUTABLES #####
 bgfx_test_exec = executable ('bgfx_test',
                              sources : ['src/bgfx_test.cpp'],
                              dependencies : [charm_dep])
@@ -267,3 +271,7 @@ chud_zone_exec = executable ('chud-zone',
                              sources : ['src/chud-zone.cpp',
                                         'src/RectangleRenderable.cpp'],
                              dependencies : [charm_dep])
+
+scan_mattes_exec = executable ('scan_mattes',
+                               sources : ['src/scan_mattes.cpp'],
+                               dependencies : [charm_dep])
