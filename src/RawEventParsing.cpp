@@ -4,11 +4,102 @@
 
 #include "Vect.h"
 
+#include "conjure-from-toml.h"
+
 #include <map>
 #include <utility>
 
+#include <algorithm>
+#include <iomanip>
+#include <sstream>
+
+#include <toml.hpp>
+
+#include <filesystem>
+
 
 using namespace charm;
+
+namespace fs = std::filesystem;
+
+
+const std::string RawOSCWandParser::default_config_dir = "/opt/trelopro/config/";
+const std::string RawOSCWandParser::default_config_filebasename
+  = "coord-xform-tto.";
+
+
+bool RawOSCWandParser::SlurpCoordTransforms (Matrix44 &pmat, Matrix44 &dmat,
+                                             const std::string &in_path)
+{ std::string dir = default_config_dir;
+  std::string pth = "";
+
+  if (! in_path . empty ())
+    { fs::path p (in_path);
+      if (fs::is_directory (p))
+        dir = in_path;
+      else if (fs::is_regular_file (p))
+        pth = in_path;
+      else
+        return false;
+    }
+
+  if (! pth . empty ())
+    return PointAndDirecTransformMatsFromTOML (pth, pmat, dmat);
+
+  size_t /* how we loathe, loathe, loathe size_t... */ scythes
+    = default_config_filebasename . size ();
+
+  std::map <fs::file_time_type, fs::directory_entry> sortiful;
+
+  for (auto item  :  fs::directory_iterator (fs::path (dir)))
+    if (item . is_regular_file ())
+      { std::string fbase
+          = item . path () . filename () . string () . substr (0, scythes);
+        if (fbase  ==  default_config_filebasename)
+          { fs::file_time_type ftt = item . last_write_time ();
+            sortiful[ftt] = item;
+          }
+      }
+  if (sortiful . empty ())
+    return false;
+  pth = sortiful . rbegin ()->second . path () . string ();
+  fprintf (stderr, "think the recentest might just be <%s>...\n",
+           pth . c_str ());
+  return PointAndDirecTransformMatsFromTOML (pth, pmat, dmat);
+}
+
+
+bool RawOSCWandParser::SpewCoordTransforms (Matrix44 &pmat, Matrix44 &dmat,
+                                            const std::string &fname,
+                                            const std::string &directory_path)
+{ f64 *eff = &pmat.a_[0];
+  toml::value pm { *eff };
+  for (i32 q = 15  ;  q > 0  ;  --q)
+    pm . push_back (*++eff);
+
+  eff = &dmat.a_[0];
+  toml::value dm { *eff };
+  for (i32 q = 15  ;  q > 0  ;  --q)
+    dm . push_back (*++eff);
+
+  toml::table tab { { "point_mat", pm }, { "direc_mat", dm } };
+
+  auto timey = std::time (nullptr);
+  std::stringstream ss;
+  ss << std::put_time (std::localtime (&timey), "%F.%T");
+  auto time_s = ss . str ();
+  std::replace (time_s . begin (), time_s . end (), ':', '-');
+
+  std::ofstream outfile;
+  outfile . open ((directory_path . empty ()
+                   ?  default_config_dir  :  directory_path)
+                  +  (fname . empty ()
+                      ?  (default_config_filebasename + time_s)  :  fname));
+  outfile << toml::value (tab);
+  outfile . close ();
+
+  return true;
+}
 
 
 using SEV_WITH_BUTT = std::pair <ZESpatialEvent *, u64>;
@@ -19,12 +110,12 @@ static std::map <std::string, SEV_WITH_BUTT> recent_wands_state;
 void RawOSCWandParser::Parse (const std::string &path, const lo::Message &m,
                               OmNihil *phage)
 { if (path  !=  "/events/spatial")
-    { fprintf (stderr, "RawOSCWandParse: unexpected address -- how'd we get"
+    { fprintf (stderr, "RawOSCWandParser: unexpected address -- how'd we get"
                " a message addressed <%s>?", path . c_str ());
       return;
     }
   if (m . types ()  !=  "shddddddddd")
-    { fprintf (stderr, "RawOSCWandPArse: mangled or unexpected message "
+    { fprintf (stderr, "RawOSCWandParser: mangled or unexpected message "
                " contents -- type boogers weirdly say <%s>...",
                m . types () . c_str ());
       return;
@@ -195,5 +286,6 @@ i64 Caliban::ZESpatialSoften (ZESpatialSoftenEvent *e)
   SummonTheDemiurgeCalculon (*geo_truth_pm, *geo_truth_dm);
   phase = -1;
   fprintf (stderr, "CALIBRATION O V E R A N D D O N E W I T H\n");
+  RawOSCWandParser::SpewCoordTransforms (*geo_truth_pm, *geo_truth_dm);
   return -666;
 }

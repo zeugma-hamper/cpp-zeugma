@@ -472,10 +472,16 @@ bool dead_zone::RunOneCycle ()
 LoopFloat elzyeff { 22.2, 3.3, 4.5 };
 LoopVect elzyvee { Vect (0.0, 1.0, 2.0), Vect (1.0, -1.0, 3.0), 5.5 };
 InterpFloat ayezee { -1.0, 1.0, 4.7 };
+LoopFloat timey { 0.0, 1.0, 0.0 };
 
 bool dead_zone::DoWhatThouWilt (i64 ratch, f64 thyme)
 { if (ayezee.val > 0.993  &&  ayezee.val < 0.999)
     elzyvee . Restart ();
+
+  if (timey.val > 1.5)
+    { rowp . HooverCoordTransforms ();
+      timey . BecomeLike (ZoftFloat (0.0));
+    }
 
   // cam -> ViewLoc () . SpewToStderr ();
   // fprintf (stderr, " is cammy's loc, and interp is all <%.2lf>\n",

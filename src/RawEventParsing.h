@@ -75,14 +75,23 @@ class Caliban  :  public Zeubject, public ZESpatialPhagy
 
 class RawOSCWandParser  :  public RawEventParser
 { public:
+  static const std::string default_config_dir;
+  static const std::string default_config_filebasename;
   Matrix44 theirs_to_ours_pm, theirs_to_ours_dm;
   RawEventSupportHose::Caliban calibrex;
 
   RawOSCWandParser ()  :  RawEventParser ()
     { calibrex . SetGeoTruthMats (theirs_to_ours_pm, theirs_to_ours_dm); }
 
-  bool SlurpCoordTransform ();
-  bool SpewCoordTransform ();
+  static bool SlurpCoordTransforms (Matrix44 &pmat, Matrix44 &dmat,
+                                    const std::string &pathy = "");
+  static bool SpewCoordTransforms (Matrix44 &pmat, Matrix44 &dmat,
+                                   const std::string &fname = "",
+                                   const std::string &directory_path = "");
+  bool HooverCoordTransforms ()
+    { return SlurpCoordTransforms (theirs_to_ours_pm, theirs_to_ours_dm); }
+  bool EmitCoordTransforms ()
+    { return SpewCoordTransforms (theirs_to_ours_pm, theirs_to_ours_dm); }
 
   void Parse (const std::string &path, const lo::Message &m,
               OmNihil *phage = NULL);
