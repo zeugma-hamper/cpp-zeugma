@@ -149,12 +149,11 @@ ReadFilmInfo (std::filesystem::path const &_path)
                                           fs::directory_iterator {});
         }
 
-      auto less_start_time = [] (ClipInfo const &l, ClipInfo const &r)
+      auto less_dir = [] (ClipInfo const &l, ClipInfo const &r)
         {
-          return l.start_time < r.start_time ||
-            (l.start_time == r.start_time && l.duration < l.duration);
+          return l.directory < r.directory;
         };
-      std::sort (fc.clips.begin (), fc.clips.end (), less_start_time);
+      std::sort (fc.clips.begin (), fc.clips.end (), less_dir);
     }
 
   return data;

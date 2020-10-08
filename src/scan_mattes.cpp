@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 
+#include <array>
 #include <filesystem>
 #include <functional>
 #include <vector>
@@ -28,6 +29,11 @@ struct MatteGeometry
   u32 min_y = u32(-1);
   u32 max_y = 0;
 
+  static const std::string s_index;
+  static const std::string s_dimensions;
+  static const std::string s_min;
+  static const std::string s_max;
+
   bool IsValid () const
   {
     return min_x < max_x && min_y < max_y;
@@ -38,29 +44,66 @@ struct MatteGeometry
     return {(min_x + max_x) / 2.0f, (min_y + max_y) / 2.0f};
   }
 
-  void Print (const char *_prefix)
+  void Print (const char *_prefix) const
   {
     printf ("%s[%u, %u]: %u - %u  x  %u - %u\n",
             _prefix, width, height, min_x, max_x, min_y, max_y);
   }
 
+  bool operator== (MatteGeometry const &_mg) const
+  {
+    return index  == _mg.index &&
+      width  == _mg.width  &&
+      height == _mg.height &&
+      min_x  == _mg.min_x  &&
+      max_x  == _mg.max_x  &&
+      min_y  == _mg.min_y  &&
+      max_y  == _mg.max_y;
+  }
+
   toml::table into_toml () const
   {
-    return toml::table {{"index", index},
-                        {"dimensions", {width, height}},
-                        {"min", {min_x, min_y}},
-                        {"max", {max_x, max_y}}};
+    return toml::table {{s_index, index},
+                        {s_dimensions, {width, height}},
+                        {s_min, {min_x, min_y}},
+                        {s_max, {max_x, max_y}}};
 
+  }
+
+  void from_toml (toml::value const &_v)
+  {
+    using coord = std::array<u32, 2>;
+    coord tmp;
+    tmp = toml::find<coord> (_v, s_dimensions);
+    width = tmp[0];
+    height = tmp[1];
+
+    tmp = toml::find<coord> (_v, s_min);
+    min_x = tmp[0];
+    min_y = tmp[1];
+
+    tmp = toml::find<coord> (_v, s_max);
+    max_x = tmp[0];
+    max_y = tmp[1];
+
+    index = toml::find<u32> (_v, s_index);
   }
 };
 
-using ClipRef = std::reference_wrapper<ClipInfo const>;
+const std::string MatteGeometry::s_index      = "index";
+const std::string MatteGeometry::s_dimensions = "dimensions";
+const std::string MatteGeometry::s_min = "min";
+const std::string MatteGeometry::s_max = "max";
+
 struct MatteDirGeometry
 {
-  FilmInfo const *film = nullptr;
-  ClipInfo const *clip = nullptr;
+  std::string clip_path;
   MatteGeometry dir_geometry;
   std::vector<MatteGeometry> frame_geometry;
+
+  static const std::string s_path;
+  static const std::string s_dir_geometry;
+  static const std::string s_frame_geometry;
 
   v2f32 GetCenter () const
   {
@@ -85,14 +128,35 @@ struct MatteDirGeometry
     return frame_geometry.size ();
   }
 
-  toml::table into_toml () const
+  void Sort ()
   {
-    toml::table geom {{"dir_geometry", dir_geometry.into_toml()},
-                      {"frame_geometry", frame_geometry}};
-    return toml::table {{film->abbreviation, toml::table {{clip->directory.filename(), geom}}}};
+    std::sort (frame_geometry.begin (), frame_geometry.end (),
+               [] (MatteGeometry const &l, MatteGeometry const &r)
+               { return l.index < r.index; });
   }
 
-  void Print (bool _per_frame_geom = false)
+  bool operator== (MatteDirGeometry const &_mdg) const
+  {
+    return clip_path == _mdg.clip_path &&
+      dir_geometry == _mdg.dir_geometry &&
+      frame_geometry == _mdg.frame_geometry;
+  }
+
+  toml::table into_toml () const
+  {
+    return toml::table {{s_path, clip_path},
+                        {s_dir_geometry, dir_geometry},
+                        {s_frame_geometry, frame_geometry}};
+  }
+
+  void from_toml (toml::value const &_v)
+  {
+    clip_path = toml::find<std::string> (_v, s_path);
+    dir_geometry = toml::find<MatteGeometry> (_v, s_dir_geometry);
+    frame_geometry = toml::find<std::vector<MatteGeometry>> (_v, s_frame_geometry);
+  }
+
+  void Print (bool _per_frame_geom = false) const
   {
     dir_geometry.Print ("");
     if (_per_frame_geom)
@@ -101,22 +165,114 @@ struct MatteDirGeometry
   }
 };
 
-static MatteDirGeometry process_directory (FilmInfo const &_film, ClipInfo const &_clip);
+const std::string MatteDirGeometry::s_path = "path";
+const std::string MatteDirGeometry::s_dir_geometry = "directory_geometry";
+const std::string MatteDirGeometry::s_frame_geometry = "frame_geometry";
+
+struct FilmGeometry
+{
+  std::string name;
+  std::string abbreviation;
+  std::vector<MatteDirGeometry> directory_geometries;
+
+  static const std::string s_name;
+  static const std::string s_abbreviation;
+  static const std::string s_directory_geometries;
+
+  void Sort ()
+  {
+    std::sort (directory_geometries.begin (), directory_geometries.end (),
+               [] (MatteDirGeometry const &l, MatteDirGeometry const &r) { return l.clip_path < r.clip_path; });
+
+    for (auto &mdg : directory_geometries)
+      mdg.Sort ();
+  }
+
+  bool operator== (FilmGeometry const &_fg) const
+  {
+    return name == _fg.name &&
+      abbreviation == _fg.abbreviation &&
+      directory_geometries == _fg.directory_geometries;
+  }
+
+  toml::table into_toml () const
+  {
+    return toml::table {{abbreviation, toml::table {{s_name, name},
+                                                    {s_abbreviation, abbreviation},
+                                                    {s_directory_geometries, directory_geometries}}}};
+  }
+
+  void from_toml (toml::value const & _v)
+  {
+    name = toml::find<std::string> (_v, s_name);
+    abbreviation = toml::find<std::string> (_v, s_abbreviation);
+    directory_geometries = toml::find<std::vector<MatteDirGeometry>> (_v, s_directory_geometries);
+
+    Sort ();
+  }
+};
+
+const std::string FilmGeometry::s_name = "name";
+const std::string FilmGeometry::s_abbreviation = "abbreviation";
+const std::string FilmGeometry::s_directory_geometries = "directory_geometries";
+
+
+static MatteDirGeometry process_directory (ClipInfo const &_clip);
 
 static int process_mattes (std::vector<FilmInfo> const &_films)
 {
-  std::vector<MatteDirGeometry> dir_geometry;
-  dir_geometry.reserve (_films.size ());
+  std::vector<FilmGeometry> film_geometry;
+  film_geometry.reserve (_films.size ());
 
   for (FilmInfo const &fm : _films)
-    for (ClipInfo const &cm : fm.clips)
-      dir_geometry.push_back (process_directory (fm, cm));
+    {
+      film_geometry.emplace_back();
+      FilmGeometry &fg = film_geometry.back ();
+      fg.directory_geometries.reserve(10);
+      fg.name = fm.name;
+      fg.abbreviation = fm.abbreviation;
+
+      for (ClipInfo const &cm : fm.clips)
+        fg.directory_geometries.push_back (process_directory (cm));
+    }
+
+  std::sort (film_geometry.begin (), film_geometry.end (),
+             [] (FilmGeometry const &l, FilmGeometry const &r)
+             { return l.abbreviation < r.abbreviation; });
 
   std::ofstream outfile;
   outfile.open ("mattes.toml");
-  for (auto &mdg : dir_geometry)
-    outfile << toml::value (mdg);
+  for (auto const &fg : film_geometry)
+    outfile << toml::value (fg);
   outfile.close ();
+
+#if 0
+  std::vector<FilmGeometry> parsed_geometry;
+  toml::value const data = toml::parse ("mattes.toml");
+  for (auto const &pr : toml::get<toml::table> (data))
+    parsed_geometry.push_back (toml::get<FilmGeometry> (pr.second));
+
+  std::sort (parsed_geometry.begin (), parsed_geometry.end (),
+             [] (FilmGeometry const &l, FilmGeometry const &r)
+             { return l.abbreviation < r.abbreviation; });
+
+  if (film_geometry == parsed_geometry)
+    fprintf (stderr, "they are equal\n");
+  else
+    {
+      fprintf (stderr, "they are not equal\n");
+
+      fprintf (stderr, "scanned:\n");
+      for (auto const &fg : film_geometry)
+        for (auto const &mdg : fg.directory_geometries)
+          mdg.Print ();
+
+      fprintf (stderr, "parsed:\n");
+      for (auto const &fg : parsed_geometry)
+        for (auto const &mdg : fg.directory_geometries)
+          mdg.Print ();
+    }
+#endif
 
   return 0;
 }
@@ -146,12 +302,11 @@ static MatteGeometry ConvertToGeom (u32 index, OIIO::ROI const &_roi)
                         u32 (_roi.ybegin), u32 (_roi.yend)};
 }
 
-static MatteDirGeometry process_directory (FilmInfo const &_film, ClipInfo const &_clip)
+static MatteDirGeometry process_directory (ClipInfo const &_clip)
 {
   fprintf (stderr, "processing %s\n", _clip.directory.c_str());
   MatteDirGeometry geometry;
-  geometry.film = &_film;
-  geometry.clip = &_clip;
+  geometry.clip_path = _clip.directory.filename();
 
   OIIO::ImageBuf image;
   OIIO::ImageBuf inverted_image;
