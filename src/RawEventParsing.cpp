@@ -46,19 +46,21 @@ bool RawOSCWandParser::SlurpCoordTransforms (Matrix44 &pmat, Matrix44 &dmat,
   if (! pth . empty ())
     return PointAndDirecTransformMatsFromTOML (pth, pmat, dmat);
 
+  if (! fs::directory_entry (fs::path (dir)) . exists ())
+    return false;
+
   size_t /* how we loathe, loathe, loathe size_t... */ scythes
     = default_config_filebasename . size ();
 
   std::map <fs::file_time_type, fs::directory_entry> sortiful;
-
   for (auto item  :  fs::directory_iterator (fs::path (dir)))
     if (item . is_regular_file ())
       { std::string fbase
-          = item . path () . filename () . string () . substr (0, scythes);
-        if (fbase  ==  default_config_filebasename)
-          { fs::file_time_type ftt = item . last_write_time ();
-            sortiful[ftt] = item;
-          }
+	  = item . path () . filename () . string () . substr (0, scythes);
+	if (fbase  ==  default_config_filebasename)
+	  { fs::file_time_type ftt = item . last_write_time ();
+	    sortiful[ftt] = item;
+	  }
       }
   if (sortiful . empty ())
     return false;
@@ -91,10 +93,16 @@ bool RawOSCWandParser::SpewCoordTransforms (Matrix44 &pmat, Matrix44 &dmat,
   std::replace (time_s . begin (), time_s . end (), ':', '-');
 
   std::ofstream outfile;
-  outfile . open ((directory_path . empty ()
-                   ?  default_config_dir  :  directory_path)
-                  +  (fname . empty ()
-                      ?  (default_config_filebasename + time_s)  :  fname));
+  std::string pth = ((directory_path . empty ()
+                      ?  default_config_dir  :  directory_path)
+                     +  (fname . empty ()
+                         ?  (default_config_filebasename + time_s)  :  fname));
+  outfile . open (pth);
+  if (outfile . fail ())
+    { fprintf (stderr, "hey chief -- couldn't open <%s> for writing.",
+               pth . c_str ());
+      return false;
+    }
   outfile << toml::value (tab);
   outfile . close ();
 
