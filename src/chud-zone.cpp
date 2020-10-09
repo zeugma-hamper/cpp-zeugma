@@ -236,6 +236,19 @@ i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
     }
   if (sole_dead_zone)
     sole_dead_zone -> FlatulateCursor (e);
+  if (PlatonicMaes *emm = sole_dead_zone -> FindMaesByName ("table"))
+    { Vect p = e -> Loc ();
+      p -= emm -> Loc ();
+      f64 wid = emm -> Width (), hei = emm -> Height ();
+      f64 d0 = 2.0 * p . Dot (emm -> Over ());
+      f64 d1 = 2.0 * p . Dot (emm -> Up ());
+      if (d0 < wid  &&  d0 > -wid  &&  d1 < hei  &&  d1 > -hei)
+        { f64 d2 = p . Dot (emm -> Norm ());
+          fprintf (stderr,
+                   "YEAUH! In bounds, <%.1lf %.1lf %.1lf> surface-relative.\n",
+                   d0, d1, d2);
+        }
+    }
   return 0;
 }
 
