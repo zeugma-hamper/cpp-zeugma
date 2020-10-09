@@ -90,8 +90,8 @@ Bolex *CameraFromMaes (const PlatonicMaes &m)
 
   cam -> SetProjectionType (Bolex::ProjType::PERSPECTIVE);
 
-  cam -> SetViewHorizAngle (2.0 * asin (0.5 * m . Width () / dst));
-  cam -> SetViewVertAngle (2.0 * asin (0.5 * m . Height () / dst));
+  cam -> SetViewHorizAngle (2.0 * atan (0.5 * m . Width () / dst));
+  cam -> SetViewVertAngle (2.0 * atan (0.5 * m . Height () / dst));
 
   cam -> SetNearAndFarClipDist (0.1, 10.0 * dst);
   return cam;
@@ -395,8 +395,8 @@ void dead_zone::Render ()
                                               as_glm (c -> ViewUp ()));
       glm::mat4 proj_transform
         = glm::perspective ((float) c -> ViewVertAngle (),
-                            (float) (sin (0.5 * c -> ViewHorizAngle ())
-                                     / sin (0.5 * c -> ViewVertAngle ())),
+                            (float) (tan (0.5 * c -> ViewHorizAngle ())
+                                     / tan (0.5 * c -> ViewVertAngle ())),
                             (float) c -> NearClipDist (),
                             (float) c -> FarClipDist ());
 
@@ -474,7 +474,8 @@ bool dead_zone::RunOneCycle ()
   UpdateSceneGraph (global_ratchet, global_frame_thyme);
   UpdateRenderLeaves (global_ratchet, global_frame_thyme);
 
-//  cam -> Inhale (global_ratchet, global_frame_thyme);
+  for (CMVTrefoil *leaf  :  render_leaves)
+    leaf -> Inhale (global_ratchet, global_frame_thyme);
 
   Render ();
 
