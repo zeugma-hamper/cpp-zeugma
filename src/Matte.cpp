@@ -156,6 +156,10 @@ ReadFilmInfo (std::filesystem::path const &_path)
       std::sort (fc.clips.begin (), fc.clips.end (), less_dir);
     }
 
+  std::sort (data.begin (), data.end (),
+             [] (FilmInfo const &l, FilmInfo const &r)
+             { return l.abbreviation < r.abbreviation; });
+
   return data;
 }
 

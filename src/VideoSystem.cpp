@@ -270,9 +270,9 @@ void VideoSystem::UploadFrames ()
 
       //i expect looping here for now
       guint64 offset_ns = pts - pipe.adjusted_loop_start_ts;
-      guint64 frame_num = guint64 (offset_ns * GST_VIDEO_INFO_FPS_N(&video_info)
-                                   / GST_VIDEO_INFO_FPS_D(&video_info) / f64(1e9));
-      //printf ("pts: %f, now: %f\n", pts/f64(1e9), offset_ns/f64(1e9));
+      guint64 frame_num = guint64 (std::round (offset_ns * GST_VIDEO_INFO_FPS_N(&video_info)
+                                               / GST_VIDEO_INFO_FPS_D(&video_info) / f64(1e9)));
+      //printf ("pts: %f, now: %f, for %lu\n", pts/f64(1e9), offset_ns/f64(1e9), frame_num);
 
       //assert (frame_num < pipe.matte_file_paths.size ());
       MatteFrame mf = pipe.matte_loader->GetFrame(frame_num);
