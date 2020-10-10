@@ -605,9 +605,9 @@ int main (int, char **)
 
   i64 total_pixwid = 0;
   i64 total_pixhei = 0;
-  i32 nm = NumMaesesFromTOML ("../maes-config.toml");
+  i32 nm = NumMaesesFromTOML ("../configs/maes-config.toml");
   for (i32 q = 0  ;  q < nm  ;  ++q)
-    if (PlatonicMaes *m = MaesFromTOML ("../maes-config.toml", q))
+    if (PlatonicMaes *m = MaesFromTOML ("../configs/maes-config.toml", q))
       { CMVTrefoil *leaf = new CMVTrefoil;
         leaf->maes = m;
         Bolex *c = CameraFromMaes (*m);
@@ -650,7 +650,8 @@ int main (int, char **)
 
   Layer &layer = zone.GetSceneLayer();
 
-  std::vector<FilmInfo> configs = ReadFilmInfo ("../jh-film-config.toml");
+  std::vector<FilmInfo> configs
+    = ReadFilmInfo ("../configs/jh-film-config.toml");
   assert (configs.size () > 0);
 
   FilmInfo &film_info = configs[0];
