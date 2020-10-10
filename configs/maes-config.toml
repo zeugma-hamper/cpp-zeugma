@@ -1,0 +1,30 @@
+
+[[maeses]]
+name = "left"
+location = [-3886.2, 1502.0, 0.0]
+over = [0.0, 0.0, -1.0]
+up = [0.0, 1.0, 0.0]
+width = 5340.0
+height = 3004.0
+ideal-pixwid = 3840
+ideal-pixhei = 2160
+
+[[maeses]]
+name = "front"
+location = [0.0, 2186.0, -2670.0]
+over = [1.0, 0.0, 0.0]
+up = [0.0, 1.0, 0.0]
+width = 7772.4
+height = 4372.0
+ideal-pixwid = 3840
+ideal-pixhei = 2160
+
+[[maeses]]
+name = "table"
+location = [0.0, 1112.5, 705.0]
+over = [1.0, 0.0, 0.0]
+up = [0.0, 0.208546, -0.978012]
+width = 1210.0
+height = 680.0
+ideal-pixwid = 1920
+ideal-pixhei = 1080
