@@ -168,37 +168,37 @@ MattePathPattern (FilmInfo const _film, ClipInfo const &_clip)
 
 bool MatteGeometry::IsValid () const
 {
-  return min_x < max_x && min_y < max_y;
+  return min[0] < max[0] && min[1] < max[1];
 }
 
 v2f32 MatteGeometry::GetCenter () const
 {
-  return {(min_x + max_x) / 2.0f, (min_y + max_y) / 2.0f};
+  return {(min[0] + max[0]) / 2.0f, (min[1] + max[1]) / 2.0f};
 }
 
 void MatteGeometry::Print (const char *_prefix) const
 {
   printf ("%s[%u, %u]: %u - %u  x  %u - %u\n",
-          _prefix, width, height, min_x, max_x, min_y, max_y);
+          _prefix, dimensions[0], dimensions[1], min[0], max[0], min[1], max[1]);
 }
 
 bool MatteGeometry::operator== (MatteGeometry const &_mg) const
 {
-  return index  == _mg.index &&
-    width  == _mg.width  &&
-    height == _mg.height &&
-    min_x  == _mg.min_x  &&
-    max_x  == _mg.max_x  &&
-    min_y  == _mg.min_y  &&
-    max_y  == _mg.max_y;
+  return index == _mg.index &&
+    dimensions[0] == _mg.dimensions[0]  &&
+    dimensions[1] == _mg.dimensions[1] &&
+    min[0] == _mg.min[0]  &&
+    max[0] == _mg.max[0]  &&
+    min[1] == _mg.min[1]  &&
+    max[1] == _mg.max[1];
 }
 
 toml::table MatteGeometry::into_toml () const
 {
   return toml::table {{s_index, index},
-                      {s_dimensions, {width, height}},
-                      {s_min, {min_x, min_y}},
-                      {s_max, {max_x, max_y}}};
+                      {s_dimensions, {dimensions[0], dimensions[1]}},
+                      {s_min, {min[0], min[1]}},
+                      {s_max, {max[0], max[1]}}};
 
 }
 
@@ -207,16 +207,16 @@ void MatteGeometry::from_toml (toml::value const &_v)
   using coord = std::array<u32, 2>;
   coord tmp;
   tmp = toml::find<coord> (_v, s_dimensions);
-  width = tmp[0];
-  height = tmp[1];
+  dimensions[0] = tmp[0];
+  dimensions[1] = tmp[1];
 
   tmp = toml::find<coord> (_v, s_min);
-  min_x = tmp[0];
-  min_y = tmp[1];
+  min[0]= tmp[0];
+  min[1] = tmp[1];
 
   tmp = toml::find<coord> (_v, s_max);
-  max_x = tmp[0];
-  max_y = tmp[1];
+  max[0] = tmp[0];
+  max[1] = tmp[1];
 
   index = toml::find<u32> (_v, s_index);
 }
@@ -323,6 +323,23 @@ void FilmGeometry::from_toml (toml::value const & _v)
   directory_geometries = toml::find<std::vector<MatteDirGeometry>> (_v, s_directory_geometries);
 
   Sort ();
+}
+
+std::vector<FilmGeometry>
+ReadFileGeometry (std::filesystem::path const &_path)
+{
+  std::vector<FilmGeometry> parsed_geometry;
+  parsed_geometry.reserve (20);
+
+  toml::value const data = toml::parse (_path.string ());
+  for (auto const &pr : toml::get<toml::table> (data))
+    parsed_geometry.push_back (toml::get<FilmGeometry> (pr.second));
+
+  std::sort (parsed_geometry.begin (), parsed_geometry.end (),
+             [] (FilmGeometry const &l, FilmGeometry const &r)
+             { return l.abbreviation < r.abbreviation; });
+
+  return parsed_geometry;
 }
 
 }

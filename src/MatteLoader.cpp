@@ -133,7 +133,9 @@ void MatteLoader::LoadFrames (MatteLoader *_loader)
           bgfx::TextureFormat::RGBA8
         };
 
-      std::unique_ptr<OIIO::ImageInput> iinput = OIIO::ImageInput::open (matte_on_deck.path ().string ());
+      std::unique_ptr<OIIO::ImageInput> iinput
+        = OIIO::ImageInput::open (matte_on_deck.path ().string ());
+
       if (! iinput)
         {
           fprintf (stderr, "error loading %s\n", matte_on_deck.path ().c_str());
@@ -150,7 +152,8 @@ void MatteLoader::LoadFrames (MatteLoader *_loader)
 
       iinput->read_image (OIIO::TypeDesc::UINT8, data);
 
-      MatteFrame frame {next, formats[ispec.nchannels], u32(ispec.width), u32(ispec.height), size, data};
+      MatteFrame frame {next, formats[ispec.nchannels],
+                        u32(ispec.width), u32(ispec.height), size, data};
       lock.lock ();
       _loader->m_frames.push_back (frame);
       //fprintf (stderr, "loaded %u\n", next);

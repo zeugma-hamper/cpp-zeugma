@@ -57,6 +57,9 @@ class VideoTexture : public CharmBase<VideoTexture>
 
   void BindGraphics (u64 _additional_state);
 
+  void SetDimensions (v2i32 _dim);
+  v2i32 GetDimensions () const;
+
   void SetNthTexture (size_t _index, bgfx::TextureHandle _handle);
   bgfx::TextureHandle GetNthTexture (size_t _index) const;
   bgfx::TextureHandle &GetNthTexture (size_t _index);
@@ -68,6 +71,7 @@ class VideoTexture : public CharmBase<VideoTexture>
 
   VideoFormat format;
   u64 const default_state = 0u;
+  v2i32 dimensions = {-1, -1};
   bgfx::ProgramHandle program  = BGFX_INVALID_HANDLE;
   bgfx::UniformHandle uniforms[5] = {BGFX_INVALID_HANDLE,
                                      BGFX_INVALID_HANDLE,

@@ -65,13 +65,10 @@ MattePathPattern (FilmInfo const _film, ClipInfo const &_clip);
 
 struct MatteGeometry
 {
-  u32 index = 0;
-  u32 width = 0;
-  u32 height = 0;
-  u32 min_x = u32(-1);
-  u32 max_x = 0;
-  u32 min_y = u32(-1);
-  u32 max_y = 0;
+  u32 index = u32(-1);
+  u32 dimensions[2] = {0, 0};
+  u32 min[2] = {u32(-1), u32 (-1)};
+  u32 max[2] = {0, 0};
 
   static const std::string s_index;
   static const std::string s_dimensions;
@@ -82,7 +79,7 @@ struct MatteGeometry
 
   v2f32 GetCenter () const;
 
-  void Print (const char *_prefix) const;
+  void Print (const char *_prefix = "") const;
 
   bool operator== (MatteGeometry const &_mg) const;
 
@@ -137,6 +134,10 @@ struct FilmGeometry
 
   void from_toml (toml::value const & _v);
 };
+
+std::vector<FilmGeometry>
+ReadFileGeometry (std::filesystem::path const &_path);
+
 
 }
 

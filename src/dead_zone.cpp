@@ -269,7 +269,7 @@ int main (int, char **)
   s_nodal->SetLocalTransformation(glm::translate(glm::vec3{0.0f, 0.0f, 9.0f})
                                   * glm::scale (glm::vec3 {10.0f}));
 
-  std::vector<FilmInfo> configs = ReadFilmInfo ("../film-config.toml");
+  std::vector<FilmInfo> configs = ReadFilmInfo ("../configs/film-config.toml");
   assert (configs.size () > 0);
 
   FilmInfo &film_info = configs[0];

@@ -45,7 +45,9 @@ void MattedVideoRenderable::Draw (u16 vyu_id)
   m_video_texture->BindGraphics (BGFX_STATE_PT_TRISTRIP);
   bgfx::setVertexCount(4);
 
-  glm::vec4 unity {1.0f, 1080.0f/1920.0f, 1.0f, 1.0f};
+  v2i32 const dim = m_video_texture->GetDimensions ();
+  f32 inv_aspect = f32(dim.y)/dim.x;
+  glm::vec4 unity {1.0f, inv_aspect, 1.0f, 1.0f};
   bgfx::setUniform(m_video_texture->GetAspectUniform(), glm::value_ptr (unity));
 
   bgfx::submit(vyu_id, m_video_texture->GetProgram());
