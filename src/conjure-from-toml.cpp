@@ -145,6 +145,12 @@ PlatonicMaes *MaesFromTOML (const std::string &toml_fpath, i32 index)
   if (emm . contains ("height"))
     maes -> SetHeight (toml::get <f64> (emm["height"]));
 
+  if (emm . contains ("ideal-pixwid"))
+    maes -> SetIdealPixelWidth (toml::get <i64> (emm["ideal-pixwid"]));
+
+  if (emm . contains ("ideal-pixhei"))
+    maes -> SetIdealPixelHeight (toml::get <i64> (emm["ideal-pixhei"]));
+
   return maes;
 }
 

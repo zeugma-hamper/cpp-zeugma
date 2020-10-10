@@ -64,7 +64,7 @@ class CMVTrefoil  :  public Zeubject
     i32 view_id;  // bgfx's is u16, so we can rep't stuff in neg nos.
     f64 botlef_x, botlef_y;
     f64 wid_frac, hei_frac;  // these four norm'd [0,1] ref'ing window res
-    i32 fb_pix_w, fb_pix_h;
+    i64 fb_pix_w, fb_pix_h;
     u16 ViewID ()  const  { return (u16)view_id; }
   } *b_view;
   CMVTrefoil ()  :  Zeubject (), cam (NULL), maes (NULL), b_view (NULL)
@@ -304,7 +304,7 @@ static void glfw_key_callback(GLFWwindow *window, int key, int, int action, int)
     }
 }
 
-static i32 WINWID = 7680;
+static i32 WINWID = 9600;
 static i32 WINHEI = 2160;
 bool dead_zone::InitWindowingAndGraphics ()
 {
@@ -603,6 +603,8 @@ int main (int, char **)
 {
   dead_zone zone;
 
+  i64 total_pixwid = 0;
+  i64 total_pixhei = 0;
   i32 nm = NumMaesesFromTOML ("../maes-config.toml");
   for (i32 q = 0  ;  q < nm  ;  ++q)
     if (PlatonicMaes *m = MaesFromTOML ("../maes-config.toml", q))
@@ -610,6 +612,13 @@ int main (int, char **)
         leaf->maes = m;
         Bolex *c = CameraFromMaes (*m);
         leaf->cam = c;
+
+        if (m -> IdealPixelWidth ()  >=  0)
+          total_pixwid += m -> IdealPixelWidth ();
+        if (m -> IdealPixelHeight ()  >=  0)
+          if (m -> IdealPixelHeight ()  >  total_pixhei)
+            total_pixhei = m -> IdealPixelHeight ();
+
         CMVTrefoil::BGFXView *bv = new CMVTrefoil::BGFXView;
         leaf->b_view = bv;
         bv->botlef_x = 0.5 * (f64)q;
@@ -618,6 +627,22 @@ int main (int, char **)
         bv->hei_frac = 1.0;
         bv->view_id = q;
         zone.render_leaves . push_back (leaf);
+      }
+
+  f64 eks = 0.0;
+  if (total_pixwid  >  0)
+    for (CMVTrefoil *leaf  :  zone.render_leaves)
+      { CMVTrefoil::BGFXView *bv = leaf->b_view;
+        PlatonicMaes *m = leaf->maes;
+        if (m -> IdealPixelWidth ())
+          { bv->wid_frac = (f64)m -> IdealPixelWidth () / (f64)total_pixwid;
+            bv->botlef_x = eks;
+            eks += bv->wid_frac;
+          }
+        if (m -> IdealPixelHeight ())
+          { bv->hei_frac = (f64)m -> IdealPixelHeight () / (f64)total_pixhei;
+            bv->botlef_y = 0.0;
+          }
       }
 
   if (! zone.StartUp ())

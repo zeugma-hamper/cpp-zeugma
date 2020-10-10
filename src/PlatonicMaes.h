@@ -13,22 +13,26 @@ class PlatonicMaes  :  public SpaceThing
 { public:
   ZoftVect loc, ovr, upp;
   ZoftFloat wid, hei;
+  i64 ideal_pixwid, ideal_pixhei;
 
   PlatonicMaes ()  :  SpaceThing (),
                       loc (Vect::zerov), ovr (Vect::xaxis), upp (Vect::yaxis),
-                      wid (400), hei (225)
+                      wid (400), hei (225),
+                      ideal_pixwid (-1), ideal_pixhei (-1)
     { }
 
   PlatonicMaes (const Vect &ell, const Vect &ohh, const Vect &yew,
                 f64 dubya, f64 aytch)
      :  SpaceThing (),
-        loc (ell), ovr (ohh), upp (yew), wid (dubya), hei (aytch)
+        loc (ell), ovr (ohh), upp (yew), wid (dubya), hei (aytch),
+        ideal_pixwid (-1), ideal_pixhei (-1)
     { }
 
   PlatonicMaes (const ZoftVect &lz, const ZoftVect &oz, const ZoftVect &uz,
                 const ZoftFloat &wz, const ZoftFloat &hz)
      :  SpaceThing (),
-        loc (lz), ovr (oz), upp (uz), wid (wz), hei (hz)
+        loc (lz), ovr (oz), upp (uz), wid (wz), hei (hz),
+        ideal_pixwid (-1), ideal_pixhei (-1)
     { }
 
   const Vect &Loc ()  const
@@ -44,6 +48,11 @@ class PlatonicMaes  :  public SpaceThing
     { return wid.val; }
   f64 Height ()  const
     { return hei.val; }
+
+  i64 IdealPixelWidth ()  const
+    { return ideal_pixwid; }
+  i64 IdealPixelHeight ()  const
+    { return ideal_pixhei; }
 
   ZoftVect &LocZoft ()
     { return loc; }
@@ -68,6 +77,10 @@ class PlatonicMaes  :  public SpaceThing
     { wid = w; }
   void SetHeight (f64 h)
     { hei = h; }
+  void SetIdealPixelWidth (i64 ipw)
+    { ideal_pixwid = ipw; }
+  void SetIdealPixelHeight (i64 iph)
+    { ideal_pixhei = iph; }
 
 
   i64 Inhale (i64 ratch, f64 thyme);
