@@ -2,6 +2,10 @@
 
 #include <Node.hpp>
 
+#include "Matrix44.h"
+
+#include <vector_interop.hpp>
+
 #include <charm_glm.hpp>
 
 namespace charm
@@ -58,13 +62,17 @@ RectangleRenderable::RectangleRenderable ()
   }
 
   void RectangleRenderable::Draw (u16 vyu_id)
-  {
-    bgfx::setTransform(&m_node->GetAbsoluteTransformation().model);
-    bgfx::setVertexBuffer(0, vbh, 0, 4);
+  { Matrix44 re_coord (INITLESS);
+    re_coord . LoadCoordTransform (Over (), Up ());
+    glm::mat4 reco = as_glm (re_coord);
+    glm::mat4 m = m_node->GetAbsoluteTransformation().model * reco;
+//    bgfx::setTransform (&m_node->GetAbsoluteTransformation().model);
+    bgfx::setTransform (&m);
+    bgfx::setVertexBuffer (0, vbh, 0, 4);
     bgfx::setState (BGFX_STATE_WRITE_RGB |
                     BGFX_STATE_PT_TRISTRIP |
                     BGFX_STATE_WRITE_Z);
-    bgfx::submit(vyu_id, program, m_graph_id);
+    bgfx::submit (vyu_id, program, m_graph_id);
   }
 
 }

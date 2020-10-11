@@ -306,6 +306,17 @@ Matrix44 &Matrix44::LoadRotationAboutPreNormed (const Vect &axs, f64 ang,
 
 
 
+Matrix44 &Matrix44::LoadCoordTransform (const Vect &o, const Vect &u,
+                                        const Vect &n)
+{ M_CPY (mIdent, *this);
+  m[0][0] = o.x;  m[0][1] = o.y;  m[0][2] = o.z;
+  m[1][0] = u.x;  m[1][1] = u.y;  m[1][2] = u.z;
+  m[2][0] = n.x;  m[2][1] = n.y;  m[2][2] = n.z;
+  return *this;
+}
+
+
+
 Vect Matrix44::TransformVect (const Vect &v)  const
 { f64 a0 = v.x * m[0][0]  +  v.y * m[1][0]  +  v.z * m[2][0]  +  m[3][0];
   f64 a1 = v.x * m[0][1]  +  v.y * m[1][1]  +  v.z * m[2][1]  +  m[3][1];

@@ -8,8 +8,8 @@ Renderable::Renderable ()
 
 Renderable::Renderable (Node *_node)
   : m_node {_node},
-    m_over {1.0f, 0.0f, 0.0f, 0.0f},
-    m_up {0.0f, 1.0f, 0.0f, 0.0f},
+    m_over {Vect::xaxis},
+    m_up {Vect::yaxis},
     m_sort_key {0u},
     m_graph_id {0u},
     m_should_draw {true}
@@ -18,25 +18,25 @@ Renderable::Renderable (Node *_node)
 Renderable::~Renderable ()
 { }
 
-void Renderable::SetOver (glm::vec4 const &_over)
-{
-  m_over = _over;
-}
 
-glm::vec4 const &Renderable::GetOver () const
-{
-  return m_over;
-}
+const Vect &Renderable::Over ()  const
+{ return m_over.val; }
 
-void Renderable::SetUp (glm::vec4 const &_up)
-{
-  m_up = _up;
-}
+const Vect &Renderable::Up ()  const
+{ return m_up.val; }
 
-glm::vec4 const &Renderable::GetUp () const
-{
-  return m_up;
-}
+void Renderable::SetOver (const Vect &o)
+{ m_over = o; }
+
+void Renderable::SetUp (const Vect &u)
+{ m_up = u; }
+
+ZoftVect &Renderable::OverZoft ()
+{ return m_over; }
+
+ZoftVect &Renderable::UpZoft ()
+{ return m_up; }
+
 
 void Renderable::Update ()
 {

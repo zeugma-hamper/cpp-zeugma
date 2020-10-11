@@ -6,6 +6,9 @@
 
 #include <charm_glm.hpp>
 
+#include "ZoftThing.h"
+
+
 namespace charm {
 
 class Node;
@@ -21,13 +24,14 @@ class Renderable
 
   CHARM_DELETE_MOVE_COPY (Renderable);
 
-  // assuming this is going to be updated once softs are installed
-  void SetOver (glm::vec4 const &_over);
-  glm::vec4 const &GetOver () const;
+  const Vect &Over ()  const;
+  const Vect &Up ()  const;
 
-  // assuming this is going to be updated once softs are installed
-  void SetUp (glm::vec4 const &_up);
-  glm::vec4 const &GetUp () const;
+  void SetOver (const Vect &o);
+  void SetUp (const Vect &u);
+
+  ZoftVect &OverZoft ();
+  ZoftVect &UpZoft ();
 
   virtual void Update ();
   virtual void Draw (u16 vyu_id) = 0;
@@ -43,8 +47,8 @@ class Renderable
 
  protected:
   Node *m_node;
-  glm::vec4 m_over;
-  glm::vec4 m_up;
+  ZoftVect m_over;
+  ZoftVect m_up;
   sort_key m_sort_key;
   graph_id m_graph_id;
   bool m_should_draw;

@@ -112,6 +112,24 @@ class ZoftThing
   ZGuts <T> *guts;
   bool just_changed, nomo_change;
 
+  template <typename TT>
+    class LatchGuts  :  public ZoftThing<TT>::template ZGuts<TT>
+      { public:
+        TT latchval;
+
+        LatchGuts ()  :  ZoftThing<TT>::template ZGuts<TT> (),
+           latchval (TT (0.0))
+          { }
+        LatchGuts (const TT &lv)
+           :  ZoftThing<TT>::template ZGuts<TT> (), latchval (lv)
+          { }
+
+        i64 Inhale (i64 ratch, f64 thyme)  override
+          { this -> PuppeteerHosts (latchval);
+            return 0;
+          }
+      };
+
   ZoftThing ()
      :  guts (NULL), just_changed (true), nomo_change (false)
     { }
@@ -129,7 +147,14 @@ class ZoftThing
     }
 
   const T &operator = (const T &v)
-    { val = v;  just_changed = true;  return val; }
+    { if (! guts)
+        { val = v;  just_changed = true;  return val; }
+      if (LatchGuts <T> *lg = dynamic_cast <LatchGuts <T> *> (guts))
+        lg->latchval = v;
+      else
+        val = v;
+      just_changed = true;  return val;
+    }
   ZoftThing &operator = (const ZoftThing &z)
     { val = z.val;
       nomo_change = z.nomo_change;
@@ -146,6 +171,18 @@ class ZoftThing
     { val = z.val;
       nomo_change = z.nomo_change;
       InstallGuts (z.guts);
+      return *this;
+    }
+
+  ZoftThing &MakeBecomeLikable ()
+    { if (! guts)
+        InstallGuts (new LatchGuts <T> (val));
+      return *this;
+    }
+
+  ZoftThing &MakeGutless ()
+    { if (guts)
+        { guts -> RemoveHost (this);  guts = NULL; }
       return *this;
     }
 

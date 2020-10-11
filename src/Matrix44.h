@@ -106,6 +106,12 @@ class Matrix44
       return LoadRotationAboutPreNormed (axs, ang, cnt);
     }
 
+  Matrix44 &LoadCoordTransform (const Vect &o, const Vect &u, const Vect &n);
+  Matrix44 &LoadCoordTransform (Vect o, Vect u)
+    { o . NormSelf ();  u . NormSelf ();
+      return LoadCoordTransform (o, u, o . Cross (u));
+    }
+
   Vect TransformVect (const Vect &v)  const;
   Vect &TransformVectInPlace (Vect &v)  const;
 };

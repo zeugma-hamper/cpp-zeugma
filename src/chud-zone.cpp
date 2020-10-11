@@ -488,12 +488,17 @@ LoopVect elzyvee { Vect (0.0, 1.0, 2.0), Vect (1.0, -1.0, 3.0), 5.5 };
 InterpFloat ayezee { -1.0, 1.0, 4.7 };
 LoopFloat timey { 0.0, 1.0, 0.0 };
 
+ZoftVect whoa_o, whoa_u;
+
+
 bool dead_zone::DoWhatThouWilt (i64 ratch, f64 thyme)
 { if (ayezee.val > 0.993  &&  ayezee.val < 0.999)
     elzyvee . Restart ();
 
   if (timey.val > 1.5)
     { rowp . HooverCoordTransforms ();
+      whoa_o = Vect::yaxis;
+      whoa_u = -Vect::xaxis;
       timey . BecomeLike (ZoftFloat (0.0));
     }
 
@@ -675,8 +680,15 @@ int main (int, char **)
       s_nodal -> Translate (maes -> Loc ());
     }
 
+  whoa_o = Vect::xaxis;
+  whoa_u = Vect::yaxis;
+  whoa_o . MakeBecomeLikable ();
+  whoa_u . MakeBecomeLikable ();
+
   RectangleRenderable *rect_rend = new RectangleRenderable ();
   (dr_no = new Node) -> AppendRenderable (rect_rend);
+  rect_rend -> OverZoft () . BecomeLike (whoa_o);
+  rect_rend -> UpZoft () . BecomeLike (whoa_u);
   layer . GetRootNode () -> AppendChild (dr_no);
 
   if (maes = zone . FindMaesByName ("front"))
@@ -687,10 +699,13 @@ int main (int, char **)
       dr_no -> Translate (maes -> Loc ());
     }
 
+  RectangleRenderable *rr;
   for (int poot = 0  ;  poot < 9  ;  ++poot)
     { Node *enn = new Node;
-      enn -> AppendRenderable (new RectangleRenderable);
+      enn -> AppendRenderable (rr = new RectangleRenderable);
       //  enn -> Rotate (ZoftThing (Vect::zaxis), SinuFloat (0.5, 2.0));
+      rr -> OverZoft () . BecomeLike (whoa_o);
+      rr -> UpZoft () . BecomeLike (whoa_u);
       enn -> RotateD (Vect::yaxis, 45.0);
       enn -> Scale (0.025 * maes -> Height ());
       enn -> Translate (maes -> Loc ()
