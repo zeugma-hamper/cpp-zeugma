@@ -3,6 +3,7 @@
 
 //#include <bgfx_utils.hpp>
 #include <base_types.hpp>
+#include <class_utils.hpp>
 
 #include <toml11/toml.hpp>
 
@@ -37,31 +38,6 @@ namespace charm
   descriptor - same descriptor as above
   index - three-digit, zero-filled index of matte in this clip
 */
-
-struct ClipInfo
-{
-  std::filesystem::path directory;
-  std::string name;
-
-  f64 start_time = -1.0;
-  f64 duration = -1.0f;
-  u32 frame_count = 0u;
-};
-
-struct FilmInfo
-{
-  std::filesystem::path film_path;
-  std::filesystem::path clip_path;
-  std::string name;
-  std::string abbreviation;
-  std::vector<ClipInfo> clips;
-};
-
-std::vector<FilmInfo>
-ReadFilmInfo (std::filesystem::path const &_path);
-
-std::string
-MattePathPattern (FilmInfo const _film, ClipInfo const &_clip);
 
 struct MatteGeometry
 {
@@ -135,9 +111,37 @@ struct FilmGeometry
   void from_toml (toml::value const & _v);
 };
 
+struct ClipInfo
+{
+  std::filesystem::path directory;
+  std::string name;
+  MatteDirGeometry geometry;
+
+  f64 start_time = -1.0;
+  f64 duration = -1.0f;
+  u32 frame_count = 0u;
+};
+
+struct FilmInfo
+{
+  std::filesystem::path film_path;
+  std::filesystem::path clip_path;
+  std::string name;
+  std::string abbreviation;
+  std::vector<ClipInfo> clips;
+};
+
+std::vector<FilmInfo>
+ReadFilmInfo (std::filesystem::path const &_path);
+
+std::string
+MattePathPattern (FilmInfo const _film, ClipInfo const &_clip);
+
 std::vector<FilmGeometry>
 ReadFileGeometry (std::filesystem::path const &_path);
 
+void MergeFilmInfoGeometry (std::vector<FilmInfo> &_info,
+                            std::vector<FilmGeometry> &_geom);
 
 }
 

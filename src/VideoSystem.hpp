@@ -60,11 +60,16 @@ class VideoTexture : public CharmBase<VideoTexture>
   void SetDimensions (v2i32 _dim);
   v2i32 GetDimensions () const;
 
+  void SetMatteDimensions (v2i32 _min, v2i32 _max);
+  v2i32 GetMatteMin () const;
+  v2i32 GetMatteMax () const;
+
   void SetNthTexture (size_t _index, bgfx::TextureHandle _handle);
   bgfx::TextureHandle GetNthTexture (size_t _index) const;
   bgfx::TextureHandle &GetNthTexture (size_t _index);
 
-  bgfx::UniformHandle const &GetAspectUniform () const;
+  bgfx::UniformHandle const &GetDimensionUniform () const;
+  bgfx::UniformHandle const &GetMatteDimUniform () const;
   bgfx::ProgramHandle const &GetProgram () const;
 
  protected:
@@ -72,8 +77,11 @@ class VideoTexture : public CharmBase<VideoTexture>
   VideoFormat format;
   u64 const default_state = 0u;
   v2i32 dimensions = {-1, -1};
+  v2i32 matte_min = {-1, -1};
+  v2i32 matte_max = {-1, -1};
   bgfx::ProgramHandle program  = BGFX_INVALID_HANDLE;
-  bgfx::UniformHandle uniforms[5] = {BGFX_INVALID_HANDLE,
+  bgfx::UniformHandle uniforms[6] = {BGFX_INVALID_HANDLE,
+                                     BGFX_INVALID_HANDLE,
                                      BGFX_INVALID_HANDLE,
                                      BGFX_INVALID_HANDLE,
                                      BGFX_INVALID_HANDLE,
@@ -122,7 +130,8 @@ class VideoSystem
                                                   BGFX_STATE_BLEND_INV_SRC_ALPHA);
     bgfx::ProgramHandle matte_program = BGFX_INVALID_HANDLE;
 
-    bgfx::UniformHandle uniforms[5] = {BGFX_INVALID_HANDLE,
+    bgfx::UniformHandle uniforms[6] = {BGFX_INVALID_HANDLE,
+                                       BGFX_INVALID_HANDLE,
                                        BGFX_INVALID_HANDLE,
                                        BGFX_INVALID_HANDLE,
                                        BGFX_INVALID_HANDLE,
@@ -151,7 +160,8 @@ class VideoSystem
   // see MattePathPattern in Matte.hpp
   VideoBrace OpenMatte (std::string_view _uri,
                         f64 _loop_start_ts, f64 _loop_end_ts,
-                        i32 _frame_count, fs::path const &_matte_dir);
+                        i32 _frame_count, fs::path const &_matte_dir,
+                        v2i32 _min, v2i32 _max);
 
  protected:
   VideoSystem ();

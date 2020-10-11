@@ -346,4 +346,31 @@ ReadFileGeometry (std::filesystem::path const &_path)
   return parsed_geometry;
 }
 
+void MergeFilmInfoGeometry (std::vector<FilmInfo> &_info,
+                            std::vector<FilmGeometry> &_geom)
+{
+  //TODO: optimize. these both should be sorted, so they should match.
+  for (FilmInfo &fm : _info)
+    {
+      auto it = std::find_if (_geom.begin(), _geom.end (),
+                              [&fm] (FilmGeometry &g)
+                              { return g.abbreviation == fm.abbreviation; });
+      if (it == _geom.end ())
+        continue;
+      FilmGeometry &fgm = *it;
+
+      for (ClipInfo &cm : fm.clips)
+        {
+          auto cit = std::find_if (fgm.directory_geometries.begin (),
+                                   fgm.directory_geometries.end (),
+                                   [&cm] (MatteDirGeometry &m)
+                                   { return cm.directory.filename() == m.clip_path; });
+          if (cit == fgm.directory_geometries.end ())
+            continue;
+
+          cm.geometry = std::move (*cit);
+        }
+    }
+}
+
 }
