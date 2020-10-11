@@ -269,20 +269,32 @@ int main (int, char **)
   s_nodal->SetLocalTransformation(glm::translate(glm::vec3{0.0f, 0.0f, 9.0f})
                                   * glm::scale (glm::vec3 {10.0f}));
 
-  std::vector<FilmInfo> configs = ReadFilmInfo ("../film-config.toml");
+
+  std::vector<FilmInfo> configs = ReadFilmInfo ("../configs/film-config.toml");
   assert (configs.size () > 0);
 
-  FilmInfo &film_info = configs[0];
+  std::vector<FilmGeometry> geom = ReadFileGeometry("../configs/mattes.toml");
+  assert (geom.size () > 0);
+  MergeFilmInfoGeometry(configs, geom);
+
+  //FilmInfo &film_info = configs[0];
+  FilmInfo &film_info = configs.back ();
   assert (film_info.clips.size () > 0);
   ClipInfo &clip_info = film_info.clips[0];
 
   // std::string file
   //   = "file:///home/blake/tlp/tamper-blu-mkv/the-fall-blu.mov";
 
-  std::string uri = std::string ("file://") + film_info.film_path.c_str ();
+  std::string uri = std::string ("file://") + film_info.film_path.string ();
   MattedVideoRenderable *renderable
     = new MattedVideoRenderable (film_info, clip_info);
 
+  printf ("clip dims: [%u, %u] - [%u, %u]\n",
+          clip_info.geometry.dir_geometry.min[0],
+          clip_info.geometry.dir_geometry.min[1],
+          clip_info.geometry.dir_geometry.max[0],
+          clip_info.geometry.dir_geometry.max[1]);
+  //VideoRenderable *renderable = new VideoRenderable (uri);
 
   s_nodal->AppendRenderable(renderable);
   layer.GetRootNode()->AppendChild(s_nodal);

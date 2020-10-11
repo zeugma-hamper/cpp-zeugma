@@ -6,4 +6,5 @@
 	url = https://github.com/bkaradzic/bimg.git
 [submodule "bgfx"]
 	path = bgfx
-	url = https://github.com/bkaradzic/bgfx.git
+	url = https://github.com/lintwaddle/bgfx.git
+	branch = dev-point

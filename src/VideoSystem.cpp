@@ -32,7 +32,7 @@ VideoTexture::VideoTexture (VideoFormat _format, u64 _state, bgfx::ProgramHandle
   for (size_t i = 0; i < array_size (textures); ++i)
     textures[i] = BGFX_INVALID_HANDLE;
 
-  assert (_uni_count <= 5);
+  assert (_uni_count <= 6);
 
   for (size_t i = 0; i < _uni_count; ++i)
     uniforms[i] = _unis[i];
@@ -71,6 +71,32 @@ void VideoTexture::BindGraphics (u64 _additional_state)
     }
 }
 
+void VideoTexture::SetDimensions (v2i32 _dim)
+{
+  dimensions = _dim;
+}
+
+v2i32 VideoTexture::GetDimensions () const
+{
+  return dimensions;
+}
+
+void VideoTexture::SetMatteDimensions (v2i32 _min, v2i32 _max)
+{
+  matte_min = _min;
+  matte_max = _max;
+}
+
+v2i32 VideoTexture::GetMatteMin () const
+{
+  return matte_min;
+}
+
+v2i32 VideoTexture::GetMatteMax () const
+{
+  return matte_max;
+}
+
 void VideoTexture::SetNthTexture (size_t _index, bgfx::TextureHandle _handle)
 {
   assert (_index < array_size (textures));
@@ -99,9 +125,15 @@ bgfx::TextureHandle VideoTexture::GetNthTexture (size_t _index) const
   return textures[_index];
 }
 
-bgfx::UniformHandle const &VideoTexture::GetAspectUniform () const
+
+bgfx::UniformHandle const &VideoTexture::GetDimensionUniform () const
 {
   return uniforms[4];
+}
+
+bgfx::UniformHandle const &VideoTexture::GetMatteDimUniform () const
+{
+  return uniforms[5];
 }
 
 bgfx::ProgramHandle const &VideoTexture::GetProgram () const
@@ -136,7 +168,8 @@ VideoSystem::VideoSystem ()
   m_vgr.uniforms[1] = bgfx::createUniform("u_video_texture1", bgfx::UniformType::Sampler);
   m_vgr.uniforms[2] = bgfx::createUniform("u_video_texture2", bgfx::UniformType::Sampler);
   m_vgr.uniforms[3] = bgfx::createUniform("u_video_matte",    bgfx::UniformType::Sampler);
-  m_vgr.uniforms[4] = bgfx::createUniform("u_aspect_ratio", bgfx::UniformType::Vec4);
+  m_vgr.uniforms[4] = bgfx::createUniform("u_dimensions",     bgfx::UniformType::Vec4);
+  m_vgr.uniforms[5] = bgfx::createUniform("u_matte_dimensions", bgfx::UniformType::Vec4);
 
   ProgramResiduals ps = CreateProgram ("video_vs.bin", "video_fs.bin", true);
   m_vgr.basic_program = ps.program;
@@ -176,8 +209,7 @@ static void update_or_create_texture (bgfx::TextureHandle &_handle, u16 _width, 
 
 static void upload_frame (gst_ptr<GstSample> const &_sample,
                           ch_ptr<VideoTexture> const &_textures,
-                          GstVideoInfo *_video_info,
-                          bool _is_matte)
+                          GstVideoInfo *_video_info)
 {
   GstCaps *sample_caps = gst_sample_get_caps(_sample.get ());
   GstVideoInfo stack_video_info;
@@ -202,14 +234,17 @@ static void upload_frame (gst_ptr<GstSample> const &_sample,
   stride = GST_VIDEO_INFO_PLANE_STRIDE(video_info, 0);
   // align = calculate_alignment (stride);
 
+  //printf ("frame: %d x %d with %d comp, %d stride\n", width, height, components, stride);
+
+  _textures->SetDimensions({width, height});
+
   video_frame_holder *frame_holder = new video_frame_holder (_sample, video_info);
   const bgfx::Memory *mem
     = bgfx::makeRef (GST_VIDEO_FRAME_PLANE_DATA(&frame_holder->video_frame, 0),
                      GST_VIDEO_FRAME_SIZE(&frame_holder->video_frame),
                      DeleteImageLeftOvers<video_frame_holder>, frame_holder);
 
-  bgfx::TextureHandle &text_handle
-    = _is_matte ? _textures->GetNthTexture(3) : _textures->GetNthTexture(0);
+  bgfx::TextureHandle &text_handle = _textures->GetNthTexture(0);
 
   update_or_create_texture(text_handle, width, height, components, stride,
                            BGFX_SAMPLER_UVW_CLAMP | BGFX_SAMPLER_POINT, mem);
@@ -228,7 +263,7 @@ void VideoSystem::UploadFrames ()
       if (! texture)
         continue;
 
-      upload_frame(sample, texture, &video_info, false);
+      upload_frame(sample, texture, &video_info);
 
       if (pipe.matte_dir_path.empty())
         continue;
@@ -237,7 +272,8 @@ void VideoSystem::UploadFrames ()
       guint64 pts = GST_BUFFER_PTS(buffer);
 
       auto calc_dur = [&video_info] (gint64 n_frames) -> gint64
-      { return n_frames * GST_VIDEO_INFO_FPS_D(&video_info) * 1e9 / GST_VIDEO_INFO_FPS_N(&video_info); };
+      { return n_frames * GST_VIDEO_INFO_FPS_D(&video_info) * 1e9
+          / GST_VIDEO_INFO_FPS_N(&video_info); };
 
       gint64 const frame_dur = calc_dur (1);
       if (pipe.adjusted_loop_start_ts == -1 &&
@@ -249,8 +285,6 @@ void VideoSystem::UploadFrames ()
             = pipe.adjusted_loop_start_ts + calc_dur (pipe.matte_frame_count);
         }
 
-      // fprintf (stderr, "loop from %ld to %ld\n", pipe.adjusted_loop_start_ts, pipe.adjusted_loop_end_ts);
-
       //TODO: set matte texture to pass through
       if (gint64(pts) < pipe.adjusted_loop_start_ts ||
           gint64(pts) > pipe.adjusted_loop_end_ts + (frame_dur / 2))
@@ -258,23 +292,20 @@ void VideoSystem::UploadFrames ()
 
       //i expect looping here for now
       guint64 offset_ns = pts - pipe.adjusted_loop_start_ts;
-      guint64 frame_num = guint64 (offset_ns * GST_VIDEO_INFO_FPS_N(&video_info)
-                                   / GST_VIDEO_INFO_FPS_D(&video_info) / f64(1e9));
-      //printf ("pts: %f, now: %f\n", pts/f64(1e9), offset_ns/f64(1e9));
+      guint64 frame_num = guint64 (std::round (offset_ns * GST_VIDEO_INFO_FPS_N(&video_info)
+                                               / GST_VIDEO_INFO_FPS_D(&video_info) / f64(1e9)));
+      //printf ("pts: %f, now: %f, for %lu\n", pts/f64(1e9), offset_ns/f64(1e9), frame_num);
 
-      //assert (frame_num < pipe.matte_file_paths.size ());
       MatteFrame mf = pipe.matte_loader->GetFrame(frame_num);
       if (! mf.data)
         {
           fprintf (stderr, "no matte for %lu which seems fishy\n", frame_num);
           continue;
         }
-      // else
-      //   {
-      //     fprintf (stderr, "got matte %u\n", mf.offset);
-      //   }
 
-      bgfx::Memory const *memory = bgfx::makeRef(mf.data, mf.data_size, MatteLoader::MatteDataReleaseFn);
+      bgfx::Memory const *memory
+        = bgfx::makeRef(mf.data, mf.data_size, MatteLoader::MatteDataReleaseFn);
+
       bgfx::TextureHandle &matte_texture = texture->GetNthTexture(3);
       if (! bgfx::isValid(matte_texture))
         matte_texture = bgfx::createTexture2D(mf.width, mf.height, false, 1, mf.format);
@@ -345,7 +376,8 @@ void VideoSystem::DestroyVideo (VideoTexture *_texture)
 
 VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
                                    f64 _loop_start_ts, f64 _loop_end_ts,
-                                   i32 _frame_count, fs::path const &_matte_dir)
+                                   i32 _frame_count, fs::path const &_matte_dir,
+                                   v2i32 _min, v2i32 _max)
 {
   BasicPipelineTerminus *term = new BasicPipelineTerminus (false);
   ch_ptr<DecodePipeline> dec {new DecodePipeline};
@@ -356,6 +388,8 @@ VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
   ch_ptr<VideoTexture>
     txt{new VideoTexture (VideoFormat::RGB, m_vgr.matte_state, m_vgr.matte_program,
                           m_vgr.uniforms, array_size (m_vgr.uniforms))};
+
+  txt->SetMatteDimensions(_min, _max);
 
   m_pipelines.emplace_back();
   VideoPipeline &pipe = m_pipelines.back ();

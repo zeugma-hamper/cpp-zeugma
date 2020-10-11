@@ -3,6 +3,7 @@
 
 //#include <bgfx_utils.hpp>
 #include <base_types.hpp>
+#include <class_utils.hpp>
 
 #include <toml11/toml.hpp>
 
@@ -38,40 +39,12 @@ namespace charm
   index - three-digit, zero-filled index of matte in this clip
 */
 
-struct ClipInfo
-{
-  std::filesystem::path directory;
-  std::string name;
-
-  f64 start_time = -1.0;
-  f64 duration = -1.0f;
-  u32 frame_count = 0u;
-};
-
-struct FilmInfo
-{
-  std::filesystem::path film_path;
-  std::filesystem::path clip_path;
-  std::string name;
-  std::string abbreviation;
-  std::vector<ClipInfo> clips;
-};
-
-std::vector<FilmInfo>
-ReadFilmInfo (std::filesystem::path const &_path);
-
-std::string
-MattePathPattern (FilmInfo const _film, ClipInfo const &_clip);
-
 struct MatteGeometry
 {
-  u32 index = 0;
-  u32 width = 0;
-  u32 height = 0;
-  u32 min_x = u32(-1);
-  u32 max_x = 0;
-  u32 min_y = u32(-1);
-  u32 max_y = 0;
+  u32 index = u32(-1);
+  u32 dimensions[2] = {0, 0};
+  u32 min[2] = {u32(-1), u32 (-1)};
+  u32 max[2] = {0, 0};
 
   static const std::string s_index;
   static const std::string s_dimensions;
@@ -82,7 +55,7 @@ struct MatteGeometry
 
   v2f32 GetCenter () const;
 
-  void Print (const char *_prefix) const;
+  void Print (const char *_prefix = "") const;
 
   bool operator== (MatteGeometry const &_mg) const;
 
@@ -137,6 +110,38 @@ struct FilmGeometry
 
   void from_toml (toml::value const & _v);
 };
+
+struct ClipInfo
+{
+  std::filesystem::path directory;
+  std::string name;
+  MatteDirGeometry geometry;
+
+  f64 start_time = -1.0;
+  f64 duration = -1.0f;
+  u32 frame_count = 0u;
+};
+
+struct FilmInfo
+{
+  std::filesystem::path film_path;
+  std::filesystem::path clip_path;
+  std::string name;
+  std::string abbreviation;
+  std::vector<ClipInfo> clips;
+};
+
+std::vector<FilmInfo>
+ReadFilmInfo (std::filesystem::path const &_path);
+
+std::string
+MattePathPattern (FilmInfo const _film, ClipInfo const &_clip);
+
+std::vector<FilmGeometry>
+ReadFileGeometry (std::filesystem::path const &_path);
+
+void MergeFilmInfoGeometry (std::vector<FilmInfo> &_info,
+                            std::vector<FilmGeometry> &_geom);
 
 }
 

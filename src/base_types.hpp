@@ -76,6 +76,113 @@ typedef struct {
   };
 } v4f64;
 
+
+
+typedef struct {
+  union {
+    struct { i32 x, y; };
+    struct { i32 a0, a1; };
+    i32 a[2];
+  };
+} v2i32;
+
+typedef struct {
+  union {
+    struct { i32 x, y, z; };
+    struct { i32 a0, a1, a2; };
+    i32 a[3];
+  };
+} v3i32;
+
+typedef struct {
+  union {
+    struct { i32 x, y, z, w; };
+    struct { i32 a0, a1, a2, a3; };
+    i32 a[4];
+  };
+} v4i32;
+
+
+
+
+typedef struct {
+  union {
+    struct { u32 x, y; };
+    struct { u32 a0, a1; };
+    u32 a[2];
+  };
+} v2u32;
+
+typedef struct {
+  union {
+    struct { u32 x, y, z; };
+    struct { u32 a0, a1, a2; };
+    u32 a[3];
+  };
+} v3u32;
+
+typedef struct {
+  union {
+    struct { u32 x, y, z, w; };
+    struct { u32 a0, a1, a2, a3; };
+    u32 a[4];
+  };
+} v4u32;
+
+
+
+
+typedef struct {
+  union {
+    struct { i64 x, y; };
+    struct { i64 a0, a1; };
+    i64 a[2];
+  };
+} v2i64;
+
+typedef struct {
+  union {
+    struct { i64 x, y, z; };
+    struct { i64 a0, a1, a2; };
+    i64 a[3];
+  };
+} v3i64;
+
+typedef struct {
+  union {
+    struct { i64 x, y, z, w; };
+    struct { i64 a0, a1, a2, a3; };
+    i64 a[4];
+  };
+} v4i64;
+
+
+
+
+typedef struct {
+  union {
+    struct { u64 x, y; };
+    struct { u64 a0, a1; };
+    u64 a[2];
+  };
+} v2u64;
+
+typedef struct {
+  union {
+    struct { u64 x, y, z; };
+    struct { u64 a0, a1, a2; };
+    u64 a[3];
+  };
+} v3u64;
+
+typedef struct {
+  union {
+    struct { u64 x, y, z, w; };
+    struct { u64 a0, a1, a2, a3; };
+    u64 a[4];
+  };
+} v4u64;
+
 }
 
 #endif
