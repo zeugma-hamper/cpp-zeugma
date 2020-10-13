@@ -81,6 +81,11 @@ static int process_mattes (std::vector<FilmInfo> const &_films)
 
 static void CombineGeom (MatteGeometry &_ref, MatteGeometry const &_new)
 {
+  // printf ("ref: (%u, %u) x (%u, %u)\n",
+  //         _ref.min[0], _ref.min[1], _ref.max[0], _ref.max[1]);
+  // printf ("new: (%u, %u) x (%u, %u)\n",
+  //         _new.min[0], _new.min[1], _new.max[0], _new.max[1]);
+
   _ref.min[0] = std::min (_ref.min[0], _new.min[0]);
   _ref.min[1] = std::min (_ref.min[1], _new.min[1]);
 
@@ -89,6 +94,8 @@ static void CombineGeom (MatteGeometry &_ref, MatteGeometry const &_new)
 
   _ref.dimensions[0] = _ref.max[0] - _ref.min[0];
   _ref.dimensions[1] = _ref.max[1] - _ref.min[1];
+
+  // printf ("dim: (%u, %u)\n", _ref.dimensions[0], _ref.dimensions[1]);
 }
 
 static MatteGeometry ConvertToGeom (u32 index, OIIO::ROI const &_roi)
@@ -100,8 +107,8 @@ static MatteGeometry ConvertToGeom (u32 index, OIIO::ROI const &_roi)
   return MatteGeometry {index,
                         {u32 (_roi.xend - _roi.xbegin),
                          u32 (_roi.yend - _roi.ybegin)},
-                        {u32 (_roi.xbegin), u32 (_roi.xend)},
-                        {u32 (_roi.ybegin), u32 (_roi.yend)}};
+                        {u32 (_roi.xbegin), u32 (_roi.ybegin)},
+                        {u32 (_roi.xend), u32 (_roi.yend)}};
 }
 
 static MatteDirGeometry process_directory (ClipInfo const &_clip)
@@ -125,6 +132,7 @@ static MatteDirGeometry process_directory (ClipInfo const &_clip)
       geometry.frame_geometry.push_back(mg);
     }
 
+  geometry.dir_geometry.Print ("");
   geometry.Print ();
   return geometry;
 }

@@ -199,30 +199,44 @@ bool MatteGeometry::operator== (MatteGeometry const &_mg) const
 
 toml::table MatteGeometry::into_toml () const
 {
-  return toml::table {{s_index, index},
-                      {s_dimensions, {dimensions[0], dimensions[1]}},
-                      {s_min, {min[0], min[1]}},
-                      {s_max, {max[0], max[1]}}};
+  std::array<u32, 7> data{index, dimensions[0], dimensions[1],
+    min[0], min[1], max[0], max[1]};
+
+  return toml::table {{"geom", data}};
+
+  // return toml::table {{s_index, index},
+  //                     {s_dimensions, {dimensions[0], dimensions[1]}},
+  //                     {s_min, {min[0], min[1]}},
+  //                     {s_max, {max[0], max[1]}}};
 
 }
 
 void MatteGeometry::from_toml (toml::value const &_v)
 {
-  using coord = std::array<u32, 2>;
-  coord tmp;
-  tmp = toml::find<coord> (_v, s_dimensions);
-  dimensions[0] = tmp[0];
-  dimensions[1] = tmp[1];
+  auto data = toml::find<std::array<u32, 7>> (_v, "geom");
+  index = data[0];
+  dimensions[0] = data[1];
+  dimensions[1] = data[2];
+  min[0] = data[3];
+  min[1] = data[4];
+  max[0] = data[5];
+  max[1] = data[6];
 
-  tmp = toml::find<coord> (_v, s_min);
-  min[0]= tmp[0];
-  min[1] = tmp[1];
+  // using coord = std::array<u32, 2>;
+  // coord tmp;
+  // tmp = toml::find<coord> (_v, s_dimensions);
+  // dimensions[0] = tmp[0];
+  // dimensions[1] = tmp[1];
 
-  tmp = toml::find<coord> (_v, s_max);
-  max[0] = tmp[0];
-  max[1] = tmp[1];
+  // tmp = toml::find<coord> (_v, s_min);
+  // min[0]= tmp[0];
+  // min[1] = tmp[1];
 
-  index = toml::find<u32> (_v, s_index);
+  // tmp = toml::find<coord> (_v, s_max);
+  // max[0] = tmp[0];
+  // max[1] = tmp[1];
+
+  // index = toml::find<u32> (_v, s_index);
 }
 
 const std::string MatteGeometry::s_index      = "index";
@@ -277,16 +291,41 @@ bool MatteDirGeometry::operator== (MatteDirGeometry const &_mdg) const
 
 toml::table MatteDirGeometry::into_toml () const
 {
+
+  using matte_val = std::array<u32, 7>;
+  std::vector<matte_val> frames;
+  frames.reserve (frame_geometry.size ());
+  for (MatteGeometry const &mg : frame_geometry)
+    {
+      frames.push_back ({mg.index, mg.dimensions[0], mg.dimensions[1],
+          mg.min[0], mg.min[1], mg.max[0], mg.max[1]});
+    }
+
   return toml::table {{s_path, clip_path},
                       {s_dir_geometry, dir_geometry},
-                      {s_frame_geometry, frame_geometry}};
+                      {s_frame_geometry, frames}};
 }
 
 void MatteDirGeometry::from_toml (toml::value const &_v)
 {
   clip_path = toml::find<std::string> (_v, s_path);
   dir_geometry = toml::find<MatteGeometry> (_v, s_dir_geometry);
-  frame_geometry = toml::find<std::vector<MatteGeometry>> (_v, s_frame_geometry);
+  auto const &arr = toml::find<toml::array> (_v, s_frame_geometry);
+
+  std::array<u32, 7> matte_val;
+  for (auto &v : arr)
+    {
+      matte_val = toml::get<std::array<u32, 7>> (v);
+      frame_geometry.emplace_back();
+      MatteGeometry &mg = frame_geometry.back ();
+      mg.index = matte_val[0];
+      mg.dimensions[0] = matte_val[1];
+      mg.dimensions[1] = matte_val[2];
+      mg.min[0] = matte_val[3];
+      mg.min[1] = matte_val[4];
+      mg.max[0] = matte_val[5];
+      mg.max[1] = matte_val[6];
+    }
 }
 
 void MatteDirGeometry::Print (bool _per_frame_geom) const
