@@ -100,14 +100,32 @@ Bolex *CameraFromMaes (const PlatonicMaes &m)
 
 class dead_zone;
 
+class Cursoresque;
 
 // oy. also: oy.
-static Node *cursoresque = NULL;
-static ZoftVect cursoresque_pos;
+std::vector <Cursoresque *> cursoresques;
 // how about some more oy?
 dead_zone *sole_dead_zone = NULL;
-static LoopFloat loopiness (0.0, 720.0, 0.5);
 // don't forget: oy.
+bool extra_poo = [] () { srand48 (32123);  return true; } ();
+
+class Cursoresque  :  public Zeubject
+{ public:
+  Node *crs_nod;
+  Renderable *crs_rnd;
+  ZoftVect crs_pos;
+  Cursoresque (f64 sz)  :  Zeubject (),
+                           crs_nod (new Node),
+                           crs_rnd (new RectangleRenderable)
+    { crs_nod -> AppendRenderable (crs_rnd);
+      f64 ltime = 0.55 - 0.1 * drand48 ();
+      crs_nod -> Rotate (ZoftVect (Vect::zaxis),
+                         LoopFloat (0.0, 2.0 * M_PI / ltime, ltime));
+      crs_nod -> Scale (sz);
+      crs_pos . MakeBecomeLikable ();
+      crs_nod -> Translate (crs_pos);
+    }
+};
 
 
 class WandCatcher  :  public Zeubject, public ZESpatialPhagy
@@ -573,12 +591,30 @@ void dead_zone::FlatulateCursor (ZESpatialMoveEvent *e)
   Vect close_p, hit;
   f64 close_d;
 
+  const std::string &which_crs = e -> Provenance ();
+  Cursoresque *crs = NULL;
+  Cursoresque *bachelor_crs = NULL;
+  for (Cursoresque *c  :  cursoresques)
+    { const std::string &nm = c -> Name ();
+      if (nm . empty ())
+        bachelor_crs = c;
+      else if (nm  ==  which_crs)
+        { crs = c;  break; }
+    }
+  if (! crs)
+    { if (! bachelor_crs)
+        return;
+      crs = bachelor_crs;
+      bachelor_crs -> SetName (which_crs);
+    }
+
   i32 cnt = NumMaeses ();
   for (i32 q = 0  ;  q < cnt  ;  ++q)
     { PlatonicMaes *emm = NthMaes (q);
-      if (GeomFumble::RayPlaneIntersection (e -> Loc (), e -> Aim (),
-                                            emm -> Loc (), emm -> Norm (),
-                                            &hit))
+      if (GeomFumble::RayRectIntersection (e -> Loc (), e -> Aim (),
+                                           emm -> Loc (), emm -> Over (),
+                                           emm -> Up (), emm -> Width (),
+                                           emm -> Height (), &hit))
         { f64 d = hit . DistFrom (e -> Loc ());
           if (! close_m  ||  d < close_d)
             { close_m = emm;
@@ -589,12 +625,9 @@ void dead_zone::FlatulateCursor (ZESpatialMoveEvent *e)
     }
 
   if (close_m)
-//    { cursoresque_pos = hit; }
-    { cursoresque -> ClearTransforms ();
-      cursoresque -> RotateD (ZoftVect (Vect::zaxis), loopiness);
-      cursoresque -> Scale (0.025 * close_m -> Height ());
-      cursoresque -> RotateD (Vect::yaxis, 45.0);
-      cursoresque -> Translate (close_p);
+    { crs->crs_pos = close_p;
+      crs->crs_rnd -> SetOver (close_m -> Over ());
+      crs->crs_rnd -> SetUp (close_m -> Up ());
     }
 }
 
@@ -715,15 +748,13 @@ int main (int, char **)
       layer . GetRootNode () -> AppendChild (enn);
     }
 
-  cursoresque = new Node;
-  cursoresque -> AppendRenderable (new RectangleRenderable);
-  cursoresque -> RotateD (ZoftVect (Vect::zaxis), loopiness);
-  cursoresque -> Scale (0.025 * maes -> Height ());
-  cursoresque -> RotateD (Vect::yaxis, 45.0);
-  cursoresque -> Translate (maes -> Loc ());//cursoresque_pos);
-  layer . GetRootNode () -> AppendChild (cursoresque);
+  for (int q = 0  ;  q < 2  ;  ++q)
+    { Cursoresque *c = new Cursoresque (0.015 * maes -> Height ());
+      layer . GetRootNode () -> AppendChild (c->crs_nod);
 
-  cursoresque_pos = maes -> Loc ();
+      cursoresques . push_back (c);
+      c->crs_pos = maes -> Loc ();
+    }
 
   zone.Run ();
 
