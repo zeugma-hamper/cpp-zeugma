@@ -4,6 +4,8 @@
 #include <Matte.hpp>
 #include <Node.hpp>
 
+#include <vector_interop.hpp>
+
 #include <algorithm>
 
 namespace charm
@@ -21,7 +23,7 @@ MattedVideoRenderable::MattedVideoRenderable (std::string_view _uri,
   m_video_texture = brace.video_texture;
 }
 
-MattedVideoRenderable::MattedVideoRenderable (FilmInfo const &_film, ClipInfo &_clip)
+MattedVideoRenderable::MattedVideoRenderable (FilmInfo const &_film, ClipInfo const &_clip)
   : Renderable ()
 {
   v2i32 min = {i32 (_clip.geometry.dir_geometry.min[0]),i32 (_clip.geometry.dir_geometry.min[1])};
@@ -57,6 +59,11 @@ void MattedVideoRenderable::Draw (u16 vyu_id)
 
   bgfx::setUniform(m_video_texture->GetDimensionUniform(), glm::value_ptr (vid_dim));
   bgfx::setUniform(m_video_texture->GetMatteDimUniform(),  glm::value_ptr (matte_dim));
+
+  glm::vec4 const over = glm::vec4 (as_glm (m_over), 0.0f);
+  glm::vec4 const up = glm::vec4 (as_glm (m_up), 0.0f);
+  bgfx::setUniform(m_video_texture->GetOverUniform(), &over);
+  bgfx::setUniform(m_video_texture->GetUpUniform(), &up);
 
   bgfx::submit(vyu_id, m_video_texture->GetProgram());
 }

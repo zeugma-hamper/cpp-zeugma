@@ -188,6 +188,7 @@ lib_sources = ['src/application.cpp',
                'src/PipelineTerminus.cpp',
                'src/PlatonicMaes.cpp',
                'src/RawEventParsing.cpp',
+               'src/RectangleRenderable.cpp',
                'src/Renderable.cpp',
                'src/RoGrappler.cpp',
                'src/ProtoZoftThingGuts.cpp',
@@ -262,8 +263,7 @@ bgfx_test_exec = executable ('bgfx_test',
                              dependencies : [charm_dep])
 
 dead_zone_exec = executable ('dead_zone',
-                             sources : ['src/dead_zone.cpp',
-                                        'src/RectangleRenderable.cpp'],
+                             sources : ['src/dead_zone.cpp'],
                              dependencies : [charm_dep])
 
 config_parser_exec = executable ('config_parser',
@@ -271,8 +271,11 @@ config_parser_exec = executable ('config_parser',
                                  dependencies : [charm_dep])
 
 chud_zone_exec = executable ('chud-zone',
-                             sources : ['src/chud-zone.cpp',
-                                        'src/RectangleRenderable.cpp'],
+                             sources : ['src/chud-zone.cpp'],
+                             dependencies : [charm_dep])
+
+cz_the_sequel_exec = executable ('cz_the_sequel',
+                             sources : ['src/cz_the_sequel.cpp'],
                              dependencies : [charm_dep])
 
 scan_mattes_exec = executable ('scan_mattes',
