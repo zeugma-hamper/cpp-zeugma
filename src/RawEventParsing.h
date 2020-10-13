@@ -6,6 +6,8 @@
 #include "Zeubject.h"
 #include "ZESpatialEvent.h"
 
+#include "Bolex.h"
+
 #include "Matrix44.h"
 
 #include "MultiSprinkler.hpp"
@@ -95,6 +97,16 @@ class RawOSCWandParser  :  public RawEventParser
 
   void Parse (const std::string &path, const lo::Message &m,
               OmNihil *phage = NULL);
+};
+
+
+class RawMouseParser  :  public RawEventParser
+{ public:
+
+  void MouseMove (const std::string &nm, f64 x_nrm, f64 y_nrm,
+                  Bolex *cam, OmNihil *phage = NULL);
+  void MouseButt (const std::string &nm, u64 which_butt, f64 prssr,
+                  OmNihil *phage = NULL);
 };
 
 

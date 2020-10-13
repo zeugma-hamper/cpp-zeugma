@@ -246,6 +246,7 @@ class dead_zone final : public charm::Application,
   WandCatcher wandy;
 
   static RawOSCWandParser rowp;
+  static RawMouseParser ramp;
 };
 
 
@@ -277,6 +278,7 @@ i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
 
 
 RawOSCWandParser dead_zone::rowp;
+RawMouseParser dead_zone::ramp;
 
 
 int eruct_handler (const char *pth, const char *typ, lo_arg **av, int ac,
@@ -347,20 +349,18 @@ static void glfw_mousepos_callback (GLFWwindow *win, double x, double y)
   x /= (f64)(leaf->b_view->fb_pix_r - leaf->b_view->fb_pix_l);
   y /= (f64)(leaf->b_view->fb_pix_t - leaf->b_view->fb_pix_b);
 
-  Bolex *b = leaf->cam;
-  Vect thr = b -> ViewLoc ()  +  b -> ViewDist () * b -> ViewAim ();
-  f64 wid = b -> IsPerspectiveTypeOthographic ()  ?  b -> ViewOrthoWid ()
-    :  b -> ViewDist () * 2.0 * tan (0.5 * b -> ViewHorizAngle ());
-  f64 hei = b -> IsPerspectiveTypeOthographic ()  ?  b -> ViewOrthoHei ()
-    :  b -> ViewDist () * 2.0 * tan (0.5 * b -> ViewVertAngle ());
-  Vect ovr = b -> ViewAim () . Cross (b -> ViewUp ()) . Norm ();
-  Vect upp = ovr . Cross (b -> ViewAim ());
-  thr += (x - 0.5) * wid * ovr  +  (y - 0.5) * hei * upp;
-  Vect frm = b -> IsPerspectiveTypeProjection ()  ?  b -> ViewLoc ()
-    :  thr - b -> ViewDist () * b -> ViewAim ();
-
-thr.SpewToStderr(); fprintf(stderr," on <%s>\n",leaf->maes->Name().c_str());
+  dead_zone::ramp . MouseMove ("mouse-0", x, y, leaf->cam,
+                               &sole_dead_zone->wandy);
 }
+
+
+static void glfw_mousebutt_callback (GLFWwindow *wind, int butt,
+                                     int actn, int mods)
+{ dead_zone::ramp . MouseButt ("mouse-0", 0x01 << butt,
+                               actn == GLFW_PRESS ? 1.0 : 0.0,
+                               &sole_dead_zone->wandy);
+}
+
 
 GLFWwindow *windoidal = NULL;
 static i32 WINWID = 9600;
@@ -391,7 +391,7 @@ bool dead_zone::InitWindowingAndGraphics ()
 
   glfwSetKeyCallback (window, glfw_key_callback);
   glfwSetCursorPosCallback (window, glfw_mousepos_callback);
-  //
+  glfwSetMouseButtonCallback (window, glfw_mousebutt_callback);
 
   glfwPollEvents ();
   glfwSetWindowSize (window, WINWID, WINHEI);
@@ -806,7 +806,7 @@ int main (int, char **)
       layer . GetRootNode () -> AppendChild (enn);
     }
 
-  for (int q = 0  ;  q < 2  ;  ++q)
+  for (int q = 0  ;  q < 3  ;  ++q)
     { Cursoresque *c = new Cursoresque (0.015 * maes -> Height ());
       layer . GetRootNode () -> AppendChild (c->crs_nod);
 
