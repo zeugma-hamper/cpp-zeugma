@@ -31,10 +31,10 @@ class Sprinkler final : public ZeEvent::ProtoSprinkler
 
   i64 Spray (ZeEvent *_event) override final;
 
-  HOOKUP AppendHandler (EVT_HANDLER_FUNC _f);
+  HOOKUP AppendHandler (EVT_HANDLER_FUNC &&_f);
 
   template <typename U>
-  HOOKUP AppendHandler (U *_receiver, MEMB_FUNC_SIG<U> _func);
+  HOOKUP AppendHandler (U *_receiver, MEMB_FUNC_SIG<U> &&_func);
 
  protected:
   SPRNKLR sp;
@@ -56,7 +56,11 @@ class MultiSprinkler
   Sprinkler <T> *SprinklerForEventType ();
 
   template<typename T>
-  ZeEvent::ProtoSprinkler::HOOKUP AppendHandler (typename Sprinkler<T>::EVT_HANDLER_FUNC _func);
+  ZeEvent::ProtoSprinkler::HOOKUP AppendHandler (typename Sprinkler<T>::EVT_HANDLER_FUNC &&_func);
+
+  template<typename T, typename U>
+  ZeEvent::ProtoSprinkler::HOOKUP AppendHandler (U *_receiver,
+                                                 typename Sprinkler<T>::template MEM_FUNC_SIG<U> &&_func);
 
  protected:
   std::unordered_map<u32, ZeEvent::ProtoSprinkler *> sprinkler_map;
@@ -79,20 +83,22 @@ Sprinkler<T>::operator SPRNKLR & ()
 
 template <typename T>
  ZeEvent::ProtoSprinkler::HOOKUP
-Sprinkler<T>::AppendHandler (EVT_HANDLER_FUNC _f)
+Sprinkler<T>::AppendHandler (EVT_HANDLER_FUNC &&_f)
 {
-  return sp.connect_extended (_f);
+  return sp.connect_extended (std::forward (_f));
 }
 
 template<typename T>
  template<typename U>
 ZeEvent::ProtoSprinkler::HOOKUP
  Sprinkler<T>::AppendHandler (U *_receiver,
-                              Sprinkler<T>::MEMB_FUNC_SIG<U> _func)
+                              Sprinkler<T>::MEMB_FUNC_SIG<U> &&_func)
 { return sp.connect_extended
     ([_receiver, _func] (HOOKUP const &_conn, T *_event)
       { return (_receiver->*_func) (_conn, _event); });
 }
+
+
 //// [end of Sprinkler methods]
 
 
@@ -125,10 +131,20 @@ Sprinkler<T> *MultiSprinkler::SprinklerForEventType ()
 
 template <typename T>
  ZeEvent::ProtoSprinkler::HOOKUP
-  MultiSprinkler::AppendHandler (typename Sprinkler<T>::EVT_HANDLER_FUNC _func)
+  MultiSprinkler::AppendHandler (typename Sprinkler<T>::EVT_HANDLER_FUNC &&_func)
 { Sprinkler <T> *sp = SprinklerForEventType <T> ();
   assert (sp);
-  return sp->AppendHandler (_func);
+  return sp->AppendHandler (std::forward (_func));
+}
+
+template<typename T, typename U>
+ZeEvent::ProtoSprinkler::HOOKUP
+MultiSprinkler::AppendHandler (U *_receiver,
+                               typename Sprinkler<T>::template MEM_FUNC_SIG<U> &&_func)
+{
+  Sprinkler<T> &sp = SprinklerForEventType<T>();
+  assert (sp);
+  return sp.AppendHandler(_receiver, std::forward (_func));
 }
 
 

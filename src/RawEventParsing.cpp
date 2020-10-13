@@ -130,7 +130,8 @@ void RawOSCWandParser::Parse (const std::string &path, const lo::Message &m,
       return;
     }
 
-  EventSprinklerGroup *essgee = SprinklerGroup ();
+  EventSprinklerGroup *essgee = SoleSprinklerGroup ();
+  MultiSprinkler &emmess = SoleMultiSprinkler ();
 
   int ac = m . argc ();
   lo_arg **av = m . argv ();
@@ -174,8 +175,11 @@ void RawOSCWandParser::Parse (const std::string &path, const lo::Message &m,
 
   if (phage)
     smev -> ProfferAsSnackTo (phage);
+  for (OmNihil *ph  :  phages)
+    smev -> ProfferAsSnackTo (ph);
   if (essgee)
     essgee -> MetaSpray (smev);
+  emmess . Spray (smev);
 
   u64 prev_bbits;
   if (prev_state)
@@ -191,8 +195,11 @@ void RawOSCWandParser::Parse (const std::string &path, const lo::Message &m,
                       = new ZESpatialHardenEvent (*smev, mask);
                     if (phage)
                       shev -> ProfferAsSnackTo (phage);
+                    for (OmNihil *ph  :  phages)
+                      shev -> ProfferAsSnackTo (ph);
                     if (essgee)
                       essgee -> MetaSpray (shev);
+                    emmess . Spray (shev);
                     delete shev;
                   }
                 else
@@ -200,8 +207,11 @@ void RawOSCWandParser::Parse (const std::string &path, const lo::Message &m,
                       = new ZESpatialSoftenEvent (*smev, mask);
                     if (phage)
                       ssev -> ProfferAsSnackTo (phage);
+                    for (OmNihil *ph  :  phages)
+                      ssev -> ProfferAsSnackTo (ph);
                     if (essgee)
                       essgee -> MetaSpray (ssev);
+                    emmess . Spray (ssev);
                     delete ssev;
                   }
                 prev_bbits ^= (prev_bbits & mask);
@@ -303,7 +313,8 @@ i64 Caliban::ZESpatialSoften (ZESpatialSoftenEvent *e)
 
 void RawMouseParser::MouseMove (const std::string &nm, f64 x_nrm, f64 y_nrm,
                                 Bolex *cam, OmNihil *phage)
-{ EventSprinklerGroup *essgee = SprinklerGroup ();
+{ EventSprinklerGroup *essgee = SoleSprinklerGroup ();
+  MultiSprinkler &emmess = SoleMultiSprinkler ();
   SEV_WITH_BUTT *prev_state = NULL;
   try { prev_state = &recent_wands_state[nm]; }
   catch (std::out_of_range &exc) { }
@@ -324,8 +335,11 @@ void RawMouseParser::MouseMove (const std::string &nm, f64 x_nrm, f64 y_nrm,
     = new ZESpatialMoveEvent (nm, frm, (thr - frm) . Norm (), ovr);
   if (phage)
     smev -> ProfferAsSnackTo (phage);
+  for (OmNihil *ph  :  phages)
+    smev -> ProfferAsSnackTo (ph);
   if (essgee)
     essgee -> MetaSpray (smev);
+  emmess . Spray (smev);
 
   if (prev_state)
     delete prev_state->first;
@@ -335,7 +349,8 @@ void RawMouseParser::MouseMove (const std::string &nm, f64 x_nrm, f64 y_nrm,
 
 void RawMouseParser::MouseButt (const std::string &nm, u64 which_butt, f64 prssr,
                                 OmNihil *phage)
-{ EventSprinklerGroup *essgee = SprinklerGroup ();
+{ EventSprinklerGroup *essgee = SoleSprinklerGroup ();
+  MultiSprinkler &emmess = SoleMultiSprinkler ();
   SEV_WITH_BUTT *prev_state = NULL;
   try { prev_state = &recent_wands_state[nm]; }
   catch (std::out_of_range &exc) { }
@@ -363,8 +378,11 @@ void RawMouseParser::MouseButt (const std::string &nm, u64 which_butt, f64 prssr
 
   if (phage)
     spev -> ProfferAsSnackTo (phage);
+  for (OmNihil *ph  :  phages)
+    spev -> ProfferAsSnackTo (ph);
   if (essgee)
     essgee -> MetaSpray (spev);
+  emmess . Spray (spev);
 
   if (prev_state)
     delete prev_state->first;

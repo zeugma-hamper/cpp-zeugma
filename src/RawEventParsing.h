@@ -20,18 +20,27 @@ namespace charm  {
 
 class RawEventParser  :  public Zeubject
 { public:
+  std::vector <OmNihil *> phages;
   EventSprinklerGroup *esg;
-  MultiSprinkler *mulspri;
+  MultiSprinkler mulspri;
   RawEventParser ()  :  Zeubject (), esg (NULL)
     { }
-  EventSprinklerGroup *SprinklerGroup ()
+  i64 NumPhages ()  const
+    { return phages . size (); }
+  OmNihil *NthPhage (i64 ind)
+    { return (ind >= 0  &&  ind < phages . size ())  ?  phages[ind]  :  NULL; }
+  void AppendPhage (OmNihil *p)
+    { if (p)  phages . push_back (p); }
+  void RemovePhage (OmNihil *p)
+    { auto it = std::find (phages . begin (), phages . end (), p);
+      if (it  !=  phages . end ())  phages . erase (it);
+    }
+  EventSprinklerGroup *SoleSprinklerGroup ()
     { return esg; }
   void InstallSprinklerGroup (EventSprinklerGroup *sprigrou)
     { esg = sprigrou; }
-  MultiSprinkler *SoleMultiSprinkler ()
+  MultiSprinkler &SoleMultiSprinkler ()
     { return mulspri; }
-  void InstallMultiSprinkler (MultiSprinkler *ms)
-    { mulspri = ms; }
 };
 
 

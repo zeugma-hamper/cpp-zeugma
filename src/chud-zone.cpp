@@ -160,6 +160,9 @@ class WandCatcher  :  public Zeubject, public ZESpatialPhagy
 
   i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
   // see below for the above... can't define inline because uses dead_zone...
+  i64 ZESpatialMoveExtra (ZeEvent::ProtoSprinkler::HOOKUP const &h,
+                          ZESpatialMoveEvent *e)
+    { return ZESpatialMove (e); }
   i64 ZESpatialHarden (ZESpatialHardenEvent *e)  override
     { if (calibrating)
         { // avanti!
@@ -175,6 +178,9 @@ class WandCatcher  :  public Zeubject, public ZESpatialPhagy
         }
       return 0;
     }
+  i64 ZESpatialHardenExtra (ZeEvent::ProtoSprinkler::HOOKUP const &h,
+                            ZESpatialHardenEvent *e)
+    { return ZESpatialHarden (e); }
   i64 ZESpatialSoften (ZESpatialSoftenEvent *e)  override
     { if (calibrating  &&  trig_partic . size () == 0)
         { // ymlaen!
@@ -196,6 +202,9 @@ class WandCatcher  :  public Zeubject, public ZESpatialPhagy
         }
       return 0;
     }
+  i64 ZESpatialSoftenExtra (ZeEvent::ProtoSprinkler::HOOKUP const &h,
+                            ZESpatialSoftenEvent *e)
+    { return ZESpatialSoften (e); }
 };
 
 
@@ -340,7 +349,7 @@ static void glfw_mousepos_callback (GLFWwindow *win, double x, double y)
     }
   if (! leaf)
     { fprintf (stderr,
-               "%p reporting at [%.1lf, %.1lf], you silly little freak\n",
+               "in window %p: mouse at [%.1lf, %.1lf], but no Maes/bgfx-view\n",
                win, x, y);
       return;
     }
@@ -349,16 +358,16 @@ static void glfw_mousepos_callback (GLFWwindow *win, double x, double y)
   x /= (f64)(leaf->b_view->fb_pix_r - leaf->b_view->fb_pix_l);
   y /= (f64)(leaf->b_view->fb_pix_t - leaf->b_view->fb_pix_b);
 
-  dead_zone::ramp . MouseMove ("mouse-0", x, y, leaf->cam,
-                               &sole_dead_zone->wandy);
+  dead_zone::ramp . MouseMove ("mouse-0", x, y, leaf->cam);//,
+//                               &sole_dead_zone->wandy);
 }
 
 
 static void glfw_mousebutt_callback (GLFWwindow *wind, int butt,
                                      int actn, int mods)
 { dead_zone::ramp . MouseButt ("mouse-0", 0x01 << butt,
-                               actn == GLFW_PRESS ? 1.0 : 0.0,
-                               &sole_dead_zone->wandy);
+                               actn == GLFW_PRESS ? 1.0 : 0.0);//,
+//                               &sole_dead_zone->wandy);
 }
 
 
@@ -491,6 +500,8 @@ dead_zone::dead_zone ()
       osc_srv -> add_method ("/events/spatial", NULL, osc_wandler, &wandy);
       osc_srv -> add_method (NULL, NULL, eruct_handler, this);
     }
+
+  ramp . AppendPhage (&wandy);
 
   wandy . SetCalibrista (&rowp.calibrex);
   sole_dead_zone = this;
