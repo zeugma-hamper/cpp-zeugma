@@ -78,6 +78,10 @@ class Bolex  :  public SpaceThing
 
   ProjType ProjectionType ()  const
     { return prj_typ; }
+  bool IsPerspectiveTypeProjection ()  const
+    { return prj_typ == ProjType::PERSPECTIVE; }
+  bool IsPerspectiveTypeOthographic ()  const
+    { return prj_typ == ProjType::ORTHOGRAPHIC; }
 
   f64 NearClipDist ()  const
     { return near_clip_dst.val; }

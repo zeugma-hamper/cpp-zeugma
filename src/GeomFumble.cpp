@@ -33,6 +33,23 @@ bool GeomFumble::LinePlaneIntersection (const Vect &frm, const Vect &aim,
 }
 
 
+bool GeomFumble::RayRectIntersection (const Vect &frm, const Vect &aim,
+                                      const Vect &cnt,
+                                      const Vect &ovr, const Vect &upp,
+                                      f64 wid, f64 hei, Vect *hit_pnt)
+{ Vect pee, p;
+  if (! RayPlaneIntersection (frm, aim, cnt, ovr . Cross (upp), &pee))
+    return false;
+  p = pee - cnt;
+  f64 t = 2.0 * p . Dot (ovr);
+  if (t >= -wid  &&  t<= wid)
+    {t = 2.0 * p . Dot (upp);
+      if (t >= -hei  &&  t <= hei)
+        { *hit_pnt = pee;  return true; }
+    }
+  return false;
+}
+
 
 bool GeomFumble::RayAnnulusIntersection (const Vect &frm, const Vect &aim,
                                          const Vect &cnt, const Vect &e0,

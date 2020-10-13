@@ -23,6 +23,11 @@ namespace GeomFumble
                               const Vect &pnt, const Vect &nrm,
                               Vect *hit_pnt);
 
+  bool RayRectIntersection (const Vect &frm, const Vect &aim,
+                            const Vect &cnt,
+                            const Vect &ovr, const Vect &upp,
+                            f64 wid, f64 hei, Vect *hit_pnt);
+
   bool RayAnnulusIntersection (const Vect &frm, const Vect &aim,
                                const Vect &cnt, const Vect &e0,
                                const Vect &e1, f64 r1, f64 r2,
