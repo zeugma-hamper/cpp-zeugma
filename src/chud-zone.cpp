@@ -64,7 +64,9 @@ class CMVTrefoil  :  public Zeubject
     i32 view_id;  // bgfx's is u16, so we can rep't stuff in neg nos.
     f64 botlef_x, botlef_y;
     f64 wid_frac, hei_frac;  // these four norm'd [0,1] ref'ing window res
-    i64 fb_pix_w, fb_pix_h;
+    i64 fb_pix_l, fb_pix_b;
+    i64 fb_pix_r, fb_pix_t;
+    i64 wind_wid, wind_hei;
     u16 ViewID ()  const  { return (u16)view_id; }
   } *b_view;
   CMVTrefoil ()  :  Zeubject (), cam (NULL), maes (NULL), b_view (NULL)
@@ -223,6 +225,9 @@ class dead_zone final : public charm::Application,
 
   Layer &GetSceneLayer ();
 
+  i32 NumRenderLeaves ()  const;
+  CMVTrefoil *NthRenderLeaf (i32 ind);
+
   i32 NumMaeses ()  const;
   PlatonicMaes *NthMaes (i32 ind);
   PlatonicMaes *FindMaesByName (const std::string &nm);
@@ -322,6 +327,42 @@ static void glfw_key_callback(GLFWwindow *window, int key, int, int action, int)
     }
 }
 
+static void glfw_mousepos_callback (GLFWwindow *win, double x, double y)
+{ CMVTrefoil *leaf = NULL;
+  i32 N = sole_dead_zone -> NumMaeses ();
+  for (i32 q = 0  ;  q < N  ;  ++q)
+    { CMVTrefoil *l = sole_dead_zone -> NthRenderLeaf (q);
+      if (x >= l->b_view->fb_pix_l  &&  x <l->b_view->fb_pix_r
+          && y >= l->b_view->fb_pix_b  &&  y < l->b_view->fb_pix_t)
+        { leaf = l;  break; }
+    }
+  if (! leaf)
+    { fprintf (stderr,
+               "%p reporting at [%.1lf, %.1lf], you silly little freak\n",
+               win, x, y);
+      return;
+    }
+  x -= leaf->b_view->fb_pix_l;
+  y = leaf->b_view->fb_pix_t - y - 1;   // freakin' (0,0) at the top left...
+  x /= (f64)(leaf->b_view->fb_pix_r - leaf->b_view->fb_pix_l);
+  y /= (f64)(leaf->b_view->fb_pix_t - leaf->b_view->fb_pix_b);
+
+  Bolex *b = leaf->cam;
+  Vect thr = b -> ViewLoc ()  +  b -> ViewDist () * b -> ViewAim ();
+  f64 wid = b -> IsPerspectiveTypeOthographic ()  ?  b -> ViewOrthoWid ()
+    :  b -> ViewDist () * 2.0 * tan (0.5 * b -> ViewHorizAngle ());
+  f64 hei = b -> IsPerspectiveTypeOthographic ()  ?  b -> ViewOrthoHei ()
+    :  b -> ViewDist () * 2.0 * tan (0.5 * b -> ViewVertAngle ());
+  Vect ovr = b -> ViewAim () . Cross (b -> ViewUp ()) . Norm ();
+  Vect upp = ovr . Cross (b -> ViewAim ());
+  thr += (x - 0.5) * wid * ovr  +  (y - 0.5) * hei * upp;
+  Vect frm = b -> IsPerspectiveTypeProjection ()  ?  b -> ViewLoc ()
+    :  thr - b -> ViewDist () * b -> ViewAim ();
+
+thr.SpewToStderr(); fprintf(stderr," on <%s>\n",leaf->maes->Name().c_str());
+}
+
+GLFWwindow *windoidal = NULL;
 static i32 WINWID = 9600;
 static i32 WINHEI = 2160;
 bool dead_zone::InitWindowingAndGraphics ()
@@ -346,7 +387,11 @@ bool dead_zone::InitWindowingAndGraphics ()
   if (! window)
     ERROR_RETURN_VAL ("couldn't create window", false);
 
-  glfwSetKeyCallback(window, glfw_key_callback);
+  windoidal = window;
+
+  glfwSetKeyCallback (window, glfw_key_callback);
+  glfwSetCursorPosCallback (window, glfw_mousepos_callback);
+  //
 
   glfwPollEvents ();
   glfwSetWindowSize (window, WINWID, WINHEI);
@@ -370,16 +415,20 @@ bool dead_zone::InitWindowingAndGraphics ()
 
   for (CMVTrefoil *leaf  :  render_leaves)
     { u16 vuid = leaf->b_view -> ViewID ();
-      leaf->b_view->fb_pix_w = glfw_width;
-      leaf->b_view->fb_pix_h = glfw_height;
+      leaf->b_view->wind_wid = glfw_width;
+      leaf->b_view->wind_hei = glfw_height;
+      leaf->b_view->fb_pix_r = leaf->b_view->wid_frac * glfw_width
+        + (leaf->b_view->fb_pix_l = leaf->b_view->botlef_x * glfw_width);
+      leaf->b_view->fb_pix_t = leaf->b_view->hei_frac * glfw_height
+        + (leaf->b_view->fb_pix_b = leaf->b_view->botlef_y * glfw_height);
       bgfx::setViewRect (vuid,
-                         leaf->b_view->botlef_x * glfw_width,
-                         leaf->b_view->botlef_y * glfw_height,
+                         leaf->b_view->fb_pix_l,
+                         leaf->b_view->fb_pix_b,
                          leaf->b_view->wid_frac * glfw_width,
                          leaf->b_view->hei_frac * glfw_height);
       bgfx::setViewScissor (vuid,
-                            leaf->b_view->botlef_x * glfw_width,
-                            leaf->b_view->botlef_y * glfw_height,
+                            leaf->b_view->fb_pix_l,
+                            leaf->b_view->fb_pix_b,
                             leaf->b_view->wid_frac * glfw_width,
                             leaf->b_view->hei_frac * glfw_height);
       bgfx::setViewClear (vuid, BGFX_CLEAR_COLOR,
@@ -569,13 +618,22 @@ Layer &dead_zone::GetSceneLayer ()
 }
 
 
-i32 dead_zone::NumMaeses ()  const
+i32 dead_zone::NumRenderLeaves ()  const
 { return render_leaves . size (); }
+
+CMVTrefoil *dead_zone::NthRenderLeaf (i32 ind)
+{ if (ind < 0  ||  ind >= render_leaves . size ())
+    return NULL;
+  return render_leaves[ind];
+}
+
+i32 dead_zone::NumMaeses ()  const
+{ return NumRenderLeaves (); }
 
 PlatonicMaes *dead_zone::NthMaes (i32 ind)
 { if (ind < 0  ||  ind >= render_leaves . size ())
     return NULL;
-  return render_leaves[ind]->maes;
+  return NthRenderLeaf (ind)->maes;
 }
 
 PlatonicMaes *dead_zone::FindMaesByName (const std::string &nm)
