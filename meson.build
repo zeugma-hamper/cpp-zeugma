@@ -241,6 +241,11 @@ shaders = [
    'src/shaders/video_varying.def.sc', 'matte_video_vs.bin'],
   ['fragment', 'src/shaders/matte_video_fs.sc',
    'src/shaders/video_varying.def.sc', 'matte_video_fs.bin'],
+  # collage background for demo
+  ['vertex',   'src/shaders/collage_bg_vs.sc',
+   'src/shaders/collage_bg_varying.def.sc', 'collage_bg_vs.bin'],
+  ['fragment', 'src/shaders/collage_bg_fs.sc',
+   'src/shaders/collage_bg_varying.def.sc', 'collage_bg_fs.bin'],
 ]
 
 foreach shader : shaders
@@ -277,6 +282,11 @@ chud_zone_exec = executable ('chud-zone',
 cz_the_sequel_exec = executable ('cz_the_sequel',
                              sources : ['src/cz_the_sequel.cpp'],
                              dependencies : [charm_dep])
+
+tri_demo_exec = executable ('tri_demo',
+                            sources : ['src/tri_demo.cpp',
+                                       'src/Collage.cpp'],
+                            dependencies : [charm_dep])
 
 scan_mattes_exec = executable ('scan_mattes',
                                sources : ['src/scan_mattes.cpp'],
