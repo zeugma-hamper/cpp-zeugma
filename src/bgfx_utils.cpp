@@ -201,4 +201,29 @@ bgfx::TextureHandle UpdateWholeTexture2D (bgfx::TextureHandle _texture,
   return _texture;
 }
 
+void BGFXFatalMessage (const char *_filePath, uint16_t _line, bgfx::Fatal::Enum, const char *_str)
+{
+  fprintf (stderr, "fatal error at %s:%u\n%s\n", _filePath, _line, _str);
+}
+
+void BGFXDebugMessage (const char *_filePath, uint16_t _line,
+                       const char *_format, va_list _argList)
+{
+  fprintf (stderr, "debug at %s:%u\n", _filePath, _line);
+  vfprintf (stderr, _format, _argList);
+}
+
+void DebugOutputCallbacks::fatal (const char* _filePath , uint16_t _line,
+                                  bgfx::Fatal::Enum _code, const char* _str)
+{
+  BGFXFatalMessage(_filePath, _line, _code, _str);
+}
+
+void DebugOutputCallbacks::traceVargs(const char* _filePath, uint16_t _line,
+                                      const char* _format, va_list _argList)
+{
+  BGFXDebugMessage(_filePath, _line, _format, _argList);
+}
+
+
 }
