@@ -57,7 +57,7 @@ class CollageMatte : public Renderable
 class Collage : public Node
 {
  public:
-  Collage (u32 _count, FilmInfo const &_films,
+  Collage (u32 _count, std::vector<FilmInfo> const &_films,
            f64 _width, f64 _height);
 };
 

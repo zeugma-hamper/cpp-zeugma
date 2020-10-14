@@ -332,8 +332,8 @@ int osc_wandler (const char *pth, const char *typ, lo_arg **av, int ac,
 }
 
 GLFWwindow *windoidal = NULL;
-static i32 WINWID = 2560;
-static i32 WINHEI = 576;
+static i32 WINWID = 9600;
+static i32 WINHEI = 2160;
 bool TriDemo::InitWindowingAndGraphics ()
 {
   glfwSetErrorCallback(glfw_error_callback);
@@ -716,16 +716,17 @@ int main (int, char **)
   PlatonicMaes *maes = demo.FindMaesByName ("front");
   assert (maes);
 
-  CollageBackground *bg = new CollageBackground (1u);
-  bg->SetColor (glm::vec4 (1.0f, 0.0f, 0.0f, 1.0f));
-  bg->SetOver (0.5 * maes->Width () * maes->Over ());
-  bg->SetUp (0.5 * maes->Height () * maes->Up ());
-  Node *n = new Node;
-  n->Translate(maes->Loc());
-  n->AppendRenderable (bg);
+  Collage *collage = new Collage (5, film_infos,
+                                  0.45 * maes->Width (),
+                                  0.45 * maes->Height());
+  collage->Translate(maes->Loc () - 0.25 * maes->Over () * maes->Width ());
+  demo.GetSceneLayer().GetRootNode()->AppendChild(collage);
 
-  demo.GetSceneLayer().GetRootNode()->AppendChild(n);
-
+  Collage *collage2 = new Collage (5, film_infos,
+                                   0.45 * maes->Width (),
+                                   0.45 * maes->Height());
+  collage2->Translate(maes->Loc () + 0.25 * maes->Over () * maes->Width ());
+  demo.GetSceneLayer().GetRootNode()->AppendChild(collage2);
 
   demo.Run ();
 

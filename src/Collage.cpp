@@ -8,6 +8,8 @@
 
 #include <vector_interop.hpp>
 
+#include <random>
+
 namespace charm
 {
 
@@ -136,11 +138,13 @@ void CollageMatte::Draw (u16 _view_id)
   bgfx::submit(_view_id, m_video_texture->GetProgram());
 }
 
-Collage::Collage (u32 _count, FilmInfo const &_films,
+static u16 s_collage_stencil_base = 1;
+Collage::Collage (u32 _count, std::vector<FilmInfo> const &_films,
                   f64 _width, f64 _height)
   : Node ()
 {
-  CollageBackground *bg = new CollageBackground (1u);
+  u16 const stencil_val = s_collage_stencil_base++;
+  CollageBackground *bg = new CollageBackground (stencil_val);
   bg->SetOver (_width * Vect (1.0, 0.0, 0.0));
   bg->SetUp (_height * Vect (0.0, 1.0, 0.0));
   bg->SetColor (glm::vec4 (0.0f, 0.0f, 0.0f, 1.0f));
@@ -148,13 +152,27 @@ Collage::Collage (u32 _count, FilmInfo const &_films,
   n->AppendRenderable(bg);
   AppendChild (n);
 
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<>  film_distrib (0, _films.size ()-1);
+  std::uniform_real_distribution<> width_distrib (-0.3 * _width, 0.3 * _width);
+  std::uniform_real_distribution<> height_distrib (-0.3 * _height, 0.3 * _height);
+
   for (u32 i = 0; i < _count; ++i)
     {
-      //add video
+      FilmInfo const &fm = _films[film_distrib (gen)];
+      fprintf (stderr, "fm is %s\n", fm.abbreviation.c_str ());
+      assert (fm.clips.size () > 1);
+      std::uniform_int_distribution<> clip_distrib (0, fm.clips.size ()-1);
+      ClipInfo const &cm = fm.clips[clip_distrib (gen)];
+
+      CollageMatte *collage_matte = new CollageMatte (fm, cm, stencil_val);
+      Node *matte_node = new Node;
+      matte_node->AppendRenderable(collage_matte);
+      matte_node->Scale(Vect (_width, _width, _width));
+      matte_node->Translate(Vect (width_distrib (gen), height_distrib (gen), 0.0));
+      AppendChild (matte_node);
     }
-
-
-
 }
 
 }
