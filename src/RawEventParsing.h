@@ -6,6 +6,8 @@
 #include "Zeubject.h"
 #include "ZESpatialEvent.h"
 
+#include "Bolex.h"
+
 #include "Matrix44.h"
 
 #include "MultiSprinkler.hpp"
@@ -18,18 +20,27 @@ namespace charm  {
 
 class RawEventParser  :  public Zeubject
 { public:
+  std::vector <OmNihil *> phages;
   EventSprinklerGroup *esg;
-  MultiSprinkler *mulspri;
+  MultiSprinkler mulspri;
   RawEventParser ()  :  Zeubject (), esg (NULL)
     { }
-  EventSprinklerGroup *SprinklerGroup ()
+  i64 NumPhages ()  const
+    { return phages . size (); }
+  OmNihil *NthPhage (i64 ind)
+    { return (ind >= 0  &&  ind < phages . size ())  ?  phages[ind]  :  NULL; }
+  void AppendPhage (OmNihil *p)
+    { if (p)  phages . push_back (p); }
+  void RemovePhage (OmNihil *p)
+    { auto it = std::find (phages . begin (), phages . end (), p);
+      if (it  !=  phages . end ())  phages . erase (it);
+    }
+  EventSprinklerGroup *SoleSprinklerGroup ()
     { return esg; }
   void InstallSprinklerGroup (EventSprinklerGroup *sprigrou)
     { esg = sprigrou; }
-  MultiSprinkler *SoleMultiSprinkler ()
+  MultiSprinkler &SoleMultiSprinkler ()
     { return mulspri; }
-  void InstallMultiSprinkler (MultiSprinkler *ms)
-    { mulspri = ms; }
 };
 
 
@@ -95,6 +106,16 @@ class RawOSCWandParser  :  public RawEventParser
 
   void Parse (const std::string &path, const lo::Message &m,
               OmNihil *phage = NULL);
+};
+
+
+class RawMouseParser  :  public RawEventParser
+{ public:
+
+  void MouseMove (const std::string &nm, f64 x_nrm, f64 y_nrm,
+                  Bolex *cam, OmNihil *phage = NULL);
+  void MouseButt (const std::string &nm, u64 which_butt, f64 prssr,
+                  OmNihil *phage = NULL);
 };
 
 

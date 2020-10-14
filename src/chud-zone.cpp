@@ -160,6 +160,9 @@ class WandCatcher  :  public Zeubject, public ZESpatialPhagy
 
   i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
   // see below for the above... can't define inline because uses dead_zone...
+  i64 ZESpatialMoveExtra (ZeEvent::ProtoSprinkler::HOOKUP const &h,
+                          ZESpatialMoveEvent *e)
+    { return ZESpatialMove (e); }
   i64 ZESpatialHarden (ZESpatialHardenEvent *e)  override
     { if (calibrating)
         { // avanti!
@@ -175,6 +178,9 @@ class WandCatcher  :  public Zeubject, public ZESpatialPhagy
         }
       return 0;
     }
+  i64 ZESpatialHardenExtra (ZeEvent::ProtoSprinkler::HOOKUP const &h,
+                            ZESpatialHardenEvent *e)
+    { return ZESpatialHarden (e); }
   i64 ZESpatialSoften (ZESpatialSoftenEvent *e)  override
     { if (calibrating  &&  trig_partic . size () == 0)
         { // ymlaen!
@@ -196,6 +202,9 @@ class WandCatcher  :  public Zeubject, public ZESpatialPhagy
         }
       return 0;
     }
+  i64 ZESpatialSoftenExtra (ZeEvent::ProtoSprinkler::HOOKUP const &h,
+                            ZESpatialSoftenEvent *e)
+    { return ZESpatialSoften (e); }
 };
 
 
@@ -246,6 +255,7 @@ class dead_zone final : public charm::Application,
   WandCatcher wandy;
 
   static RawOSCWandParser rowp;
+  static RawMouseParser ramp;
 };
 
 
@@ -277,6 +287,7 @@ i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
 
 
 RawOSCWandParser dead_zone::rowp;
+RawMouseParser dead_zone::ramp;
 
 
 int eruct_handler (const char *pth, const char *typ, lo_arg **av, int ac,
@@ -338,7 +349,7 @@ static void glfw_mousepos_callback (GLFWwindow *win, double x, double y)
     }
   if (! leaf)
     { fprintf (stderr,
-               "%p reporting at [%.1lf, %.1lf], you silly little freak\n",
+               "in window %p: mouse at [%.1lf, %.1lf], but no Maes/bgfx-view\n",
                win, x, y);
       return;
     }
@@ -347,20 +358,18 @@ static void glfw_mousepos_callback (GLFWwindow *win, double x, double y)
   x /= (f64)(leaf->b_view->fb_pix_r - leaf->b_view->fb_pix_l);
   y /= (f64)(leaf->b_view->fb_pix_t - leaf->b_view->fb_pix_b);
 
-  Bolex *b = leaf->cam;
-  Vect thr = b -> ViewLoc ()  +  b -> ViewDist () * b -> ViewAim ();
-  f64 wid = b -> IsPerspectiveTypeOthographic ()  ?  b -> ViewOrthoWid ()
-    :  b -> ViewDist () * 2.0 * tan (0.5 * b -> ViewHorizAngle ());
-  f64 hei = b -> IsPerspectiveTypeOthographic ()  ?  b -> ViewOrthoHei ()
-    :  b -> ViewDist () * 2.0 * tan (0.5 * b -> ViewVertAngle ());
-  Vect ovr = b -> ViewAim () . Cross (b -> ViewUp ()) . Norm ();
-  Vect upp = ovr . Cross (b -> ViewAim ());
-  thr += (x - 0.5) * wid * ovr  +  (y - 0.5) * hei * upp;
-  Vect frm = b -> IsPerspectiveTypeProjection ()  ?  b -> ViewLoc ()
-    :  thr - b -> ViewDist () * b -> ViewAim ();
-
-thr.SpewToStderr(); fprintf(stderr," on <%s>\n",leaf->maes->Name().c_str());
+  dead_zone::ramp . MouseMove ("mouse-0", x, y, leaf->cam);//,
+//                               &sole_dead_zone->wandy);
 }
+
+
+static void glfw_mousebutt_callback (GLFWwindow *wind, int butt,
+                                     int actn, int mods)
+{ dead_zone::ramp . MouseButt ("mouse-0", 0x01 << butt,
+                               actn == GLFW_PRESS ? 1.0 : 0.0);//,
+//                               &sole_dead_zone->wandy);
+}
+
 
 GLFWwindow *windoidal = NULL;
 static i32 WINWID = 9600;
@@ -391,7 +400,7 @@ bool dead_zone::InitWindowingAndGraphics ()
 
   glfwSetKeyCallback (window, glfw_key_callback);
   glfwSetCursorPosCallback (window, glfw_mousepos_callback);
-  //
+  glfwSetMouseButtonCallback (window, glfw_mousebutt_callback);
 
   glfwPollEvents ();
   glfwSetWindowSize (window, WINWID, WINHEI);
@@ -491,6 +500,8 @@ dead_zone::dead_zone ()
       osc_srv -> add_method ("/events/spatial", NULL, osc_wandler, &wandy);
       osc_srv -> add_method (NULL, NULL, eruct_handler, this);
     }
+
+  ramp . AppendPhage (&wandy);
 
   wandy . SetCalibrista (&rowp.calibrex);
   sole_dead_zone = this;
@@ -806,7 +817,7 @@ int main (int, char **)
       layer . GetRootNode () -> AppendChild (enn);
     }
 
-  for (int q = 0  ;  q < 2  ;  ++q)
+  for (int q = 0  ;  q < 3  ;  ++q)
     { Cursoresque *c = new Cursoresque (0.015 * maes -> Height ());
       layer . GetRootNode () -> AppendChild (c->crs_nod);
 
