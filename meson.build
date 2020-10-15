@@ -194,6 +194,7 @@ lib_sources = ['src/application.cpp',
                'src/ProtoZoftThingGuts.cpp',
                'src/ScGrappler.cpp',
                'src/SpaceThing.cpp',
+               'src/TexturedRenderable.cpp',
                'src/TrGrappler.cpp',
                'src/Vect.cpp',
                'src/VideoSystem.cpp',
@@ -246,6 +247,11 @@ shaders = [
    'src/shaders/collage_bg_varying.def.sc', 'collage_bg_vs.bin'],
   ['fragment', 'src/shaders/collage_bg_fs.sc',
    'src/shaders/collage_bg_varying.def.sc', 'collage_bg_fs.bin'],
+  # collage background for demo
+  ['vertex',   'src/shaders/textured_renderable.vs.sc',
+   'src/shaders/basic_varying.def.sc', 'textured_renderable.vs.bin'],
+  ['fragment', 'src/shaders/textured_renderable.fs.sc',
+   'src/shaders/basic_varying.def.sc', 'textured_renderable.fs.bin'],
 ]
 
 foreach shader : shaders
@@ -254,6 +260,7 @@ foreach shader : shaders
                  output : [shader[3]],
                  command : [shaderc_prog,
                             '-i', meson.source_root () + '/bgfx/src',
+                            '-i', meson.source_root () + '/src/shaders/include',
                             '-f', '@INPUT0@',
                             '-o', '@OUTPUT0@',
                             '--type', shader[0],
