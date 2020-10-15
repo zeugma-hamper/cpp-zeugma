@@ -1,11 +1,17 @@
+
 #ifndef SLAPPY_TYPES_LEAVE_A_RED_MARK
 #define SLAPPY_TYPES_LEAVE_A_RED_MARK
+
 
 #include <stddef.h>
 #include <stdint.h>
 
+#include <limits>
+
+
 namespace charm
 {
+
 
 //basic numerics
 using i8  = int8_t;
@@ -24,6 +30,15 @@ using szt = size_t;
 using sort_key = u64;
 using graph_id = u64;
 using animation_step = u64;
+
+
+// limit values
+extern f64 CHRM_MIN_F64;
+extern f64 CHRM_MAX_F64;
+
+extern f32 CHRM_MIN_F32;
+extern f32 CHRM_MAX_F32;
+
 
 // vect base types
 typedef struct {
@@ -104,7 +119,6 @@ typedef struct {
 
 
 
-
 typedef struct {
   union {
     struct { u32 x, y; };
@@ -128,7 +142,6 @@ typedef struct {
     u32 a[4];
   };
 } v4u32;
-
 
 
 
@@ -158,7 +171,6 @@ typedef struct {
 
 
 
-
 typedef struct {
   union {
     struct { u64 x, y; };
@@ -183,6 +195,8 @@ typedef struct {
   };
 } v4u64;
 
+
 }
+
 
 #endif

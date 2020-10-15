@@ -202,6 +202,7 @@ lib_sources = ['src/application.cpp',
                'src/ZESpatialEvent.cpp',
                'src/ZEYowlEvent.cpp',
                'src/ZoftThing.cpp',
+               'src/base_types.cpp',
                'src/bgfx_utils.cpp',
                'src/conjure-from-toml.cpp']
 
