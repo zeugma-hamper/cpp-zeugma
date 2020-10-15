@@ -463,7 +463,7 @@ TriDemo::TriDemo ()
       osc_srv -> add_method (NULL, NULL, eruct_handler, this);
     }
 
-  wandy . SetCalibrista (&rowp.calibrex);
+  wandy . SetCalibrista (&rowp.room_calibrex);
   application_instance = this;
 }
 

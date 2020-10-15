@@ -539,7 +539,7 @@ dead_zone::dead_zone ()
       osc_srv -> add_method (NULL, NULL, eruct_handler, this);
     }
 
-  wandy . SetCalibrista (&rowp.calibrex);
+  wandy . SetCalibrista (&rowp.room_calibrex);
   sole_dead_zone = this;
 }
 
