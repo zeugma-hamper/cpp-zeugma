@@ -5,11 +5,14 @@
 
 #include <Node.hpp>
 #include <VideoSystem.hpp>
+#include <Matte.hpp>
 
 #include <unistd.h>
 
 #include <string>
 #include <string_view>
+
+
 
 namespace charm
 {
@@ -21,6 +24,16 @@ VideoRenderable::VideoRenderable (std::string_view _uri)
   VideoSystem *system = VideoSystem::GetSystem();
 
   VideoBrace brace = system->OpenVideo (_uri);
+  m_video_texture = brace.video_texture;
+}
+
+VideoRenderable::VideoRenderable (FilmInfo const &_fm)
+  : Renderable (),
+    m_video_texture {nullptr}
+{
+  VideoSystem *system = VideoSystem::GetSystem();
+
+  VideoBrace brace = system->OpenVideo (std::string ("file://") + _fm.film_path.string ());
   m_video_texture = brace.video_texture;
 }
 

@@ -285,7 +285,8 @@ cz_the_sequel_exec = executable ('cz_the_sequel',
 
 tri_demo_exec = executable ('tri_demo',
                             sources : ['src/tri_demo.cpp',
-                                       'src/Collage.cpp'],
+                                       'src/Collage.cpp',
+                                       'src/TriBand.cpp'],
                             dependencies : [charm_dep])
 
 scan_mattes_exec = executable ('scan_mattes',

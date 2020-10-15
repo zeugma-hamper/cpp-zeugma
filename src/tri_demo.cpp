@@ -53,6 +53,7 @@
 
 
 //for the demo
+#include <TriBand.hpp>
 #include <Collage.hpp>
 
 using namespace charm;
@@ -403,7 +404,7 @@ bool TriDemo::InitWindowingAndGraphics ()
                             leaf->b_view->wid_frac * glfw_width,
                             leaf->b_view->hei_frac * glfw_height);
       bgfx::setViewClear (vuid, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH | BGFX_CLEAR_STENCIL,
-                          0x808080FF + vuid * 0x00200000);
+                          0x505050FF);
       // use depth integer to order GPU draw submission
       // drawables are enumerated by order in scene graph,
       // so that id number is used as the depth.
@@ -716,17 +717,51 @@ int main (int, char **)
   PlatonicMaes *maes = demo.FindMaesByName ("front");
   assert (maes);
 
-  Collage *collage = new Collage (5, film_infos,
-                                  0.45 * maes->Width (),
-                                  0.45 * maes->Height());
-  collage->Translate(maes->Loc () - 0.25 * maes->Over () * maes->Width ());
-  demo.GetSceneLayer().GetRootNode()->AppendChild(collage);
+  // f64 const size_factor = 0.225;
+  // f64 const placement_factor = 0.125;
 
-  Collage *collage2 = new Collage (5, film_infos,
-                                   0.45 * maes->Width (),
-                                   0.45 * maes->Height());
-  collage2->Translate(maes->Loc () + 0.25 * maes->Over () * maes->Width ());
-  demo.GetSceneLayer().GetRootNode()->AppendChild(collage2);
+  // Collage *collage = new Collage (5, film_infos,
+  //                                 size_factor * maes->Width (),
+  //                                 size_factor * maes->Height());
+  // collage->Translate(maes->Loc ()
+  //                    - 3.0 * placement_factor * maes->Over () * maes->Width ()
+  //                    + 0.25 * maes->Up () * maes->Height ());
+  // demo.GetSceneLayer().GetRootNode()->AppendChild(collage);
+
+  // Collage *collage2 = new Collage (5, film_infos,
+  //                                  size_factor * maes->Width (),
+  //                                  size_factor * maes->Height());
+  // collage2->Translate(maes->Loc ()
+  //                     - placement_factor * maes->Over () * maes->Width ()
+  //                     + 0.25 * maes->Up () * maes->Height ());
+  // demo.GetSceneLayer().GetRootNode()->AppendChild(collage2);
+
+  // Collage *collage3 = new Collage (5, film_infos,
+  //                                 size_factor * maes->Width (),
+  //                                 size_factor * maes->Height());
+  // collage3->Translate(maes->Loc ()
+  //                    + placement_factor * maes->Over () * maes->Width ()
+  //                    + 0.25 * maes->Up () * maes->Height ());
+  // demo.GetSceneLayer().GetRootNode()->AppendChild(collage3);
+
+  // Collage *collage4 = new Collage (5, film_infos,
+  //                                  size_factor * maes->Width (),
+  //                                  size_factor * maes->Height());
+  // collage4->Translate(maes->Loc ()
+  //                     + 3.0 *  placement_factor * maes->Over () * maes->Width ()
+  //                     + 0.25 * maes->Up () * maes->Height ());
+  // demo.GetSceneLayer().GetRootNode()->AppendChild(collage4);
+
+  // VideoRenderable *vr = new VideoRenderable (film_infos[4]);
+  // Node *video = new Node;
+  // video->AppendRenderable (vr);
+  // video->Scale (Vect (0.5 * maes->Width ()));
+  // video->Translate (maes->Loc () - 0.25 * maes->Height () * maes->Up ());
+  // demo.GetSceneLayer().GetRootNode()->AppendChild(video);
+
+  TriBand *triband = new TriBand (maes->Width (), 2.0 * maes->Height (), film_infos);
+  triband->Translate (maes->Loc () - (1.0/2.0) * maes->Height () * maes->Up ());
+  demo.GetSceneLayer().GetRootNode()->AppendChild(triband);
 
   demo.Run ();
 
