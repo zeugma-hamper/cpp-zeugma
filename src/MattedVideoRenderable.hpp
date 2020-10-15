@@ -24,7 +24,7 @@ class MattedVideoRenderable final : public Renderable
   MattedVideoRenderable (std::string_view _uri,
                          f64 _loop_start_ts, f64 _loop_end_ts,
                          std::string_view _matte_pattern);
-  MattedVideoRenderable (FilmInfo const &_film, ClipInfo &_clip);
+  MattedVideoRenderable (FilmInfo const &_film, ClipInfo const &_clip);
   ~MattedVideoRenderable () override;
 
   void Draw (u16 vyu_id) override;
