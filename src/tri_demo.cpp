@@ -62,6 +62,7 @@ class CMVTrefoil  :  public Zeubject
 { public:
   Bolex *cam;
   PlatonicMaes *maes;
+  std::vector<Layer *> layers;
   struct BGFXView {
     i32 view_id;  // bgfx's is u16, so we can rep't stuff in neg nos.
     f64 botlef_x, botlef_y;
@@ -193,7 +194,10 @@ class TriDemo final : public Application
 
   static FrameTime *GetFrameTime ();
 
-  Layer &GetSceneLayer ();
+  Layer *GetSceneLayer ();
+  Layer *GetNthSceneLayer (i32 nth);
+  void AppendSceneLayer (Layer *layer);
+  i32 NumSceneLayers () const;
 
   i32 NumRenderLeaves ()  const;
   CMVTrefoil *NthRenderLeaf (i32 ind);
@@ -211,7 +215,7 @@ class TriDemo final : public Application
 
  protected:
   GLFWwindow *window;
-  Layer *m_scene_graph_layer;
+  std::vector<Layer *> m_scene_graph_layers;
 
   std::vector <CMVTrefoil *> render_leaves;
   lo::Server *osc_srv;
@@ -421,8 +425,10 @@ void TriDemo::ShutDownGraphics ()
 }
 
 void TriDemo::Render ()
-{ for (Renderable *r : m_scene_graph_layer->GetRenderables())
-    r -> Update ();
+{
+  for (Layer *l : m_scene_graph_layers)
+    for (Renderable *r : l->GetRenderables())
+      r -> Update ();
 
   for (CMVTrefoil *leaf  :  render_leaves)
     { u16 vuid = leaf->b_view -> ViewID ();
@@ -442,8 +448,9 @@ void TriDemo::Render ()
       bgfx::setViewTransform (vuid, glm::value_ptr (view_transform),
                               glm::value_ptr (proj_transform));
 
-      for (Renderable *r  :  m_scene_graph_layer->GetRenderables())
-        r -> Draw (vuid);
+      for (Layer *l : leaf->layers)
+        for (Renderable *r  :  l->GetRenderables())
+          r -> Draw (vuid);
     }
   bgfx::frame ();
 }
@@ -451,7 +458,7 @@ void TriDemo::Render ()
 
 TriDemo::TriDemo ()
   : window {nullptr},
-    m_scene_graph_layer {new Layer},
+    m_scene_graph_layers {new Layer},
     osc_srv (NULL)
 { lo_server los = lo_server_new ("54345", NULL);
   if (! los)
@@ -530,16 +537,23 @@ void TriDemo::UpdateRenderLeaves (i64 ratch, f64 thyme)
 
 void TriDemo::UpdateSceneGraph(i64 ratch, f64 thyme)
 {
-  m_scene_graph_layer->GetRootNode()
-    -> UpdateTransformsHierarchically (ratch, thyme);
-  m_scene_graph_layer->GetRootNode()->EnumerateRenderables();
+  graph_id id = 0;
+  for (Layer *layer : m_scene_graph_layers)
+    {
+      layer->GetRootNode()
+        ->UpdateTransformsHierarchically (ratch, thyme);
+      id = layer->GetRootNode()->EnumerateRenderables(id);
+    }
 }
 
 void TriDemo::ShutDownSceneGraph()
 {
-  delete m_scene_graph_layer;
-  m_scene_graph_layer = nullptr;
+  for (auto *l : m_scene_graph_layers)
+    delete l;
+
+  m_scene_graph_layers.clear ();
 }
+
 
 bool TriDemo::ShutDown ()
 {
@@ -558,11 +572,29 @@ FrameTime *TriDemo::GetFrameTime ()
   return s_TriDemo_frame_time;
 }
 
-Layer &TriDemo::GetSceneLayer ()
+Layer *TriDemo::GetSceneLayer ()
 {
-  return *m_scene_graph_layer;
+  return m_scene_graph_layers[0];
 }
 
+Layer *TriDemo::GetNthSceneLayer (i32 nth)
+{
+  assert (nth < i64 (m_scene_graph_layers.size ()));
+  return m_scene_graph_layers[nth];
+}
+
+void TriDemo::AppendSceneLayer (Layer *layer)
+{
+  if (layer == nullptr)
+    return;
+
+  m_scene_graph_layers.push_back (layer);
+}
+
+i32 TriDemo::NumSceneLayers () const
+{
+  return i32 (m_scene_graph_layers.size ());
+}
 
 i32 TriDemo::NumRenderLeaves ()  const
 { return render_leaves . size (); }
@@ -700,8 +732,25 @@ int main (int, char **)
   if (! demo.StartUp ())
     return -1;
 
-  Layer &layer = demo.GetSceneLayer();
-  (void)layer;
+  Layer *front_layer = demo.GetSceneLayer();
+  Layer *left_layer = new Layer ();
+  demo.AppendSceneLayer(left_layer);
+  Layer *ee_layer = new Layer ();
+  demo.AppendSceneLayer(ee_layer);
+
+  for (CMVTrefoil *leaf : demo.RenderLeaves())
+    {
+      if (! leaf->maes)
+        continue;
+
+      if (leaf->maes->Name() == "front")
+        leaf->layers.push_back(front_layer);
+      else if (leaf->maes->Name () == "left")
+        leaf->layers.push_back(left_layer);
+
+      //ee_layer goes on all
+      leaf->layers.push_back(ee_layer);
+    }
 
   std::vector<FilmInfo> film_infos
     = ReadFilmInfo ("../configs/film-config.toml");
@@ -717,51 +766,9 @@ int main (int, char **)
   PlatonicMaes *maes = demo.FindMaesByName ("front");
   assert (maes);
 
-  // f64 const size_factor = 0.225;
-  // f64 const placement_factor = 0.125;
-
-  // Collage *collage = new Collage (5, film_infos,
-  //                                 size_factor * maes->Width (),
-  //                                 size_factor * maes->Height());
-  // collage->Translate(maes->Loc ()
-  //                    - 3.0 * placement_factor * maes->Over () * maes->Width ()
-  //                    + 0.25 * maes->Up () * maes->Height ());
-  // demo.GetSceneLayer().GetRootNode()->AppendChild(collage);
-
-  // Collage *collage2 = new Collage (5, film_infos,
-  //                                  size_factor * maes->Width (),
-  //                                  size_factor * maes->Height());
-  // collage2->Translate(maes->Loc ()
-  //                     - placement_factor * maes->Over () * maes->Width ()
-  //                     + 0.25 * maes->Up () * maes->Height ());
-  // demo.GetSceneLayer().GetRootNode()->AppendChild(collage2);
-
-  // Collage *collage3 = new Collage (5, film_infos,
-  //                                 size_factor * maes->Width (),
-  //                                 size_factor * maes->Height());
-  // collage3->Translate(maes->Loc ()
-  //                    + placement_factor * maes->Over () * maes->Width ()
-  //                    + 0.25 * maes->Up () * maes->Height ());
-  // demo.GetSceneLayer().GetRootNode()->AppendChild(collage3);
-
-  // Collage *collage4 = new Collage (5, film_infos,
-  //                                  size_factor * maes->Width (),
-  //                                  size_factor * maes->Height());
-  // collage4->Translate(maes->Loc ()
-  //                     + 3.0 *  placement_factor * maes->Over () * maes->Width ()
-  //                     + 0.25 * maes->Up () * maes->Height ());
-  // demo.GetSceneLayer().GetRootNode()->AppendChild(collage4);
-
-  // VideoRenderable *vr = new VideoRenderable (film_infos[4]);
-  // Node *video = new Node;
-  // video->AppendRenderable (vr);
-  // video->Scale (Vect (0.5 * maes->Width ()));
-  // video->Translate (maes->Loc () - 0.25 * maes->Height () * maes->Up ());
-  // demo.GetSceneLayer().GetRootNode()->AppendChild(video);
-
   TriBand *triband = new TriBand (maes->Width (), 2.0 * maes->Height (), film_infos);
-  triband->Translate (maes->Loc () - (1.0/2.0) * maes->Height () * maes->Up ());
-  demo.GetSceneLayer().GetRootNode()->AppendChild(triband);
+  triband->Translate (maes->Loc ());// - (1.0/2.0) * maes->Height () * maes->Up ());
+  front_layer->GetRootNode()->AppendChild(triband);
 
   PlatonicMaes *left = demo.FindMaesByName("left");
   triband = new TriBand (maes->Width (), 2.0 * maes->Height (), film_infos);
@@ -769,7 +776,9 @@ int main (int, char **)
   triband->Translate (left->Loc ()
                       - (1.0/2.0) * left->Height () * left->Up ());
                       //+ (1.0/2.0) * maes->Height () * left->Up ());
-  demo.GetSceneLayer().GetRootNode()->AppendChild(triband);
+  left_layer->GetRootNode()->AppendChild(triband);
+
+  //std::this_thread::sleep_for(std::chrono::seconds (2));
 
   demo.Run ();
 
