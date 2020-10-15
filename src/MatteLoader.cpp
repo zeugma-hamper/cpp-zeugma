@@ -1,13 +1,14 @@
 #include <MatteLoader.hpp>
 
 #include <algorithm>
+#include <chrono>
 
 #include <OpenImageIO/imageio.h>
 
 namespace charm
 {
 
-static u32 max_loaded_frames = 5;
+static u32 max_loaded_frames = 3;
 
 namespace fs = std::filesystem;
 
@@ -72,6 +73,11 @@ MatteFrame MatteLoader::GetFrame (u32 _offset)
         }
     }
 
+  // didn't find what we're looking for so trash everything
+  m_requested_offset = _offset;
+  std::for_each (m_frames.begin (), m_frames.end (),
+                 [] (MatteFrame &f) { free (f.data); });
+  m_frames.clear ();
   m_frame_cond.notify_one();
   return {};
 }
@@ -156,6 +162,8 @@ void MatteLoader::LoadFrames (MatteLoader *_loader)
                         u32(ispec.width), u32(ispec.height), size, data};
       lock.lock ();
       _loader->m_frames.push_back (frame);
+      lock.unlock();
+      std::this_thread::sleep_for(std::chrono::milliseconds (2));
       //fprintf (stderr, "loaded %u\n", next);
     }
 }

@@ -311,7 +311,7 @@ void VideoSystem::UploadFrames ()
       MatteFrame mf = pipe.matte_loader->GetFrame(frame_num);
       if (! mf.data)
         {
-          fprintf (stderr, "no matte for %lu which seems fishy\n", frame_num);
+          fprintf (stdout, "no matte for %lu which seems fishy\n", frame_num);
           continue;
         }
 
