@@ -763,6 +763,14 @@ int main (int, char **)
   triband->Translate (maes->Loc () - (1.0/2.0) * maes->Height () * maes->Up ());
   demo.GetSceneLayer().GetRootNode()->AppendChild(triband);
 
+  PlatonicMaes *left = demo.FindMaesByName("left");
+  triband = new TriBand (maes->Width (), 2.0 * maes->Height (), film_infos);
+  triband->RotateD (maes->Up (), 90.0);
+  triband->Translate (left->Loc ()
+                      - (1.0/2.0) * left->Height () * left->Up ());
+                      //+ (1.0/2.0) * maes->Height () * left->Up ());
+  demo.GetSceneLayer().GetRootNode()->AppendChild(triband);
+
   demo.Run ();
 
   return 0;
