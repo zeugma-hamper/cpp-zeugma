@@ -25,6 +25,7 @@
 //animation
 #include <ZoftThing.h>
 #include <InterpZoft.h>
+#include <LoopZoft.h>
 
 //events
 #include <ZESpatialEvent.h>
@@ -103,6 +104,34 @@ Bolex *CameraFromMaes (const PlatonicMaes &m)
   cam -> SetNearAndFarClipDist (0.1, 10.0 * dst);
   return cam;
 }
+
+
+// oy. also: oy.
+class Cursoresque;
+// how about some more oy?
+std::vector <Cursoresque *> cursoresques;
+// don't forget: oy.
+bool extra_poo = [] () { srand48 (32123);  return true; } ();
+
+
+class Cursoresque  :  public Zeubject
+{ public:
+  Node *crs_nod;
+  Renderable *crs_rnd;
+  ZoftVect crs_pos;
+  Cursoresque (f64 sz)  :  Zeubject (),
+                           crs_nod (new Node),
+                           crs_rnd (new RectangleRenderable)
+    { crs_nod -> AppendRenderable (crs_rnd);
+      f64 ltime = 0.55 - 0.1 * drand48 ();
+      crs_nod -> Rotate (ZoftVect (Vect::zaxis),
+                         LoopFloat (0.0, 2.0 * M_PI / ltime, ltime));
+      crs_nod -> Scale (sz);
+      crs_pos . MakeBecomeLikable ();
+      crs_nod -> Translate (crs_pos);
+    }
+};
+
 
 class WandCatcher  :  public Zeubject, public ZESpatialPhagy
 {
@@ -308,9 +337,9 @@ i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
       f64 d1 = 2.0 * p . Dot (emm -> Up ());
       if (d0 < wid  &&  d0 > -wid  &&  d1 < hei  &&  d1 > -hei)
         { f64 d2 = p . Dot (emm -> Norm ());
-          fprintf (stderr,
-                   "YEAUH! In bounds, <%.1lf %.1lf %.1lf> surface-relative.\n",
-                   d0, d1, d2);
+          // fprintf (stderr,
+          //          "YEAUH! In bounds, <%.1lf %.1lf %.1lf> surface-relative.\n",
+          //          d0, d1, d2);
         }
     }
   return 0;
@@ -365,15 +394,15 @@ static void glfw_mousepos_callback (GLFWwindow *win, double x, double y)
   x /= (f64)(leaf->b_view->fb_pix_r - leaf->b_view->fb_pix_l);
   y /= (f64)(leaf->b_view->fb_pix_t - leaf->b_view->fb_pix_b);
 
-  TriDemo::RAMP().MouseMove ("mouse-0", x, y, leaf->cam);
+  TriDemo::RAMP () . MouseMove ("mouse-0", x, y, leaf->cam);
 }
 
 
 static void glfw_mousebutt_callback (GLFWwindow *wind, int butt,
                                      int actn, int mods)
 {
-  TriDemo::RAMP().MouseButt ("mouse-0", 0x01 << butt,
-                             actn == GLFW_PRESS ? 1.0 : 0.0);
+  TriDemo::RAMP () . MouseButt ("mouse-0", 0x01 << butt,
+                                actn == GLFW_PRESS ? 1.0 : 0.0);
 }
 
 int eruct_handler (const char *pth, const char *typ, lo_arg **av, int ac,
@@ -532,6 +561,9 @@ TriDemo::TriDemo ()
 
   wandy . SetCalibrista (&rowp.room_calibrex);
   elev_transl . MakeBecomeLikable ();
+
+  RAMP () . AppendPhage (&wandy);
+
   application_instance = this;
 }
 
@@ -585,8 +617,14 @@ bool TriDemo::RunOneCycle ()
   return true;
 }
 
+
+static LoopFloat timey { 0.0, 1.0, 0.0 };
+
 bool TriDemo::DoWhatThouWilt (i64, f64)
-{
+{ if (timey.val > 1.5)
+    { TriDemo::ROWP () . HooverCoordTransforms ();
+      timey . BecomeLike (ZoftFloat (0.0));
+    }
   return true;
 }
 
@@ -689,49 +727,48 @@ std::vector<CMVTrefoil *> &TriDemo::RenderLeaves ()
 
 
 void TriDemo::FlatulateCursor (ZESpatialMoveEvent *e)
-{
-  // PlatonicMaes *close_m = NULL;
-  // Vect close_p, hit;
-  // f64 close_d;
+{ PlatonicMaes *close_m = NULL;
+  Vect close_p, hit;
+  f64 close_d;
 
-  // const std::string &which_crs = e -> Provenance ();
-  // Cursoresque *crs = NULL;
-  // Cursoresque *bachelor_crs = NULL;
-  // for (Cursoresque *c  :  cursoresques)
-  //   { const std::string &nm = c -> Name ();
-  //     if (nm . empty ())
-  //       bachelor_crs = c;
-  //     else if (nm  ==  which_crs)
-  //       { crs = c;  break; }
-  //   }
-  // if (! crs)
-  //   { if (! bachelor_crs)
-  //       return;
-  //     crs = bachelor_crs;
-  //     bachelor_crs -> SetName (which_crs);
-  //   }
+  const std::string &which_crs = e -> Provenance ();
+  Cursoresque *crs = NULL;
+  Cursoresque *bachelor_crs = NULL;
+  for (Cursoresque *c  :  cursoresques)
+    { const std::string &nm = c -> Name ();
+      if (nm . empty ())
+        bachelor_crs = c;
+      else if (nm  ==  which_crs)
+        { crs = c;  break; }
+    }
+  if (! crs)
+    { if (! bachelor_crs)
+        return;
+      crs = bachelor_crs;
+      bachelor_crs -> SetName (which_crs);
+    }
 
-  // i32 cnt = NumMaeses ();
-  // for (i32 q = 0  ;  q < cnt  ;  ++q)
-  //   { PlatonicMaes *emm = NthMaes (q);
-  //     if (GeomFumble::RayRectIntersection (e -> Loc (), e -> Aim (),
-  //                                          emm -> Loc (), emm -> Over (),
-  //                                          emm -> Up (), emm -> Width (),
-  //                                          emm -> Height (), &hit))
-  //       { f64 d = hit . DistFrom (e -> Loc ());
-  //         if (! close_m  ||  d < close_d)
-  //           { close_m = emm;
-  //             close_p = hit;
-  //             close_d = d;
-  //           }
-  //       }
-  //   }
+  i32 cnt = NumMaeses ();
+  for (i32 q = 0  ;  q < cnt  ;  ++q)
+    { PlatonicMaes *emm = NthMaes (q);
+      if (GeomFumble::RayRectIntersection (e -> Loc (), e -> Aim (),
+                                           emm -> Loc (), emm -> Over (),
+                                           emm -> Up (), emm -> Width (),
+                                           emm -> Height (), &hit))
+        { f64 d = hit . DistFrom (e -> Loc ());
+          if (! close_m  ||  d < close_d)
+            { close_m = emm;
+              close_p = hit;
+              close_d = d;
+            }
+        }
+    }
 
-  // if (close_m)
-  //   { crs->crs_pos = close_p;
-  //     crs->crs_rnd -> SetOver (close_m -> Over ());
-  //     crs->crs_rnd -> SetUp (close_m -> Up ());
-  //   }
+  if (close_m)
+    { crs->crs_pos = close_p;
+      crs->crs_rnd -> SetOver (close_m -> Over ());
+      crs->crs_rnd -> SetUp (close_m -> Up ());
+    }
 }
 
 
@@ -826,7 +863,8 @@ int main (int, char **)
 
   {
     BlockTimer bt ("loading geom");
-    std::vector<FilmGeometry> geoms = ReadFileGeometry("../configs/mattes.toml");
+    std::vector<FilmGeometry> geoms
+      = ReadFileGeometry("../configs/mattes.toml");
     assert (geoms.size () > 0);
     MergeFilmInfoGeometry(film_infos, geoms);
   }
@@ -847,11 +885,17 @@ int main (int, char **)
     (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
      -  0.5 * maes -> Width () * maes -> Over ()
      +  maes -> Loc () . Dot (maes -> Up ()) * maes -> Up ());
-                      //left->Loc ()
-                      //- (1.0/2.0) * left->Height () * left->Up ());
-                      //+ (1.0/2.0) * maes->Height () * left->Up ());
+
   triband -> Translate (demo.elev_transl);
   left_layer->GetRootNode()->AppendChild(triband);
+
+  for (int q = 0  ;  q < 3  ;  ++q)
+    { Cursoresque *c = new Cursoresque (0.015 * maes -> Height ());
+      ee_layer -> GetRootNode () -> AppendChild (c->crs_nod);
+
+      cursoresques . push_back (c);
+      c->crs_pos = maes -> Loc ();
+    }
 
   //std::this_thread::sleep_for(std::chrono::seconds (2));
 
