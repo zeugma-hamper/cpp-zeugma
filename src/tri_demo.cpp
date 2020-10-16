@@ -51,6 +51,7 @@
 //C++, C
 #include <unordered_set>
 #include <optional>
+#include <boost/program_options.hpp>
 
 #include <stdio.h>
 
@@ -788,8 +789,22 @@ RawMouseParser &TriDemo::RAMP ()
   return ramp;
 }
 
-int main (int, char **)
+namespace po = boost::program_options;
+
+int main (int ac, char **av)
 {
+  bool prison_break_mode = false;
+  po::options_description desc ("available options");
+  desc.add_options()
+    ("prison-break", "escaped elements only mode");
+
+  po::variables_map arg_map;
+  po::store (po::parse_command_line(ac, av, desc), arg_map);
+  po::notify(arg_map);
+
+  if (arg_map.count ("prison-break"))
+    prison_break_mode = true;
+
   TriDemo demo;
 
   i64 total_pixwid = 0;
@@ -871,42 +886,56 @@ int main (int, char **)
 
   PlatonicMaes *maes = demo.FindMaesByName ("front");
   assert (maes);
+  PlatonicMaes *left = demo.FindMaesByName("left");
+  assert (left);
 
   f64 const total_height = maes->Height() * 2.0;
   f64 const total_width = maes->Width ();
-  f64 const center_height = maes->Height () * 0.5;
   f64 const band_height = total_height / 3.0;
 
-  CollageBand *collage_band
-    = new CollageBand (total_width, band_height, film_infos);
-  collage_band -> Translate (demo.elev_transl);
-  collage_band->Translate(maes->Loc ()
-                          +  band_height * maes->Up ());
-  front_layer->GetRootNode()->AppendChild(collage_band);
+  if (! prison_break_mode)
+    {
+      CollageBand *collage_band
+        = new CollageBand (total_width, band_height, film_infos);
+      collage_band -> Translate (demo.elev_transl);
+      collage_band->Translate(maes->Loc ()
+                              +  band_height * maes->Up ());
+      front_layer->GetRootNode()->AppendChild(collage_band);
+
+      VideoRenderable *vr = new VideoRenderable (film_infos[4]);
+      Node *video_band = new Node;
+      video_band->AppendRenderable (vr);
+      video_band->Scale (Vect (0.6 * total_width));
+      video_band -> Translate (demo.elev_transl);
+      video_band->Translate (maes->Loc () - band_height * maes->Up ());
+      front_layer->GetRootNode()->AppendChild(video_band);
+
+      collage_band = new CollageBand (total_width, band_height, film_infos);
+      collage_band->RotateD (maes->Up (), 90.0);
+      collage_band -> Translate (demo.elev_transl);
+      collage_band->Translate
+        (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
+         -  0.5 * maes -> Width () * maes -> Over ()
+         +  (band_height + maes -> Loc () . Dot (maes -> Up ())) * maes -> Up ());
+      left_layer->GetRootNode()->AppendChild(collage_band);
+
+      vr = new VideoRenderable (film_infos[3]);
+      video_band = new Node;
+      video_band->AppendRenderable (vr);
+      video_band->Scale (Vect (0.6 * total_width));
+      video_band->RotateD (maes->Up (), 90.0);
+      video_band -> Translate (demo.elev_transl);
+      video_band->Translate
+        (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
+         -  0.5 * maes -> Width () * maes -> Over ()
+         +  (maes -> Loc () . Dot (maes -> Up ()) - band_height) * maes -> Up ());
+      left_layer->GetRootNode()->AppendChild(video_band);
+    }
 
   ElementsBand *elements_band = new ElementsBand (total_width, band_height, film_infos);
   elements_band -> Translate (demo.elev_transl);
   elements_band->Translate (maes->Loc ());
   ee_layer->GetRootNode()->AppendChild(elements_band);
-
-  VideoRenderable *vr = new VideoRenderable (film_infos[4]);
-  Node *video_band = new Node;
-  video_band->AppendRenderable (vr);
-  video_band->Scale (Vect (0.6 * total_width));
-  video_band -> Translate (demo.elev_transl);
-  video_band->Translate (maes->Loc () - band_height * maes->Up ());
-  front_layer->GetRootNode()->AppendChild(video_band);
-
-  PlatonicMaes *left = demo.FindMaesByName("left");
-
-  collage_band = new CollageBand (total_width, band_height, film_infos);
-  collage_band->RotateD (maes->Up (), 90.0);
-  collage_band -> Translate (demo.elev_transl);
-  collage_band->Translate
-    (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
-     -  0.5 * maes -> Width () * maes -> Over ()
-     +  (band_height + maes -> Loc () . Dot (maes -> Up ())) * maes -> Up ());
-  left_layer->GetRootNode()->AppendChild(collage_band);
 
   elements_band = new ElementsBand (total_width, band_height, film_infos);
   elements_band->RotateD (maes->Up (), 90.0);
@@ -916,18 +945,6 @@ int main (int, char **)
      -  0.5 * maes -> Width () * maes -> Over ()
      +  maes -> Loc () . Dot (maes -> Up ()) * maes -> Up ());
   ee_layer->GetRootNode()->AppendChild(elements_band);
-
-  vr = new VideoRenderable (film_infos[3]);
-  video_band = new Node;
-  video_band->AppendRenderable (vr);
-  video_band->Scale (Vect (0.6 * total_width));
-  video_band->RotateD (maes->Up (), 90.0);
-  video_band -> Translate (demo.elev_transl);
-  video_band->Translate
-    (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
-     -  0.5 * maes -> Width () * maes -> Over ()
-     +  (maes -> Loc () . Dot (maes -> Up ()) - band_height) * maes -> Up ());
-  left_layer->GetRootNode()->AppendChild(video_band);
 
   for (int q = 0  ;  q < 3  ;  ++q)
     { Cursoresque *c = new Cursoresque (0.015 * maes -> Height ());
