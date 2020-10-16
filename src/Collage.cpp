@@ -11,6 +11,8 @@
 
 #include <vector_interop.hpp>
 
+#include "global-params.h"
+
 #include <random>
 
 namespace charm
@@ -112,7 +114,8 @@ void CollageMatte::Draw (u16 _view_id)
 
   u32 const stencil_state = BGFX_STENCIL_FUNC_REF(m_stencil_val) |
     BGFX_STENCIL_FUNC_RMASK(0xff) |
-    BGFX_STENCIL_TEST_EQUAL |
+    (global_param_should_clip_collages
+     ?  BGFX_STENCIL_TEST_EQUAL  :  BGFX_STENCIL_TEST_ALWAYS) |
     BGFX_STENCIL_OP_FAIL_S_KEEP |
     BGFX_STENCIL_OP_FAIL_Z_KEEP | //not really needed
     BGFX_STENCIL_OP_PASS_Z_KEEP;
@@ -194,10 +197,16 @@ CollageBand::CollageBand (f64 _width, f64 _height,
        collage_center,
        collage_center + 1.0 * placement_factor * xxx * _width};
 
-  //top band - 4 collages
+  std::random_device rd;
+  std::mt19937 genny (rd ());
+  std::uniform_int_distribution<> elem_cnt_dist (4, 6);
+
+  //top band - 4-ish collages
   for (Vect const &v : positions)
-    {
-      Collage *collage = new Collage (5, _films,
+    { i64 ecnt = elem_cnt_dist (genny);
+      fprintf (stderr, "and lo! <%ld> elements enchosen for THIS collage.\n",
+               ecnt);
+      Collage *collage = new Collage (ecnt, _films,
                                       size_factor * _width,
                                       size_factor * _height);
       SinuVect perky (0.25 * size_factor * _height * Vect::yaxis,

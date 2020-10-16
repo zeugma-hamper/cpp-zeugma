@@ -55,12 +55,14 @@
 
 #include <stdio.h>
 
-
 //for the demo
 #include <TriBand.hpp>
 #include <Collage.hpp>
+#include "global-params.h"  // (or could be at top in the 'application' stanza)
+
 
 using namespace charm;
+
 
 class CMVTrefoil  :  public Zeubject
 { public:
@@ -789,21 +791,25 @@ RawMouseParser &TriDemo::RAMP ()
   return ramp;
 }
 
+
 namespace po = boost::program_options;
+
 
 int main (int ac, char **av)
 {
-  bool prison_break_mode = false;
   po::options_description desc ("available options");
   desc.add_options()
-    ("prison-break", "escaped elements only mode");
+    ("prison-break", "escaped elements only mode")
+    ("clip-collages", "disallow collage elements outside rect-bounds");
 
   po::variables_map arg_map;
   po::store (po::parse_command_line(ac, av, desc), arg_map);
   po::notify(arg_map);
 
   if (arg_map.count ("prison-break"))
-    prison_break_mode = true;
+    global_params_prison_break_mode = true;
+  if (arg_map . count ("clip-collages"))
+    global_param_should_clip_collages = true;
 
   TriDemo demo;
 
@@ -893,7 +899,7 @@ int main (int ac, char **av)
   f64 const total_width = maes->Width ();
   f64 const band_height = total_height / 3.0;
 
-  if (! prison_break_mode)
+  if (! global_params_prison_break_mode)
     {
       CollageBand *collage_band
         = new CollageBand (total_width, band_height, film_infos);
