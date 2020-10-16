@@ -101,10 +101,4 @@ compile_commands.json
 bld
 bld-asan
 bld-clang
-
-#subproject directories
-subprojects/volk
-subprojects/xxHash-0.7.0
-subprojects/xxHash-0.7.3
-subprojects/fmt-6.2.0
-subprojects/packagecache
+bld-release

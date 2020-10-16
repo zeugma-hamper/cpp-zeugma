@@ -50,7 +50,6 @@
 
 //C++, C
 #include <unordered_set>
-#include <optional>
 #include <boost/program_options.hpp>
 
 #include <stdio.h>
@@ -639,13 +638,15 @@ void TriDemo::UpdateRenderLeaves (i64 ratch, f64 thyme)
 
 void TriDemo::UpdateSceneGraph(i64 ratch, f64 thyme)
 {
-  graph_id id = 0;
+  std::array<graph_id, 2> ids {0, 0};
   for (Layer *layer : m_scene_graph_layers)
     {
       layer->GetRootNode()
         ->UpdateTransformsHierarchically (ratch, thyme);
-      id = layer->GetRootNode()->EnumerateRenderables(id);
+      ids = layer->GetRootNode()->EnumerateGraph(ids[0], ids[1]);
+      layer->SortFrontiers ();
     }
+
 }
 
 void TriDemo::ShutDownSceneGraph()
@@ -733,6 +734,14 @@ void TriDemo::FlatulateCursor (ZESpatialMoveEvent *e)
 { PlatonicMaes *close_m = NULL;
   Vect close_p, hit;
   f64 close_d;
+
+  Vect hit_point;
+  for (Layer *l : m_scene_graph_layers)
+    {
+      Frontier *f = l->FirstHitFrontier({e->Loc(), e->Aim()}, &hit_point);
+      if (f)
+        fprintf (stdout, "I hit %p at (%0.2f, %0.2f, %0.2f)\n", f, hit_point.x, hit_point.y, hit_point.z);
+    }
 
   const std::string &which_crs = e -> Provenance ();
   Cursoresque *crs = NULL;
@@ -945,13 +954,13 @@ int main (int ac, char **av)
     }
 
   ElementsBand *elements_band = new ElementsBand (total_width, band_height, film_infos);
-  elements_band -> Translate (demo.elev_transl);
+  elements_band->Translate (demo.elev_transl);
   elements_band->Translate (maes->Loc ());
   ee_layer->GetRootNode()->AppendChild(elements_band);
 
   elements_band = new ElementsBand (total_width, band_height, film_infos);
   elements_band->RotateD (maes->Up (), 90.0);
-  elements_band -> Translate (demo.elev_transl);
+  elements_band->Translate (demo.elev_transl);
   elements_band->Translate
     (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
      -  0.5 * maes -> Width () * maes -> Over ()
@@ -965,8 +974,6 @@ int main (int ac, char **av)
       cursoresques . push_back (c);
       c->crs_pos = maes -> Loc ();
     }
-
-  //std::this_thread::sleep_for(std::chrono::seconds (2));
 
   demo.Run ();
 

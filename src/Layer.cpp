@@ -2,6 +2,9 @@
 
 #include <algorithm>
 
+#include <Frontier.hpp>
+#include <Node.hpp>
+
 namespace charm {
 
 Layer::Layer ()
@@ -22,9 +25,24 @@ Node *Layer::GetRootNode ()
   return &m_root_node;
 }
 
+Frontier *Layer::FirstHitFrontier (Ray const &_ray, Vect *_hit_pt) const
+{
+  for (Frontier *fr : m_frontiers)
+    if (fr->CheckHit(_ray, _hit_pt))
+      return fr;
+
+  return nullptr;
+}
+
+
 std::vector<Renderable *> &Layer::GetRenderables ()
 {
   return m_renderables;
+}
+
+std::vector<Frontier *> &Layer::GetFrontiers ()
+{
+  return m_frontiers;
 }
 
 glm::mat4 const &Layer::GetProjectionMatrix () const
@@ -45,6 +63,20 @@ glm::mat4 const &Layer::GetCameraMatrix () const
 void Layer::SetCameraMatrix (glm::mat4 const &_cam)
 {
   m_camera_matrix = _cam;
+}
+
+void Layer::SortFrontiers ()
+{
+  std::sort (m_frontiers.begin (), m_frontiers.end (),
+             [] (Frontier const * const _left, Frontier const * const _right)
+             {
+               return _left->GetNode ()->GetGraphID() > _right->GetNode()->GetGraphID();
+             });
+}
+
+void Layer::RemoveFrontier (Frontier *_frontier)
+{
+  m_frontiers.erase (std::remove (m_frontiers.begin (), m_frontiers.end (), _frontier));
 }
 
 void Layer::RemoveRenderable (Renderable *_rend)

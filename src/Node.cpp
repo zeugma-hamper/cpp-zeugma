@@ -2,6 +2,7 @@
 
 #include <Layer.hpp>
 #include <Renderable.hpp>
+#include <Frontier.hpp>
 
 #include "vector_interop.hpp"
 
@@ -18,7 +19,9 @@ namespace charm {
 Node::Node ()
   : m_layer {nullptr},
     m_parent {nullptr},
-    m_graps {nullptr}
+    m_graps {nullptr},
+    m_frontier {nullptr},
+    m_id {0u}
 {
 }
 
@@ -32,8 +35,8 @@ Node::~Node ()
     delete rend;
   m_renderables.clear ();
 
-  if (m_graps)
-    delete m_graps;
+  delete m_frontier;
+  delete m_graps;
 
   m_parent = nullptr;
   m_layer = nullptr;
@@ -81,27 +84,40 @@ Transformation const &Node::GetAbsoluteTransformation () const
 
 struct RenderableEnumerator
 {
-  RenderableEnumerator (graph_id _id)
-    : id {_id}
+  RenderableEnumerator (graph_id _id, graph_id _rend_id)
+    : id {_id}, rend_id {_rend_id}
   { }
 
   void operator () (Node &_node)
   {
+    _node.SetGraphID(id++);
     std::vector<Renderable *> &rs = _node.GetRenderables();
     size_t const rend_count = rs.size ();
     for (size_t i = 0; i < rend_count; ++i)
-      rs[i]->SetGraphID (id++);
+      rs[i]->SetGraphID (rend_id++);
   }
 
   graph_id id;
+  graph_id rend_id;
 };
 
-graph_id Node::EnumerateRenderables(graph_id _base_id)
+std::array<graph_id, 2> Node::EnumerateGraph (graph_id _base_id, graph_id _base_rend_id)
 {
-  RenderableEnumerator re {_base_id};
+  RenderableEnumerator re {_base_id, _base_rend_id};
   VisitDepthFirst (re);
 
-  return re.id;
+
+  return {re.id, re.rend_id};
+}
+
+void Node::SetGraphID (graph_id _id)
+{
+  m_id = _id;
+}
+
+graph_id Node::GetGraphID () const
+{
+  return m_id;
 }
 
 void Node::SetLocalTransformation (Transformation const &_local)
@@ -254,13 +270,20 @@ std::vector<Renderable *> const &Node::GetRenderables () const
 void Node::SetLayer (Layer *_layer)
 {
   if (m_layer)
-    m_layer->RemoveRenderables(m_renderables);
+    {
+      m_layer->RemoveRenderables(m_renderables);
+      m_layer->RemoveFrontier(m_frontier);
+    }
 
   m_layer = _layer;
   if (m_layer)
-    m_layer->m_renderables.insert(m_layer->m_renderables.end (),
-                                  m_renderables.begin (),
-                                  m_renderables.end ());
+    {
+      m_layer->m_renderables.insert(m_layer->m_renderables.end (),
+                                    m_renderables.begin (),
+                                    m_renderables.end ());
+      if (m_frontier)
+        m_layer->m_frontiers.push_back(m_frontier);
+    }
 
   for (Node *child : m_children)
     child->SetLayer (_layer);
@@ -270,5 +293,36 @@ Layer *Node::GetLayer () const
 {
   return m_layer;
 }
+
+void Node::SetFrontier (Frontier *_frontier)
+{
+  if (! m_layer)
+    {
+      delete m_frontier;
+      m_frontier = _frontier;
+      m_frontier->m_node = this;
+      return;
+    }
+
+  if (m_frontier)
+    {
+      m_layer->RemoveFrontier(m_frontier);
+      delete m_frontier;
+      m_frontier = nullptr;
+    }
+
+  if (_frontier)
+    {
+      _frontier->m_node = this;
+      m_frontier = _frontier;
+      m_layer->m_frontiers.push_back(_frontier);
+    }
+}
+
+Frontier *Node::GetFrontier () const
+{
+  return m_frontier;
+}
+
 
 }
