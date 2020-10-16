@@ -766,17 +766,63 @@ int main (int, char **)
   PlatonicMaes *maes = demo.FindMaesByName ("front");
   assert (maes);
 
-  TriBand *triband = new TriBand (maes->Width (), 2.0 * maes->Height (), film_infos);
-  triband->Translate (maes->Loc ());// - (1.0/2.0) * maes->Height () * maes->Up ());
-  front_layer->GetRootNode()->AppendChild(triband);
+  f64 const total_height = maes->Height() * 2.0;
+  f64 const total_width = maes->Width ();
+  f64 const center_height = maes->Height () * 0.5;
+  f64 const band_height = total_height / 3.0;
+
+  CollageBand *collage_band = new CollageBand (total_width, band_height, film_infos);
+  collage_band->Translate(maes->Loc ()
+                          + 1.0 * band_height * maes->Up ());
+  front_layer->GetRootNode()->AppendChild(collage_band);
+
+  ElementsBand *elements_band = new ElementsBand (total_width, band_height, film_infos);
+  elements_band->Translate (maes->Loc ());
+  ee_layer->GetRootNode()->AppendChild(elements_band);
+
+  VideoRenderable *vr = new VideoRenderable (film_infos[4]);
+  Node *video_band = new Node;
+  video_band->AppendRenderable (vr);
+  video_band->Scale (Vect (0.6 * total_width));
+  video_band->Translate (maes->Loc () - band_height * maes->Up ());
+  front_layer->GetRootNode()->AppendChild(video_band);
 
   PlatonicMaes *left = demo.FindMaesByName("left");
-  triband = new TriBand (maes->Width (), 2.0 * maes->Height (), film_infos);
-  triband->RotateD (maes->Up (), 90.0);
-  triband->Translate (left->Loc ()
-                      - (1.0/2.0) * left->Height () * left->Up ());
-                      //+ (1.0/2.0) * maes->Height () * left->Up ());
-  left_layer->GetRootNode()->AppendChild(triband);
+  collage_band = new CollageBand (total_width, band_height, film_infos);
+  collage_band->RotateD (maes->Up (), 90.0);
+  collage_band->Translate(left->Loc ()
+                          - 0.5 * left->Height() * left->Up ()
+                          + (center_height + band_height) * left->Up ());
+  left_layer->GetRootNode()->AppendChild(collage_band);
+
+  elements_band = new ElementsBand (total_width, band_height, film_infos);
+  elements_band->RotateD (maes->Up (), 90.0);
+  elements_band->Translate (left->Loc ()
+                            - 0.5 * left->Height() * left->Up ()
+                            + center_height * left->Up ());
+  ee_layer->GetRootNode()->AppendChild(elements_band);
+
+  vr = new VideoRenderable (film_infos[3]);
+  video_band = new Node;
+  video_band->AppendRenderable (vr);
+  video_band->Scale (Vect (0.6 * total_width));
+  video_band->RotateD (maes->Up (), 90.0);
+  video_band->Translate (left->Loc ()
+                         - 0.5 * left->Height() * left->Up ()
+                         + (center_height - band_height) * left->Up ());
+  left_layer->GetRootNode()->AppendChild(video_band);
+
+  // TriBand *triband = new TriBand (maes->Width (), 2.0 * maes->Height (), film_infos);
+  // triband->Translate (maes->Loc ());// - (1.0/2.0) * maes->Height () * maes->Up ());
+  // front_layer->GetRootNode()->AppendChild(triband);
+
+  // //PlatonicMaes *left = demo.FindMaesByName("left");
+  // triband = new TriBand (maes->Width (), 2.0 * maes->Height (), film_infos);
+  // triband->RotateD (maes->Up (), 90.0);
+  // triband->Translate (left->Loc ()
+  //                     - (1.0/2.0) * left->Height () * left->Up ());
+  //                     //+ (1.0/2.0) * maes->Height () * left->Up ());
+  // left_layer->GetRootNode()->AppendChild(triband);
 
   //std::this_thread::sleep_for(std::chrono::seconds (2));
 

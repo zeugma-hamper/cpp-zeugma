@@ -61,6 +61,12 @@ class Collage : public Node
            f64 _width, f64 _height);
 };
 
+class CollageBand : public Node
+{
+ public:
+  CollageBand (f64 _band_width, f64 _band_height,
+               std::vector<FilmInfo> const &_films);
+};
 
 }
 

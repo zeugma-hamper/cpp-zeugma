@@ -10,6 +10,36 @@
 namespace charm
 {
 
+ElementsBand::ElementsBand (f64 _band_width, f64 _band_height,
+                            std::vector<FilmInfo> const &_films)
+{
+  // middle band - 10 escaped, currently non-mobile, elements
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<>  film_distrib (0, _films.size ()-1);
+  std::uniform_real_distribution<> width_distrib (-0.5 * _band_width, 0.5 * _band_width);
+  std::uniform_real_distribution<> height_distrib (-0.5 * _band_height, 0.5 * _band_height);
+  std::uniform_real_distribution<> scale_distrib (0.3 * _band_height, 0.7 * _band_height);
+
+  u32 const escapee_count = 10;
+  for (u32 i = 0; i < escapee_count; ++i)
+    {
+      FilmInfo const &fm = _films[film_distrib (gen)];
+      assert (fm.clips.size () > 1);
+      std::uniform_int_distribution<> clip_distrib (0, fm.clips.size ()-1);
+      ClipInfo const &cm = fm.clips[clip_distrib (gen)];
+
+      MattedVideoRenderable *matte_able = new MattedVideoRenderable (fm, cm);
+      Node *matte_node = new Node;
+      matte_node->AppendRenderable(matte_able);
+      matte_node->Scale(Vect (scale_distrib (gen)));
+      matte_node->Translate(Vect (width_distrib (gen), height_distrib (gen), 0.0));
+      AppendChild (matte_node);
+    }
+}
+
+
+
 TriBand::TriBand (f64 _width, f64 _height, std::vector<FilmInfo> const &_films)
   : Node ()
 {
