@@ -54,6 +54,51 @@ void MatteLoader::Shutdown ()
   m_thread.join();
 }
 
+static u32 ring_distance (u32 _cur, u32 _last, u32 _max)
+{
+  if (_cur <= _last)
+    return _last - _cur;
+
+  return (_max - _cur) + _last;
+}
+
+static u32 ring_next (u32 _cur, u32 _last, u32 _max)
+{
+  u32 l = _last % _max;
+  if (ring_distance (_cur, l, _max) == 0)
+    return u32 (-1);
+
+  return (_cur + 1) % _max;
+}
+
+u32 MatteLoader::FindNextOffset ()
+{
+  std::unique_lock lock {m_frame_mutex};
+  while (true)
+    {
+      //if we've loaded no mattes, load the last requested matte
+      if (m_frames.empty())
+        return (m_requested_offset) % m_dir_frame_count;
+      else //otherwise load the matte after the previously loaded matte
+        {
+          u32 next = ring_next (m_frames.back ().offset, m_requested_offset + max_loaded_frames,
+                                m_dir_frame_count);
+          if (next != u32 (-1))
+            return next;
+        }
+
+      //wait if we've loaded enough buffers
+      m_frame_cond.wait(lock);
+    }
+
+  return u32(-1);
+}
+
+void MatteLoader::StoreMatte (MatteFrame const &_mf)
+{
+  std::unique_lock lock {m_frame_mutex};
+  m_frames.push_back (_mf);
+}
 
 MatteFrame MatteLoader::GetFrame (u32 _offset)
 {
@@ -82,46 +127,13 @@ MatteFrame MatteLoader::GetFrame (u32 _offset)
   return {};
 }
 
-static u32 ring_distance (u32 _cur, u32 _last, u32 _max)
-{
-  if (_cur <= _last)
-    return _last - _cur;
-
-  return (_max - _cur) + _last;
-}
-
-static u32 ring_next (u32 _cur, u32 _last, u32 _max)
-{
-  u32 l = _last % _max;
-  if (ring_distance (_cur, l, _max) == 0)
-    return u32 (-1);
-
-  return (_cur + 1) % _max;
-}
-
 void MatteLoader::LoadFrames (MatteLoader *_loader)
 {
   while (_loader->m_keep_running.load ())
     {
       //determine next matte to load
       //u32 max signifies no loading is required right now
-      u32 next = u32 (-1);
-
-      std::unique_lock lock {_loader->m_frame_mutex};
-
-      //if we've loaded no mattes, load the last requested matte
-      if (_loader->m_frames.empty())
-        next = (_loader->m_requested_offset) % _loader->m_dir_frame_count;
-      else //otherwise load the matte after the previously loaded matte
-        next = ring_next (_loader->m_frames.back ().offset, _loader->m_requested_offset + max_loaded_frames,
-                          _loader->m_dir_frame_count);
-
-      if (next == u32 (-1)) //wait if we've loaded enough buffers
-        {
-          _loader->m_frame_cond.wait(lock);
-          continue;
-        }
-      lock.unlock ();
+      u32 next = _loader->FindNextOffset();
 
       //ok, actually load from disk
       fs::directory_entry matte_on_deck = _loader->m_matte_paths[next];
@@ -157,14 +169,11 @@ void MatteLoader::LoadFrames (MatteLoader *_loader)
       u8 *data = (u8 *)malloc (size);
 
       iinput->read_image (OIIO::TypeDesc::UINT8, data);
+      iinput->close ();
 
       MatteFrame frame {next, formats[ispec.nchannels],
                         u32(ispec.width), u32(ispec.height), size, data};
-      lock.lock ();
-      _loader->m_frames.push_back (frame);
-      lock.unlock();
-      std::this_thread::sleep_for(std::chrono::milliseconds (2));
-      //fprintf (stderr, "loaded %u\n", next);
+      _loader->StoreMatte(frame);
     }
 }
 
