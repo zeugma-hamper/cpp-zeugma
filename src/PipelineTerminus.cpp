@@ -161,14 +161,14 @@ BasicPipelineTerminus::HandleVideoPad (DecodePipeline *_pipe, GstElement *,
   // TODO: expand caps support to save colorspace conversion and PCIe bandwidth
   // gst_caps_append (caps, gst_caps_new_simple ("video/x-raw", "format", G_TYPE_STRING, "NV12", NULL));
   // gst_caps_append (caps, gst_caps_new_simple ("video/x-raw", "format", G_TYPE_STRING, "I420", NULL));
-  caps = gst_caps_new_simple ("video/x-raw", "format", G_TYPE_STRING, "RGB", NULL);
-  caps = gst_caps_merge (caps,
-                         gst_caps_new_simple ("video/x-raw",
-                                              "format", G_TYPE_STRING, "GRAY8", NULL));
+  caps = gst_caps_new_simple ("video/x-raw", "format", G_TYPE_STRING, "I420", NULL);
   if (! caps)
     goto remove_sink;
 
-  g_object_set (GST_OBJECT (as), "caps", caps, NULL);
+  g_object_set (GST_OBJECT (as),
+                "caps", caps,
+                "qos",  TRUE,
+                "drop", TRUE, NULL);
   gst_caps_unref (caps);
 
   convert = gst_element_factory_make ("videoconvert", "vconvert");

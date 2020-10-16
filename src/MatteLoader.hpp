@@ -44,6 +44,10 @@ class MatteLoader
  protected:
   void Shutdown ();
 
+  u32 FindNextOffset ();
+  void StoreMatte (MatteFrame const &_mf);
+
+
   std::filesystem::path m_matte_dir;
   std::vector<std::filesystem::directory_entry> m_matte_paths;
   std::thread m_thread;
