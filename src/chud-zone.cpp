@@ -503,7 +503,7 @@ dead_zone::dead_zone ()
 
   ramp . AppendPhage (&wandy);
 
-  wandy . SetCalibrista (&rowp.calibrex);
+  wandy . SetCalibrista (&rowp.table_calibrex);
   sole_dead_zone = this;
 }
 

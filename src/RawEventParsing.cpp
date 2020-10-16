@@ -7,6 +7,7 @@
 #include "conjure-from-toml.h"
 
 #include <map>
+#include <vector>
 #include <utility>
 
 #include <algorithm>
@@ -236,7 +237,7 @@ void RawOSCWandParser::Parse (const std::string &path, const lo::Message &m,
 using namespace charm::RawEventSupportHose;
 
 
-void Caliban::Reset ()
+void RoomCaliban::Reset ()
 { above_the_floor_ness = 653.0;
   lateral_stretchy_metron = 4000.0;
   phase = -1;
@@ -246,7 +247,8 @@ void Caliban::Reset ()
 }
 
 
-void Caliban::SummonTheDemiurgeCalculon (Matrix44 &out_pmat, Matrix44 &out_dmat)
+void RoomCaliban::SummonTheDemiurgeCalculon (Matrix44 &out_pmat,
+                                             Matrix44 &out_dmat)
 { Vect e0 = vee[1] - vee[0];
   f64 d = e0 . NormSelfReturningMag ();
   Vect e1 = e0 . Cross (vee[2] - vee[0]) . Norm ();
@@ -268,7 +270,7 @@ void Caliban::SummonTheDemiurgeCalculon (Matrix44 &out_pmat, Matrix44 &out_dmat)
 }
 
 
-i64 Caliban::ZESpatialMove (ZESpatialMoveEvent *e)
+i64 RoomCaliban::ZESpatialMove (ZESpatialMoveEvent *e)
 { if (e -> Provenance ()  !=  "wand-0")
     return 0;
   just_now = e -> Loc ();
@@ -283,7 +285,7 @@ i64 Caliban::ZESpatialMove (ZESpatialMoveEvent *e)
   return 0;
 }
 
-i64 Caliban::ZESpatialHarden (ZESpatialHardenEvent *e)
+i64 RoomCaliban::ZESpatialHarden (ZESpatialHardenEvent *e)
 { if (e -> Provenance ()  ==  "wand-0")
     return 0;
   slurping = true;
@@ -295,7 +297,7 @@ i64 Caliban::ZESpatialHarden (ZESpatialHardenEvent *e)
   return 0;
 }
 
-i64 Caliban::ZESpatialSoften (ZESpatialSoftenEvent *e)
+i64 RoomCaliban::ZESpatialSoften (ZESpatialSoftenEvent *e)
 { if (e -> Provenance ()  ==  "wand-0")
     return 0;
   vee[phase] = accum / (f64)count;
@@ -304,8 +306,159 @@ i64 Caliban::ZESpatialSoften (ZESpatialSoftenEvent *e)
     return 0;
   SummonTheDemiurgeCalculon (*geo_truth_pm, *geo_truth_dm);
   phase = -1;
-  fprintf (stderr, "CALIBRATION O V E R A N D D O N E W I T H\n");
+  fprintf (stderr, "ROOM CALIBRATION O V E R A N D D O N E W I T H\n");
   RawOSCWandParser::SpewCoordTransforms (*geo_truth_pm, *geo_truth_dm);
+  return -666;
+}
+
+
+
+void TableCaliban::Reset ()
+{ captures . clear ();
+  slurping = false;
+}
+
+
+Vect TableCaliban::ShabbyTableInferencizing ()
+{ const std::vector <Vect> &pts = captures;
+  i64 cnt = pts . size ();
+  i64 a = 0, b = cnt / 3, c = 2 * cnt / 3;
+
+  Vect center, norman;
+  i64 largess = 0;
+  for (  ;  a < cnt  ;  ++a, ++b, ++c)
+    { const Vect &v = pts[a];
+      Vect leg1 = (pts[b%cnt] - v) . Norm ();
+      Vect leg2 = (pts[c%cnt] - v) . Norm ();
+      Vect n = leg1 . Cross (leg2);
+      if (n . AutoDot ()  <  0.01)
+        continue;
+      if (n . Dot (Vect::yaxis)  <  0)
+        norman -= n;
+      else
+        norman += n;
+      center += v;
+      ++largess;
+    }
+  center /= (f64)largess;
+  norman . NormSelf ();
+
+  fprintf (stderr,
+           "ShAvNo: able to use %ld out of %ld three-way combinations...\n"
+           "Anyway, ",
+           largess, cnt);
+  norman . SpewToStderr ();
+  fprintf (stderr, " was the brilliant ave'd-normal outcome.\n");
+
+  struct sac { i64 ind; f64 dst; f64 ang; Vect pnt; };
+
+  f64 mind = CHRM_MAX_F64;
+  f64 maxd = -CHRM_MAX_F64;
+  f64 frc = 0.0;
+  std::vector <sac> sacpnt (cnt);
+  for (a = 0  ;  a < cnt  ;  ++a)
+    { sacpnt[a].ind = a;
+      f64 d = norman . Dot (pts[a] - center);
+      if (d < mind)
+        mind = d;
+      else if (d > maxd)
+        maxd = d;
+      frc += (sacpnt[a].dst = d);
+    }
+  frc /= (f64)cnt;
+
+  // er... no hooke's law simulation actually necessary here, as we can
+  // achieve equilibrium in one go by displacnig cnt by d_avg (aka frc,
+  // above) along the normal.
+
+  Vect offset = frc * norman;
+  center += offset;
+
+  // well, heck. now we have a plane! should we... dare we project each
+  // collected point down (or up) onto this newly canonical plane? yes:
+  // because for corner-finding we don't want to be misled by 'spurious'
+  // (yes, yes...) y-axis jigglings.
+  for (a = 0  ;  a < cnt  ;  ++a)
+    sacpnt[a].dst = ((sacpnt[a].pnt = pts[a] + offset) - center) . Mag ();
+
+
+  // if we now "sweep around" the plane, can we find the corners?
+  Vect fko = (sacpnt[0].pnt - center) . Norm ();
+  Vect fku = norman . Cross (fko) . Norm ();
+  Vect tmp;
+  for (a = 0  ;  a < cnt  ;  ++a)
+    { tmp = sacpnt[a].pnt - center;
+      sacpnt[a].ang = 180.0
+        +  180.0 / M_PI * atan2 (tmp . Dot (fku), tmp . Dot (fko));
+    }
+  std::sort (sacpnt . begin (), sacpnt . end (),
+             [] (const sac &a, const sac &b) { return a.dst > b.dst; });
+
+  sac crnrs[4];
+  crnrs[0] = sacpnt[0];
+  a = 1;
+  i64 w, q = 0;
+  Vect goodlegs[4];  // yes, yes: could be three instead of four.
+  goodlegs[0] = (crnrs[0].pnt - center) . Norm ();
+  while (q < 3  &&  a < cnt)
+    { Vect newleg = (sacpnt[a].pnt - center) . Norm ();
+      for (w = q  ;  w >= 0  ;  --w)
+        { f64 blang = 180.0 / M_PI * acos (newleg . Dot (goodlegs[w]));
+          if (blang < 15.0)  // figger fi'teen degrees is furnuf...
+            break;
+        }
+      if (w  <  0)  // angularly distant from all winners foregoing
+        { ++q;
+          crnrs[q] = sacpnt[a];
+          goodlegs[q] = newleg;
+        }
+      ++a;
+    }
+  Vect splend_center;
+  if (q != 4)
+    { fprintf (stderr, "TableCaliban::ShabbyTableInferencizing -- "
+               "whole heapa trouble...\n");
+    }
+  else
+    { splend_center
+        = 0.25 * (crnrs[0].pnt + crnrs[1].pnt + crnrs[2].pnt + crnrs[3].pnt);
+      splend_center -= norman . Dot (splend_center - center) * norman;
+    }
+
+  return norman;
+}
+
+i64 TableCaliban::ZESpatialMove (ZESpatialMoveEvent *e)
+{ if (e -> Provenance ()  !=  "wand-0")
+    return 0;
+  Vect pos = e -> Loc ();
+  if (! slurping)
+    { pos . SpewToStderr ();  fprintf (stderr, "\n");
+      return 0;
+    }
+  captures . push_back (pos);
+  pos . SpewToStderr ();
+  fprintf (stderr, " just now ACCUM'D [count %d]\n", captures . size ());
+  return 0;
+}
+
+i64 TableCaliban::ZESpatialHarden (ZESpatialHardenEvent *e)
+{ if (e -> Provenance ()  ==  "wand-0")
+    return 0;
+  fprintf (stderr, "\n\n\n--- READY TO COLLECT TABULARLY ---\n");
+  return 0;
+}
+
+i64 TableCaliban::ZESpatialSoften (ZESpatialSoftenEvent *e)
+{ if (e -> Provenance ()  ==  "wand-0")
+    return 0;
+  if (slurping  ==  false)
+    { slurping = true;
+      return 0;
+    }
+  slurping = false;
+  ShabbyTableInferencizing ();
+  fprintf (stderr, "O V E R A N D D O N E W I T H, IS TABLE CALIBRATION\n");
   return -666;
 }
 
