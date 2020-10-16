@@ -946,14 +946,14 @@ int main (int ac, char **av)
   elements_band->Translate (maes->Loc ());
   ee_layer->GetRootNode()->AppendChild(elements_band);
 
-  // elements_band = new ElementsBand (total_width, band_height, film_infos);
-  // elements_band->RotateD (maes->Up (), 90.0);
-  // elements_band->Translate (demo.elev_transl);
-  // elements_band->Translate
-  //   (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
-  //    -  0.5 * maes -> Width () * maes -> Over ()
-  //    +  maes -> Loc () . Dot (maes -> Up ()) * maes -> Up ());
-  // ee_layer->GetRootNode()->AppendChild(elements_band);
+  elements_band = new ElementsBand (total_width, band_height, film_infos);
+  elements_band->RotateD (maes->Up (), 90.0);
+  elements_band->Translate (demo.elev_transl);
+  elements_band->Translate
+    (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
+     -  0.5 * maes -> Width () * maes -> Over ()
+     +  maes -> Loc () . Dot (maes -> Up ()) * maes -> Up ());
+  ee_layer->GetRootNode()->AppendChild(elements_band);
 
   for (int q = 0  ;  q < 3  ;  ++q)
     { Cursoresque *c = new Cursoresque (0.015 * maes -> Height ());

@@ -3,6 +3,8 @@
 #include <Node.hpp>
 #include <Renderable.hpp>
 
+#include <vector_interop.hpp>
+
 namespace charm
 {
 
@@ -117,12 +119,11 @@ AABB RectRenderableFrontier::GetGlobalAABB () const
   if (! m_node || ! m_node->UnsecuredGrapplerPile())
     return GetLocalAABB();
 
-  GrapplerPile *const pl = m_node->UnsecuredGrapplerPile();
-
   AABB const aabb = GetLocalAABB();
 
-  Vect const t_bl = pl->pnt_mat.TransformVect(aabb.blf);
-  Vect const t_tr = pl->pnt_mat.TransformVect(aabb.trb);
+  Matrix44 const m = from_glm (m_node->GetAbsoluteTransformation().model);
+  Vect const t_bl = m.TransformVect(aabb.blf);
+  Vect const t_tr = m.TransformVect(aabb.trb);
 
   return AABB {compwise_min(t_bl, t_tr), compwise_max(t_bl, t_tr)};
 }
