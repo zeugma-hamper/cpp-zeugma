@@ -16,6 +16,7 @@ namespace charm
 
 class Layer;
 class Renderable;
+class Frontier;
 
 struct Transformation
 {
@@ -95,11 +96,14 @@ class Node
   void   SetLayer (Layer *_layer);
   Layer *GetLayer () const;
 
+  void SetFrontier (Frontier *_frontier);
+  Frontier *GetFrontier () const;
 
  private:
   Layer *m_layer;
   Node  *m_parent;
   GrapplerPile *m_graps;
+  Frontier *m_frontier;
 
   std::vector<Node *>       m_children;
   std::vector<Renderable *> m_renderables;

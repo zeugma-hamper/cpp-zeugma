@@ -2,6 +2,7 @@
 
 #include <Layer.hpp>
 #include <Renderable.hpp>
+#include <Frontier.hpp>
 
 #include "vector_interop.hpp"
 
@@ -18,7 +19,8 @@ namespace charm {
 Node::Node ()
   : m_layer {nullptr},
     m_parent {nullptr},
-    m_graps {nullptr}
+    m_graps {nullptr},
+    m_frontier {nullptr}
 {
 }
 
@@ -32,8 +34,8 @@ Node::~Node ()
     delete rend;
   m_renderables.clear ();
 
-  if (m_graps)
-    delete m_graps;
+  delete m_frontier;
+  delete m_graps;
 
   m_parent = nullptr;
   m_layer = nullptr;
@@ -270,5 +272,19 @@ Layer *Node::GetLayer () const
 {
   return m_layer;
 }
+
+void Node::SetFrontier (Frontier *_frontier)
+{
+  if (m_frontier)
+    delete m_frontier;
+
+  m_frontier = _frontier;
+}
+
+Frontier *Node::GetFrontier () const
+{
+  return m_frontier;
+}
+
 
 }
