@@ -5,9 +5,6 @@
 #include <MattedVideoRenderable.hpp>
 #include <VideoRenderable.hpp>
 
-#include <SumZoft.h>
-#include <SinuZoft.h>
-
 #include <random>
 
 namespace charm
@@ -62,21 +59,12 @@ TriBand::TriBand (f64 _width, f64 _height, std::vector<FilmInfo> const &_films)
        collage_center,
        collage_center + 1.0 * placement_factor * xxx * band_width};
 
-  srand48 (435262534);
   //top band - "4" collages
   for (Vect const &v : positions)
     {
       Collage *collage = new Collage (5, _films,
                                       size_factor * band_width,
                                       size_factor * band_height);
-      SinuVect perky (0.25 * size_factor * band_height * yyy,
-                      1.0 / (2.0 + drand48 ()), ZoftVect(),
-                      2.0 * M_PI * drand48 ());
-      SinuVect loping (0.35 * size_factor * band_height * xxx,  // yes, not _wid
-                       1.0 / (6.0 + drand48 ()), ZoftVect(),
-                       2.0 * M_PI * drand48 ());
-      SumVect robert (perky, loping);
-      collage -> Translate (robert);
       collage->Translate(v);
       AppendChild(collage);
     }

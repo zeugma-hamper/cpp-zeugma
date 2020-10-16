@@ -4,6 +4,9 @@
 #include <Node.hpp>
 #include <VideoSystem.hpp>
 
+#include <SumZoft.h>
+#include <SinuZoft.h>
+
 #include <DecodePipeline.hpp>
 
 #include <vector_interop.hpp>
@@ -197,6 +200,14 @@ CollageBand::CollageBand (f64 _width, f64 _height,
       Collage *collage = new Collage (5, _films,
                                       size_factor * _width,
                                       size_factor * _height);
+      SinuVect perky (0.25 * size_factor * _height * Vect::yaxis,
+                      1.0 / (2.0 + drand48 ()), ZoftVect(),
+                      2.0 * M_PI * drand48 ());
+      SinuVect loping (0.35 * size_factor * _height * Vect::xaxis,  // yes, not _wid
+                       1.0 / (6.0 + drand48 ()), ZoftVect(),
+                       2.0 * M_PI * drand48 ());
+      SumVect robert (perky, loping);
+      collage -> Translate (robert);
       collage->Translate(v);
       AppendChild(collage);
     }
