@@ -22,5 +22,5 @@ void main()
                    texture2D (u_video_texture1, v_uv).r,
                    texture2D (u_video_texture2, v_uv).r);
 
-  out_color = vec4 (convert_bt601_scaled (yuv), 1.0);
+  out_color = vec4 (convert_bt601_scaled (yuv), alpha);
 }
