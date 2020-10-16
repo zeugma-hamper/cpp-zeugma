@@ -9,6 +9,8 @@ SAMPLER2D (u_video_matte, 3);
 
 layout (location = 0) out vec4 out_color;
 
+//TODO: premultiplied alpha?
+//TODO: gamma?
 void main()
 {
   vec4 vd = texture2D (u_video_texture0, v_uv);

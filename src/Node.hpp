@@ -33,7 +33,7 @@ class Node
   CHARM_DELETE_COPY (Node);
   CHARM_DEFAULT_MOVE (Node);
 
-  void EnumerateRenderables ();
+  graph_id EnumerateRenderables (graph_id _base_id = 0);
 
   void UpdateTransformsHierarchically (i64 ratch, f64 thyme);
   void UpdateTransformsHierarchically (Transformation const &_parent,

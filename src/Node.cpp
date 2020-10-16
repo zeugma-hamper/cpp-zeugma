@@ -81,6 +81,10 @@ Transformation const &Node::GetAbsoluteTransformation () const
 
 struct RenderableEnumerator
 {
+  RenderableEnumerator (graph_id _id)
+    : id {_id}
+  { }
+
   void operator () (Node &_node)
   {
     std::vector<Renderable *> &rs = _node.GetRenderables();
@@ -89,13 +93,15 @@ struct RenderableEnumerator
       rs[i]->SetGraphID (id++);
   }
 
-  graph_id id = 0u;
+  graph_id id;
 };
 
-void Node::EnumerateRenderables()
+graph_id Node::EnumerateRenderables(graph_id _base_id)
 {
-  RenderableEnumerator re;
+  RenderableEnumerator re {_base_id};
   VisitDepthFirst (re);
+
+  return re.id;
 }
 
 void Node::SetLocalTransformation (Transformation const &_local)
