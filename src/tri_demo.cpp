@@ -800,7 +800,13 @@ int main (int ac, char **av)
   po::options_description desc ("available options");
   desc.add_options()
     ("prison-break", "escaped elements only mode")
-    ("clip-collages", "disallow collage elements outside rect-bounds");
+    ("clip-collages", "disallow collage elements outside rect-bounds")
+    ("ee-scale", po::value<f64>(&global_param_ee_scale),
+     "median scale for escaped elements; default is 0.5")
+    ("ee-scale-delta", po::value<f64>(&global_param_ee_scale_delta),
+     "+/- scale range for escaped elements (around median); default is 0.0")
+    ("ee-count-per-wall", po::value<i32>(&global_param_ee_count_per_wall),
+     "how many escaped elements per wall; default 10");
 
   po::variables_map arg_map;
   po::store (po::parse_command_line(ac, av, desc), arg_map);

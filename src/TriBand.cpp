@@ -5,6 +5,8 @@
 #include <MattedVideoRenderable.hpp>
 #include <VideoRenderable.hpp>
 
+#include "global-params.h"
+
 #include <random>
 
 namespace charm
@@ -13,15 +15,19 @@ namespace charm
 ElementsBand::ElementsBand (f64 _band_width, f64 _band_height,
                             std::vector<FilmInfo> const &_films)
 {
+
+  f64 min_sca = global_param_ee_scale - global_param_ee_scale_delta;
+  f64 max_sca = global_param_ee_scale + global_param_ee_scale_delta;
   // middle band - 10 escaped, currently non-mobile, elements
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<>  film_distrib (0, _films.size ()-1);
   std::uniform_real_distribution<> width_distrib (-0.5 * _band_width, 0.5 * _band_width);
   std::uniform_real_distribution<> height_distrib (-0.5 * _band_height, 0.5 * _band_height);
-  std::uniform_real_distribution<> scale_distrib (0.3 * _band_height, 0.7 * _band_height);
+  std::uniform_real_distribution<> scale_distrib (min_sca * _band_height,
+                                                  max_sca * _band_height);
 
-  u32 const escapee_count = 10;
+  u32 const escapee_count = global_param_ee_count_per_wall;
   for (u32 i = 0; i < escapee_count; ++i)
     {
       FilmInfo const &fm = _films[film_distrib (gen)];
