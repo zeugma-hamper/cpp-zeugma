@@ -175,4 +175,32 @@ Collage::Collage (u32 _count, std::vector<FilmInfo> const &_films,
     }
 }
 
+CollageBand::CollageBand (f64 _width, f64 _height,
+                          std::vector<FilmInfo> const &_films)
+  : Node ()
+{
+  f64 const size_factor = 0.3;
+  f64 const placement_factor = 1.0 / 3.0;
+
+  Vect const xxx = Vect (1.0, 0.0, 0.0);
+
+  Vect const collage_center (0.0);
+
+  std::array<Vect, 3> const positions
+    = {collage_center - 1.0 * placement_factor * xxx * _width,
+       collage_center,
+       collage_center + 1.0 * placement_factor * xxx * _width};
+
+  //top band - 4 collages
+  for (Vect const &v : positions)
+    {
+      Collage *collage = new Collage (5, _films,
+                                      size_factor * _width,
+                                      size_factor * _height);
+      collage->Translate(v);
+      AppendChild(collage);
+    }
+
+}
+
 }
