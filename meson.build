@@ -11,7 +11,7 @@ dl_dep = cpp.find_library('dl')
 threads_dep = dependency('threads')
 
 ##### boost
-boost_dep = dependency ('boost')
+boost_dep = dependency ('boost', modules : ['program_options'])
 
 ##### OpenImageIO
 oiio_dep = dependency ('OpenImageIO')
