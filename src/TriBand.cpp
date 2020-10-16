@@ -8,6 +8,8 @@
 #include <SumZoft.h>
 #include <SinuZoft.h>
 
+#include <Frontier.hpp>
+
 #include <random>
 
 namespace charm
@@ -24,7 +26,7 @@ ElementsBand::ElementsBand (f64 _band_width, f64 _band_height,
   std::uniform_real_distribution<> height_distrib (-0.5 * _band_height, 0.5 * _band_height);
   std::uniform_real_distribution<> scale_distrib (0.3 * _band_height, 0.7 * _band_height);
 
-  u32 const escapee_count = 10;
+  u32 const escapee_count = 1;
   for (u32 i = 0; i < escapee_count; ++i)
     {
       FilmInfo const &fm = _films[film_distrib (gen)];
@@ -37,6 +39,12 @@ ElementsBand::ElementsBand (f64 _band_width, f64 _band_height,
       matte_node->AppendRenderable(matte_able);
       matte_node->Scale(Vect (scale_distrib (gen)));
       matte_node->Translate(Vect (width_distrib (gen), height_distrib (gen), 0.0));
+
+      RectRenderableFrontier *rrf = new RectRenderableFrontier (matte_able,
+                                                                Vect (-0.5, -0.5, 0.0),
+                                                                Vect (0.5, 0.5, 0.0));
+      matte_node->SetFrontier(rrf);
+
       AppendChild (matte_node);
     }
 }

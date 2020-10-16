@@ -34,7 +34,9 @@ class Node
   CHARM_DELETE_COPY (Node);
   CHARM_DEFAULT_MOVE (Node);
 
-  graph_id EnumerateRenderables (graph_id _base_id = 0);
+  std::array<graph_id, 2> EnumerateGraph (graph_id _base_id = 0, graph_id _base_rend_id = 0);
+  void SetGraphID (graph_id _id);
+  graph_id GetGraphID () const;
 
   void UpdateTransformsHierarchically (i64 ratch, f64 thyme);
   void UpdateTransformsHierarchically (Transformation const &_parent,
@@ -104,6 +106,7 @@ class Node
   Node  *m_parent;
   GrapplerPile *m_graps;
   Frontier *m_frontier;
+  graph_id m_id;
 
   std::vector<Node *>       m_children;
   std::vector<Renderable *> m_renderables;

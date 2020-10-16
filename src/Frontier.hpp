@@ -9,7 +9,9 @@
 
 namespace charm
 {
+
 class Node;
+class Renderable;
 
 class Frontier
 {
@@ -19,6 +21,10 @@ class Frontier
   Frontier ();
   Frontier (Node *_node);
   virtual ~Frontier ();
+
+  CHARM_DELETE_MOVE_COPY(Frontier);
+
+  Node *GetNode () const;
 
   virtual AABB GetLocalAABB  () const;
   virtual AABB GetGlobalAABB () const;
@@ -43,6 +49,24 @@ class RectangleFrontier : public Frontier
   Vect m_bl;
   Vect m_tr;
   Vect m_norm;
+};
+
+class RectRenderableFrontier : public Frontier
+{
+ public:
+  RectRenderableFrontier (Renderable *_rend,
+                          Vect const &_bl, Vect const &_tr);
+
+  Renderable *GetRenderable () const;
+
+  AABB GetLocalAABB  () const override;
+  AABB GetGlobalAABB () const override;
+  bool CheckHit (Ray const &_ray, Vect *_hit_pt) const override;
+
+ protected:
+  Renderable *m_renderable; //non-owning
+  Vect m_bl;
+  Vect m_tr;
 };
 
 }

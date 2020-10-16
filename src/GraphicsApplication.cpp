@@ -174,7 +174,7 @@ void GraphicsApplication::UpdateSceneGraph(i64 ratch, f64 thyme)
 {
   m_scene_graph_layer->GetRootNode()
     -> UpdateTransformsHierarchically (ratch, thyme);
-  m_scene_graph_layer->GetRootNode()->EnumerateRenderables();
+  m_scene_graph_layer->GetRootNode()->EnumerateGraph();
 }
 
 MultiSprinkler &GraphicsApplication::GetSprinkler ()
