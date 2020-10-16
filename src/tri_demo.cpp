@@ -24,6 +24,7 @@
 
 //animation
 #include <ZoftThing.h>
+#include <InterpZoft.h>
 
 //events
 #include <ZESpatialEvent.h>
@@ -48,6 +49,7 @@
 
 //C++, C
 #include <unordered_set>
+#include <optional>
 
 #include <stdio.h>
 
@@ -106,12 +108,18 @@ class WandCatcher  :  public Zeubject, public ZESpatialPhagy
  public:
   i32 trig_butt_simulcount;
   u64 trig_butt_ident;
-  std::unordered_set<std::string> trig_partic;
+  std::unordered_set <std::string> trig_partic;
+  std::unordered_set <std::string> elev_partic;
   bool calibrating;
+  bool elevating;
+  Vect elev_prevpos;
+  std::map <std::string, Vect> recentest_pos;
   ZESpatialPhagy *cally;
 
-  WandCatcher ()  :  Zeubject (), ZESpatialPhagy (), trig_butt_simulcount (2),
-                     trig_butt_ident (8), calibrating (false), cally (nullptr)
+  WandCatcher ()  :  Zeubject (), ZESpatialPhagy (),
+                     trig_butt_simulcount (2), trig_butt_ident (8),
+                     calibrating (false), elevating (false),
+                     cally (nullptr)
     { }
   ~WandCatcher () override { }
 
@@ -125,6 +133,21 @@ class WandCatcher  :  public Zeubject, public ZESpatialPhagy
     { return trig_butt_simulcount; }
   void SetTriggerButtonSimulcount (i32 cnt)
     { trig_butt_simulcount = cnt; }
+
+  // std::optional <const Vect &> RecentPos (const std::string &prov)  const
+  //   { if (std::find (recentest_pos . begin (), recentest_pos . end (), prov)
+  //         !=  recentest_pos . end ())
+  //       return recentest_pos[prov];
+  //     return {};
+  //   }
+  Vect AveragePos ()  const
+    { Vect avg;
+      i32 cnt = 0;
+      for (auto &poo  :  recentest_pos)
+        { avg += poo.second;  ++cnt; }
+      if (cnt)  avg /= (f64)cnt;
+      return avg;
+    }
 
   ZESpatialPhagy *Calibrista ()  const
     { return cally; }
@@ -146,6 +169,16 @@ class WandCatcher  :  public Zeubject, public ZESpatialPhagy
             calibrating = true;
           return 0;
         }
+
+      if (e -> Aim () . Dot (Vect::yaxis)  > 0.75)
+        { if (! elevating)
+            { elev_partic . insert (e -> Provenance ());
+              if (elev_partic . size ()  >  1)
+                { elevating = true;
+                  elev_prevpos = AveragePos ();
+                }
+            }
+        }
       return 0;
     }
   i64 ZESpatialSoften (ZESpatialSoftenEvent *e)  override
@@ -166,6 +199,13 @@ class WandCatcher  :  public Zeubject, public ZESpatialPhagy
                 fprintf (stderr, "S T A R T I N G  CALIBRATION\n");
             }
           return 0;
+        }
+
+      auto it = elev_partic . find (e -> Provenance ());
+      if (it  !=  elev_partic . end ())
+        { elev_partic . erase (it);
+          if (elevating)
+            {  elevating = false; }
         }
       return 0;
     }
@@ -206,6 +246,8 @@ class TriDemo final : public Application
 
   void FlatulateCursor (ZESpatialMoveEvent *e);
 
+  void AccrueElevatorOffset (const Vect &off);
+
   static RawOSCWandParser &ROWP ();
   static RawMouseParser &RAMP ();
 
@@ -219,13 +261,19 @@ class TriDemo final : public Application
 
   static RawOSCWandParser rowp;
   static RawMouseParser ramp;
+
+ public:
+  ZoftVect elev_transl;
+  f64 elev_trans_mult;
 };
+
 
 static TriDemo *application_instance = nullptr;
 
 RawOSCWandParser TriDemo::rowp;
 RawMouseParser TriDemo::ramp;
 FrameTime *s_TriDemo_frame_time = nullptr;
+
 
 i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
 { if (calibrating  &&  trig_partic . size () == 0)
@@ -234,8 +282,20 @@ i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
         cally -> ZESpatialMove (e);
       return 0;
     }
+
   if (application_instance)
     application_instance -> FlatulateCursor (e);
+
+  recentest_pos[e -> Provenance ()] = e -> Loc ();
+  if (elevating)
+    { Vect newpos = AveragePos ();
+      Vect offset = newpos - elev_prevpos;
+      offset = offset . Dot (Vect::yaxis) * Vect::yaxis;
+      if (application_instance)
+        application_instance -> AccrueElevatorOffset (offset);
+      elev_prevpos = newpos;
+    }
+
   if (PlatonicMaes *emm = application_instance -> FindMaesByName ("table"))
     { Vect p = e -> Loc ();
       p -= emm -> Loc ();
@@ -452,7 +512,7 @@ void TriDemo::Render ()
 TriDemo::TriDemo ()
   : window {nullptr},
     m_scene_graph_layer {new Layer},
-    osc_srv (NULL)
+    osc_srv (NULL), elev_trans_mult (77.0)
 { lo_server los = lo_server_new ("54345", NULL);
   if (! los)
     fprintf (stderr, "Could not conjure an OSC server -- prob'ly the port.\n");
@@ -464,6 +524,7 @@ TriDemo::TriDemo ()
     }
 
   wandy . SetCalibrista (&rowp.room_calibrex);
+  elev_transl . MakeBecomeLikable ();
   application_instance = this;
 }
 
@@ -641,6 +702,13 @@ void TriDemo::FlatulateCursor (ZESpatialMoveEvent *e)
   //   }
 }
 
+
+void TriDemo::AccrueElevatorOffset (const Vect &off)
+{ Vect hither = elev_transl.val + elev_trans_mult * off;
+  elev_transl = hither;
+}
+
+
 RawOSCWandParser &TriDemo::ROWP ()
 {
   return rowp;
@@ -759,8 +827,12 @@ int main (int, char **)
   // video->Translate (maes->Loc () - 0.25 * maes->Height () * maes->Up ());
   // demo.GetSceneLayer().GetRootNode()->AppendChild(video);
 
-  TriBand *triband = new TriBand (maes->Width (), 2.0 * maes->Height (), film_infos);
+
+
+  TriBand *triband = new TriBand (maes->Width (), 2.0 * maes->Height (),
+                                  film_infos);
   triband->Translate (maes->Loc () - (1.0/2.0) * maes->Height () * maes->Up ());
+  triband -> Translate (demo.elev_transl);
   demo.GetSceneLayer().GetRootNode()->AppendChild(triband);
 
   PlatonicMaes *left = demo.FindMaesByName("left");
@@ -769,6 +841,7 @@ int main (int, char **)
   triband->Translate (left->Loc ()
                       - (1.0/2.0) * left->Height () * left->Up ());
                       //+ (1.0/2.0) * maes->Height () * left->Up ());
+  triband -> Translate (demo.elev_transl);
   demo.GetSceneLayer().GetRootNode()->AppendChild(triband);
 
   demo.Run ();
