@@ -12,5 +12,7 @@ f64 global_param_ee_scale = 0.5;
 f64 global_param_ee_scale_delta = 0.0;
 i32 global_param_ee_count_per_wall = 10;
 
+f64 global_param_background_gray = 0.0;
+
 
 }  // scram, charm

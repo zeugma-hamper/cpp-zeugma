@@ -16,6 +16,8 @@ extern f64 global_param_ee_scale;
 extern f64 global_param_ee_scale_delta;
 extern i32 global_param_ee_count_per_wall;
 
+extern f64 global_param_background_gray;
+
 
 }  // nomo namespace charm
 
