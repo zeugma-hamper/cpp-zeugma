@@ -207,7 +207,8 @@ lib_sources = ['src/application.cpp',
                'src/ZoftThing.cpp',
                'src/base_types.cpp',
                'src/bgfx_utils.cpp',
-               'src/conjure-from-toml.cpp']
+               'src/conjure-from-toml.cpp',
+               'src/global-params.cpp']
 
 
 charm_inc = include_directories ('src')
