@@ -153,7 +153,7 @@ Collage::Collage (u32 _count, std::vector<FilmInfo> const &_films,
   CollageBackground *bg = new CollageBackground (stencil_val);
   bg->SetOver (_width * Vect (1.0, 0.0, 0.0));
   bg->SetUp (_height * Vect (0.0, 1.0, 0.0));
-  bg->SetColor (glm::vec4 (0.0f, 0.0f, 0.0f, 1.0f));
+  bg->SetColor (glm::vec4 (0.2f, 0.2f, 0.2f, 1.0f));
   Node *n = new Node;
   n->AppendRenderable(bg);
   AppendChild (n);
