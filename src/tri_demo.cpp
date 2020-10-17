@@ -54,6 +54,8 @@
 
 #include <stdio.h>
 
+#include <iostream>
+
 //for the demo
 #include <TriBand.hpp>
 #include <Collage.hpp>
@@ -498,8 +500,13 @@ bool TriDemo::InitWindowingAndGraphics ()
                             leaf->b_view->fb_pix_b,
                             leaf->b_view->wid_frac * glfw_width,
                             leaf->b_view->hei_frac * glfw_height);
-      bgfx::setViewClear (vuid, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH | BGFX_CLEAR_STENCIL,
-                          0x505050FF);
+      u8 gray = u8 (global_param_background_gray * 255.0);
+      u32 bg_rgba = (0xFF | gray << 8 | gray << 16 | gray << 24);
+      bgfx::setViewClear (vuid,
+                          BGFX_CLEAR_COLOR |
+                          BGFX_CLEAR_DEPTH |
+                          BGFX_CLEAR_STENCIL,
+                          bg_rgba);
       // use depth integer to order GPU draw submission
       // drawables are enumerated by order in scene graph,
       // so that id number is used as the depth.
@@ -807,9 +814,12 @@ namespace po = boost::program_options;
 int main (int ac, char **av)
 {
   po::options_description desc ("available options");
-  desc.add_options()
+  desc . add_options ()
+    ("help", "hm. what do you think?")
     ("prison-break", "escaped elements only mode")
     ("clip-collages", "disallow collage elements outside rect-bounds")
+    ("background-gray", po::value<f64>(&global_param_background_gray),
+     "gray value (range 0.0-1.0) for screen background; default is 0.0")
     ("ee-scale", po::value<f64>(&global_param_ee_scale),
      "median scale for escaped elements; default is 0.5")
     ("ee-scale-delta", po::value<f64>(&global_param_ee_scale_delta),
@@ -820,6 +830,12 @@ int main (int ac, char **av)
   po::variables_map arg_map;
   po::store (po::parse_command_line(ac, av, desc), arg_map);
   po::notify(arg_map);
+
+
+  if (arg_map . count ("help"))
+    { std::cout << desc << "\n";
+      return 0;
+    }
 
   if (arg_map.count ("prison-break"))
     global_params_prison_break_mode = true;
