@@ -7,6 +7,10 @@
 #include <VideoSystem.hpp>
 #include <Matte.hpp>
 
+//scene graph
+#include <Node.hpp>
+#include <Frontier.hpp>
+
 //Renderables
 #include <Renderable.hpp>
 #include <RectangleRenderable.hpp>
@@ -190,59 +194,8 @@ class WandCatcher  :  public Zeubject, public ZESpatialPhagy
 
   i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
   // see below for the above... can't define inline because uses TriDemo...
-  i64 ZESpatialHarden (ZESpatialHardenEvent *e)  override
-    { if (calibrating)
-        { // avanti!
-          if (cally)
-            cally -> ZESpatialHarden (e);
-          return 0;
-        }
-      if (e -> WhichPressor ()  ==  trig_butt_ident)
-        { trig_partic . insert (e -> Provenance ());
-          if (i64(trig_partic . size ())  >=  trig_butt_simulcount)
-            calibrating = true;
-          return 0;
-        }
-
-      if (e -> Aim () . Dot (Vect::yaxis)  > 0.75)
-        { if (! elevating)
-            { elev_partic . insert (e -> Provenance ());
-              if (elev_partic . size ()  >  1)
-                { elevating = true;
-                  elev_prevpos = AveragePos ();
-                }
-            }
-        }
-      return 0;
-    }
-  i64 ZESpatialSoften (ZESpatialSoftenEvent *e)  override
-    { if (calibrating  &&  trig_partic . size () == 0)
-        { // ymlaen!
-          if (cally)
-            { if (cally -> ZESpatialSoften (e)  ==  -666)
-                calibrating = false;
-            }
-          return 0;
-        }
-      if (e -> WhichPressor ()  ==  trig_butt_ident)
-        { if (trig_partic . size ()  >  0)
-            { auto it = trig_partic . find (e -> Provenance ());
-              if (it  !=  trig_partic . end ())
-                trig_partic . erase (it);  // three verbose lines to remove...
-              if (calibrating  &&  trig_partic . size () == 0)
-                fprintf (stderr, "S T A R T I N G  CALIBRATION\n");
-            }
-          return 0;
-        }
-
-      auto it = elev_partic . find (e -> Provenance ());
-      if (it  !=  elev_partic . end ())
-        { elev_partic . erase (it);
-          if (elevating)
-            {  elevating = false; }
-        }
-      return 0;
-    }
+  i64 ZESpatialHarden (ZESpatialHardenEvent *e)  override;
+  i64 ZESpatialSoften (ZESpatialSoftenEvent *e)  override;
 };
 
 class TriDemo final : public Application
@@ -281,6 +234,10 @@ class TriDemo final : public Application
 
   std::vector<CMVTrefoil *> &RenderLeaves ();
 
+  PlatonicMaes *ClosestIntersectedMaes (const Vect &frm, const Vect &aim,
+                                        Vect *hit_point = NULL);
+  Frontier *IntersectedFrontier (const Vect &frm, const Vect &aim,
+                                 Vect *hit_point = NULL);
   void FlatulateCursor (ZESpatialMoveEvent *e);
 
   void AccrueElevatorOffset (const Vect &off);
@@ -312,6 +269,10 @@ RawMouseParser TriDemo::ramp;
 FrameTime *s_TriDemo_frame_time = nullptr;
 
 
+using BrundlePair = std::pair <Node *, PlatonicMaes *>;
+
+std::unordered_map <std::string, BrundlePair> rupaul_map;
+
 i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
 { if (calibrating  &&  trig_partic . size () == 0)
     { // forward!
@@ -332,6 +293,27 @@ i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
         application_instance -> AccrueElevatorOffset (offset);
       elev_prevpos = newpos;
     }
+  else
+    { auto it = rupaul_map . find (e -> Provenance ());
+      if (it != rupaul_map . end ())
+        { BrundlePair &br = it->second;
+          Vect hit;
+          if (PlatonicMaes *maes
+              = application_instance -> ClosestIntersectedMaes (e -> Loc (),
+                                                                e -> Aim (),
+                                                                &hit))
+            { if (br.second  !=  maes)
+                { br.second = maes;
+                  for (Renderable *rendy  :  br.first -> GetRenderables ())
+                    { rendy -> SetOver (maes -> Over ());
+                      rendy -> SetUp (maes -> Up ());
+                    }
+                }
+              if (CineAtom *ca = dynamic_cast <CineAtom *> (br.first))
+                { ca->loc = hit; }
+            }
+        }
+    }
 
   if (PlatonicMaes *emm = application_instance -> FindMaesByName ("table"))
     { Vect p = e -> Loc ();
@@ -348,6 +330,72 @@ i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
     }
   return 0;
 }
+
+i64 WandCatcher::ZESpatialHarden (ZESpatialHardenEvent *e)
+{ if (calibrating)
+    { // avanti!
+      if (cally)
+        cally -> ZESpatialHarden (e);
+      return 0;
+    }
+  if (e -> WhichPressor ()  ==  trig_butt_ident)
+    { trig_partic . insert (e -> Provenance ());
+      if (i64(trig_partic . size ())  >=  trig_butt_simulcount)
+        calibrating = true;
+      return 0;
+    }
+
+  if (e -> Aim () . Dot (Vect::yaxis)  > 0.75)
+    { if (! elevating)
+        { elev_partic . insert (e -> Provenance ());
+          if (elev_partic . size ()  >  1)
+            { elevating = true;
+              elev_prevpos = AveragePos ();
+            }
+        }
+    }
+  else if (Frontier *f = application_instance -> IntersectedFrontier
+           (e -> Loc (), e -> Aim ()))
+    rupaul_map[e -> Provenance ()] = BrundlePair (f -> ItsNode (), NULL);
+
+  return 0;
+}
+
+i64 WandCatcher::ZESpatialSoften (ZESpatialSoftenEvent *e)
+{ if (calibrating  &&  trig_partic . size () == 0)
+    { // ymlaen!
+      if (cally)
+        { if (cally -> ZESpatialSoften (e)  ==  -666)
+            calibrating = false;
+        }
+      return 0;
+    }
+  if (e -> WhichPressor ()  ==  trig_butt_ident)
+    { if (trig_partic . size ()  >  0)
+        { auto it = trig_partic . find (e -> Provenance ());
+          if (it  !=  trig_partic . end ())
+            trig_partic . erase (it);  // three verbose lines to remove...
+          if (calibrating  &&  trig_partic . size () == 0)
+            fprintf (stderr, "S T A R T I N G  CALIBRATION\n");
+        }
+      return 0;
+    }
+
+  auto it = elev_partic . find (e -> Provenance ());
+  if (it  !=  elev_partic . end ())
+    { elev_partic . erase (it);
+      if (elevating)
+        {  elevating = false; }
+    }
+  else
+    { auto it = rupaul_map . find (e -> Provenance ());
+      if (it != rupaul_map . end ())
+        rupaul_map . erase (it);
+    }
+
+  return 0;
+}
+
 
 #define ERROR_RETURN_VAL(MSG, VAL)                 \
   {                                                \
@@ -737,20 +785,50 @@ std::vector<CMVTrefoil *> &TriDemo::RenderLeaves ()
 }
 
 
-void TriDemo::FlatulateCursor (ZESpatialMoveEvent *e)
+PlatonicMaes *TriDemo::ClosestIntersectedMaes (const Vect &frm, const Vect &aim,
+                                               Vect *hit_point)
 { PlatonicMaes *close_m = NULL;
   Vect close_p, hit;
   f64 close_d;
 
-  Vect hit_point;
-  for (Layer *l : m_scene_graph_layers)
-    {
-      Frontier *f = l->FirstHitFrontier({e->Loc(), e->Aim()}, &hit_point);
-      if (f)
-        fprintf (stdout, "I hit %p at (%0.2f, %0.2f, %0.2f)\n", f, hit_point.x, hit_point.y, hit_point.z);
+  i32 cnt = NumMaeses ();
+  for (i32 q = 0  ;  q < cnt  ;  ++q)
+    { PlatonicMaes *emm = NthMaes (q);
+      if (GeomFumble::RayRectIntersection (frm, aim,
+                                           emm -> Loc (), emm -> Over (),
+                                           emm -> Up (), emm -> Width (),
+                                           emm -> Height (), &hit))
+        { f64 d = hit . DistFrom (frm);
+          if (! close_m  ||  d < close_d)
+            { close_m = emm;
+              close_p = hit;
+              close_d = d;
+            }
+        }
     }
+  if (hit_point)
+    *hit_point = close_p;
+  return close_m;
+}
 
-  const std::string &which_crs = e -> Provenance ();
+Frontier *TriDemo::IntersectedFrontier (const Vect &frm, const Vect &aim,
+                                        Vect *hit_point)
+{ Vect hit;
+  for (Layer *l  :  m_scene_graph_layers)
+    { Frontier *f = l -> FirstHitFrontier ({frm, aim}, &hit);
+      if (f)
+        { fprintf (stdout, "I hit %p at (%0.2f, %0.2f, %0.2f)\n", f, hit.x, hit.y, hit.z);
+          if (hit_point)
+            *hit_point = hit;
+          return f;
+        }
+    }
+  return NULL;
+}
+
+
+void TriDemo::FlatulateCursor (ZESpatialMoveEvent *e)
+{ const std::string &which_crs = e -> Provenance ();
   Cursoresque *crs = NULL;
   Cursoresque *bachelor_crs = NULL;
   for (Cursoresque *c  :  cursoresques)
@@ -767,26 +845,12 @@ void TriDemo::FlatulateCursor (ZESpatialMoveEvent *e)
       bachelor_crs -> SetName (which_crs);
     }
 
-  i32 cnt = NumMaeses ();
-  for (i32 q = 0  ;  q < cnt  ;  ++q)
-    { PlatonicMaes *emm = NthMaes (q);
-      if (GeomFumble::RayRectIntersection (e -> Loc (), e -> Aim (),
-                                           emm -> Loc (), emm -> Over (),
-                                           emm -> Up (), emm -> Width (),
-                                           emm -> Height (), &hit))
-        { f64 d = hit . DistFrom (e -> Loc ());
-          if (! close_m  ||  d < close_d)
-            { close_m = emm;
-              close_p = hit;
-              close_d = d;
-            }
-        }
-    }
-
-  if (close_m)
-    { crs->crs_pos = close_p;
-      crs->crs_rnd -> SetOver (close_m -> Over ());
-      crs->crs_rnd -> SetUp (close_m -> Up ());
+  Vect hit;
+  if (PlatonicMaes *emm = ClosestIntersectedMaes (e -> Loc (), e -> Aim (),
+                                                  &hit))
+    { crs->crs_pos = hit;
+      crs->crs_rnd -> SetOver (emm -> Over ());
+      crs->crs_rnd -> SetUp (emm -> Up ());
     }
 }
 
@@ -969,18 +1033,22 @@ int main (int ac, char **av)
       left_layer->GetRootNode()->AppendChild(video_band);
     }
 
-  ElementsBand *elements_band = new ElementsBand (total_width, band_height, film_infos);
+  ElementsBand *elements_band
+    = new ElementsBand (total_width, band_height, film_infos,
+                        *maes, maes -> Loc ());
   elements_band->Translate (demo.elev_transl);
-  elements_band->Translate (maes->Loc ());
+//  elements_band->Translate (maes->Loc ());
   ee_layer->GetRootNode()->AppendChild(elements_band);
 
-  elements_band = new ElementsBand (total_width, band_height, film_infos);
-  elements_band->RotateD (maes->Up (), 90.0);
+  Vect left_cntr
+    = (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
+       -  0.5 * maes -> Width () * maes -> Over ()
+       +  maes -> Loc () . Dot (maes -> Up ()) * maes -> Up ());
+  elements_band = new ElementsBand (total_width, band_height, film_infos,
+                                    *left, left_cntr);
+//  elements_band->RotateD (maes->Up (), 90.0);
   elements_band->Translate (demo.elev_transl);
-  elements_band->Translate
-    (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
-     -  0.5 * maes -> Width () * maes -> Over ()
-     +  maes -> Loc () . Dot (maes -> Up ()) * maes -> Up ());
+//  elements_band->Translate (left_cntr);
   ee_layer->GetRootNode()->AppendChild(elements_band);
 
   for (int q = 0  ;  q < 3  ;  ++q)

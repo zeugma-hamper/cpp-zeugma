@@ -15,7 +15,8 @@ namespace charm
 {
 
 ElementsBand::ElementsBand (f64 _band_width, f64 _band_height,
-                            std::vector<FilmInfo> const &_films)
+                            std::vector<FilmInfo> const &_films,
+                            PlatonicMaes &maes, const Vect &cntr)
 {
 
   f64 min_sca = global_param_ee_scale - global_param_ee_scale_delta;
@@ -24,10 +25,15 @@ ElementsBand::ElementsBand (f64 _band_width, f64 _band_height,
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<>  film_distrib (0, _films.size ()-1);
-  std::uniform_real_distribution<> width_distrib (-0.5 * _band_width, 0.5 * _band_width);
-  std::uniform_real_distribution<> height_distrib (-0.5 * _band_height, 0.5 * _band_height);
+  std::uniform_real_distribution<> width_distrib (-0.5 * _band_width,
+                                                  0.5 * _band_width);
+  std::uniform_real_distribution<> height_distrib (-0.5 * _band_height,
+                                                   0.5 * _band_height);
   std::uniform_real_distribution<> scale_distrib (min_sca * _band_height,
                                                   max_sca * _band_height);
+
+  Vect ovr = maes . Over ();
+  Vect upp = maes . Up ();
 
   u32 const escapee_count = global_param_ee_count_per_wall;
   for (u32 i = 0; i < escapee_count; ++i)
@@ -38,14 +44,18 @@ ElementsBand::ElementsBand (f64 _band_width, f64 _band_height,
       ClipInfo const &cm = fm.clips[clip_distrib (gen)];
 
       MattedVideoRenderable *matte_able = new MattedVideoRenderable (fm, cm);
-      Node *matte_node = new Node;
-      matte_node->AppendRenderable(matte_able);
-      matte_node->Scale(Vect (scale_distrib (gen)));
-      matte_node->Translate(Vect (width_distrib (gen), height_distrib (gen), 0.0));
+      matte_able -> SetOver (ovr);
+      matte_able -> SetUp (upp);
+      CineAtom *matte_node = new CineAtom;
+      matte_node->AppendRenderable (matte_able);
+      matte_node->Scale (Vect (scale_distrib (gen)));
+      matte_node->Translate (matte_node->loc);
+      matte_node->loc
+        = cntr  +  width_distrib (gen) * ovr  +  height_distrib (gen) * upp;
 
-      RectRenderableFrontier *rrf = new RectRenderableFrontier (matte_able,
-                                                                Vect (-0.5, -0.5, 0.0),
-                                                                Vect (0.5, 0.5, 0.0));
+      RectRenderableFrontier *rrf
+        = new RectRenderableFrontier (matte_able,
+                                      -0.5 * (ovr + upp), 0.5 * (ovr + upp));
       matte_node->SetFrontier(rrf);
 
       AppendChild (matte_node);

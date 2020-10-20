@@ -21,7 +21,7 @@ Frontier::~Frontier ()
   m_node = nullptr;
 }
 
-Node *Frontier::GetNode () const
+Node *Frontier::ItsNode () const
 {
   return m_node;
 }

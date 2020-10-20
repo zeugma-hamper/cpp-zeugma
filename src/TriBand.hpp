@@ -1,18 +1,33 @@
+
 #ifndef MAXIMUM_HULA_HOOPING_SKILLS
 #define MAXIMUM_HULA_HOOPING_SKILLS
 
-#include <Node.hpp>
 
-namespace charm
-{
+#include <Node.hpp>
+#include "PlatonicMaes.h"
+
+
+namespace charm  {
+
 
 class FilmInfo;
+
+
+class CineAtom  :  public Node
+{ public:
+  ZoftVect loc;
+
+  CineAtom ()  :  Node ()
+    { loc . MakeBecomeLikable (); }
+};
+
 
 class ElementsBand final : public Node
 {
  public:
   ElementsBand (f64 _band_width, f64 _band_height,
-                std::vector<FilmInfo> const &_films);
+                std::vector<FilmInfo> const &_films,
+                PlatonicMaes &maes, const Vect &cntr);
 
 };
 
@@ -24,6 +39,8 @@ class TriBand final : public Node
  protected:
 };
 
+
 }
+
 
 #endif

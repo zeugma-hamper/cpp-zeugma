@@ -152,39 +152,54 @@ GrapplerPile *Node::UnsecuredGrapplerPile ()
 { return m_graps; }
 
 
-void Node::Translate (const Vect &tr)
-{ AssuredGrapplerPile () -> AppendGrappler (new TrGrappler (tr)); }
+Grappler *Node::Translate (const Vect &tr)
+{ Grappler *g = new TrGrappler (tr);
+  AssuredGrapplerPile () -> AppendGrappler (g);
+  return g;
+}
 
-void Node::Scale (const Vect &sc)
-{ AssuredGrapplerPile () -> AppendGrappler (new ScGrappler (sc)); }
+Grappler *Node::Scale (const Vect &sc)
+{ Grappler *g = new ScGrappler (sc);
+  AssuredGrapplerPile () -> AppendGrappler (g);
+  return g;
+}
 
-void Node::Rotate (const Vect &ax, f64 an)
-{ AssuredGrapplerPile () -> AppendGrappler (new RoGrappler (ax, an)); }
+Grappler *Node::Rotate (const Vect &ax, f64 an)
+{ Grappler *g = new RoGrappler (ax, an);
+  AssuredGrapplerPile () -> AppendGrappler (g);
+  return g;
+}
 
-void Node::RotateWithCenter (const Vect &ax, f64 an, const Vect &ce)
-{ AssuredGrapplerPile () -> AppendGrappler (new RoGrappler (ax, an, ce)); }
+Grappler *Node::RotateWithCenter (const Vect &ax, f64 an, const Vect &ce)
+{ Grappler *g = new RoGrappler (ax, an, ce);
+  AssuredGrapplerPile () -> AppendGrappler (g);
+  return g;
+}
 
 
-void Node::Translate (const ZoftVect &tzo)
+Grappler *Node::Translate (const ZoftVect &tzo)
 { TrGrappler *tgr = new TrGrappler;
   tgr -> TranslationZoft () . BecomeLike (tzo);
   AssuredGrapplerPile () -> AppendGrappler (tgr);
+  return tgr;
 }
 
-void Node::Scale (const ZoftVect &szo)
+Grappler *Node::Scale (const ZoftVect &szo)
 { ScGrappler *sgr = new ScGrappler;
   sgr -> ScaleZoft () . BecomeLike (szo);
   AssuredGrapplerPile () -> AppendGrappler (sgr);
+  return sgr;
 }
 
-void Node::Rotate (const ZoftVect &axzo, const ZoftFloat &anzo,
-                   const ZoftVect &cezo, const ZoftFloat &phzo)
+Grappler *Node::Rotate (const ZoftVect &axzo, const ZoftFloat &anzo,
+                        const ZoftVect &cezo, const ZoftFloat &phzo)
 { RoGrappler *rgr = new RoGrappler (Vect::zaxis);
   rgr -> AxisZoft () . BecomeLike (axzo);
   rgr -> AngleZoft () . BecomeLike (anzo);
   rgr -> CenterZoft () . BecomeLike (cezo);
   rgr -> PhaseZoft () . BecomeLike (phzo);
   AssuredGrapplerPile () -> AppendGrappler (rgr);
+  return rgr;
 }
 
 
