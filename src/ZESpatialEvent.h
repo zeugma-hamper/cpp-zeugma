@@ -33,6 +33,8 @@ class ZESpatialEvent  :  public ZeEvent
 
   ZESpatialEvent (const ZESpatialEvent &spe);
 
+  void AdoptParticulars (const ZESpatialEvent &spe);
+
   const Vect &Loc ()  const;
   void SetLoc (const Vect &l);
 

@@ -11,7 +11,7 @@ namespace charm
 //https://stackoverflow.com/questions/52851239/local-static-variable-linkage-in-a-template-class-static-member-function
 //https://stackoverflow.com/questions/32172137/local-static-thread-local-variables-of-inline-functions
 template<typename T>
-struct counter
+struct ch_counter
 {
   static T next ()
   {
@@ -21,11 +21,11 @@ struct counter
 };
 
 template<typename T>
-struct index
+struct ch_index
 {
   static u32 get ()
   {
-    static u32 ind = counter<u32>::next ();
+    static u32 ind = ch_counter<u32>::next ();
     szt const size = sizeof (T); // assure complete type
     (void)size;
     return ind;

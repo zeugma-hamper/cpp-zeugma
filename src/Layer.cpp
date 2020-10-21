@@ -8,9 +8,7 @@
 namespace charm {
 
 Layer::Layer ()
-  : m_root_node {},
-    m_projection_matrix {1.0f},
-    m_camera_matrix {1.0f}
+  : m_root_node {}
 {
   m_root_node.SetLayer(this);
 }
@@ -43,26 +41,6 @@ std::vector<Renderable *> &Layer::GetRenderables ()
 std::vector<Frontier *> &Layer::GetFrontiers ()
 {
   return m_frontiers;
-}
-
-glm::mat4 const &Layer::GetProjectionMatrix () const
-{
-  return m_projection_matrix;
-}
-
-void Layer::SetProjectionMatrix (glm::mat4 const &_proj)
-{
-  m_projection_matrix = _proj;
-}
-
-glm::mat4 const &Layer::GetCameraMatrix () const
-{
-  return m_camera_matrix;
-}
-
-void Layer::SetCameraMatrix (glm::mat4 const &_cam)
-{
-  m_camera_matrix = _cam;
 }
 
 void Layer::SortFrontiers ()
