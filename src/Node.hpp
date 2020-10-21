@@ -29,7 +29,7 @@ class Node
  public:
 
   Node ();
-  ~Node ();
+  virtual ~Node ();
 
   CHARM_DELETE_COPY (Node);
   CHARM_DEFAULT_MOVE (Node);
@@ -56,27 +56,34 @@ class Node
   GrapplerPile *AssuredGrapplerPile ();
   GrapplerPile *UnsecuredGrapplerPile ();
 
-  void Translate (const Vect &tr);
-  inline void Translate (f64 dx, f64 dy, f64 dz)
-    { Translate (Vect (dx, dy, dz)); }
+  Grappler *Translate (const Vect &tr);
+  inline Grappler *Translate (f64 dx, f64 dy, f64 dz)
+    { return Translate (Vect (dx, dy, dz)); }
 
-  void Scale (const Vect &sc);
-  inline void Scale (f64 sx, f64 sy, f64 sz)  { Scale (Vect (sx, sy, sz)); }
-  inline void Scale (f64 s)  { Scale (s, s, s); }
+  Grappler *Scale (const Vect &sc);
+  inline Grappler *Scale (f64 sx, f64 sy, f64 sz)
+    { return Scale (Vect (sx, sy, sz)); }
+  inline Grappler *Scale (f64 s)
+    { return Scale (s, s, s); }
 
-  void Rotate (const Vect &ax, f64 an);
-  inline void RotateD (const Vect &ax, f64 an)
-    { Rotate (ax, M_PI / 180.0 * an); }
-  void RotateWithCenter (const Vect &ax, f64 an, const Vect &ce);
-  inline void RotateWithCenterD (const Vect &ax, f64 an, const Vect &ce)
-    { RotateWithCenter (ax, M_PI / 180.0 * an, ce); }
+  Grappler *Rotate (const Vect &ax, f64 an);
+  inline Grappler *RotateD (const Vect &ax, f64 an)
+    { return Rotate (ax, M_PI / 180.0 * an); }
+  Grappler *RotateWithCenter (const Vect &ax, f64 an, const Vect &ce);
+  inline Grappler *RotateWithCenterD (const Vect &ax, f64 an, const Vect &ce)
+    { return RotateWithCenter (ax, M_PI / 180.0 * an, ce); }
 
-  void Translate (const ZoftVect &tzo);
-  void Scale (const ZoftVect &szo);
-  void Rotate (const ZoftVect &ax_zft,
-               const ZoftFloat &an_zft,
-               const ZoftVect &ce_zft = Vect::zerov,
-               const ZoftFloat &ph_zft = ZoftFloat_zero);
+  Grappler *Translate (ZoftVect &tzo);
+  Grappler *Scale (ZoftVect &szo);
+  Grappler *Rotate (ZoftVect &ax_zft,
+                    ZoftFloat &an_zft,
+                    ZoftVect &ce_zft,
+                    ZoftFloat &ph_zft);
+  Grappler *Rotate (ZoftVect &ax_zft,
+                    ZoftFloat &an_zft,
+                    ZoftVect &ce_zft);
+  Grappler *Rotate (ZoftVect &ax_zft,
+                    ZoftFloat &an_zft);
 
   void ClearTransforms ();
 

@@ -47,8 +47,8 @@ void Layer::SortFrontiers ()
 {
   std::sort (m_frontiers.begin (), m_frontiers.end (),
              [] (Frontier const * const _left, Frontier const * const _right)
-             {
-               return _left->GetNode ()->GetGraphID() > _right->GetNode()->GetGraphID();
+             { return (_left -> ItsNode () -> GetGraphID ()
+                       >  _right -> ItsNode () -> GetGraphID ());
              });
 }
 

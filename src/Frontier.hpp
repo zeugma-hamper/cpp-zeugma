@@ -24,7 +24,7 @@ class Frontier
 
   CHARM_DELETE_MOVE_COPY(Frontier);
 
-  Node *GetNode () const;
+  Node *ItsNode () const;
 
   virtual AABB GetLocalAABB  () const;
   virtual AABB GetGlobalAABB () const;
