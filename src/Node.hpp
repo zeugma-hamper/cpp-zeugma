@@ -73,12 +73,17 @@ class Node
   inline Grappler *RotateWithCenterD (const Vect &ax, f64 an, const Vect &ce)
     { return RotateWithCenter (ax, M_PI / 180.0 * an, ce); }
 
-  Grappler *Translate (const ZoftVect &tzo);
-  Grappler *Scale (const ZoftVect &szo);
-  Grappler *Rotate (const ZoftVect &ax_zft,
-                    const ZoftFloat &an_zft,
-                    const ZoftVect &ce_zft = Vect::zerov,
-                    const ZoftFloat &ph_zft = ZoftFloat_zero);
+  Grappler *Translate (ZoftVect &tzo);
+  Grappler *Scale (ZoftVect &szo);
+  Grappler *Rotate (ZoftVect &ax_zft,
+                    ZoftFloat &an_zft,
+                    ZoftVect &ce_zft,
+                    ZoftFloat &ph_zft);
+  Grappler *Rotate (ZoftVect &ax_zft,
+                    ZoftFloat &an_zft,
+                    ZoftVect &ce_zft);
+  Grappler *Rotate (ZoftVect &ax_zft,
+                    ZoftFloat &an_zft);
 
   void ClearTransforms ();
 

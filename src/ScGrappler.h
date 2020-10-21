@@ -62,9 +62,9 @@ class ScGrappler  :  public Grappler
   ZoftVect &CenterZoft ()
     { return cnt; }
 
-  ScGrappler &InstallScale (const ZoftVect &s_zft)
+  ScGrappler &InstallScale (ZoftVect &s_zft)
     { sca . BecomeLike (s_zft);  return *this; }
-  ScGrappler &InstallCenter (const ZoftVect &c_zft)
+  ScGrappler &InstallCenter (ZoftVect &c_zft)
     { cnt . BecomeLike (c_zft);  return *this; }
 
   const Matrix44 &PntMat ()  const  override

@@ -18,7 +18,7 @@ class CineAtom  :  public Node
   ZoftVect loc;
 
   CineAtom ()  :  Node ()
-    { loc . MakeBecomeLikable (); }
+    { /*loc . MakeBecomeLikable ();*/ }
 };
 
 

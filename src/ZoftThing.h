@@ -109,7 +109,7 @@ class ZoftThing
       };
 
   T val;
-  ZGuts <T> *guts;
+  mutable ZGuts <T> *guts;
   bool just_changed, nomo_change;
 
   template <typename TT>
@@ -136,7 +136,7 @@ class ZoftThing
   ZoftThing (const T &v)
      :  val (v), guts (NULL), just_changed (true), nomo_change (false)
     { }
-  ZoftThing (const ZoftThing &z)
+  ZoftThing (ZoftThing &z)
      :  val (z.val), guts (NULL), just_changed (true),
         nomo_change (z.nomo_change)
     { InstallGuts (z.guts); }
@@ -146,16 +146,17 @@ class ZoftThing
         guts -> RemoveHost (this);
     }
 
-  const T &operator = (const T &v)
+  ZoftThing &operator = (const T &v)
     { if (! guts)
-        { val = v;  just_changed = true;  return val; }
+        { val = v;  just_changed = true;  return *this; }
       if (LatchGuts <T> *lg = dynamic_cast <LatchGuts <T> *> (guts))
         lg->latchval = v;
       else
         val = v;
-      just_changed = true;  return val;
+      just_changed = true;
+      return *this;
     }
-  ZoftThing &operator = (const ZoftThing &z)
+  ZoftThing &operator = (ZoftThing &z)
     { val = z.val;
       nomo_change = z.nomo_change;
       InstallGuts (z.guts);
@@ -167,9 +168,12 @@ class ZoftThing
   // make it work with derived types... even though the foregoing should,
   // unmodified, already do that: because its signature and contents
   // are identical to the methody version below.
-  ZoftThing &BecomeLike (const ZoftThing &z)
-    { val = z.val;
+  ZoftThing &BecomeLike (const ZoftThing &zee)
+    { ZoftThing &z = const_cast <ZoftThing &> (zee);
+      val = z.val;
       nomo_change = z.nomo_change;
+      if (! z.guts)
+        z . MakeBecomeLikable ();
       InstallGuts (z.guts);
       return *this;
     }

@@ -48,7 +48,7 @@ ElementsBand::ElementsBand (f64 _band_width, f64 _band_height,
       matte_able -> SetUp (upp);
       CineAtom *matte_node = new CineAtom;
       matte_node->AppendRenderable (matte_able);
-      matte_node->Scale (Vect (scale_distrib (gen)));
+      matte_node->Scale (scale_distrib (gen));
       matte_node->Translate (matte_node->loc);
       matte_node->loc
         = cntr  +  width_distrib (gen) * ovr  +  height_distrib (gen) * upp;
