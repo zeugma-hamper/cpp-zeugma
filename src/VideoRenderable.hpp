@@ -13,12 +13,14 @@ namespace charm
 {
 
 struct VideoTexture;
+struct FilmInfo;
 
 class VideoRenderable final : public Renderable
 {
  public:
 
   VideoRenderable (std::string_view _uri);
+  VideoRenderable (FilmInfo const &_film);
   ~VideoRenderable () override;
 
   void Draw (u16 vyu_id) override;

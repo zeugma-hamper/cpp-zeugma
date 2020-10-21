@@ -503,7 +503,7 @@ dead_zone::dead_zone ()
 
   ramp . AppendPhage (&wandy);
 
-  wandy . SetCalibrista (&rowp.calibrex);
+  wandy . SetCalibrista (&rowp.table_calibrex);
   sole_dead_zone = this;
 }
 
@@ -597,7 +597,7 @@ void dead_zone::UpdateSceneGraph(i64 ratch, f64 thyme)
 {
   m_scene_graph_layer->GetRootNode()
     -> UpdateTransformsHierarchically (ratch, thyme);
-  m_scene_graph_layer->GetRootNode()->EnumerateRenderables();
+  m_scene_graph_layer->GetRootNode()->EnumerateGraph();
 }
 
 void dead_zone::ShutDownSceneGraph()

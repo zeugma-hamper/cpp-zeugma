@@ -16,6 +16,7 @@ namespace charm
 
 class Layer;
 class Renderable;
+class Frontier;
 
 struct Transformation
 {
@@ -33,7 +34,9 @@ class Node
   CHARM_DELETE_COPY (Node);
   CHARM_DEFAULT_MOVE (Node);
 
-  void EnumerateRenderables ();
+  std::array<graph_id, 2> EnumerateGraph (graph_id _base_id = 0, graph_id _base_rend_id = 0);
+  void SetGraphID (graph_id _id);
+  graph_id GetGraphID () const;
 
   void UpdateTransformsHierarchically (i64 ratch, f64 thyme);
   void UpdateTransformsHierarchically (Transformation const &_parent,
@@ -95,11 +98,15 @@ class Node
   void   SetLayer (Layer *_layer);
   Layer *GetLayer () const;
 
+  void SetFrontier (Frontier *_frontier);
+  Frontier *GetFrontier () const;
 
  private:
   Layer *m_layer;
   Node  *m_parent;
   GrapplerPile *m_graps;
+  Frontier *m_frontier;
+  graph_id m_id;
 
   std::vector<Node *>       m_children;
   std::vector<Renderable *> m_renderables;

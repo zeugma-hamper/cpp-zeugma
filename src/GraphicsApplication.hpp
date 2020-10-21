@@ -7,6 +7,8 @@
 #include <Layer.hpp>
 #include <MultiSprinkler.hpp>
 #include <ZePublicWaterWorks.hpp>
+#include <PlatonicMaes.h>
+#include <CMVTrefoil.h>
 
 #define GLFW_EXPOSE_NATIVE_X11
 #define GLFW_EXPOSE_NATIVE_GLX
@@ -21,6 +23,8 @@ class GraphicsApplication : public Application
  public:
   GraphicsApplication ();
   ~GraphicsApplication () override;
+
+  CHARM_DELETE_MOVE_COPY(GraphicsApplication);
 
   bool StartUp     () override;
   bool RunOneCycle () override;
@@ -42,17 +46,28 @@ class GraphicsApplication : public Application
   ZePublicWaterWorks *ExciseWaterWorks (ZePublicWaterWorks *_pub);
 
   static FrameTime *GetFrameTime ();
+  static GraphicsApplication *GetApplication ();
 
   Layer &GetSceneLayer ();
+
+  i32 NumMaeses ()  const;
+  PlatonicMaes *NthMaes (i32 ind) const;
+  PlatonicMaes *FindMaesByName (std::string_view _name) const;
+
+  i32 NumRenderLeaves ()  const;
+  CMVTrefoil *NthRenderLeaf (i32 ind) const;
+  CMVTrefoil *FindRenderLeafByName (std::string_view _name) const;
 
  protected:
 
   MultiSprinkler m_event_sprinkler;
   std::vector<ZePublicWaterWorks *> m_event_drainage;
 
-  GLFWwindow *window;
+  GLFWwindow *m_window;
+  std::vector<PlatonicMaes *> m_maes;
 
   Layer *m_scene_graph_layer;
+  std::vector<CMVTrefoil *> m_trefoils;
 };
 
 }

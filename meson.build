@@ -11,7 +11,7 @@ dl_dep = cpp.find_library('dl')
 threads_dep = dependency('threads')
 
 ##### boost
-boost_dep = dependency ('boost')
+boost_dep = dependency ('boost', modules : ['program_options'])
 
 ##### OpenImageIO
 oiio_dep = dependency ('OpenImageIO')
@@ -168,9 +168,11 @@ gst_video_dep = dependency ('gstreamer-video-1.0')
 ##### CHARM #####
 lib_sources = ['src/application.cpp',
                'src/Bolex.cpp',
+               'src/CMVTrefoil.cpp',
                'src/DecodePipeline.cpp',
                'src/FlatRenderable.cpp',
                'src/FrameTime.cpp',
+               'src/Frontier.cpp',
                'src/GeomFumble.cpp',
                'src/GraphicsApplication.cpp',
                'src/Grappler.cpp',
@@ -194,17 +196,21 @@ lib_sources = ['src/application.cpp',
                'src/ProtoZoftThingGuts.cpp',
                'src/ScGrappler.cpp',
                'src/SpaceThing.cpp',
+               'src/TexturedRenderable.cpp',
                'src/TrGrappler.cpp',
                'src/Vect.cpp',
                'src/VideoSystem.cpp',
                'src/VideoRenderable.cpp',
                'src/Zeubject.cpp',
                'src/ZeEvent.cpp',
+               'src/ZePublicWaterWorks.cpp',
                'src/ZESpatialEvent.cpp',
                'src/ZEYowlEvent.cpp',
                'src/ZoftThing.cpp',
+               'src/base_types.cpp',
                'src/bgfx_utils.cpp',
-               'src/conjure-from-toml.cpp']
+               'src/conjure-from-toml.cpp',
+               'src/global-params.cpp']
 
 
 charm_inc = include_directories ('src')
@@ -241,6 +247,16 @@ shaders = [
    'src/shaders/video_varying.def.sc', 'matte_video_vs.bin'],
   ['fragment', 'src/shaders/matte_video_fs.sc',
    'src/shaders/video_varying.def.sc', 'matte_video_fs.bin'],
+  # collage background for demo
+  ['vertex',   'src/shaders/collage_bg_vs.sc',
+   'src/shaders/collage_bg_varying.def.sc', 'collage_bg_vs.bin'],
+  ['fragment', 'src/shaders/collage_bg_fs.sc',
+   'src/shaders/collage_bg_varying.def.sc', 'collage_bg_fs.bin'],
+  # collage background for demo
+  ['vertex',   'src/shaders/textured_renderable.vs.sc',
+   'src/shaders/basic_varying.def.sc', 'textured_renderable.vs.bin'],
+  ['fragment', 'src/shaders/textured_renderable.fs.sc',
+   'src/shaders/basic_varying.def.sc', 'textured_renderable.fs.bin'],
 ]
 
 foreach shader : shaders
@@ -249,6 +265,7 @@ foreach shader : shaders
                  output : [shader[3]],
                  command : [shaderc_prog,
                             '-i', meson.source_root () + '/bgfx/src',
+                            '-i', meson.source_root () + '/src/shaders/include',
                             '-f', '@INPUT0@',
                             '-o', '@OUTPUT0@',
                             '--type', shader[0],
@@ -277,6 +294,12 @@ chud_zone_exec = executable ('chud-zone',
 cz_the_sequel_exec = executable ('cz_the_sequel',
                              sources : ['src/cz_the_sequel.cpp'],
                              dependencies : [charm_dep])
+
+tri_demo_exec = executable ('tri_demo',
+                            sources : ['src/tri_demo.cpp',
+                                       'src/Collage.cpp',
+                                       'src/TriBand.cpp'],
+                            dependencies : [charm_dep])
 
 scan_mattes_exec = executable ('scan_mattes',
                                sources : ['src/scan_mattes.cpp'],

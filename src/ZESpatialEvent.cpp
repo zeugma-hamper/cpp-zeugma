@@ -31,6 +31,18 @@ ZESpatialEvent::ZESpatialEvent (const ZESpatialEvent &spe)
  :  ZeEvent (spe), loc (spe.loc), aim (spe.aim), ovr (spe.ovr)
 { }
 
+void ZESpatialEvent::AdoptParticulars (const ZESpatialEvent &spe)
+{
+  prov = spe.prov;
+  tstamp = spe.tstamp;
+  tratch = spe.tratch;
+
+  loc = spe.loc;
+  aim = spe.aim;
+  ovr = spe.ovr;
+  pressures = spe.pressures;
+}
+
 const Vect &ZESpatialEvent::Loc ()  const
 { return loc; }
 

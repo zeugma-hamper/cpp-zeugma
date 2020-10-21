@@ -48,6 +48,12 @@ namespace RawEventSupportHose  {
 
 class Caliban  :  public Zeubject, public ZESpatialPhagy
 { public:
+  Caliban ()  :  Zeubject ()
+    { }
+};
+
+class RoomCaliban  :  public Caliban
+{ public:
   Vect just_now, accum;
   Vect vee[3];
   int phase, count;
@@ -56,9 +62,9 @@ class Caliban  :  public Zeubject, public ZESpatialPhagy
   Matrix44 default_xform_pmat, default_xform_dmat;
   Matrix44 *geo_truth_pm, *geo_truth_dm;
 
-  Caliban ()  :  Zeubject (),
-                 geo_truth_pm (&default_xform_pmat),
-                 geo_truth_dm (&default_xform_dmat)
+  RoomCaliban ()  :  Caliban (),
+                     geo_truth_pm (&default_xform_pmat),
+                     geo_truth_dm (&default_xform_dmat)
     { Reset (); }
 
   void Reset ();
@@ -78,7 +84,24 @@ class Caliban  :  public Zeubject, public ZESpatialPhagy
   i64 ZESpatialHarden (ZESpatialHardenEvent *e)  override;
   i64 ZESpatialSoften (ZESpatialSoftenEvent *e)  override;
 };
-// end of 'class Caliban', don't you know.
+// end of 'class RoomCaliban', don't you know.
+
+
+class TableCaliban  :  public Caliban
+{ public:
+  std::vector <Vect> captures;
+  bool slurping;
+  TableCaliban ()  :  Caliban ()
+    { Reset (); }
+
+  void Reset ();
+
+  Vect ShabbyTableInferencizing ();
+
+  i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
+  i64 ZESpatialHarden (ZESpatialHardenEvent *e)  override;
+  i64 ZESpatialSoften (ZESpatialSoftenEvent *e)  override;
+};
 
 
 }  // lights out for namespace RawEventSupportHose
@@ -89,10 +112,11 @@ class RawOSCWandParser  :  public RawEventParser
   static const std::string default_config_dir;
   static const std::string default_config_filebasename;
   Matrix44 theirs_to_ours_pm, theirs_to_ours_dm;
-  RawEventSupportHose::Caliban calibrex;
+  RawEventSupportHose::RoomCaliban room_calibrex;
+  RawEventSupportHose::TableCaliban table_calibrex;
 
   RawOSCWandParser ()  :  RawEventParser ()
-    { calibrex . SetGeoTruthMats (theirs_to_ours_pm, theirs_to_ours_dm); }
+    { room_calibrex . SetGeoTruthMats (theirs_to_ours_pm, theirs_to_ours_dm); }
 
   static bool SlurpCoordTransforms (Matrix44 &pmat, Matrix44 &dmat,
                                     const std::string &pathy = "");

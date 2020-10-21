@@ -42,7 +42,9 @@ MattedVideoRenderable::~MattedVideoRenderable ()
 
 void MattedVideoRenderable::Draw (u16 vyu_id)
 {
-  if (! m_video_texture || ! bgfx::isValid(m_video_texture->GetNthTexture(0)))
+  if (! m_video_texture
+      || ! bgfx::isValid(m_video_texture->GetNthTexture(0))
+      || ! bgfx::isValid(m_video_texture->GetNthTexture(3)))
     return;
 
   bgfx::setTransform(&m_node->GetAbsoluteTransformation().model);

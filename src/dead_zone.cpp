@@ -225,7 +225,7 @@ void dead_zone::UpdateSceneGraph(i64 ratch, f64 thyme)
 {
   m_scene_graph_layer->GetRootNode()
     -> UpdateTransformsHierarchically (ratch, thyme);
-  m_scene_graph_layer->GetRootNode()->EnumerateRenderables();
+  m_scene_graph_layer->GetRootNode()->EnumerateGraph();
 }
 
 void dead_zone::ShutDownSceneGraph()
@@ -286,8 +286,9 @@ int main (int, char **)
   //   = "file:///home/blake/tlp/tamper-blu-mkv/the-fall-blu.mov";
 
   std::string uri = std::string ("file://") + film_info.film_path.string ();
-  MattedVideoRenderable *renderable
-    = new MattedVideoRenderable (film_info, clip_info);
+  // MattedVideoRenderable *renderable
+  //   = new MattedVideoRenderable (film_info, clip_info);
+  VideoRenderable *renderable = new VideoRenderable (film_info);
 
   printf ("clip dims: [%u, %u] - [%u, %u]\n",
           clip_info.geometry.dir_geometry.min[0],

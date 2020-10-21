@@ -235,31 +235,43 @@ static void upload_frame (gst_ptr<GstSample> const &_sample,
   if (! gst_video_info_from_caps (video_info, sample_caps))
     return;
 
-  if (! (GST_VIDEO_INFO_IS_RGB (video_info) ||
-         GST_VIDEO_INFO_IS_GRAY(video_info)))
+  // if (! (GST_VIDEO_INFO_IS_RGB (video_info) ||
+  //        GST_VIDEO_INFO_IS_GRAY(video_info)))
+  //   return;
+
+  if (! GST_VIDEO_INFO_IS_YUV(video_info))
     return;
+
 
   width = GST_VIDEO_INFO_WIDTH (video_info);
   height = GST_VIDEO_INFO_HEIGHT (video_info);
   components = GST_VIDEO_INFO_N_COMPONENTS (video_info);
-  //RGB is all one plane
-  stride = GST_VIDEO_INFO_PLANE_STRIDE(video_info, 0);
-  // align = calculate_alignment (stride);
-
-  //printf ("frame: %d x %d with %d comp, %d stride\n", width, height, components, stride);
-
   _textures->SetDimensions({width, height});
 
-  video_frame_holder *frame_holder = new video_frame_holder (_sample, video_info);
-  const bgfx::Memory *mem
-    = bgfx::makeRef (GST_VIDEO_FRAME_PLANE_DATA(&frame_holder->video_frame, 0),
-                     GST_VIDEO_FRAME_SIZE(&frame_holder->video_frame),
-                     DeleteImageLeftOvers<video_frame_holder>, frame_holder);
+  //RGB is all one plane
+  assert (GST_VIDEO_INFO_N_PLANES(video_info) < 4);
+  for (u32 i = 0; i < GST_VIDEO_INFO_N_COMPONENTS(video_info); ++i)
+    {
+      int comp_width = GST_VIDEO_INFO_COMP_WIDTH(video_info, i);
+      int comp_height = GST_VIDEO_INFO_COMP_HEIGHT(video_info, i);
+      stride = GST_VIDEO_INFO_COMP_STRIDE(video_info, i);
+      int plane_idx = GST_VIDEO_INFO_COMP_PLANE(video_info, i);
 
-  bgfx::TextureHandle &text_handle = _textures->GetNthTexture(0);
+      // align = calculate_alignment (stride);
 
-  update_or_create_texture(text_handle, width, height, components, stride,
-                           BGFX_SAMPLER_UVW_CLAMP | BGFX_SAMPLER_POINT, mem);
+      //printf ("frame: %d x %d with %d comp, %d stride\n", width, height, components, stride);
+
+      video_frame_holder *frame_holder = new video_frame_holder (_sample, video_info);
+      const bgfx::Memory *mem
+        = bgfx::makeRef (GST_VIDEO_FRAME_PLANE_DATA(&frame_holder->video_frame, plane_idx),
+                         GST_VIDEO_FRAME_SIZE(&frame_holder->video_frame),
+                         DeleteImageLeftOvers<video_frame_holder>, frame_holder);
+
+      bgfx::TextureHandle &text_handle = _textures->GetNthTexture(i);
+
+      update_or_create_texture(text_handle, comp_width, comp_height, 1, stride,
+                               BGFX_SAMPLER_UVW_CLAMP | BGFX_SAMPLER_POINT, mem);
+    }
 }
 
 void VideoSystem::UploadFrames ()
@@ -311,7 +323,7 @@ void VideoSystem::UploadFrames ()
       MatteFrame mf = pipe.matte_loader->GetFrame(frame_num);
       if (! mf.data)
         {
-          fprintf (stderr, "no matte for %lu which seems fishy\n", frame_num);
+          fprintf (stdout, "no matte for %lu which seems fishy\n", frame_num);
           continue;
         }
 
@@ -324,7 +336,6 @@ void VideoSystem::UploadFrames ()
 
       bgfx::updateTexture2D(matte_texture, 0, 0, 0, 0, mf.width, mf.height, memory);
     }
-
 }
 
 void VideoSystem::PollMessages()
@@ -341,7 +352,7 @@ VideoBrace VideoSystem::OpenVideo (std::string_view _uri)
   dec->Play ();
 
   ch_ptr<VideoTexture>
-    txt{new VideoTexture (VideoFormat::RGB, m_vgr.basic_state, m_vgr.basic_program,
+    txt{new VideoTexture (VideoFormat::I420, m_vgr.basic_state, m_vgr.basic_program,
                           m_vgr.uniforms, array_size (m_vgr.uniforms))};
 
   m_pipelines.emplace_back();
@@ -398,7 +409,7 @@ VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
   dec->Loop (_loop_start_ts, _loop_end_ts);
 
   ch_ptr<VideoTexture>
-    txt{new VideoTexture (VideoFormat::RGB, m_vgr.matte_state, m_vgr.matte_program,
+    txt{new VideoTexture (VideoFormat::I420, m_vgr.matte_state, m_vgr.matte_program,
                           m_vgr.uniforms, array_size (m_vgr.uniforms))};
 
   txt->SetMatteDimensions(_min, _max);
