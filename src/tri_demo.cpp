@@ -30,6 +30,8 @@
 #include <ZoftThing.h>
 #include <InterpZoft.h>
 #include <LoopZoft.h>
+#include "SinuZoft.h"
+#include "LatchZoft.h"
 
 //events
 #include <ZESpatialEvent.h>
@@ -269,9 +271,9 @@ RawMouseParser TriDemo::ramp;
 FrameTime *s_TriDemo_frame_time = nullptr;
 
 
-struct Cerberoid { Node *no;  PlatonicMaes *ma;  Renderable *re;  Vect off; };
+struct QuadroPod { Node *no;  PlatonicMaes *ma;  Renderable *re;  Vect off; };
 
-std::unordered_map <std::string, Cerberoid> rupaul_map;
+std::unordered_map <std::string, QuadroPod> rupaul_map;
 
 i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
 { if (calibrating  &&  trig_partic . size () == 0)
@@ -296,23 +298,23 @@ i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
   else
     { auto it = rupaul_map . find (e -> Provenance ());
       if (it != rupaul_map . end ())
-        { Cerberoid &br = it->second;
+        { QuadroPod &qu = it->second;
           Vect hit;
           if (PlatonicMaes *maes
               = application_instance -> ClosestIntersectedMaes (e -> Loc (),
                                                                 e -> Aim (),
                                                                 &hit))
-            { if (br.ma  !=  maes)
-                { br.ma = maes;
-                  for (Renderable *rendy  :  br.no -> GetRenderables ())
+            { if (qu.ma  !=  maes)
+                { qu.ma = maes;
+                  for (Renderable *rendy  :  qu.no -> GetRenderables ())
                     { rendy -> SetOver (maes -> Over ());
                       rendy -> SetUp (maes -> Up ());
                     }
                 }
-              if (CineAtom *ca = dynamic_cast <CineAtom *> (br.no))
-                { if (br.re)
-                    { hit -= (br.off.x * br.re -> Over ()
-                              +  br.off.y * br.re -> Up ());
+              if (CineAtom *ca = dynamic_cast <CineAtom *> (qu.no))
+                { if (qu.re)
+                    { hit -= (qu.off.x * qu.re -> Over ()
+                              +  qu.off.y * qu.re -> Up ());
                       ca->loc = hit;
                     }
                 }
@@ -351,7 +353,7 @@ i64 WandCatcher::ZESpatialHarden (ZESpatialHardenEvent *e)
     }
 
   Vect hit;
-  if (e -> Aim () . Dot (Vect::yaxis)  > 0.75)
+  if (e -> Aim () . Dot (Vect::yaxis)  >  0.75)
     { if (! elevating)
         { elev_partic . insert (e -> Provenance ());
           if (elev_partic . size ()  >  1)
@@ -372,8 +374,7 @@ i64 WandCatcher::ZESpatialHarden (ZESpatialHardenEvent *e)
               offs
                 . Set (del . Dot (r -> Over ()), del . Dot (r -> Up ()), 0.0);
             }
-      rupaul_map[e -> Provenance ()]
-        = { f -> ItsNode (), NULL, r, offs };
+      rupaul_map[e -> Provenance ()] = { f -> ItsNode (), NULL, r, offs };
     }
 
   return 0;
@@ -1055,7 +1056,6 @@ int main (int ac, char **av)
     = new ElementsBand (total_width, band_height, film_infos,
                         *maes, maes -> Loc ());
   elements_band->Translate (demo.elev_transl);
-//  elements_band->Translate (maes->Loc ());
   ee_layer->GetRootNode()->AppendChild(elements_band);
 
   Vect left_cntr
@@ -1064,9 +1064,7 @@ int main (int ac, char **av)
        +  maes -> Loc () . Dot (maes -> Up ()) * maes -> Up ());
   elements_band = new ElementsBand (total_width, band_height, film_infos,
                                     *left, left_cntr);
-//  elements_band->RotateD (maes->Up (), 90.0);
   elements_band->Translate (demo.elev_transl);
-//  elements_band->Translate (left_cntr);
   ee_layer->GetRootNode()->AppendChild(elements_band);
 
   for (int q = 0  ;  q < 3  ;  ++q)
@@ -1076,6 +1074,13 @@ int main (int ac, char **av)
       cursoresques . push_back (c);
       c->crs_pos = maes -> Loc ();
     }
+
+LatchFloat elleff (4.7);
+SinuFloat esseff (2.0, 6.28);
+LoopFloat oopeff;
+assert (oopeff . GutsIfOrigType ()  !=  NULL);
+oopeff . BecomeLike (esseff);
+assert (oopeff . GutsIfOrigType ()  ==  NULL);
 
   demo.Run ();
 

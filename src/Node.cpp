@@ -177,22 +177,22 @@ Grappler *Node::RotateWithCenter (const Vect &ax, f64 an, const Vect &ce)
 }
 
 
-Grappler *Node::Translate (ZoftVect &tzo)
+Grappler *Node::Translate (const ZoftVect &tzo)
 { TrGrappler *tgr = new TrGrappler;
   tgr -> TranslationZoft () . BecomeLike (tzo);
   AssuredGrapplerPile () -> AppendGrappler (tgr);
   return tgr;
 }
 
-Grappler *Node::Scale (ZoftVect &szo)
+Grappler *Node::Scale (const ZoftVect &szo)
 { ScGrappler *sgr = new ScGrappler;
   sgr -> ScaleZoft () . BecomeLike (szo);
   AssuredGrapplerPile () -> AppendGrappler (sgr);
   return sgr;
 }
 
-Grappler *Node::Rotate (ZoftVect &axzo, ZoftFloat &anzo,
-                        ZoftVect &cezo, ZoftFloat &phzo)
+Grappler *Node::Rotate (const ZoftVect &axzo, const ZoftFloat &anzo,
+                        const ZoftVect &cezo, const ZoftFloat &phzo)
 { RoGrappler *rgr = new RoGrappler (Vect::zaxis);
   rgr -> AxisZoft () . BecomeLike (axzo);
   rgr -> AngleZoft () . BecomeLike (anzo);
@@ -201,7 +201,7 @@ Grappler *Node::Rotate (ZoftVect &axzo, ZoftFloat &anzo,
   AssuredGrapplerPile () -> AppendGrappler (rgr);
   return rgr;
 }
-
+/*
 Grappler *Node::Rotate (ZoftVect &axzo, ZoftFloat &anzo,
                         ZoftVect &cezo)
 { ZoftFloat up_yours_bjarne (0.0);
@@ -215,7 +215,7 @@ Grappler *Node::Rotate (ZoftVect &axzo, ZoftFloat &anzo)
                  caught_stroustrups_by_licking_a_gas_station_toilet_seat,
                  up_yours_bjarne);
 }
-
+*/
 
 void Node::ClearTransforms ()
 { if (m_graps)

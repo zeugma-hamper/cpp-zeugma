@@ -109,7 +109,7 @@ class ZoftThing
       };
 
   T val;
-  mutable ZGuts <T> *guts;
+  ZGuts <T> *guts;
   bool just_changed, nomo_change;
 
   template <typename TT>
@@ -168,12 +168,22 @@ class ZoftThing
   // make it work with derived types... even though the foregoing should,
   // unmodified, already do that: because its signature and contents
   // are identical to the methody version below.
-  ZoftThing &BecomeLike (const ZoftThing &zee)
-    { ZoftThing &z = const_cast <ZoftThing &> (zee);
+  ZoftThing &BecomeLike (ZoftThing &z)
+    { if (&z  ==  this)
+        return *this;
       val = z.val;
       nomo_change = z.nomo_change;
+fprintf(stderr,"AAAAAIIIIIIIIEEEEEEEEEEEEEEEEEEEEEE!\n");
       if (! z.guts)
         z . MakeBecomeLikable ();
+      InstallGuts (z.guts);
+      return *this;
+    }
+  ZoftThing &BecomeLike (const ZoftThing &z)
+    { if (&z  ==  this)
+        return *this;
+      val = z.val;
+      nomo_change = z.nomo_change;
       InstallGuts (z.guts);
       return *this;
     }
