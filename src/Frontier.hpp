@@ -56,6 +56,8 @@ class RectRenderableFrontier : public Frontier
  public:
   RectRenderableFrontier (Renderable *_rend,
                           Vect const &_bl, Vect const &_tr);
+  RectRenderableFrontier (Renderable *_rend,
+                          Vect const &_p, f64 _w, f64 _h);
 
   Renderable *GetRenderable () const;
 
@@ -67,6 +69,8 @@ class RectRenderableFrontier : public Frontier
   Renderable *m_renderable; //non-owning
   Vect m_bl;
   Vect m_tr;
+  Vect m_pos;
+  f64 m_wid, m_hei;
 };
 
 }
