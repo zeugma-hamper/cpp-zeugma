@@ -269,9 +269,9 @@ RawMouseParser TriDemo::ramp;
 FrameTime *s_TriDemo_frame_time = nullptr;
 
 
-using BrundlePair = std::pair <Node *, PlatonicMaes *>;
+struct Cerberoid { Node *no;  PlatonicMaes *ma;  Renderable *re;  Vect off; };
 
-std::unordered_map <std::string, BrundlePair> rupaul_map;
+std::unordered_map <std::string, Cerberoid> rupaul_map;
 
 i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
 { if (calibrating  &&  trig_partic . size () == 0)
@@ -296,21 +296,26 @@ i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
   else
     { auto it = rupaul_map . find (e -> Provenance ());
       if (it != rupaul_map . end ())
-        { BrundlePair &br = it->second;
+        { Cerberoid &br = it->second;
           Vect hit;
           if (PlatonicMaes *maes
               = application_instance -> ClosestIntersectedMaes (e -> Loc (),
                                                                 e -> Aim (),
                                                                 &hit))
-            { if (br.second  !=  maes)
-                { br.second = maes;
-                  for (Renderable *rendy  :  br.first -> GetRenderables ())
+            { if (br.ma  !=  maes)
+                { br.ma = maes;
+                  for (Renderable *rendy  :  br.no -> GetRenderables ())
                     { rendy -> SetOver (maes -> Over ());
                       rendy -> SetUp (maes -> Up ());
                     }
                 }
-              if (CineAtom *ca = dynamic_cast <CineAtom *> (br.first))
-                { ca->loc = hit; }
+              if (CineAtom *ca = dynamic_cast <CineAtom *> (br.no))
+                { if (br.re)
+                    { hit -= (br.off.x * br.re -> Over ()
+                              +  br.off.y * br.re -> Up ());
+                      ca->loc = hit;
+                    }
+                }
             }
         }
     }
@@ -345,6 +350,7 @@ i64 WandCatcher::ZESpatialHarden (ZESpatialHardenEvent *e)
       return 0;
     }
 
+  Vect hit;
   if (e -> Aim () . Dot (Vect::yaxis)  > 0.75)
     { if (! elevating)
         { elev_partic . insert (e -> Provenance ());
@@ -355,8 +361,20 @@ i64 WandCatcher::ZESpatialHarden (ZESpatialHardenEvent *e)
         }
     }
   else if (Frontier *f = application_instance -> IntersectedFrontier
-           (e -> Loc (), e -> Aim ()))
-    rupaul_map[e -> Provenance ()] = BrundlePair (f -> ItsNode (), NULL);
+           (e -> Loc (), e -> Aim (), &hit))
+    { Vect offs;
+      Renderable *r = NULL;
+      if (CineAtom *ca = dynamic_cast <CineAtom *> (f -> ItsNode ()))
+        if (RectRenderableFrontier *rrf
+            = dynamic_cast <RectRenderableFrontier *> (f))
+          if (r = rrf -> GetRenderable ())
+            { Vect del = hit - ca->loc;
+              offs
+                . Set (del . Dot (r -> Over ()), del . Dot (r -> Up ()), 0.0);
+            }
+      rupaul_map[e -> Provenance ()]
+        = { f -> ItsNode (), NULL, r, offs };
+    }
 
   return 0;
 }
