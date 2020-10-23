@@ -84,6 +84,9 @@ class SinuZoft  :  public ZoftThing <T>
   SinuZoft (const T &a, f64 f, const T &c, f64 p)  :  ZoftThing <T> ()
     { this -> InstallGuts (NewGuts (a, f, c, p)); }
 
+  SinuZoft &operator = (const T &v)
+    { ZoftThing<T>::Set (v);  return *this; }
+
 
   ZoftThing <T> &Amplitude ()
     { if (GutsTyp *g = GutsIfOrigType ())

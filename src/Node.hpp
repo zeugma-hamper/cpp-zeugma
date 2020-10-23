@@ -73,19 +73,27 @@ class Node
   inline Grappler *RotateWithCenterD (const Vect &ax, f64 an, const Vect &ce)
     { return RotateWithCenter (ax, M_PI / 180.0 * an, ce); }
 
+  Grappler *Translate (ZoftVect &tzo);
+  Grappler *Scale (ZoftVect &szo);
+  Grappler *Rotate (ZoftVect &ax_zft,
+                    ZoftFloat &an_zft,
+                    ZoftVect &ce_zft,
+                    ZoftFloat &ph_zft);
+  Grappler *Rotate (ZoftVect &ax_zft,
+                    ZoftFloat &an_zft,
+                    ZoftVect &ce_zft)
+    { ZoftFloat zf;  return Rotate (ax_zft, an_zft, ce_zft, zf); }
+  Grappler *Rotate (ZoftVect &ax_zft,
+                    ZoftFloat &an_zft)
+    { ZoftVect zv;  ZoftFloat zf;  return Rotate (ax_zft, an_zft, zv, zf); }
+
   Grappler *Translate (const ZoftVect &tzo);
   Grappler *Scale (const ZoftVect &szo);
   Grappler *Rotate (const ZoftVect &ax_zft,
                     const ZoftFloat &an_zft,
-                    const ZoftVect &ce_zft = ZoftVect (Vect::zerov),
-                    const ZoftFloat &ph_zft = ZoftFloat (0.0));
-/*
-  Grappler *Rotate (ZoftVect &ax_zft,
-                    ZoftFloat &an_zft,
-                    ZoftVect &ce_zft);
-  Grappler *Rotate (ZoftVect &ax_zft,
-                    ZoftFloat &an_zft);
-*/
+                    const ZoftVect &ce_zft = ZoftVect_zero,
+                    const ZoftFloat &ph_zft = ZoftFloat_zero);
+
   void ClearTransforms ();
 
   // node takes ownership of child nodes

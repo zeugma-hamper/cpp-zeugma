@@ -66,6 +66,9 @@ class ScaleZoft  :  public ZoftThing <T>
      :  ZoftThing <T> (leez.val * lerz.val)
     { this -> InstallGuts (NewGuts (leez, lerz)); }
 
+  ScaleZoft &operator = (const T &v)
+    { ZoftThing<T>::Set (v);  return *this; }
+
   ZoftThing <T> &Scalee ()
     { if (GutsTyp *g = GutsIfOrigType ())
         return g -> Scalee ();

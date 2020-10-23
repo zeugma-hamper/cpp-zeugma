@@ -44,6 +44,9 @@ class TrGrappler  :  public Grappler
   TrGrappler &InstallTranslation (ZoftVect &t_zft)
     { trans . BecomeLike (t_zft);  return *this; }
 
+  TrGrappler &InstallTranslation (const ZoftVect &t_zft)
+    { trans . BecomeLike (t_zft);  return *this; }
+
   const Matrix44 &PntMat ()  const  override;
   const Matrix44 &NrmMat ()  const  override;
 

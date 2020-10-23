@@ -59,6 +59,15 @@ class RoGrappler  :  public Grappler
   RoGrappler &InstallPhase (ZoftFloat &p)
     { pha . BecomeLike (p);  return *this; }
 
+  RoGrappler &InstallAxis (const ZoftVect &a)
+    { axs . BecomeLike (a);  return *this; }
+  RoGrappler &InstallAngle (const ZoftFloat &a)
+    { ang . BecomeLike (a);  return *this; }
+  RoGrappler &InstallCenter (const ZoftVect &c)
+    { cnt . BecomeLike (c);  return *this; }
+  RoGrappler &InstallPhase (const ZoftFloat &p)
+    { pha . BecomeLike (p);  return *this; }
+
   const Matrix44 &PntMat ()  const  override
     { return pm; }
   const Matrix44 &NrmMat ()  const  override

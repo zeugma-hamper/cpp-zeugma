@@ -120,6 +120,9 @@ class LoopZoft  :  public ZoftThing <T>
             const ZoftFloat &ldurz)  :  ZoftThing <T> (start)
     { this -> InstallGuts (NewGuts (start, slopez, ldurz)); }
 
+  LoopZoft &operator = (const T &v)
+    { ZoftThing<T>::Set (v);  return *this; }
+
   ZoftThing <T> &StartVal ()
     { if (GutsTyp *g = GutsIfOrigType ())
         return g -> StartVal ();

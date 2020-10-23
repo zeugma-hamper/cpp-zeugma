@@ -72,6 +72,9 @@ class SumZoft  :  public ZoftThing <T>
            const ZoftThing <T> &bbz)  :  ZoftThing <T> (aaz.val + bbz.val)
     { this -> InstallGuts (NewGuts (aaz, bbz)); }
 
+  SumZoft &operator = (const T &v)
+    { ZoftThing<T>::Set (v);  return *this; }
+
   ZoftThing <T> &SummandA ()
     { if (GutsTyp *g = GutsIfOrigType ())
         return g -> SummandA ();
