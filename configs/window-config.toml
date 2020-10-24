@@ -14,8 +14,8 @@ offset = [0, 0]
 size = [3840, 2160]
 
 [[trefoils]]
-name = "right"
-maes = "right"
+name = "front"
+maes = "front"
 offset = [3840, 0]
 size = [3840, 2160]
 

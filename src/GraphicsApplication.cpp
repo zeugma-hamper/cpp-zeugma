@@ -1,12 +1,14 @@
 #include <GraphicsApplication.hpp>
 
 #include <bgfx_utils.hpp>
+#include <Bolex.h>
 #include <GLFWWaterWorks.hpp>
+#include <OSCWandWaterWorks.hpp>
 #include <Renderable.hpp>
 #include <VideoSystem.hpp>
 
 #include <conjure-from-toml.h>
-#include <toml.hpp>
+#include <vector_interop.hpp>
 
 #include <stdio.h>
 
@@ -32,95 +34,19 @@ static void glfw_error_callback (int, const char *_msg)
   fprintf (stderr, "glfw error: %s\n", _msg);
 }
 
-// TOML-related key names
-static const char *s_window_toml_file_windows = "windows";
-static const char *s_window_toml_file_trefoils = "trefoils";
-
-
-static const char *s_window_toml_name = "name";
-static const char *s_window_toml_pos = "pos";
-static const char *s_window_toml_size = "size";
-static const char *s_window_toml_rgba = "rgba";
-static const char *s_window_toml_ds = "ds";
-static const char *s_window_toml_decorated = "decorated";
-
-static const char *s_trefoil_toml_name = "name";
-static const char *s_trefoil_toml_maes = "maes";
-static const char *s_trefoil_toml_offset = "offset";
-static const char *s_trefoil_toml_size = "size";
-
-struct WindowTOML
-{
-  std::string name;
-  std::array<i32, 2> pos = {0, 0};
-  std::array<u32, 2> size = {1920, 1080};
-  std::array<u8, 4> rgba = {8, 8, 8, 8};
-  std::array<u8, 2> ds = {24, 8};
-  bool decorated = false;
-
-  void from_toml (toml::value const &_v)
-  {
-    name = toml::find<std::string> (_v, s_window_toml_name);
-    pos = toml::find<std::array<i32, 2>> (_v, s_window_toml_pos);
-    size = toml::find<std::array<u32, 2>> (_v, s_window_toml_size);
-    rgba = toml::find<std::array<u8, 4>> (_v, s_window_toml_rgba);
-    ds = toml::find<std::array<u8, 2>> (_v, s_window_toml_ds);
-    decorated = toml::find<bool> (_v, s_window_toml_decorated);
-  }
-};
-
-struct TrefoilTOML
-{
-  std::string name;
-  std::string maes_name;
-  std::array<u32, 2> offset {0, 0};
-  std::array<u32, 2> size {u32 (-1), u32 (-1)};
-
-  void from_toml (toml::value const &_v)
-  {
-    name = toml::find<std::string> (_v, s_trefoil_toml_name);
-    maes_name = toml::find<std::string> (_v, s_trefoil_toml_maes);
-    offset = toml::find<std::array<u32, 2>> (_v, s_trefoil_toml_offset);
-    size = toml::find<std::array<u32, 2>> (_v, s_trefoil_toml_size);
-  }
-};
-
-static bool ReadWindowTOML (std::string_view _file, WindowTOML &_window,
-                            std::vector<TrefoilTOML> &_views)
-{
-  try
-    {
-      auto config = toml::parse (_file);
-      std::vector<WindowTOML> wins
-        = toml::find<std::vector<WindowTOML>> (config, s_window_toml_file_windows);
-      _window = wins[0];
-      _views = toml::find<std::vector<TrefoilTOML>> (config, s_window_toml_file_trefoils);
-    }
-  catch (std::runtime_error &_error)
-    {
-      fprintf (stderr, "error loading %s:\n%s\n",
-               _file.data(), _error.what ());
-
-      return false;
-    }
-  catch (toml::exception &_error)
-    {
-      fprintf (stderr, "toml error %s:%s\n%s\n",
-               _error.location().file_name().c_str(),
-               _error.location().line_str().c_str(),
-               _error.what());
-      return false;
-    }
-
-  return true;
-}
-
 bool GraphicsApplication::InitWindowingAndGraphics ()
 {
   WindowTOML win;
   std::vector<TrefoilTOML> trefoils;
-  if (! ReadWindowTOML ("../configs/window-config.toml", win, trefoils))
+  if (! ReadWindowTOMLFile ("../configs/window-config.toml", win, trefoils))
     return false;
+
+  std::array<u32, 2> max_dimensions {0u, 0u};
+  for (auto const &t : trefoils)
+    {
+      max_dimensions[0] = std::max (max_dimensions[0], t.offset[0] + t.size[0]);
+      max_dimensions[1] = std::max (max_dimensions[1], t.offset[1] + t.size[1]);
+    }
 
   glfwSetErrorCallback(glfw_error_callback);
   if (! glfwInit())
@@ -145,7 +71,8 @@ bool GraphicsApplication::InitWindowingAndGraphics ()
   // install window key and mouse handler
   GLFWWaterWorks *glfw_ww = new GLFWWaterWorks (window);
   AppendWaterWorks(glfw_ww);
-  glfw_ww->Drain (&m_event_sprinkler); //call poll events, basically
+  //call poll events, basically
+  glfw_ww->Drain (&m_event_sprinkler);
 
   glfwSetWindowPos(window, win.pos[0], win.pos[1]);
   glfwSetWindowSize(window, win.size[0], win.size[1]);
@@ -167,32 +94,36 @@ bool GraphicsApplication::InitWindowingAndGraphics ()
   if (! bgfx::init (init))
     ERROR_RETURN_VAL ("couldn't initialize bgfx", false);
 
-  bgfx::setViewRect(0, 0, 0, glfw_width, glfw_height);
-  bgfx::setViewScissor(0);
-  bgfx::setViewClear (0, BGFX_CLEAR_COLOR, 0x808080FF);
-  // use depth integer to order GPU draw submission
-  // drawables are enumerated by order in scene graph,
-  // so that id number is used as the depth.
-  bgfx::setViewMode (0, bgfx::ViewMode::DepthAscending);
+  // bgfx::setViewRect(0, 0, 0, glfw_width, glfw_height);
+  // bgfx::setViewScissor(0);
+  // bgfx::setViewClear (0, BGFX_CLEAR_COLOR, 0x808080FF);
+  // // use depth integer to order GPU draw submission
+  // // drawables are enumerated by order in scene graph,
+  // // so that id number is used as the depth.
+  // bgfx::setViewMode (0, bgfx::ViewMode::DepthAscending);
 
-  glm::mat4 view_transform = glm::lookAt (glm::vec3 {0.0f, 0.0f, 10.0f},
-                                          glm::vec3 {0.0f, 0.0f, 2.0f},
-                                          glm::vec3 {0.0f, 1.0f, 0.0f});
-  glm::mat4 proj_transform = glm::perspectiveFov (glm::pi<float> ()/4.0f,
-                                                  1920.0f, 1080.0f, 0.5f, 10.0f);
-  bgfx::setViewTransform(0, glm::value_ptr (view_transform),
-                         glm::value_ptr (proj_transform));
+  // glm::mat4 view_transform = glm::lookAt (glm::vec3 {0.0f, 0.0f, 10.0f},
+  //                                         glm::vec3 {0.0f, 0.0f, 2.0f},
+  //                                         glm::vec3 {0.0f, 1.0f, 0.0f});
+  // glm::mat4 proj_transform = glm::perspectiveFov (glm::pi<float> ()/4.0f,
+  //                                                 1920.0f, 1080.0f, 0.5f, 10.0f);
+  // bgfx::setViewTransform(0, glm::value_ptr (view_transform),
+  //                        glm::value_ptr (proj_transform));
 
 
-  std::string const maes_path = "../config/maes-config.toml";
+  std::string const maes_path = "../configs/maes-config.toml";
   i32 const num_maes = NumMaesesFromTOML(maes_path);
+  fprintf (stderr, "num maes is %d\n", num_maes);
+
 
   for (i32 i = 0; i < num_maes; ++i)
     if (PlatonicMaes *mm = MaesFromTOML(maes_path, i); mm)
       m_maes.push_back (mm);
 
-  f64 width_scale = glfw_width / f64 (win.size[0]);
-  f64 height_scale = glfw_height / f64 (win.size[1]);
+  f64 width_scale = glfw_width / f64 (max_dimensions[0]);
+  f64 height_scale = glfw_height / f64 (max_dimensions[1]);
+
+  fprintf (stdout, "scaling views by (%.3f, %.3f)\n", width_scale, height_scale);
   i32 const tsize = i32 (trefoils.size ());
   for (i32 i = 0; i < tsize; ++i)
     {
@@ -208,9 +139,34 @@ bool GraphicsApplication::InitWindowingAndGraphics ()
       tr->SetName (tt.name);
       tr->view.view_id = i;
       tr->view.fb_pix_l = (i64)std::round (width_scale  * tt.offset[0]);
-      tr->view.fb_pix_t = (i64)std::round (height_scale * tt.offset[1]);
+      tr->view.fb_pix_t = (i64)std::round (height_scale * (tt.offset[1] + tt.size[1]));
       tr->view.fb_pix_r = (i64)std::round (width_scale  * (tt.offset[0] + tt.size[0]));
-      tr->view.fb_pix_b = (i64)std::round (height_scale * (tt.offset[1] + tt.size[1]));
+      tr->view.fb_pix_b = (i64)std::round (height_scale * tt.offset[1]);
+
+      bgfx::setViewRect (i,
+                         tr->view.fb_pix_l,
+                         tr->view.fb_pix_b,
+                         tr->view.GetWidth(),
+                         tr->view.GetHeight());
+      bgfx::setViewScissor (i,
+                            tr->view.fb_pix_l,
+                            tr->view.fb_pix_b,
+                            tr->view.GetWidth(),
+                            tr->view.GetHeight());
+
+      //TODO: add color back
+      //u8 gray = u8 (global_param_background_gray * 255.0);
+      u8 gray = 26u;
+      u32 bg_rgba = (0xFF | gray << 8 | gray << 16 | gray << 24);
+        bgfx::setViewClear (i,
+                          BGFX_CLEAR_COLOR |
+                          BGFX_CLEAR_DEPTH |
+                          BGFX_CLEAR_STENCIL,
+                          bg_rgba);
+      // use depth integer to order GPU draw submission
+      // drawables are enumerated by order in scene graph,
+      // so that id number is used as the depth.
+      bgfx::setViewMode (i, bgfx::ViewMode::DepthAscending);
 
       m_trefoils.push_back (tr);
     }
@@ -226,20 +182,33 @@ void GraphicsApplication::ShutDownGraphics ()
 
 void GraphicsApplication::Render ()
 {
-  for (Renderable *r : m_scene_graph_layer->GetRenderables())
-    r->Update ();
+  for (Layer *l : m_scene_graph_layers)
+    for (Renderable *r : l->GetRenderables())
+      r -> Update ();
 
-  bgfx::touch (0);
+  for (CMVTrefoil *leaf : m_trefoils)
+    {
+      u16 vuid = leaf->view.ViewID ();
+      bgfx::touch (vuid);
 
-  glm::mat4 view_transform = glm::lookAt (glm::vec3 {0.0f, 0.0f, 10.0f},
-                                          glm::vec3 {0.0f, 0.0f, 2.0f},
-                                          glm::vec3 {0.0f, 1.0f, 0.0f});
-  glm::mat4 proj_transform = glm::perspective (47.0f, 1920.0f/1080.0f, 0.5f, 10.0f);
-  bgfx::setViewTransform(0, glm::value_ptr (view_transform),
-                         glm::value_ptr (proj_transform));
+      Bolex *c = leaf->cam;
+      glm::mat4 view_transform = glm::lookAt (as_glm (c -> ViewLoc ()),
+                                              as_glm (c -> ViewCOI ()),
+                                              as_glm (c -> ViewUp ()));
+      glm::mat4 proj_transform
+        = glm::perspective ((float) c -> ViewVertAngle (),
+                            (float) (tan (0.5 * c -> ViewHorizAngle ())
+                                     / tan (0.5 * c -> ViewVertAngle ())),
+                            (float) c -> NearClipDist (),
+                            (float) c -> FarClipDist ());
 
-  for (Renderable *r : m_scene_graph_layer->GetRenderables())
-    r->Draw(0);
+      bgfx::setViewTransform (vuid, glm::value_ptr (view_transform),
+                              glm::value_ptr (proj_transform));
+
+      for (Layer *l : leaf->layers)
+        for (Renderable *r  :  l->GetRenderables())
+          r -> Draw (vuid);
+    }
 
   bgfx::frame ();
 }
@@ -248,8 +217,9 @@ FrameTime *s_app_frame_time {nullptr};
 GraphicsApplication *s_graphics_application_instance {nullptr};
 
 GraphicsApplication::GraphicsApplication ()
-  : m_window {nullptr},
-    m_scene_graph_layer {new Layer}
+  : m_global_ratchet (0),
+    m_window {nullptr},
+    m_scene_graph_layers {new Layer}
 {
   s_graphics_application_instance = this;
 }
@@ -268,22 +238,34 @@ bool GraphicsApplication::StartUp ()
   bool ret = InitWindowingAndGraphics();
   VideoSystem::Initialize ();
 
+  AppendWaterWorks(new OSCWandWaterWorks);
+
   return ret;
 }
 
 bool GraphicsApplication::RunOneCycle ()
 {
   GetFrameTime()->UpdateTime();
+  f64 global_frame_thyme = GetFrameTime () -> GetCurrentTime ();
+  m_global_ratchet += 8;
 
   for (ZePublicWaterWorks *ww : m_event_drainage)
     ww->Drain (&m_event_sprinkler);
+
+  if (ProtoZoftThingGuts::IsMassBreathing ())
+    ProtoZoftThingGuts::MassBreather ()
+      -> Inhale (m_global_ratchet, global_frame_thyme);
 
   VideoSystem *vs = VideoSystem::GetSystem();
   assert (vs);
   vs->PollMessages();
   vs->UploadFrames();
 
-  UpdateSceneGraph (-1, 0.0);
+  UpdateSceneGraph (m_global_ratchet, global_frame_thyme);
+  UpdateRenderLeaves (m_global_ratchet, global_frame_thyme);
+
+  for (CMVTrefoil *leaf  :  m_trefoils)
+    leaf -> Inhale (m_global_ratchet, global_frame_thyme);
 
   Render ();
 
@@ -292,9 +274,20 @@ bool GraphicsApplication::RunOneCycle ()
 
 void GraphicsApplication::UpdateSceneGraph(i64 ratch, f64 thyme)
 {
-  m_scene_graph_layer->GetRootNode()
-    -> UpdateTransformsHierarchically (ratch, thyme);
-  m_scene_graph_layer->GetRootNode()->EnumerateGraph();
+  std::array<graph_id, 2> ids {0, 0};
+  for (Layer *layer : m_scene_graph_layers)
+    {
+      layer->GetRootNode()
+        ->UpdateTransformsHierarchically (ratch, thyme);
+      ids = layer->GetRootNode()->EnumerateGraph(ids[0], ids[1]);
+      layer->SortFrontiers ();
+    }
+}
+
+void GraphicsApplication::UpdateRenderLeaves (i64 ratch, f64 thyme)
+{
+  for (CMVTrefoil *leaf  :  m_trefoils)
+    leaf -> Inhale (ratch, thyme);
 }
 
 MultiSprinkler &GraphicsApplication::GetSprinkler ()
@@ -328,8 +321,9 @@ ZePublicWaterWorks *GraphicsApplication::ExciseWaterWorks (ZePublicWaterWorks *_
 
 void GraphicsApplication::ShutDownSceneGraph()
 {
-  delete m_scene_graph_layer;
-  m_scene_graph_layer = nullptr;
+  for (Layer *layer : m_scene_graph_layers)
+    delete layer;
+  m_scene_graph_layers.clear();
 }
 
 bool GraphicsApplication::ShutDown ()
@@ -349,9 +343,9 @@ FrameTime *GraphicsApplication::GetFrameTime ()
   return s_app_frame_time;
 }
 
-Layer &GraphicsApplication::GetSceneLayer ()
+GraphicsApplication *GraphicsApplication::GetApplication ()
 {
-  return *m_scene_graph_layer;
+  return s_graphics_application_instance;
 }
 
 i32 GraphicsApplication::NumMaeses ()  const
@@ -396,6 +390,30 @@ CMVTrefoil *GraphicsApplication::FindRenderLeafByName (std::string_view _name) c
       return cmv;
 
   return nullptr;
+}
+
+Layer *GraphicsApplication::GetSceneLayer ()
+{
+  return m_scene_graph_layers[0];
+}
+
+Layer *GraphicsApplication::GetNthSceneLayer (i32 nth)
+{
+  assert (nth < i64 (m_scene_graph_layers.size ()));
+  return m_scene_graph_layers[nth];
+}
+
+void GraphicsApplication::AppendSceneLayer (Layer *layer)
+{
+  if (layer == nullptr)
+    return;
+
+  m_scene_graph_layers.push_back (layer);
+}
+
+i32 GraphicsApplication::NumSceneLayers () const
+{
+  return i32 (m_scene_graph_layers.size ());
 }
 
 }

@@ -1,6 +1,7 @@
 
 #include "ZESpatialEvent.h"
 
+#include <MultiSprinkler.hpp>
 
 namespace charm  {
 
@@ -99,5 +100,28 @@ u64 ZESpatialEvent::NthPressure (i64 ind)  const
   return it->second;
 }
 
+void AppendSpatialPhagy (MultiSprinkler *_ms, OmNihil *_phagy)
+{
+  if (! _ms || ! _phagy)
+    return;
+
+  _ms->AppendPhage<ZESpatialMoveEvent> (_phagy);
+  _ms->AppendPhage<ZESpatialAppearEvent> (_phagy);
+  _ms->AppendPhage<ZESpatialVanishEvent> (_phagy);
+  _ms->AppendPhage<ZESpatialHardenEvent> (_phagy);
+  _ms->AppendPhage<ZESpatialSoftenEvent> (_phagy);
+}
+
+void RemoveSpatialPhagy (MultiSprinkler *_ms, OmNihil *_phagy)
+{
+  if (! _ms || ! _phagy)
+    return;
+
+  _ms->RemovePhage<ZESpatialMoveEvent> (_phagy);
+  _ms->RemovePhage<ZESpatialAppearEvent> (_phagy);
+  _ms->RemovePhage<ZESpatialVanishEvent> (_phagy);
+  _ms->RemovePhage<ZESpatialHardenEvent> (_phagy);
+  _ms->RemovePhage<ZESpatialSoftenEvent> (_phagy);
+}
 
 }  // namespace charm is still spoken of, when it is noted, with high regard

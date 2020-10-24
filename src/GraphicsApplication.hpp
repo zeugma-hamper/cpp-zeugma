@@ -36,6 +36,7 @@ class GraphicsApplication : public Application
   void Render ();
 
   void UpdateSceneGraph (i64 ratch, f64 thyme);
+  void UpdateRenderLeaves (i64 ratch, f64 thyme);
 
   MultiSprinkler &GetSprinkler ();
 
@@ -48,8 +49,6 @@ class GraphicsApplication : public Application
   static FrameTime *GetFrameTime ();
   static GraphicsApplication *GetApplication ();
 
-  Layer &GetSceneLayer ();
-
   i32 NumMaeses ()  const;
   PlatonicMaes *NthMaes (i32 ind) const;
   PlatonicMaes *FindMaesByName (std::string_view _name) const;
@@ -58,15 +57,20 @@ class GraphicsApplication : public Application
   CMVTrefoil *NthRenderLeaf (i32 ind) const;
   CMVTrefoil *FindRenderLeafByName (std::string_view _name) const;
 
- protected:
+  Layer *GetSceneLayer ();
+  Layer *GetNthSceneLayer (i32 nth);
+  void AppendSceneLayer (Layer *layer);
+  i32 NumSceneLayers () const;
 
+protected:
+  i64 m_global_ratchet;
   MultiSprinkler m_event_sprinkler;
   std::vector<ZePublicWaterWorks *> m_event_drainage;
 
   GLFWwindow *m_window;
   std::vector<PlatonicMaes *> m_maes;
 
-  Layer *m_scene_graph_layer;
+  std::vector<Layer *> m_scene_graph_layers;
   std::vector<CMVTrefoil *> m_trefoils;
 };
 

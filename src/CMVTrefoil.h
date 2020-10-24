@@ -22,6 +22,16 @@ struct BGFXView
   i64 fb_pix_l = 0, fb_pix_b = 0;
   i64 fb_pix_r = 0, fb_pix_t = 0;
 
+  i64 GetWidth () const
+  {
+    return fb_pix_r - fb_pix_l;
+  }
+
+  i64 GetHeight () const
+  {
+    return fb_pix_t - fb_pix_b;
+  }
+
   u16 ViewID () const
   { return u16 (view_id); }
 };

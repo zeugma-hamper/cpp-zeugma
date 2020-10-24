@@ -181,6 +181,10 @@ class ZESpatialPhagy
      public ZESpatialSoftenEvent::ZESpatialSoftenPhage
 { };
 
+class MultiSprinkler;
+void AppendSpatialPhagy (MultiSprinkler *_ms, OmNihil *_phagy);
+void RemoveSpatialPhagy (MultiSprinkler *_ms, OmNihil *_phagy);
+
 
 }  // snuffed it, did namespace charm, o me droogs...
 

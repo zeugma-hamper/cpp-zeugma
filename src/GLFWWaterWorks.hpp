@@ -30,15 +30,17 @@ class GLFWWaterWorks : public ZePublicWaterWorks
 
   void Drain (MultiSprinkler *_ms) override;
 
-  // called by GLFW callbacks in cpp file
+  // called by CreateZE* methods
   void SpraySpatialMove   (ZESpatialMoveEvent *_zsme);
   void SpraySpatialHarden (ZESpatialHardenEvent *_zshe);
   void SpraySpatialSoften (ZESpatialSoftenEvent *_zsse);
 
+  // called by GLFW callbacks in cpp file
   void SprayYowlAppear (ZEYowlAppearEvent *_zyae);
   void SprayYowlRepeat (ZEYowlRepeatEvent *_zyre);
   void SprayYowlVanish (ZEYowlVanishEvent *_zyve);
 
+  // called by GLFW mouse callbacks
   void CreateZEMoveFromGLFW (GLFWwindow *_window, f64 _x, f64 _y);
   void CreateZEPressureFromGLFW (GLFWwindow *wind, int butt,
                                  int actn, int mods);
