@@ -499,8 +499,7 @@ int main (int ac, char **av)
 
       // plays the fall
       VideoRenderable *vr = new VideoRenderable (film_infos[4]);
-      Node *video_band = new Node;
-      video_band->AppendRenderable (vr);
+      Node *video_band = new Node (vr);
       video_band->Scale (Vect (0.6 * total_width));
       video_band -> Translate (demo.elev_transl);
       video_band->Translate (maes->Loc () - band_height * maes->Up ());
@@ -517,8 +516,7 @@ int main (int ac, char **av)
 
       // plays carnosaur
       vr = new VideoRenderable (film_infos[2]);
-      video_band = new Node;
-      video_band->AppendRenderable (vr);
+      video_band = new Node (vr);
       video_band->Scale (Vect (0.6 * total_width));
       video_band->RotateD (maes->Up (), 90.0);
       video_band -> Translate (demo.elev_transl);

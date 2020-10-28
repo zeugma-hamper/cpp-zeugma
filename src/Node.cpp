@@ -25,6 +25,12 @@ Node::Node ()
 {
 }
 
+Node::Node (Renderable *_renderable)
+  : Node {}
+{
+  AppendRenderable (_renderable);
+}
+
 Node::~Node ()
 {
   for (Node *node : m_children)
