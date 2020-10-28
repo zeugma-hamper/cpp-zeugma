@@ -62,6 +62,7 @@ bool GraphicsApplication::InitWindowingAndGraphics ()
   glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint (GLFW_CLIENT_API, GLFW_OPENGL_API);
   glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint (GLFW_DECORATED, win.decorated ? GLFW_TRUE : GLFW_FALSE);
 
   GLFWwindow *window = glfwCreateWindow (win.size[0], win.size[1],
                                          win.name.c_str (), nullptr, nullptr);

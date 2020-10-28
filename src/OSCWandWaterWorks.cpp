@@ -372,6 +372,7 @@ void OSCWandWaterWorks::Parse(std::string_view path, const lo::Message &m)
   wstate.valid = true;
   wstate.event.AdoptParticulars(*smev);
   wstate.button_state = butt_bits;
+  delete smev;
 }
 
 
