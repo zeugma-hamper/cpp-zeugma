@@ -54,8 +54,8 @@ ElementsBand::ElementsBand (f64 _band_width, f64 _band_height,
         = cntr  +  width_distrib (gen) * ovr  +  height_distrib (gen) * upp;
 
       RectRenderableFrontier *rrf
-        = new RectRenderableFrontier (matte_able,
-                                      -0.5 * (ovr + upp), 0.5 * (ovr + upp));
+        = new RectRenderableFrontier (matte_able, Vect::zerov, 1.0, 1.0);
+//                                      -0.5 * (ovr + upp), 0.5 * (ovr + upp));
       matte_node->SetFrontier(rrf);
 
       AppendChild (matte_node);
