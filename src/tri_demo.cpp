@@ -1081,6 +1081,7 @@ LoopFloat oopeff;
 assert (oopeff . GutsIfOrigType ()  !=  NULL);
 oopeff . BecomeLike (esseff);
 assert (oopeff . GutsIfOrigType ()  ==  NULL);
+elleff . BecomeLike (ZoftFloat_zero);
 
   demo.Run ();
 

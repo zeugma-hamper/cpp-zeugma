@@ -139,6 +139,9 @@ class InterpZoft  :  public ZoftThing <T>
               const ZoftThing <T> &vb, f64 terpt = 1.0)  :  ZoftThing <T> (va)
     { this -> InstallGuts (NewGuts (va, vb, terpt)); }
 
+  InterpZoft &operator = (const T &v)
+    { ZoftThing<T>::Set (v);  return *this; }
+
   bool Commence ()
     { if (GutsTyp *g = GutsIfOrigType ())
         { g -> Commence ();  return true; }

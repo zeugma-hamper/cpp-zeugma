@@ -27,6 +27,9 @@ class LatchZoft  :  public ZoftThing<T>
     { this -> InstallGuts (NewGuts ()); }
   LatchZoft (const T &v)  :  ZoftThing <T> (v)
     { this -> InstallGuts (NewGuts (v)); }
+
+  LatchZoft &operator = (const T &v)
+    { ZoftThing<T>::Set (v);  return *this; }
 };
 
 

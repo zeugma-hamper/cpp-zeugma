@@ -146,16 +146,19 @@ class ZoftThing
         guts -> RemoveHost (this);
     }
 
-  ZoftThing &operator = (const T &v)
+  ZoftThing &Set (const T &v)
     { if (! guts)
-        { val = v;  just_changed = true;  return *this; }
-      if (LatchGuts <T> *lg = dynamic_cast <LatchGuts <T> *> (guts))
+        val = v;
+      else if (LatchGuts <T> *lg = dynamic_cast <LatchGuts <T> *> (guts))
         lg->latchval = v;
       else
-        val = v;
+        return *this;
       just_changed = true;
       return *this;
     }
+
+  ZoftThing &operator = (const T &v)
+    { return Set (v); }
   ZoftThing &operator = (ZoftThing &z)
     { val = z.val;
       nomo_change = z.nomo_change;
@@ -163,17 +166,11 @@ class ZoftThing
       return *this;
     }
 
-  // the following as a placeholder until the author figures out the
-  // moronic templatized version of the equals operator foregoing to
-  // make it work with derived types... even though the foregoing should,
-  // unmodified, already do that: because its signature and contents
-  // are identical to the methody version below.
   ZoftThing &BecomeLike (ZoftThing &z)
     { if (&z  ==  this)
         return *this;
       val = z.val;
       nomo_change = z.nomo_change;
-fprintf(stderr,"AAAAAIIIIIIIIEEEEEEEEEEEEEEEEEEEEEE!\n");
       if (! z.guts)
         z . MakeBecomeLikable ();
       InstallGuts (z.guts);
@@ -249,6 +246,7 @@ using ZoftVect = ZoftThing <Vect>;
 
 extern const ZoftFloat ZoftFloat_zero;
 extern const ZoftVect ZoftVect_zero;
+
 
 }  // no ashes; just dust for namespace charm
 

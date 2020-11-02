@@ -4,7 +4,10 @@
 
 
 #include <Node.hpp>
+
 #include "PlatonicMaes.h"
+
+#include "LatchZoft.h"
 
 
 namespace charm  {
@@ -18,7 +21,7 @@ class CineAtom  :  public Node
   ZoftVect loc;
 
   CineAtom ()  :  Node ()
-    { /*loc . MakeBecomeLikable ();*/ }
+    { }
 };
 
 
