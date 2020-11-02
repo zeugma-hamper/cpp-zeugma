@@ -164,9 +164,15 @@ class TriCleanup final : public GraphicsApplication
 };
 
 
-using BrundlePair = std::pair <Node *, PlatonicMaes *>;
+struct QuadroPod
+{
+  Node *no;
+  PlatonicMaes *ma;
+  Renderable *re;
+  Vect off;
+};
 
-std::unordered_map <std::string, BrundlePair> rupaul_map;
+std::unordered_map <std::string, QuadroPod> rupaul_map;
 
 i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
 { if (calibrating  &&  trig_partic . size () == 0)
@@ -193,21 +199,25 @@ i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
   else
     { auto it = rupaul_map . find (e -> Provenance ());
       if (it != rupaul_map . end ())
-        { BrundlePair &br = it->second;
+        { QuadroPod &qu = it->second;
           Vect hit;
+          TriCleanup *app = (TriCleanup *)GraphicsApplication::GetApplication();
           if (PlatonicMaes *maes
-              = instance -> ClosestIntersectedMaes (e -> Loc (),
-                                                                e -> Aim (),
-                                                                &hit))
-            { if (br.second  !=  maes)
-                { br.second = maes;
-                  for (Renderable *rendy  :  br.first -> GetRenderables ())
+              = app-> ClosestIntersectedMaes (e -> Loc (), e -> Aim (), &hit))
+            { if (qu.ma  !=  maes)
+                { qu.ma = maes;
+                  for (Renderable *rendy  :  qu.no -> GetRenderables ())
                     { rendy -> SetOver (maes -> Over ());
                       rendy -> SetUp (maes -> Up ());
                     }
                 }
-              if (CineAtom *ca = dynamic_cast <CineAtom *> (br.first))
-                { ca->loc = hit; }
+              if (CineAtom *ca = dynamic_cast <CineAtom *> (qu.no))
+                { if (qu.re)
+                    { hit -= (qu.off.x * qu.re -> Over ()
+                              +  qu.off.y * qu.re -> Up ());
+                      ca->loc = hit;
+                    }
+                }
             }
         }
     }
@@ -243,6 +253,7 @@ i64 WandCatcher::ZESpatialHarden (ZESpatialHardenEvent *e)
     }
 
   TriCleanup *instance = (TriCleanup *)GraphicsApplication::GetApplication();
+  Vect hit;
   if (e -> Aim () . Dot (Vect::yaxis)  > 0.75)
     { if (! elevating)
         { elev_partic . insert (e -> Provenance ());
@@ -253,8 +264,19 @@ i64 WandCatcher::ZESpatialHarden (ZESpatialHardenEvent *e)
         }
     }
   else if (Frontier *f = instance -> IntersectedFrontier
-           (e -> Loc (), e -> Aim ()))
-    rupaul_map[e -> Provenance ()] = BrundlePair (f -> ItsNode (), NULL);
+           (e -> Loc (), e -> Aim (), &hit))
+    { Vect offs;
+      Renderable *r = NULL;
+      if (CineAtom *ca = dynamic_cast <CineAtom *> (f -> ItsNode ()))
+        if (RectRenderableFrontier *rrf
+            = dynamic_cast <RectRenderableFrontier *> (f))
+          if (r = rrf -> GetRenderable ())
+            { Vect del = hit - ca->loc;
+              offs
+                . Set (del . Dot (r -> Over ()), del . Dot (r -> Up ()), 0.0);
+            }
+      rupaul_map[e -> Provenance ()] = { f -> ItsNode (), NULL, r, offs };
+    }
 
   return 0;
 }
