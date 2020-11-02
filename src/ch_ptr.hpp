@@ -134,6 +134,8 @@ template<typename T>
 class ch_ptr
 {
  public:
+  template<typename U>
+  friend class ch_ptr;
 
   ch_ptr ()
     : m_pointer {nullptr}
@@ -456,6 +458,46 @@ class ch_weak_ptr
  private:
   T *m_pointer;
 };
+
+template<typename T, typename U>
+ch_ptr<T> dynamic_ch_cast (ch_ptr<U> const &_ptr)
+{
+  T *t = dynamic_cast<T *> (_ptr.get ());
+  if (t)
+    t->add_reference ();
+
+  return ch_ptr<T>{t};
+}
+
+template<typename T, typename U>
+ch_ptr<T> static_ch_cast (ch_ptr<U> const &_ptr)
+{
+  T *t = static_cast<T *> (_ptr.get ());
+  if (t)
+    t->add_reference ();
+
+  return ch_ptr<T>{t};
+}
+
+template<typename T, typename U>
+ch_ptr<T> const_ch_cast (ch_ptr<U> const &_ptr)
+{
+  T *t = const_cast<T *> (_ptr.get ());
+  if (t)
+    t->add_reference ();
+
+  return ch_ptr<T>{t};
+}
+
+template<typename T, typename U>
+ch_ptr<T> reinterpret_ch_cast (ch_ptr<U> const &_ptr)
+{
+  T *t = reinterpret_cast<T *> (_ptr.get ());
+  if (t)
+    t->add_reference ();
+
+  return ch_ptr<T>{t};
+}
 
 //operator== and operator!= for ch_ptr on the left
 template<typename T, typename U>

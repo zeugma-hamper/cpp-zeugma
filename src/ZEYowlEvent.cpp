@@ -35,7 +35,7 @@ i32 ZEYowlEvent::RepetitionOrdinal ()  const
 void ZEYowlEvent::SetRepetitionOrdinal (i32 ro)
 { rept_ord = ro; }
 
-void AppendYowlPhagy (MultiSprinkler *_ms, OmNihil *_phagy)
+void AppendYowlPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy)
 {
   if (! _ms || ! _phagy)
     return;
@@ -45,7 +45,7 @@ void AppendYowlPhagy (MultiSprinkler *_ms, OmNihil *_phagy)
   _ms->AppendPhage<ZEYowlVanishEvent> (_phagy);
 }
 
-void RemoveYowlPhagy (MultiSprinkler *_ms, OmNihil *_phagy)
+void RemoveYowlPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy)
 {
   if (! _ms || ! _phagy)
     return;

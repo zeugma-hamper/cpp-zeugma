@@ -100,7 +100,7 @@ u64 ZESpatialEvent::NthPressure (i64 ind)  const
   return it->second;
 }
 
-void AppendSpatialPhagy (MultiSprinkler *_ms, OmNihil *_phagy)
+void AppendSpatialPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy)
 {
   if (! _ms || ! _phagy)
     return;
@@ -112,7 +112,7 @@ void AppendSpatialPhagy (MultiSprinkler *_ms, OmNihil *_phagy)
   _ms->AppendPhage<ZESpatialSoftenEvent> (_phagy);
 }
 
-void RemoveSpatialPhagy (MultiSprinkler *_ms, OmNihil *_phagy)
+void RemoveSpatialPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy)
 {
   if (! _ms || ! _phagy)
     return;

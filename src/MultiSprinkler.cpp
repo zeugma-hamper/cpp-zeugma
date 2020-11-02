@@ -9,9 +9,7 @@ MultiSprinkler::MultiSprinkler ()
 { }
 
 MultiSprinkler::~MultiSprinkler ()
-{ for (auto p : sprinkler_map)
-    delete p.second;
-
+{
   sprinkler_map.clear();
 }
 

@@ -37,13 +37,14 @@ class Sprinkler final : public ZeEvent::ProtoSprinkler
   HOOKUP AppendHandler (U *_receiver, MEMB_FUNC_SIG<U> _func);
 
   // who owns these? time for ch_ptr?
-  void AppendPhage (OmNihil *phage);
-  void RemovePhage (OmNihil *phage);
-  OmNihil *ExcisePhage (OmNihil *phage);
+  void AppendPhage (ch_ptr<OmNihil> const &phage);
+  void RemovePhage (ch_ptr<OmNihil> const &phage);
+  ch_ptr<OmNihil> ExcisePhage (ch_ptr<OmNihil> const &phage);
+
 
  protected:
   SPRNKLR sp;
-  std::vector<OmNihil *> phages;
+  std::vector<ch_weak_ptr<OmNihil>> phages;
 };
 
 
@@ -62,9 +63,9 @@ class MultiSprinkler
   void Spray (It _begin, It _end);
 
   template <typename T>
-  Sprinkler <T> *AssuredSprinklerForEventType ();
+  ch_ptr<Sprinkler<T>> AssuredSprinklerForEventType ();
   template <typename T>
-  Sprinkler <T> *UnsecuredSprinklerForEventType ();
+  ch_ptr<Sprinkler <T>> UnsecuredSprinklerForEventType ();
 
   template<typename T>
   ZeEvent::ProtoSprinkler::HOOKUP
@@ -75,14 +76,14 @@ class MultiSprinkler
   AppendHandler (U *_receiver, i64 (U::*) (ZeEvent::ProtoSprinkler::HOOKUP const &, T *));
 
   template<typename T>
-  void AppendPhage (OmNihil *phage);
+  void AppendPhage (ch_ptr<OmNihil> const &phage);
   template<typename T>
-  void RemovePhage (OmNihil *phage);
+  void RemovePhage (ch_ptr<OmNihil> const &phage);
   template<typename T>
-  OmNihil *ExcisePhage (OmNihil *phage);
+  ch_ptr<OmNihil> ExcisePhage (ch_ptr<OmNihil> const &phage);
 
  protected:
-  std::unordered_map<u32, ZeEvent::ProtoSprinkler *> sprinkler_map;
+  std::unordered_map<u32, ch_ptr<ZeEvent::ProtoSprinkler>> sprinkler_map;
 };
 
 
@@ -93,8 +94,12 @@ i64 Sprinkler<T>::Spray (ZeEvent *_event)
   T *event = dynamic_cast <T *> (_event);
   assert (event);
   sp (event);
-  for (OmNihil *ph : phages)
-    _event->ProfferAsSnackTo (ph);
+  for (ch_weak_ptr<OmNihil> weak_ph : phages)
+    {
+      ch_ptr<OmNihil> ph {weak_ph.lock ()};
+      if (ph)
+        _event->ProfferAsSnackTo (ph.get());
+    }
 
   return 0;
 }
@@ -121,26 +126,26 @@ ZeEvent::ProtoSprinkler::HOOKUP
 }
 
 template<typename T>
-void Sprinkler<T>::AppendPhage (OmNihil *_phage)
+void Sprinkler<T>::AppendPhage (ch_ptr<OmNihil> const &_phage)
 {
-  phages.push_back (_phage);
+  phages.push_back (ch_weak_ptr{_phage});
 }
 
 template<typename T>
-void Sprinkler<T>::RemovePhage (OmNihil *_phage)
+void Sprinkler<T>::RemovePhage (ch_ptr<OmNihil> const &_phage)
 {
-  delete ExcisePhage(_phage);
+  ExcisePhage(_phage);
 }
 
 template<typename T>
-OmNihil *Sprinkler<T>::ExcisePhage (OmNihil *_phage)
+ch_ptr<OmNihil> Sprinkler<T>::ExcisePhage (ch_ptr<OmNihil> const &_phage)
 {
   auto it = std::find (phages.begin (), phages.end (), _phage);
   if (it == phages.end ())
-    return nullptr;
+    return {};
 
   phages.erase (it);
-  return *it;
+  return it->lock();
 }
 
 //// [end of Sprinkler methods]
@@ -153,7 +158,7 @@ void MultiSprinkler::Spray (T *_event)
   static_assert (std::is_base_of_v <ZeEvent, T>,
                  "T must be derived from ZeEvent");
 
-  Sprinkler<T> *sp = UnsecuredSprinklerForEventType<T>();
+  ch_ptr<Sprinkler<T>> sp = UnsecuredSprinklerForEventType<T>();
   if (! sp)
     return;
 
@@ -167,7 +172,7 @@ void MultiSprinkler::Spray (It _begin, It _end)
   static_assert (std::is_base_of_v <ZeEvent, EvT>,
                  "T must be derived from ZeEvent");
 
-  Sprinkler<EvT> *sp = UnsecuredSprinklerForEventType<EvT>();
+  ch_ptr<Sprinkler<EvT>> sp = UnsecuredSprinklerForEventType<EvT>();
   if (! sp)
     return;
 
@@ -177,33 +182,29 @@ void MultiSprinkler::Spray (It _begin, It _end)
 
 
 template <typename T>
-Sprinkler<T> *MultiSprinkler::AssuredSprinklerForEventType ()
+ch_ptr<Sprinkler<T>> MultiSprinkler::AssuredSprinklerForEventType ()
 { u32 const idx = ch_index<T>::get ();
 
   auto const it = sprinkler_map . find (idx);
   if (it  ==  sprinkler_map . end ())
     {
-      auto sp = new Sprinkler<T>;
+      ch_ptr<Sprinkler<T>> sp {new Sprinkler<T>};
       sprinkler_map[idx] = sp;
       return sp;
     }
 
-  return (Sprinkler<T> *)(it->second);
+  return reinterpret_ch_cast<Sprinkler<T>> (it->second);
 }
 
 template <typename T>
-Sprinkler<T> *MultiSprinkler::UnsecuredSprinklerForEventType ()
+ch_ptr<Sprinkler<T>> MultiSprinkler::UnsecuredSprinklerForEventType ()
 { u32 const idx = ch_index<T>::get ();
 
   auto const it = sprinkler_map . find (idx);
   if (it  ==  sprinkler_map . end ())
-    {
-      auto sp = new Sprinkler<T>;
-      sprinkler_map[idx] = sp;
-      return sp;
-    }
+    {};
 
-  return (Sprinkler<T> *)(it->second);
+  return reinterpret_ch_cast<Sprinkler<T>> (it->second);
 }
 
 template <typename T>
@@ -217,46 +218,47 @@ MultiSprinkler::AppendHandler (typename Sprinkler<T>::EVT_HANDLER_FUNC &&_func)
 
 template<typename U, typename T>
 ZeEvent::ProtoSprinkler::HOOKUP
-MultiSprinkler::AppendHandler (U *_receiver, i64 (U::* _func) (ZeEvent::ProtoSprinkler::HOOKUP const &, T *))
+MultiSprinkler::AppendHandler (U *_receiver, i64 (U::* _func)
+                               (ZeEvent::ProtoSprinkler::HOOKUP const &, T *))
 {
-  Sprinkler<T> *sp = AssuredSprinklerForEventType<T>();
+  ch_ptr<Sprinkler<T>> sp = AssuredSprinklerForEventType<T>();
   assert (sp);
   return sp->AppendHandler(_receiver, _func);
 }
 
 template<typename T>
-void MultiSprinkler::AppendPhage (OmNihil *_phage)
+void MultiSprinkler::AppendPhage (ch_ptr<OmNihil> const &_phage)
 {
   static_assert (std::is_base_of_v <ZeEvent, T>,
                  "T must be derived from ZeEvent");
 
-  Sprinkler<T> *sp = AssuredSprinklerForEventType<T>();
+  ch_ptr<Sprinkler<T>> sp = AssuredSprinklerForEventType<T>();
   assert (sp);
   sp->AppendPhage(_phage);
 }
 
 template<typename T>
-void MultiSprinkler::RemovePhage (OmNihil *_phage)
+void MultiSprinkler::RemovePhage (ch_ptr<OmNihil> const &_phage)
 {
   static_assert (std::is_base_of_v <ZeEvent, T>,
                  "T must be derived from ZeEvent");
 
-  Sprinkler<T> *sp = UnsecuredSprinklerForEventType<T>();
+  ch_ptr<Sprinkler<T>> sp = UnsecuredSprinklerForEventType<T>();
   if (sp)
     sp->RemovePhage(_phage);
 }
 
 template<typename T>
-OmNihil *MultiSprinkler::ExcisePhage (OmNihil *_phage)
+ch_ptr<OmNihil> MultiSprinkler::ExcisePhage (ch_ptr<OmNihil> const &_phage)
 {
   static_assert (std::is_base_of_v <ZeEvent, T>,
                  "T must be derived from ZeEvent");
 
-  Sprinkler<T> *sp = UnsecuredSprinklerForEventType<T>();
+  ch_ptr<Sprinkler<T>> sp = UnsecuredSprinklerForEventType<T>();
   if (sp)
     return sp->RemovePhage(_phage);
 
-  return nullptr;
+  return {};
 }
 
 }  // namespace charm and marie antoinette -- just some heads bouncing around

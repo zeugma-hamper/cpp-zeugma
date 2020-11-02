@@ -182,8 +182,21 @@ class ZESpatialPhagy
 { };
 
 class MultiSprinkler;
-void AppendSpatialPhagy (MultiSprinkler *_ms, OmNihil *_phagy);
-void RemoveSpatialPhagy (MultiSprinkler *_ms, OmNihil *_phagy);
+
+void AppendSpatialPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy);
+void RemoveSpatialPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy);
+
+template<typename T>
+void AppendSpatialPhagy (MultiSprinkler *_ms, ch_ptr<T> const &_phagy)
+{
+  AppendSpatialPhagy(_ms, static_ch_cast<OmNihil>(_phagy));
+}
+
+template<typename T>
+void RemoveSpatialPhagy (MultiSprinkler *_ms, ch_ptr<T> const &_phagy)
+{
+  RemoveSpatialPhagy(_ms, static_ch_cast<OmNihil>(_phagy));
+}
 
 
 }  // snuffed it, did namespace charm, o me droogs...

@@ -156,7 +156,7 @@ class TriCleanup final : public GraphicsApplication
   void AccrueElevatorOffset (const Vect &off);
 
  protected:
-  WandCatcher wandy;
+  ch_ptr<WandCatcher> wandy;
 
  public:
   ZoftVect elev_transl;
@@ -331,9 +331,10 @@ i64 WandCatcher::ZESpatialSoften (ZESpatialSoftenEvent *e)
 
 TriCleanup::TriCleanup ()
   : GraphicsApplication (),
+    wandy {new WandCatcher},
     elev_trans_mult (77.0)
 {
-  AppendSpatialPhagy(&m_event_sprinkler, &wandy);
+  AppendSpatialPhagy(&m_event_sprinkler, wandy);
   elev_transl . MakeBecomeLikable ();
 }
 
