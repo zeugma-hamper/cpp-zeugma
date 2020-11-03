@@ -16,8 +16,11 @@ boost_dep = dependency ('boost', modules : ['program_options'])
 ##### OpenImageIO
 oiio_dep = dependency ('OpenImageIO')
 
-#### liblo -- you know, for kids! and for OSC
+#### liblo -- you know, for kids! and also for OSC.
 lo_dep = dependency ('liblo')
+
+#### libGLU: sure, it's deprecated; but then: aren't we all?
+glu_dep = cpp.find_library ('libGLU')
 
 ##### bx
 bx_include_dirs = ['bx/include', 'bx/3rdparty']
@@ -188,6 +191,7 @@ lib_sources = ['src/application.cpp',
                'src/Node.cpp',
                'src/PipelineTerminus.cpp',
                'src/PlatonicMaes.cpp',
+               'src/PolygonRenderable.cpp',
                'src/RawEventParsing.cpp',
                'src/RectangleRenderable.cpp',
                'src/Renderable.cpp',
@@ -234,6 +238,13 @@ shaderc_prog = find_program ('shaderc', dirs : [get_option ('shaderc-path')])
 
 # [type, input file, varying file, output file]
 shaders = [
+  # the very most basicest
+  ['vertex',   'src/shaders/primal_vs.sc',
+               'src/shaders/primal_varying.def.sc',
+                'primal_vs.bin'],
+  ['fragment', 'src/shaders/primal_fs.sc',
+               'src/shaders/primal_varying.def.sc',
+                'primal_fs.bin'],
   # quad
   ['vertex',   'src/shaders/quad_vs.sc', 'src/shaders/quad_varying.def.sc', 'quad_vs.bin'],
   ['fragment', 'src/shaders/quad_fs.sc', 'src/shaders/quad_varying.def.sc', 'quad_fs.bin'],
@@ -250,7 +261,7 @@ shaders = [
    'src/shaders/collage_bg_varying.def.sc', 'collage_bg_vs.bin'],
   ['fragment', 'src/shaders/collage_bg_fs.sc',
    'src/shaders/collage_bg_varying.def.sc', 'collage_bg_fs.bin'],
-  # collage background for demo
+  # tex-quaddish object
   ['vertex',   'src/shaders/textured_renderable.vs.sc',
    'src/shaders/basic_varying.def.sc', 'textured_renderable.vs.bin'],
   ['fragment', 'src/shaders/textured_renderable.fs.sc',
@@ -297,7 +308,7 @@ tri_demo_exec = executable ('tri_demo',
                             sources : ['src/tri_demo.cpp',
                                        'src/Collage.cpp',
                                        'src/TriBand.cpp'],
-                            dependencies : [charm_dep])
+                            dependencies : [charm_dep, glu_dep])
 
 scan_mattes_exec = executable ('scan_mattes',
                                sources : ['src/scan_mattes.cpp'],

@@ -16,6 +16,7 @@
 #include <RectangleRenderable.hpp>
 #include <VideoRenderable.hpp>
 #include <MattedVideoRenderable.hpp>
+#include "PolygonRenderable.h"
 
 //base Ze
 #include <Zeubject.h>
@@ -1082,6 +1083,21 @@ assert (oopeff . GutsIfOrigType ()  !=  NULL);
 oopeff . BecomeLike (esseff);
 assert (oopeff . GutsIfOrigType ()  ==  NULL);
 elleff . BecomeLike (ZoftFloat_zero);
+
+  Node *splat = new Node;
+  PolygonRenderable *polysplat = new PolygonRenderable;
+  i64 nv = 9;
+  for (i64 q = 0  ;  q < nv  ;  ++q)
+    { f64 r = 0.3 * maes -> Height ();
+      f64 theeeta = 2.0 * M_PI / (f64)nv * (f64)q;
+      polysplat -> AppendVertex (r //* 0.5 * (1 + q%2)
+                                 * (cos (theeeta) * Vect::xaxis
+                                    +  sin (theeeta) * Vect::yaxis)
+                                 + maes -> Loc ());
+    }
+  splat -> AppendRenderable (polysplat);
+  polysplat -> SpankularlyTesselate ();
+  ee_layer -> GetRootNode () -> AppendChild (splat);
 
   demo.Run ();
 
