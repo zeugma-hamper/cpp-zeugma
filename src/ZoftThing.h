@@ -136,7 +136,7 @@ class ZoftThing
   ZoftThing (const T &v)
      :  val (v), guts (NULL), just_changed (true), nomo_change (false)
     { }
-  ZoftThing (ZoftThing &z)
+  ZoftThing (const ZoftThing &z)
      :  val (z.val), guts (NULL), just_changed (true),
         nomo_change (z.nomo_change)
     { InstallGuts (z.guts); }
