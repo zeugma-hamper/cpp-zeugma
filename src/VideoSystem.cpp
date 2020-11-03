@@ -219,6 +219,25 @@ static void update_or_create_texture (bgfx::TextureHandle &_handle, u16 _width, 
   bgfx::updateTexture2D(_handle, 0, 0, 0, 0, _width, _height, _mem, _stride);
 }
 
+static void ReleaseBimgImageContainer (void *, void *_container)
+{
+  auto *cont = reinterpret_cast<bimg::ImageContainer *> (_container);
+  bimg::imageFree (cont);
+}
+
+static void update_or_create_texture (bgfx::TextureHandle &_handle, u64 _flags, bimg::ImageContainer *_image)
+{
+  if (! bgfx::isValid(_handle))
+    {
+      _handle = bgfx::createTexture2D (_image->m_width, _image->m_height, false, 1,
+                                       (bgfx::TextureFormat::Enum)_image->m_format, _flags);
+    }
+
+  bgfx::Memory const *mem = bgfx::makeRef(_image->m_data, _image->m_size, ReleaseBimgImageContainer, _image);
+  bgfx::updateTexture2D(_handle, 0, 0, 0, 0, _image->m_width, _image->m_height, mem);
+}
+
+
 static void upload_frame (gst_ptr<GstSample> const &_sample,
                           ch_ptr<VideoTexture> const &_textures,
                           GstVideoInfo *_video_info)
@@ -320,21 +339,16 @@ void VideoSystem::UploadFrames ()
                                                / GST_VIDEO_INFO_FPS_D(&video_info) / f64(1e9)));
       //printf ("pts: %f, now: %f, for %lu\n", pts/f64(1e9), offset_ns/f64(1e9), frame_num);
 
-      MatteFrame mf = pipe.matte_loader->GetFrame(frame_num);
+      MatteFrameBimg mf = pipe.matte_loader->GetFrame(frame_num);
       if (! mf.data)
         {
           fprintf (stdout, "no matte for %lu which seems fishy\n", frame_num);
           continue;
         }
 
-      bgfx::Memory const *memory
-        = bgfx::makeRef(mf.data, mf.data_size, MatteLoader::MatteDataReleaseFn);
-
-      bgfx::TextureHandle &matte_texture = texture->GetNthTexture(3);
-      if (! bgfx::isValid(matte_texture))
-        matte_texture = bgfx::createTexture2D(mf.width, mf.height, false, 1, mf.format);
-
-      bgfx::updateTexture2D(matte_texture, 0, 0, 0, 0, mf.width, mf.height, memory);
+      bimg::ImageContainer *image = mf.data.release();
+      update_or_create_texture(texture->GetNthTexture(3),
+                               BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE, image);
     }
 }
 
@@ -423,7 +437,7 @@ VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
   pipe.adjusted_loop_start_ts = -1;
   pipe.adjusted_loop_end_ts = -1;
   pipe.matte_frame_count = _frame_count;
-  pipe.matte_loader = std::make_unique<MatteLoader> ();
+  pipe.matte_loader = std::make_unique<MatteLoaderBimg> ();
   pipe.matte_loader->StartLoading (_matte_dir);
   pipe.matte_dir_path = _matte_dir;
 

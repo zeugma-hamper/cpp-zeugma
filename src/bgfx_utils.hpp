@@ -4,10 +4,12 @@
 #include <base_types.hpp>
 
 #include <bx/bx.h>
+#include <bimg/bimg.h>
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
 #include <bx/filepath.h>
 
+#include <memory>
 #include <vector>
 
 namespace charm
@@ -18,6 +20,8 @@ struct ProgramResiduals
   bgfx::ShaderHandle vertex;
   bgfx::ShaderHandle fragment;
 };
+
+bx::DefaultAllocator *GetBxDefaultAllocator ();
 
 const bgfx::Memory *ReadFileIntoBGFX (bx::FilePath const &_path);
 
@@ -34,6 +38,21 @@ bgfx::TextureHandle CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags)
 //Updates texture from image file. Format, size, etc. must match.
 bgfx::TextureHandle UpdateWholeTexture2D (bgfx::TextureHandle _texture,
                                           bx::FilePath const &_path);
+
+
+struct BImgFree
+{
+  void operator () (bimg::ImageContainer *img) const
+  {
+    bimg::imageFree (img);
+  }
+};
+
+using bimg_ptr = std::unique_ptr<bimg::ImageContainer, BImgFree>;
+
+bimg_ptr LoadKTXImage (std::string_view _path, bx::Error *_error);
+
+
 
 // helper function to delete classes used with bgfx::makeRef
 template<typename T>

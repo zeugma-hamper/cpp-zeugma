@@ -109,7 +109,7 @@ struct VideoPipeline
   i64 adjusted_loop_end_ts = -1;
   fs::path matte_dir_path;
   i32 matte_frame_count;
-  std::unique_ptr<MatteLoader> matte_loader;
+  std::unique_ptr<MatteLoaderBimg> matte_loader;
 };
 
 struct VideoBrace

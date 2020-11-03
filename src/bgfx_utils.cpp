@@ -23,6 +23,12 @@
 namespace charm
 {
 
+bx::DefaultAllocator *GetBxDefaultAllocator ()
+{
+  static bx::DefaultAllocator *alloc = new bx::DefaultAllocator;
+  return alloc;
+}
+
 const bgfx::Memory *ReadFileIntoBGFX (bx::FilePath const &_path)
 {
   bx::Error error;
@@ -199,6 +205,48 @@ bgfx::TextureHandle UpdateWholeTexture2D (bgfx::TextureHandle _texture,
   bgfx::updateTexture2D (_texture, 0, 0, 0, 0, ispec.width, ispec.height, img_mem);
 
   return _texture;
+}
+
+struct MappedFile
+{
+  MappedFile (std::string_view _path)
+    : fd {-1},
+      size {0},
+      ptr {nullptr}
+  {
+    fd = open (_path.data (), O_RDONLY | O_CLOEXEC);
+    if (fd <= 0)
+      return;
+
+    size = lseek (fd, 0, SEEK_END);
+    lseek (fd, 0, SEEK_SET);
+
+    ptr = mmap (NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
+  }
+
+  ~MappedFile ()
+  {
+    if (ptr)
+      munmap (ptr, size);
+    ptr = nullptr;
+
+    if (fd > 0)
+      close (fd);
+    fd = 0;
+  }
+
+  int fd;
+  off_t size;
+  void *ptr;
+};
+
+bimg_ptr LoadKTXImage (std::string_view _path, bx::Error *_error)
+{
+  MappedFile fl {_path};
+  if (fl.ptr == nullptr)
+    return {};
+
+  return bimg_ptr {bimg::imageParseKtx (GetBxDefaultAllocator(), fl.ptr, fl.size, _error)};
 }
 
 void BGFXFatalMessage (const char *_filePath, uint16_t _line, bgfx::Fatal::Enum, const char *_str)
