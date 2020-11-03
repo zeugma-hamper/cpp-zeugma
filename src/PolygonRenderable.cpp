@@ -55,6 +55,8 @@ PolygonRenderable::~PolygonRenderable ()
 static PolygonRenderable *ephem_pr = NULL;
 static i64 trifan_prgrs = -1;
 static glm::vec3 trifan_vrts[2];
+static i64 strippy_prog = -1;
+static glm::vec3 strippy_vs[2];
 
 
 static void PRBeginCB (GLenum mode, void *bonus)
@@ -65,17 +67,21 @@ static void PRBeginCB (GLenum mode, void *bonus)
     { trifan_prgrs = 0;
       mode = GL_TRIANGLES;
     }
+  else if (mode == GL_TRIANGLE_STRIP)
+    { strippy_prog = 0;
+      mode = GL_TRIANGLES;
+    }
   ephem_pr->gl_mode = mode;
 }
 
 static void PRVertexCB (void *pvas, void *bonus)
 { v3f64 *vrt = (v3f64 *)pvas;
   glm::vec3 vv (as_glm (*vrt));
-  if (trifan_prgrs < 0)
+  if (trifan_prgrs < 0  &&  strippy_prog < 0)
     { if (ephem_pr)
         ephem_pr->ts_verts . push_back (vv);
     }
-  else
+  else if (trifan_prgrs  >=  0)
     { if (trifan_prgrs < 2)
         trifan_vrts[trifan_prgrs] = vv;
       else
@@ -86,11 +92,25 @@ static void PRVertexCB (void *pvas, void *bonus)
         }
       trifan_prgrs++;
     }
+  else
+    { if (strippy_prog < 2)
+        strippy_vs[strippy_prog] = vv;
+      else
+        { ephem_pr->ts_verts . push_back (strippy_vs[0]);
+          ephem_pr->ts_verts . push_back (strippy_vs[1]);
+          ephem_pr->ts_verts . push_back (vv);
+          strippy_vs[0] = strippy_vs[1];
+          strippy_vs[1] = vv;
+        }
+      strippy_prog++;
+    }
 }
 
 static void PREndCB (void *bonus)
 { if (trifan_prgrs >= 0)
     trifan_prgrs = -1;
+  else if (strippy_prog >= 0)
+    strippy_prog = -1;
   ephem_pr = NULL;
 }
 
@@ -131,11 +151,17 @@ void PolygonRenderable::SpankularlyTesselate ()
   const bgfx::Memory *memmy = bgfx::copy (ts_verts . data (),
                                     ts_vrt_cnt * sizeof (glm::vec3));
   bgfx::update (vert_buf, 0, memmy);
+
+  spanking_time = false;
 }
 
 
 void PolygonRenderable::Draw (u16 vyu_id)
-{ bgfx::setTransform (&(m_node -> GetAbsoluteTransformation ().model));
+{ if (spanking_time)
+    SpankularlyTesselate ();
+spanking_time = true;
+
+  bgfx::setTransform (&(m_node -> GetAbsoluteTransformation ().model));
   bgfx::setVertexBuffer (0, vert_buf, 0, ts_vrt_cnt);
   u64 prim = (gl_mode == GL_TRIANGLE_STRIP  ?  BGFX_STATE_PT_TRISTRIP  :  0x0);
   bgfx::setState (BGFX_STATE_WRITE_RGB

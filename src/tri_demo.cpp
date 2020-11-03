@@ -32,6 +32,7 @@
 #include <InterpZoft.h>
 #include <LoopZoft.h>
 #include "SinuZoft.h"
+#include "SumZoft.h"
 #include "LatchZoft.h"
 
 //events
@@ -697,6 +698,7 @@ bool TriDemo::RunOneCycle ()
 
 static LoopFloat timey { 0.0, 1.0, 0.0 };
 
+
 bool TriDemo::DoWhatThouWilt (i64, f64)
 { if (timey.val > 1.5)
     { TriDemo::ROWP () . HooverCoordTransforms ();
@@ -1086,17 +1088,19 @@ elleff . BecomeLike (ZoftFloat_zero);
 
   Node *splat = new Node;
   PolygonRenderable *polysplat = new PolygonRenderable;
-  i64 nv = 9;
+  i64 nv = 14;
+  ZoftVect centz (maes -> Loc ());
   for (i64 q = 0  ;  q < nv  ;  ++q)
     { f64 r = 0.3 * maes -> Height ();
       f64 theeeta = 2.0 * M_PI / (f64)nv * (f64)q;
-      polysplat -> AppendVertex (r //* 0.5 * (1 + q%2)
-                                 * (cos (theeeta) * Vect::xaxis
-                                    +  sin (theeeta) * Vect::yaxis)
-                                 + maes -> Loc ());
+      Vect radv = cos (theeeta) * Vect::xaxis  +  sin (theeeta) * Vect::yaxis;
+      SinuVect arm (0.3 * r * radv, 1.0 + 0.3 * drand48 (),
+                    0.5 * (1.0 + q%2) * r * radv);
+      SumVect voit (arm, centz);
+      polysplat -> AppendVertex (voit);
     }
   splat -> AppendRenderable (polysplat);
-  polysplat -> SpankularlyTesselate ();
+//  polysplat -> SpankularlyTesselate ();
   ee_layer -> GetRootNode () -> AppendChild (splat);
 
   demo.Run ();
