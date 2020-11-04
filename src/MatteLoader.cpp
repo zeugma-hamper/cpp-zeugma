@@ -74,7 +74,7 @@ static u32 ring_next (u32 _cur, u32 _last, u32 _max)
 u32 MatteLoader::FindNextOffset ()
 {
   std::unique_lock lock {m_frame_mutex};
-  while (true)
+  while (m_keep_running.load ())
     {
       //if we've loaded no mattes, load the last requested matte
       if (m_frames.empty())
