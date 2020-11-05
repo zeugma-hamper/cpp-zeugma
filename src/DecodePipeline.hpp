@@ -21,6 +21,8 @@ struct LoopStatus
 {
   gint64 loop_start = -1;
   gint64 loop_end = -1;
+  gint64 adjusted_loop_start = -1;
+  gint64 adjusted_loop_end = -1;
 };
 
 struct QueuedSeek
