@@ -202,7 +202,7 @@ ch_ptr<Sprinkler<T>> MultiSprinkler::UnsecuredSprinklerForEventType ()
 
   auto const it = sprinkler_map . find (idx);
   if (it  ==  sprinkler_map . end ())
-    {};
+    return {};
 
   return reinterpret_ch_cast<Sprinkler<T>> (it->second);
 }
