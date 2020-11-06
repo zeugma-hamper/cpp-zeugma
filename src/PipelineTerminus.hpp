@@ -62,6 +62,7 @@ class BasicPipelineTerminus : public PipelineTerminus
 
   void HandoffSample (GstSample *_sample);
 
+  DecodePipeline *m_pipeline;
   GstElement *m_video_sink;
   GstElement *m_audio_sink;
 
@@ -69,42 +70,6 @@ class BasicPipelineTerminus : public PipelineTerminus
   gst_ptr<GstSample> m_sample;
   gint64 m_current_ts;
 
-  bool m_enable_audio;
-};
-
-class CachingPipelineTerminus : public PipelineTerminus
-{
- public:
-  CachingPipelineTerminus (bool _enable_audio, u32 _max_cache_samples);
-  ~CachingPipelineTerminus () override;
-
-  bool OnStart       (DecodePipeline *) override;
-  bool NewDecodedPad (DecodePipeline *, GstElement *, GstPad *, GstCaps *) override;
-  bool OnShutdown    (DecodePipeline *) override;
-
-  void FlushNotify () override;
-
-  bool HasSink () const override;
-
-  gst_ptr<GstSample> FetchSample ();
-  gst_ptr<GstSample> FetchClearSample ();
-  gst_ptr<GstSample> FetchByOffset (u64 _offset, u64 _mod);
-  gst_ptr<GstSample> FetchClearByOffset (u64 _offset, u64 _mod);
-
-  gst_ptr<GstSample> FetchNewest ();
-  void ClearCache ();
-
-  bool HandleAudioPad (DecodePipeline *, GstElement *, GstPad *, const char *);
-  bool HandleVideoPad (DecodePipeline *, GstElement *, GstPad *, const char *);
-
-  void HandoffSample (GstSample *_sample);
-
-  DecodePipeline *m_pipeline;
-  GstElement *m_video_sink;
-  GstElement *m_audio_sink;
-  std::mutex m_sample_mutex;
-  u32 m_max_cached_samples;
-  std::vector<gst_ptr<GstSample>> m_samples;
   bool m_enable_audio;
 };
 
