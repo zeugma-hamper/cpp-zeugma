@@ -1,6 +1,7 @@
 
 #include "ZESpatialEvent.h"
 
+#include <MultiSprinkler.hpp>
 
 namespace charm  {
 
@@ -30,6 +31,18 @@ ZESpatialEvent::ZESpatialEvent (std::string_view prv,
 ZESpatialEvent::ZESpatialEvent (const ZESpatialEvent &spe)
  :  ZeEvent (spe), loc (spe.loc), aim (spe.aim), ovr (spe.ovr)
 { }
+
+void ZESpatialEvent::AdoptParticulars (const ZESpatialEvent &spe)
+{
+  prov = spe.prov;
+  tstamp = spe.tstamp;
+  tratch = spe.tratch;
+
+  loc = spe.loc;
+  aim = spe.aim;
+  ovr = spe.ovr;
+  pressures = spe.pressures;
+}
 
 const Vect &ZESpatialEvent::Loc ()  const
 { return loc; }
@@ -87,5 +100,28 @@ u64 ZESpatialEvent::NthPressure (i64 ind)  const
   return it->second;
 }
 
+void AppendSpatialPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy)
+{
+  if (! _ms || ! _phagy)
+    return;
+
+  _ms->AppendPhage<ZESpatialMoveEvent> (_phagy);
+  _ms->AppendPhage<ZESpatialAppearEvent> (_phagy);
+  _ms->AppendPhage<ZESpatialVanishEvent> (_phagy);
+  _ms->AppendPhage<ZESpatialHardenEvent> (_phagy);
+  _ms->AppendPhage<ZESpatialSoftenEvent> (_phagy);
+}
+
+void RemoveSpatialPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy)
+{
+  if (! _ms || ! _phagy)
+    return;
+
+  _ms->RemovePhage<ZESpatialMoveEvent> (_phagy);
+  _ms->RemovePhage<ZESpatialAppearEvent> (_phagy);
+  _ms->RemovePhage<ZESpatialVanishEvent> (_phagy);
+  _ms->RemovePhage<ZESpatialHardenEvent> (_phagy);
+  _ms->RemovePhage<ZESpatialSoftenEvent> (_phagy);
+}
 
 }  // namespace charm is still spoken of, when it is noted, with high regard

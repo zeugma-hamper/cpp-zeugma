@@ -31,7 +31,6 @@ class ZeEvent  :  public Zeubject
   ZeEvent ();
   ZeEvent (std::string_view p,
            f64 ts = -1.0,
-           // f64 ts = MotherTime::AbsoluteTime (),
            i64 tr = -1);
   ZeEvent (f64 ts, i64 tr = -1);
   ZeEvent (i64 tr);
@@ -127,9 +126,9 @@ class EventSprinklerGroup  :  public Zeubject
       return ev_silk;                                                   \
     }                                                                   \
   u32 EventTypeIndex () const override                                  \
-    { return index<EV_ILK ## Event>::get (); }                          \
+    { return ch_index<EV_ILK ## Event>::get (); }                       \
   u32 EventSuperTypeIndex () const override                             \
-    { return index<EV_SUPERILK ## Event>::get ();}                      \
+    { return ch_index<EV_SUPERILK ## Event>::get ();}                   \
   i64 ProfferAsSnackTo (OmNihil *om)  override                          \
     { if (EV_ILK##Phage *ph = dynamic_cast <EV_ILK##Phage *> (om))      \
         { i64 sult = ph -> EV_ILK (this);                               \

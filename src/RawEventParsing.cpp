@@ -58,11 +58,11 @@ bool RawOSCWandParser::SlurpCoordTransforms (Matrix44 &pmat, Matrix44 &dmat,
   for (auto item  :  fs::directory_iterator (fs::path (dir)))
     if (item . is_regular_file ())
       { std::string fbase
-	  = item . path () . filename () . string () . substr (0, scythes);
-	if (fbase  ==  default_config_filebasename)
-	  { fs::file_time_type ftt = item . last_write_time ();
-	    sortiful[ftt] = item;
-	  }
+          = item . path () . filename () . string () . substr (0, scythes);
+        if (fbase  ==  default_config_filebasename)
+          { fs::file_time_type ftt = item . last_write_time ();
+            sortiful[ftt] = item;
+          }
       }
   if (sortiful . empty ())
     return false;
@@ -230,6 +230,7 @@ void RawOSCWandParser::Parse (const std::string &path, const lo::Message &m,
 // HEY-YO: the delete instances foregoing probably will want to stay
 // even after mem-mangament is implemented, but... let's remember to
 // think about it. Okay, Chet?
+// HI: Don't call me Chet, Buddy!
 
 
 

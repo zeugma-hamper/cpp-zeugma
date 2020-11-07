@@ -33,6 +33,8 @@ class ZESpatialEvent  :  public ZeEvent
 
   ZESpatialEvent (const ZESpatialEvent &spe);
 
+  void AdoptParticulars (const ZESpatialEvent &spe);
+
   const Vect &Loc ()  const;
   void SetLoc (const Vect &l);
 
@@ -178,6 +180,23 @@ class ZESpatialPhagy
      public ZESpatialHardenEvent::ZESpatialHardenPhage,
      public ZESpatialSoftenEvent::ZESpatialSoftenPhage
 { };
+
+class MultiSprinkler;
+
+void AppendSpatialPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy);
+void RemoveSpatialPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy);
+
+template<typename T>
+void AppendSpatialPhagy (MultiSprinkler *_ms, ch_ptr<T> const &_phagy)
+{
+  AppendSpatialPhagy(_ms, static_ch_cast<OmNihil>(_phagy));
+}
+
+template<typename T>
+void RemoveSpatialPhagy (MultiSprinkler *_ms, ch_ptr<T> const &_phagy)
+{
+  RemoveSpatialPhagy(_ms, static_ch_cast<OmNihil>(_phagy));
+}
 
 
 }  // snuffed it, did namespace charm, o me droogs...

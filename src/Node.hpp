@@ -29,10 +29,11 @@ class Node
  public:
 
   Node ();
+  explicit Node (Renderable *_renderable);
   virtual ~Node ();
 
   CHARM_DELETE_COPY (Node);
-  CHARM_DEFAULT_MOVE (Node);
+  CHARM_DELETE_MOVE (Node);
 
   std::array<graph_id, 2> EnumerateGraph (graph_id _base_id = 0, graph_id _base_rend_id = 0);
   void SetGraphID (graph_id _id);

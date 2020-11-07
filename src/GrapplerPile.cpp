@@ -26,7 +26,7 @@ i64 GrapplerPile::GrapplerCount ()  const
 { return graps . size (); }
 
 Grappler *GrapplerPile::NthGrappler (i64 ind)  const
-{ if (ind < 0  ||  ind >= graps . size ())
+{ if (ind < 0  ||  ind >= i64 (graps . size ()))
     return NULL;
   return graps[ind];
 }
@@ -66,7 +66,7 @@ GrapplerPile &GrapplerPile::PrependGrappler (Grappler *g)
 }
 
 GrapplerPile &GrapplerPile::InsertGrappler (Grappler *g, i64 ind)
-{ if (g  &&  ind >= 0  &&  ind <= graps . size ())
+{ if (g  &&  ind >= 0  &&  ind <= i64 (graps . size ()))
     graps . insert (graps . begin () + ind, g);
   return *this;
 }
@@ -75,22 +75,32 @@ GrapplerPile &GrapplerPile::InsertGrappler (Grappler *g, i64 ind)
 GrapplerPile &GrapplerPile::RemoveGrappler (Grappler *g)
 { if (! g)
     return *this;
-  for (auto qi = graps . begin ()  ;  qi != graps . end ()  ;  ++qi)
+  auto const end_it = graps.end ();
+  for (auto qi = graps . begin ()  ;  qi != end_it  ;  ++qi)
     if (*qi == g)
-      { graps . erase (qi);
+      {
+        delete g;
+        graps . erase (qi);
         break;
       }
   return *this;
 }
 
 GrapplerPile &GrapplerPile::RemoveNthGrappler (i64 ind)
-{ if (ind >= 0  ||  ind < graps . size ())
-    graps . erase (graps . begin () + ind);
+{ if (ind >= 0  ||  ind < i64 (graps . size ()))
+    {
+      delete graps[ind];
+      graps . erase (graps . begin () + ind);
+    }
   return *this;
 }
 
 GrapplerPile &GrapplerPile::RemoveAllGrapplers ()
-{ graps . clear ();
+{
+  for (Grappler *g : graps)
+    delete g;
+
+  graps . clear ();
   pnt_mat . LoadIdent ();  nrm_mat . LoadIdent ();
   inv_pnt_mat . LoadIdent ();  inv_nrm_mat . LoadIdent ();
   return *this;

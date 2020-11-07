@@ -84,7 +84,7 @@ const std::string &ZeEvent::EventSuperIlk ()  const
 }
 
 u32 ZeEvent::EventTypeIndex ()  const
-{ return index<ZeEvent>::get (); }
+{ return ch_index<ZeEvent>::get (); }
 
 u32 ZeEvent::EventSuperTypeIndex ()  const
 { return u32 (-1); }

@@ -1,6 +1,7 @@
 
 #include "ZEYowlEvent.h"
 
+#include <MultiSprinkler.hpp>
 
 namespace charm  {
 
@@ -34,5 +35,24 @@ i32 ZEYowlEvent::RepetitionOrdinal ()  const
 void ZEYowlEvent::SetRepetitionOrdinal (i32 ro)
 { rept_ord = ro; }
 
+void AppendYowlPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy)
+{
+  if (! _ms || ! _phagy)
+    return;
+
+  _ms->AppendPhage<ZEYowlRepeatEvent> (_phagy);
+  _ms->AppendPhage<ZEYowlAppearEvent> (_phagy);
+  _ms->AppendPhage<ZEYowlVanishEvent> (_phagy);
+}
+
+void RemoveYowlPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy)
+{
+  if (! _ms || ! _phagy)
+    return;
+
+  _ms->RemovePhage<ZEYowlRepeatEvent> (_phagy);
+  _ms->RemovePhage<ZEYowlAppearEvent> (_phagy);
+  _ms->RemovePhage<ZEYowlVanishEvent> (_phagy);
+}
 
 }

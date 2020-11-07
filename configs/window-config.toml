@@ -1,0 +1,26 @@
+[[windows]]
+name = "only"
+position = [0, 0]
+size = [9600, 2160]
+color-size = [8, 8, 8, 8]
+ds-size = [24, 8]
+decorated = false
+
+# at the moment, view doesn't need a name
+[[trefoils]]
+name = "left"
+maes = "left"
+offset = [0, 0]
+size = [3840, 2160]
+
+[[trefoils]]
+name = "front"
+maes = "front"
+offset = [3840, 0]
+size = [3840, 2160]
+
+[[trefoils]]
+name = "table"
+maes = "table"
+offset = [7680, 0]
+size = [1920, 1080]
