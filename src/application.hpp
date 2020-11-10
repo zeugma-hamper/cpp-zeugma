@@ -1,10 +1,14 @@
+
 #include <class_utils.hpp>
 
 #include "base_types.hpp"
 
+#include <MultiSprinkler.hpp>
+
 
 namespace charm
 {
+
 
 class Application
 {
@@ -15,6 +19,8 @@ class Application
   CHARM_DELETE_MOVE_COPY(Application);
 
   bool InstallDefaultSignalHandlers ();
+
+  MultiSprinkler &GetSprinkler ();
 
   static void StopRunning ();
 
@@ -30,6 +36,9 @@ class Application
 
   //loops update, then calls shutdown
   virtual void Run ();
+
+ protected:
+  MultiSprinkler m_event_sprinkler;
 };
 
 }

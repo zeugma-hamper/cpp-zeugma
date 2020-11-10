@@ -1,3 +1,4 @@
+
 #include <GraphicsApplication.hpp>
 
 #include <bgfx_utils.hpp>
@@ -12,20 +13,21 @@
 
 #include <stdio.h>
 
+
 #define ERROR_RETURN_VAL(MSG, VAL)                 \
-  {                                                \
-    fprintf (stderr, "%s\n", MSG);                 \
+  { fprintf (stderr, "%s\n", MSG);                 \
     return VAL;                                    \
   }
 
 #define ERROR_RETURN(MSG)                          \
-   {                                               \
-    fprintf (stderr, "%s\n", MSG);                 \
+  { fprintf (stderr, "%s\n", MSG);                 \
     return;                                        \
   }
 
+
 namespace charm
 {
+
 
 static void glfw_error_callback (int, const char *_msg)
 {
@@ -37,7 +39,7 @@ static void glfw_error_callback (int, const char *_msg)
 bool GraphicsApplication::InitWindowingAndGraphics ()
 {
   WindowTOML win;
-  std::vector<TrefoilTOML> trefoils;
+  std::vector <TrefoilTOML> trefoils;
   if (! ReadWindowTOMLFile ("../configs/window-config.toml", win, trefoils))
     return false;
 
@@ -49,7 +51,7 @@ bool GraphicsApplication::InitWindowingAndGraphics ()
     }
 
   glfwSetErrorCallback(glfw_error_callback);
-  if (! glfwInit())
+  if (! glfwInit ())
     ERROR_RETURN_VAL ("error initializing glfw", false);
 
   glfwWindowHint (GLFW_RED_BITS,     win.rgba[0]);
@@ -71,7 +73,7 @@ bool GraphicsApplication::InitWindowingAndGraphics ()
 
   // install window key and mouse handler
   GLFWWaterWorks *glfw_ww = new GLFWWaterWorks (window);
-  AppendWaterWorks(glfw_ww);
+  AppendWaterWorks (glfw_ww);
   //call poll events, basically
   glfw_ww->Drain (&m_event_sprinkler);
 
@@ -239,7 +241,7 @@ bool GraphicsApplication::StartUp ()
   bool ret = InitWindowingAndGraphics();
   VideoSystem::Initialize ();
 
-  AppendWaterWorks(new OSCWandWaterWorks);
+  AppendWaterWorks (new OSCWandWaterWorks);
 
   return ret;
 }
@@ -289,11 +291,6 @@ void GraphicsApplication::UpdateRenderLeaves (i64 ratch, f64 thyme)
 {
   for (CMVTrefoil *leaf  :  m_trefoils)
     leaf -> Inhale (ratch, thyme);
-}
-
-MultiSprinkler &GraphicsApplication::GetSprinkler ()
-{
-  return m_event_sprinkler;
 }
 
 void GraphicsApplication::AppendWaterWorks (ZePublicWaterWorks *_pub)

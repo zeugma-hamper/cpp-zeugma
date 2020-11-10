@@ -320,6 +320,10 @@ tri_cleanup_exec = executable ('tri_cleanup',
                                        'src/TriBand.cpp'],
                             dependencies : [charm_dep])
 
+tample_exec = executable ('tample',
+                           sources : ['src/tample.cpp'],
+                           dependencies : [charm_dep, glu_dep])
+
 scan_mattes_exec = executable ('scan_mattes',
                                sources : ['src/scan_mattes.cpp'],
                                dependencies : [charm_dep])

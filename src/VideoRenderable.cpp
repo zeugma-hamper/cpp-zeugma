@@ -1,3 +1,4 @@
+
 #include <VideoRenderable.hpp>
 
 #include <charm_glm.hpp>
@@ -40,6 +41,13 @@ VideoRenderable::VideoRenderable (FilmInfo const &_fm)
 VideoRenderable::~VideoRenderable ()
 {
 }
+
+
+const ch_ptr <DecodePipeline> VideoRenderable::ItsDecodePipeline ()
+{ return VideoSystem::GetSystem ()
+    -> FindDecodePipeline (m_video_texture);
+}
+
 
 void VideoRenderable::Draw (u16 vyu_id)
 {

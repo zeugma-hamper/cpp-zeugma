@@ -1,3 +1,4 @@
+
 //application
 #include <GraphicsApplication.hpp>
 #include <FrameTime.hpp>
@@ -16,6 +17,7 @@
 #include <RectangleRenderable.hpp>
 #include <VideoRenderable.hpp>
 #include <MattedVideoRenderable.hpp>
+#include <PolygonRenderable.h>
 
 //base Ze
 #include <Zeubject.h>
@@ -30,9 +32,12 @@
 #include <ZoftThing.h>
 #include <InterpZoft.h>
 #include <LoopZoft.h>
+#include "SinuZoft.h"
+#include "SumZoft.h"
 
 //events
 #include <ZESpatialEvent.h>
+#include <ZEYowlEvent.h>
 #include <RawEventParsing.h>
 #include <GeomFumble.h>
 
@@ -52,11 +57,6 @@
 #include <stdio.h>
 
 #include <iostream>
-
-//for the demo
-#include <TriBand.hpp>
-#include <Collage.hpp>
-#include "global-params.h"  // (or could be at top in the 'application' stanza)
 
 
 using namespace charm;
@@ -88,9 +88,8 @@ class Cursoresque  :  public Zeubject
 };
 
 
-class WandCatcher  :  public Zeubject, public ZESpatialPhagy
-{
- public:
+class Sensorium  :  public Zeubject, public ZESpatialPhagy, public ZEYowlPhagy
+{ public:
   i32 trig_butt_simulcount;
   u64 trig_butt_ident;
   std::unordered_set <std::string> trig_partic;
@@ -101,12 +100,12 @@ class WandCatcher  :  public Zeubject, public ZESpatialPhagy
   std::map <std::string, Vect> recentest_pos;
   ZESpatialPhagy *cally;
 
-  WandCatcher ()  :  Zeubject (), ZESpatialPhagy (),
-                     trig_butt_simulcount (2), trig_butt_ident (8),
-                     calibrating (false), elevating (false),
-                     cally (nullptr)
+  Sensorium ()  :  Zeubject (), ZESpatialPhagy (),
+                   trig_butt_simulcount (2), trig_butt_ident (8),
+                   calibrating (false), elevating (false),
+                   cally (nullptr)
     { }
-  ~WandCatcher () override { }
+  ~Sensorium () override { }
 
 
   u64 TriggerButtonIdentifier ()  const
@@ -134,16 +133,18 @@ class WandCatcher  :  public Zeubject, public ZESpatialPhagy
     { cally = cal; }
 
   i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
-  // see below for the above... can't define inline because uses TriCleanup...
+  // see below for the above... can't define inline because uses Tampo...
   i64 ZESpatialHarden (ZESpatialHardenEvent *e)  override;
   i64 ZESpatialSoften (ZESpatialSoftenEvent *e)  override;
+
+  i64 ZEYowlAppear (ZEYowlAppearEvent *e)  override;
 };
 
-class TriCleanup final : public GraphicsApplication
-{
- public:
-  TriCleanup ();
-  ~TriCleanup () override final;
+
+class Tampo final : public GraphicsApplication
+{ public:
+  Tampo ();
+  ~Tampo () override final;
 
   bool DoWhatThouWilt (i64 ratch, f64 thyme)  override;
 
@@ -156,17 +157,20 @@ class TriCleanup final : public GraphicsApplication
   void AccrueElevatorOffset (const Vect &off);
 
  protected:
-  ch_ptr<WandCatcher> wandy;
+  ch_ptr<Sensorium> sensy;
 
  public:
   ZoftVect elev_transl;
   f64 elev_trans_mult;
+  VideoRenderable *steenbeck;
 };
 
 
+static Tampo *solo_tamp = NULL;
+
+
 struct QuadroPod
-{
-  Node *no;
+{ Node *no;
   PlatonicMaes *ma;
   Renderable *re;
   Vect off;
@@ -174,7 +178,8 @@ struct QuadroPod
 
 std::unordered_map <std::string, QuadroPod> rupaul_map;
 
-i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
+
+i64 Sensorium::ZESpatialMove (ZESpatialMoveEvent *e)
 { if (calibrating  &&  trig_partic . size () == 0)
     { // forward!
       if (cally)
@@ -182,7 +187,7 @@ i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
       return 0;
     }
 
-  TriCleanup *instance = (TriCleanup *)GraphicsApplication::GetApplication();
+  Tampo *instance = (Tampo *)GraphicsApplication::GetApplication();
 
   if (instance)
     instance -> FlatulateCursor (e);
@@ -198,10 +203,10 @@ i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
     }
   else
     { auto it = rupaul_map . find (e -> Provenance ());
-      if (it != rupaul_map . end ())
+/*      if (it != rupaul_map . end ())
         { QuadroPod &qu = it->second;
           Vect hit;
-          TriCleanup *app = (TriCleanup *)GraphicsApplication::GetApplication();
+          Tampo *app = (Tampo *)GraphicsApplication::GetApplication();
           if (PlatonicMaes *maes
               = app-> ClosestIntersectedMaes (e -> Loc (), e -> Aim (), &hit))
             { if (qu.ma  !=  maes)
@@ -219,7 +224,7 @@ i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
                     }
                 }
             }
-        }
+        } */
     }
 
   if (PlatonicMaes *emm = instance -> FindMaesByName ("table"))
@@ -238,7 +243,7 @@ i64 WandCatcher::ZESpatialMove (ZESpatialMoveEvent *e)
   return 0;
 }
 
-i64 WandCatcher::ZESpatialHarden (ZESpatialHardenEvent *e)
+i64 Sensorium::ZESpatialHarden (ZESpatialHardenEvent *e)
 { if (calibrating)
     { // avanti!
       if (cally)
@@ -252,7 +257,7 @@ i64 WandCatcher::ZESpatialHarden (ZESpatialHardenEvent *e)
       return 0;
     }
 
-  TriCleanup *instance = (TriCleanup *)GraphicsApplication::GetApplication();
+  Tampo *instance = (Tampo *)GraphicsApplication::GetApplication();
   Vect hit;
   if (e -> Aim () . Dot (Vect::yaxis)  > 0.75)
     { if (! elevating)
@@ -263,7 +268,7 @@ i64 WandCatcher::ZESpatialHarden (ZESpatialHardenEvent *e)
             }
         }
     }
-  else if (Frontier *f = instance -> IntersectedFrontier
+/*  else if (Frontier *f = instance -> IntersectedFrontier
            (e -> Loc (), e -> Aim (), &hit))
     { Vect offs;
       Renderable *r = NULL;
@@ -277,11 +282,11 @@ i64 WandCatcher::ZESpatialHarden (ZESpatialHardenEvent *e)
             }
       rupaul_map[e -> Provenance ()] = { f -> ItsNode (), NULL, r, offs };
     }
-
+*/
   return 0;
 }
 
-i64 WandCatcher::ZESpatialSoften (ZESpatialSoftenEvent *e)
+i64 Sensorium::ZESpatialSoften (ZESpatialSoftenEvent *e)
 { if (calibrating  &&  trig_partic . size () == 0)
     { // ymlaen!
       if (cally)
@@ -307,54 +312,73 @@ i64 WandCatcher::ZESpatialSoften (ZESpatialSoftenEvent *e)
       if (elevating)
         {  elevating = false; }
     }
-  else
+/*  else
     { auto it = rupaul_map . find (e -> Provenance ());
       if (it != rupaul_map . end ())
         rupaul_map . erase (it);
     }
-
+*/
   return 0;
 }
 
 
+i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
+{ if (! solo_tamp->steenbeck  ||  ! e)
+    return -1;
+  const ch_ptr <DecodePipeline> deep
+    = solo_tamp->steenbeck -> ItsDecodePipeline ();
+
+  static bool now_playing = true;
+
+  if (e -> Utterance ()  ==  "p")
+    if (DecodePipeline *knob = deep . get ())
+      { if (now_playing)
+          knob -> Pause ();
+        else
+          knob -> Play ();
+        now_playing = ! now_playing;
+      }
+  return 0;
+}
+
 #define ERROR_RETURN_VAL(MSG, VAL)                 \
-  {                                                \
-    fprintf (stderr, "%s\n", MSG);                 \
+  { fprintf (stderr, "%s\n", MSG);                 \
     return VAL;                                    \
   }
 
 #define ERROR_RETURN(MSG)                          \
-   {                                               \
-    fprintf (stderr, "%s\n", MSG);                 \
+  { fprintf (stderr, "%s\n", MSG);                 \
     return;                                        \
   }
 
-TriCleanup::TriCleanup ()
-  : GraphicsApplication (),
-    wandy {new WandCatcher},
-    elev_trans_mult (77.0)
-{
-  AppendSpatialPhage (&m_event_sprinkler, wandy);
+
+Tampo::Tampo ()  :  GraphicsApplication (),
+                    sensy {new Sensorium},
+                    elev_trans_mult (77.0),
+                    steenbeck (NULL)
+{ AppendSpatialPhage (&m_event_sprinkler, sensy);
+  AppendYowlPhage (&m_event_sprinkler, sensy);
   elev_transl . MakeBecomeLikable ();
 }
 
-TriCleanup::~TriCleanup ()
-{
-}
+
+Tampo::~Tampo ()
+{ }
+
 
 static LoopFloat timey { 0.0, 1.0, 0.0 };
 
-bool TriCleanup::DoWhatThouWilt (i64, f64)
+bool Tampo::DoWhatThouWilt (i64, f64)
 {
   // if (timey.val > 1.5)
-  //   { TriCleanup::ROWP () . HooverCoordTransforms ();
+  //   { Tampo::ROWP () . HooverCoordTransforms ();
   //     timey . BecomeLike (ZoftFloat (0.0));
   //   }
   return true;
 }
 
-PlatonicMaes *TriCleanup::ClosestIntersectedMaes (const Vect &frm, const Vect &aim,
-                                               Vect *hit_point)
+PlatonicMaes *Tampo::ClosestIntersectedMaes (const Vect &frm, const Vect &aim,
+                                             Vect *hit_point)
 { PlatonicMaes *close_m = NULL;
   Vect close_p, hit;
   f64 close_d;
@@ -379,8 +403,8 @@ PlatonicMaes *TriCleanup::ClosestIntersectedMaes (const Vect &frm, const Vect &a
   return close_m;
 }
 
-Frontier *TriCleanup::IntersectedFrontier (const Vect &frm, const Vect &aim,
-                                        Vect *hit_point)
+Frontier *Tampo::IntersectedFrontier (const Vect &frm, const Vect &aim,
+                                      Vect *hit_point)
 { Vect hit;
   for (Layer *l  :  m_scene_graph_layers)
     { Frontier *f = l -> FirstHitFrontier ({frm, aim}, &hit);
@@ -395,7 +419,7 @@ Frontier *TriCleanup::IntersectedFrontier (const Vect &frm, const Vect &aim,
 }
 
 
-void TriCleanup::FlatulateCursor (ZESpatialMoveEvent *e)
+void Tampo::FlatulateCursor (ZESpatialMoveEvent *e)
 { const std::string &which_crs = e -> Provenance ();
   Cursoresque *crs = NULL;
   Cursoresque *bachelor_crs = NULL;
@@ -423,7 +447,7 @@ void TriCleanup::FlatulateCursor (ZESpatialMoveEvent *e)
 }
 
 
-void TriCleanup::AccrueElevatorOffset (const Vect &off)
+void Tampo::AccrueElevatorOffset (const Vect &off)
 { Vect hither = elev_transl.val + elev_trans_mult * off;
   elev_transl = hither;
 }
@@ -433,11 +457,10 @@ namespace po = boost::program_options;
 
 
 int main (int ac, char **av)
-{
-  po::options_description desc ("available options");
+{ po::options_description desc ("available options");
   desc . add_options ()
     ("help", "hm. what do you think?")
-    ("prison-break", "escaped elements only mode")
+/*    ("prison-break", "escaped elements only mode")
     ("clip-collages", "disallow collage elements outside rect-bounds")
     ("background-gray", po::value<f64>(&global_param_background_gray),
      "gray value (range 0.0-1.0) for screen background; default is 0.0")
@@ -446,7 +469,8 @@ int main (int ac, char **av)
     ("ee-scale-delta", po::value<f64>(&global_param_ee_scale_delta),
      "+/- scale range for escaped elements (around median); default is 0.0")
     ("ee-count-per-wall", po::value<i32>(&global_param_ee_count_per_wall),
-     "how many escaped elements per wall; default 10");
+     "how many escaped elements per wall; default 10")*/
+    ;
 
   po::variables_map arg_map;
   po::store (po::parse_command_line(ac, av, desc), arg_map);
@@ -457,128 +481,104 @@ int main (int ac, char **av)
     { std::cout << desc << "\n";
       return 0;
     }
-
+/*
   if (arg_map.count ("prison-break"))
     global_params_prison_break_mode = true;
   if (arg_map . count ("clip-collages"))
     global_param_should_clip_collages = true;
+*/
+  Tampo tamp;
+  solo_tamp = &tamp;
 
-  TriCleanup demo;
-
-  if (! demo.StartUp ())
+  if (! tamp . StartUp ())
     return -1;
 
-  Layer *front_layer = demo.GetSceneLayer();
+  Layer *front_layer = tamp . GetSceneLayer();
   Layer *left_layer = new Layer ();
-  demo.AppendSceneLayer(left_layer);
-  Layer *ee_layer = new Layer ();
-  demo.AppendSceneLayer(ee_layer);
+  tamp . AppendSceneLayer (left_layer);
+  Layer *omni_layer = new Layer ();
+  tamp . AppendSceneLayer (omni_layer);
 
-  i32 const leaf_count = demo.NumRenderLeaves();
+  i32 const leaf_count = tamp . NumRenderLeaves();
   for (i32 i = 0; i < leaf_count; ++i)
-    {
-      CMVTrefoil *leaf = demo.NthRenderLeaf(i);
+    { CMVTrefoil *leaf = tamp . NthRenderLeaf(i);
       if (! leaf->maes)
         continue;
 
-      if (leaf->maes->Name() == "front")
-        leaf->layers.push_back(front_layer);
-      else if (leaf->maes->Name () == "left")
-        leaf->layers.push_back(left_layer);
+      if (leaf->maes -> Name () == "front")
+        leaf->layers . push_back (front_layer);
+      else if (leaf->maes -> Name () == "left")
+        leaf->layers . push_back (left_layer);
 
       //ee_layer goes on all
-      leaf->layers.push_back(ee_layer);
+      leaf->layers . push_back (omni_layer);
     }
 
-  std::vector<FilmInfo> film_infos
+  std::vector <FilmInfo> film_infos
     = ReadFilmInfo ("../configs/film-config.toml");
   assert (film_infos.size () > 0);
-
-  {
-    BlockTimer bt ("loading geom");
+/*
+  { BlockTimer bt ("loading geom");
     std::vector<FilmGeometry> geoms
       = ReadFileGeometry("../configs/mattes.toml");
-    assert (geoms.size () > 0);
-    MergeFilmInfoGeometry(film_infos, geoms);
+    assert (geoms . size ()  >  0);
+    MergeFilmInfoGeometry (film_infos, geoms);
   }
-
-  PlatonicMaes *maes = demo.FindMaesByName ("front");
+*/
+  PlatonicMaes *maes = tamp . FindMaesByName ("front");
   assert (maes);
-  PlatonicMaes *left = demo.FindMaesByName("left");
+  PlatonicMaes *left = tamp . FindMaesByName ("left");
   assert (left);
 
-  f64 const total_height = maes->Height() * 2.0;
-  f64 const total_width = maes->Width ();
+  f64 const total_height = 2.0 * maes -> Height();
+  f64 const total_width = maes -> Width ();
   f64 const band_height = total_height / 3.0;
 
-  if (! global_params_prison_break_mode)
-    {
-      CollageBand *collage_band
-        = new CollageBand (total_width, band_height, film_infos);
-      collage_band -> Translate (demo.elev_transl);
-      collage_band -> Translate (maes->Loc ()
-                                 + band_height * maes->Up ());
-      front_layer -> GetRootNode () -> AppendChild (collage_band);
-
-      // plays the fall
-      VideoRenderable *vr = new VideoRenderable (film_infos[4]);
-      Node *video_band = new Node (vr);
-      video_band -> Scale (Vect (0.6 * total_width));
-      video_band -> Translate (demo.elev_transl);
-      video_band -> Translate (maes->Loc () - band_height * maes->Up ());
-      front_layer -> GetRootNode () -> AppendChild (video_band);
-
-      collage_band = new CollageBand (total_width, band_height, film_infos);
-      collage_band -> RotateD (maes->Up (), 90.0);
-      collage_band -> Translate (demo.elev_transl);
-      collage_band -> Translate
-        (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
-         -  0.5 * maes -> Width () * maes -> Over ()
-         +  (band_height
-             + maes -> Loc () . Dot (maes -> Up ())) * maes -> Up ());
-      left_layer -> GetRootNode () -> AppendChild (collage_band);
-
-      // plays carnosaur
-      vr = new VideoRenderable (film_infos[2]);
-      video_band = new Node (vr);
-      video_band -> Scale (Vect (0.6 * total_width));
-      video_band -> RotateD (maes -> Up (), 90.0);
-      video_band -> Translate (demo.elev_transl);
-      video_band -> Translate
-        (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
-         -  0.5 * maes -> Width () * maes -> Over ()
-         +  (maes -> Loc () . Dot (maes -> Up ())
-             - band_height) * maes -> Up ());
-      left_layer -> GetRootNode () -> AppendChild (video_band);
-    }
-
-  ElementsBand *elements_band
-    = new ElementsBand (total_width, band_height, film_infos,
-                        *maes, maes -> Loc ());
-  elements_band->Translate (demo.elev_transl);
-//  elements_band->Translate (maes->Loc ());
-  ee_layer->GetRootNode()->AppendChild(elements_band);
+  Node *kawntent = new Node;
+  kawntent -> Translate (tamp . elev_transl);
+  kawntent -> Translate (maes -> Loc ());
+  omni_layer -> GetRootNode () -> AppendChild (kawntent);
 
   Vect left_cntr
     = (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
        -  0.5 * maes -> Width () * maes -> Over ()
        +  maes -> Loc () . Dot (maes -> Up ()) * maes -> Up ());
-  elements_band = new ElementsBand (total_width, band_height, film_infos,
-                                    *left, left_cntr);
-//  elements_band->RotateD (maes->Up (), 90.0);
-  elements_band -> Translate (demo.elev_transl);
-//  elements_band->Translate (left_cntr);
-  ee_layer -> GetRootNode () -> AppendChild (elements_band);
+  // elements_band = new ElementsBand (total_width, band_height, film_infos,
+  //                                   *left, left_cntr);
+  // elements_band->Translate (tamp . elev_transl);
+
+  // ee_layer -> GetRootNode () -> AppendChild (elements_band);
 
   for (int q = 0  ;  q < 3  ;  ++q)
     { Cursoresque *c = new Cursoresque (0.015 * maes -> Height ());
-      ee_layer -> GetRootNode () -> AppendChild (c->crs_nod);
+      omni_layer -> GetRootNode () -> AppendChild (c->crs_nod);
 
       cursoresques . push_back (c);
       c->crs_pos = maes -> Loc ();
     }
 
-  demo.Run ();
+  tamp.steenbeck = new VideoRenderable (film_infos[4]);
+  Node *drive_in = new Node (tamp.steenbeck);
+  drive_in -> Scale (0.7 * total_width);
+  kawntent -> AppendChild (drive_in);
+
+  Node *splat = new Node;
+  PolygonRenderable *polysplat = new PolygonRenderable;
+  i64 nv = 14;
+  ZoftVect centz (maes -> Loc ());
+  for (i64 q = 0  ;  q < nv  ;  ++q)
+    { f64 r = 0.3 * maes -> Height ();
+      f64 theeeta = 2.0 * M_PI / (f64)nv * (f64)q;
+      Vect radv = cos (theeeta) * Vect::xaxis  +  sin (theeeta) * Vect::yaxis;
+      SinuVect arm (0.3 * r * radv, 1.0 + 0.3 * drand48 (),
+                    0.5 * (1.0 + q%2) * r * radv);
+      SumVect voit (arm, centz);
+      polysplat -> AppendVertex (voit);
+    }
+  splat -> AppendRenderable (polysplat);
+  kawntent -> AppendChild (splat);
+
+  tamp . Run ();
 
   return 0;
 }

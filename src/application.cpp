@@ -1,11 +1,15 @@
+
 #include <application.hpp>
 
 #include <assert.h>
 #include <signal.h>
 #include <string.h>
 
+
 namespace charm
 {
+
+
 static bool s_keep_running = true;
 
 bool Application::StartUp ()
@@ -57,6 +61,13 @@ bool Application::InstallDefaultSignalHandlers ()
 
   return true;
 }
+
+
+MultiSprinkler &Application::GetSprinkler ()
+{
+  return m_event_sprinkler;
+}
+
 
 void Application::StopRunning ()
 {

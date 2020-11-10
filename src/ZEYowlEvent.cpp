@@ -35,24 +35,25 @@ i32 ZEYowlEvent::RepetitionOrdinal ()  const
 void ZEYowlEvent::SetRepetitionOrdinal (i32 ro)
 { rept_ord = ro; }
 
-void AppendYowlPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy)
-{
-  if (! _ms || ! _phagy)
+
+
+void AppendYowlPhage (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phage)
+{ if (! _ms || ! _phage)
     return;
 
-  _ms->AppendPhage<ZEYowlRepeatEvent> (_phagy);
-  _ms->AppendPhage<ZEYowlAppearEvent> (_phagy);
-  _ms->AppendPhage<ZEYowlVanishEvent> (_phagy);
+  _ms -> AppendPhage <ZEYowlRepeatEvent> (_phage);
+  _ms -> AppendPhage <ZEYowlAppearEvent> (_phage);
+  _ms -> AppendPhage <ZEYowlVanishEvent> (_phage);
 }
 
-void RemoveYowlPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy)
-{
-  if (! _ms || ! _phagy)
+void RemoveYowlPhage (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phage)
+{ if (! _ms || ! _phage)
     return;
 
-  _ms->RemovePhage<ZEYowlRepeatEvent> (_phagy);
-  _ms->RemovePhage<ZEYowlAppearEvent> (_phagy);
-  _ms->RemovePhage<ZEYowlVanishEvent> (_phagy);
+  _ms -> RemovePhage <ZEYowlRepeatEvent> (_phage);
+  _ms -> RemovePhage <ZEYowlAppearEvent> (_phage);
+  _ms -> RemovePhage <ZEYowlVanishEvent> (_phage);
 }
+
 
 }

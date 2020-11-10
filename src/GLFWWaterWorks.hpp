@@ -1,20 +1,26 @@
+
 #ifndef COME_ON_ITS_OK_LET_IT_ALL_OUT_SHHHHHH
 #define COME_ON_ITS_OK_LET_IT_ALL_OUT_SHHHHHH
+
 
 #include <ZePublicWaterWorks.hpp>
 
 #include <ZESpatialEvent.h>
 #include <ZEYowlEvent.h>
 
+
 extern "C"
 {
   struct GLFWwindow;
 }
 
+
 namespace charm
 {
 
+
 class Bolex;
+
 
 struct MouseState
 {
@@ -22,6 +28,7 @@ struct MouseState
   u64 button_state = 0;
   bool valid = false;
 };
+
 
 class GLFWWaterWorks : public ZePublicWaterWorks
 {

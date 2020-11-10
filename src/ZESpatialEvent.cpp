@@ -100,28 +100,27 @@ u64 ZESpatialEvent::NthPressure (i64 ind)  const
   return it->second;
 }
 
-void AppendSpatialPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy)
-{
-  if (! _ms || ! _phagy)
+void AppendSpatialPhage (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phage)
+{ if (! _ms || ! _phage)
     return;
 
-  _ms->AppendPhage<ZESpatialMoveEvent> (_phagy);
-  _ms->AppendPhage<ZESpatialAppearEvent> (_phagy);
-  _ms->AppendPhage<ZESpatialVanishEvent> (_phagy);
-  _ms->AppendPhage<ZESpatialHardenEvent> (_phagy);
-  _ms->AppendPhage<ZESpatialSoftenEvent> (_phagy);
+  _ms -> AppendPhage <ZESpatialMoveEvent> (_phage);
+  _ms -> AppendPhage <ZESpatialAppearEvent> (_phage);
+  _ms -> AppendPhage <ZESpatialVanishEvent> (_phage);
+  _ms -> AppendPhage <ZESpatialHardenEvent> (_phage);
+  _ms -> AppendPhage <ZESpatialSoftenEvent> (_phage);
 }
 
-void RemoveSpatialPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy)
-{
-  if (! _ms || ! _phagy)
+void RemoveSpatialPhage (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phage)
+{ if (! _ms || ! _phage)
     return;
 
-  _ms->RemovePhage<ZESpatialMoveEvent> (_phagy);
-  _ms->RemovePhage<ZESpatialAppearEvent> (_phagy);
-  _ms->RemovePhage<ZESpatialVanishEvent> (_phagy);
-  _ms->RemovePhage<ZESpatialHardenEvent> (_phagy);
-  _ms->RemovePhage<ZESpatialSoftenEvent> (_phagy);
+  _ms -> RemovePhage <ZESpatialMoveEvent> (_phage);
+  _ms -> RemovePhage <ZESpatialAppearEvent> (_phage);
+  _ms -> RemovePhage <ZESpatialVanishEvent> (_phage);
+  _ms -> RemovePhage <ZESpatialHardenEvent> (_phage);
+  _ms -> RemovePhage <ZESpatialSoftenEvent> (_phage);
 }
+
 
 }  // namespace charm is still spoken of, when it is noted, with high regard

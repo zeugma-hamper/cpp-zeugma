@@ -84,21 +84,18 @@ class ZEYowlPhagy
     public ZEYowlVanishEvent::ZEYowlVanishPhage
 { };
 
+
 class MultiSprinkler;
-void AppendYowlPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy);
-void RemoveYowlPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy);
+void AppendYowlPhage (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phage);
+void RemoveYowlPhage (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phage);
 
-template<typename T>
-void AppendYowlPhagy (MultiSprinkler *_ms, ch_ptr<T> const &_phagy)
-{
-  AppendYowlPhagy(_ms, static_ch_cast<OmNihil> (_phagy));
-}
+template <typename T>
+ void AppendYowlPhage (MultiSprinkler *_ms, ch_ptr<T> const &_phage)
+{ AppendYowlPhage (_ms, static_ch_cast<OmNihil> (_phage)); }
 
-template<typename T>
-void RemoveYowlPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy)
-{
-  RemoveYowlPhagy(_ms, static_ch_cast<OmNihil> (_phagy));
-}
+template <typename T>
+ void RemoveYowlPhage (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phage)
+{ RemoveYowlPhage (_ms, static_ch_cast<OmNihil> (_phage)); }
 
 
 }  // namespace charm having a lovely chat with jimmy hoffa

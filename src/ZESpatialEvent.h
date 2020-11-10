@@ -181,21 +181,23 @@ class ZESpatialPhagy
      public ZESpatialSoftenEvent::ZESpatialSoftenPhage
 { };
 
+
 class MultiSprinkler;
 
-void AppendSpatialPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy);
-void RemoveSpatialPhagy (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phagy);
+void AppendSpatialPhage (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phage);
+void RemoveSpatialPhage (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phage);
 
-template<typename T>
-void AppendSpatialPhagy (MultiSprinkler *_ms, ch_ptr<T> const &_phagy)
+
+template <typename T>
+void AppendSpatialPhage (MultiSprinkler *_ms, ch_ptr<T> const &_phage)
 {
-  AppendSpatialPhagy(_ms, static_ch_cast<OmNihil>(_phagy));
+  AppendSpatialPhage (_ms, static_ch_cast <OmNihil> (_phage));
 }
 
-template<typename T>
-void RemoveSpatialPhagy (MultiSprinkler *_ms, ch_ptr<T> const &_phagy)
+template <typename T>
+void RemoveSpatialPhage (MultiSprinkler *_ms, ch_ptr<T> const &_phage)
 {
-  RemoveSpatialPhagy(_ms, static_ch_cast<OmNihil>(_phagy));
+  RemoveSpatialPhage (_ms, static_ch_cast <OmNihil> (_phage));
 }
 
 

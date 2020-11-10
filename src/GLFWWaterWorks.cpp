@@ -1,3 +1,4 @@
+
 #include <GLFWWaterWorks.hpp>
 
 #include <Bolex.h>
@@ -12,10 +13,13 @@
 
 #include <unordered_map>
 
+
 namespace charm
 {
 
+
 static GLFWWaterWorks *s_rmww_instance {nullptr};
+
 
 static void glfw_mousepos_callback (GLFWwindow *win, double x, double y)
 {
@@ -27,10 +31,9 @@ static void glfw_mousebutt_callback (GLFWwindow *wind, int butt,
                                      int actn, int mods)
 {
   s_rmww_instance->CreateZEPressureFromGLFW (wind, butt, actn, mods);
-
 }
 
-static std::unordered_map<int, char> s_glfw_lower_map
+static std::unordered_map <int, char> s_glfw_lower_map
   {
     { GLFW_KEY_SPACE, ' '},
     { GLFW_KEY_APOSTROPHE, '\''},
@@ -82,7 +85,7 @@ static std::unordered_map<int, char> s_glfw_lower_map
     { GLFW_KEY_GRAVE_ACCENT, '`'}
   };
 
-static std::unordered_map<int, char> s_glfw_upper_map
+static std::unordered_map <int, char> s_glfw_upper_map
   {
     { GLFW_KEY_SPACE, ' '},
     { GLFW_KEY_APOSTROPHE, '\"'},
@@ -134,51 +137,48 @@ static std::unordered_map<int, char> s_glfw_upper_map
     { GLFW_KEY_GRAVE_ACCENT, '~'}
   };
 
-static void glfw_key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
-{
-  (void)window;
+static void glfw_key_callback (GLFWwindow *window, int key,
+                               int scancode, int action, int mods)
+{ (void)window;
   (void)scancode;
 
-  char ch = ' ';
-  const char *ch_ptr = &ch;
+  // current scheme results in one-byte 'keystrokes', but someday UTF-X?
+  char ch[2];
+  ch[1] = 0;
+  const char *ch_ptr = &ch[0];
   if (mods & GLFW_MOD_SHIFT)
-    {
-      auto it = s_glfw_upper_map.find (key);
+    { auto it = s_glfw_upper_map.find (key);
       if (it == s_glfw_upper_map.end ())
         return;
 
-      ch = it->second;
+      ch[0] = it->second;
     }
   else
-    {
-      auto it = s_glfw_lower_map.find (key);
+    { auto it = s_glfw_lower_map.find (key);
       if (it == s_glfw_lower_map.end ())
         return;
 
-      ch = it->second;
+      ch[0] = it->second;
     }
 
   if (GLFW_PRESS == action)
-    {
-      ZEYowlAppearEvent yaevt (ch_ptr);
-      s_rmww_instance->SprayYowlAppear(&yaevt);
+    { ZEYowlAppearEvent yaevt (ch_ptr);
+      s_rmww_instance -> SprayYowlAppear(&yaevt);
     }
   else if (GLFW_REPEAT == action)
-    {
-      ZEYowlRepeatEvent yrevt (ch_ptr);
-      s_rmww_instance->SprayYowlRepeat (&yrevt);
+    { ZEYowlRepeatEvent yrevt (ch_ptr);
+      s_rmww_instance -> SprayYowlRepeat (&yrevt);
     }
   else if (GLFW_RELEASE == action)
-    {
-      ZEYowlVanishEvent yvevt (ch_ptr);
-      s_rmww_instance->SprayYowlVanish (&yvevt);
+    { ZEYowlVanishEvent yvevt (ch_ptr);
+      s_rmww_instance -> SprayYowlVanish (&yvevt);
     }
 }
 
+
 GLFWWaterWorks::GLFWWaterWorks (GLFWwindow *window)
   : m_temp_sprinkler {nullptr}
-{
-  s_rmww_instance = this;
+{ s_rmww_instance = this;
 
   glfwSetKeyCallback (window, glfw_key_callback);
   glfwSetCursorPosCallback (window, glfw_mousepos_callback);
@@ -186,46 +186,45 @@ GLFWWaterWorks::GLFWWaterWorks (GLFWwindow *window)
 }
 
 void GLFWWaterWorks::Drain (MultiSprinkler *_ms)
-{
-  m_temp_sprinkler = _ms;
+{ m_temp_sprinkler = _ms;
   glfwPollEvents();
 }
 
 void GLFWWaterWorks::SpraySpatialMove (ZESpatialMoveEvent *_zsme)
 {
-  m_temp_sprinkler->Spray (_zsme);
+  m_temp_sprinkler -> Spray (_zsme);
 }
 
 void GLFWWaterWorks::SpraySpatialHarden (ZESpatialHardenEvent *_zshe)
 {
-  m_temp_sprinkler->Spray (_zshe);
+  m_temp_sprinkler -> Spray (_zshe);
 }
 
 void GLFWWaterWorks::SpraySpatialSoften (ZESpatialSoftenEvent *_zsse)
 {
-  m_temp_sprinkler->Spray (_zsse);
+  m_temp_sprinkler -> Spray (_zsse);
 }
 
 void GLFWWaterWorks::SprayYowlAppear (ZEYowlAppearEvent *_zyae)
 {
-  m_temp_sprinkler->Spray (_zyae);
+  m_temp_sprinkler -> Spray (_zyae);
 }
 
 void GLFWWaterWorks::SprayYowlRepeat (ZEYowlRepeatEvent *_zyre)
 {
-  m_temp_sprinkler->Spray (_zyre);
+  m_temp_sprinkler -> Spray (_zyre);
 }
 
 void GLFWWaterWorks::SprayYowlVanish (ZEYowlVanishEvent *_zyve)
 {
-  m_temp_sprinkler->Spray (_zyve);
+  m_temp_sprinkler -> Spray (_zyve);
 }
+
 
 static std::string const s_glfw_mouse_name = "mouse-0";
 
 void GLFWWaterWorks::CreateZEMoveFromGLFW (GLFWwindow *_window, f64 _x, f64 _y)
-{
-  GraphicsApplication * const ga = GraphicsApplication::GetApplication();
+{ GraphicsApplication * const ga = GraphicsApplication::GetApplication();
   CMVTrefoil *leaf = nullptr;
   i32 const maes_count = ga->NumMaeses ();
   for (i32 q = 0;  q < maes_count;  ++q)
@@ -272,10 +271,10 @@ void GLFWWaterWorks::CreateZEMoveFromGLFW (GLFWwindow *_window, f64 _x, f64 _y)
   SpraySpatialMove(&smev);
 }
 
+
 void GLFWWaterWorks::CreateZEPressureFromGLFW (GLFWwindow *wind, int butt,
                                                int actn, int mods)
-{
-  (void)wind;
+{ (void)wind;
   (void)mods;
   u64 const which_button = 0x01 << butt;
   f64 const pressure = actn == GLFW_PRESS ? 1.0 : 0.0;

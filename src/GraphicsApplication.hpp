@@ -1,11 +1,12 @@
+
 #ifndef PIXELS_DANCE_A_SOFT_RHUMBA
 #define PIXELS_DANCE_A_SOFT_RHUMBA
+
 
 #include <application.hpp>
 #include <base_types.hpp>
 #include <FrameTime.hpp>
 #include <Layer.hpp>
-#include <MultiSprinkler.hpp>
 #include <ZePublicWaterWorks.hpp>
 #include <PlatonicMaes.h>
 #include <CMVTrefoil.h>
@@ -18,7 +19,8 @@
 
 namespace charm {
 
-class GraphicsApplication : public Application
+
+class GraphicsApplication  :  public Application
 {
  public:
   GraphicsApplication ();
@@ -37,8 +39,6 @@ class GraphicsApplication : public Application
 
   void UpdateSceneGraph (i64 ratch, f64 thyme);
   void UpdateRenderLeaves (i64 ratch, f64 thyme);
-
-  MultiSprinkler &GetSprinkler ();
 
   void AppendWaterWorks (ZePublicWaterWorks *_pub);
   //removes and deletes water works
@@ -62,10 +62,9 @@ class GraphicsApplication : public Application
   void AppendSceneLayer (Layer *layer);
   i32 NumSceneLayers () const;
 
-protected:
+ protected:
   i64 m_global_ratchet;
-  MultiSprinkler m_event_sprinkler;
-  std::vector<ZePublicWaterWorks *> m_event_drainage;
+  std::vector <ZePublicWaterWorks *> m_event_drainage;
 
   GLFWwindow *m_window;
   std::vector<PlatonicMaes *> m_maes;
@@ -74,6 +73,8 @@ protected:
   std::vector<CMVTrefoil *> m_trefoils;
 };
 
+
 }
+
 
 #endif //PIXELS_DANCE_A_SOFT_RHUMBA
