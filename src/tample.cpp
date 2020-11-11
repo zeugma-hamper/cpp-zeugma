@@ -576,6 +576,7 @@ int main (int ac, char **av)
       polysplat -> AppendVertex (voit);
     }
   splat -> AppendRenderable (polysplat);
+polysplat -> SetShouldStroke (true);
   kawntent -> AppendChild (splat);
 
   tamp . Run ();
