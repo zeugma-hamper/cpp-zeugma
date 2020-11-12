@@ -99,6 +99,14 @@ bool DecodePipeline::OpenVideoFile (std::string_view _uri, PipelineTerminus *_te
 
   bool ret = m_terminus->OnStart (this);
   SetState(GST_STATE_PAUSED);
+
+
+  GstState current, pending;
+  GstStateChangeReturn scret = gst_element_get_state (m_pipeline, &current, &pending,
+                                                      GST_CLOCK_TIME_NONE);
+  if (scret != GST_STATE_CHANGE_SUCCESS)
+    fprintf (stderr, "pipeline couldn't get to PAUSED; returned %d\n", scret);
+
   return ret;
 }
 
