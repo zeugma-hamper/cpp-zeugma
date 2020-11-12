@@ -321,7 +321,9 @@ tri_cleanup_exec = executable ('tri_cleanup',
                             dependencies : [charm_dep])
 
 tample_exec = executable ('tample',
-                           sources : ['src/tample.cpp'],
+                           sources : ['src/tample.cpp',
+                                      'src/Orksur.cpp',
+                                      'src/Ticato.cpp'],
                            dependencies : [charm_dep, glu_dep])
 
 scan_mattes_exec = executable ('scan_mattes',

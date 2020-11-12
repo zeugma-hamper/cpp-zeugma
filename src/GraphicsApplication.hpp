@@ -40,6 +40,11 @@ class GraphicsApplication  :  public Application
   void UpdateSceneGraph (i64 ratch, f64 thyme);
   void UpdateRenderLeaves (i64 ratch, f64 thyme);
 
+  std::size_t NumWaterWorkses ()  const
+    { return m_event_drainage . size (); }
+  ZePublicWaterWorks *NthWaterWorks (std::size_t ind)
+    { return m_event_drainage . at (ind); }
+
   void AppendWaterWorks (ZePublicWaterWorks *_pub);
   //removes and deletes water works
   void RemoveWaterWorks (ZePublicWaterWorks *_pub);

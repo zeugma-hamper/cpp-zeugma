@@ -396,14 +396,14 @@ static void glfw_mousepos_callback (GLFWwindow *win, double x, double y)
 
   Bolex *b = leaf->cam;
   Vect thr = b -> ViewLoc ()  +  b -> ViewDist () * b -> ViewAim ();
-  f64 wid = b -> IsPerspectiveTypeOthographic ()  ?  b -> ViewOrthoWid ()
+  f64 wid = b -> IsProjectionTypeOrthographic ()  ?  b -> ViewOrthoWid ()
     :  b -> ViewDist () * 2.0 * tan (0.5 * b -> ViewHorizAngle ());
-  f64 hei = b -> IsPerspectiveTypeOthographic ()  ?  b -> ViewOrthoHei ()
+  f64 hei = b -> IsProjectionTypeOrthographic ()  ?  b -> ViewOrthoHei ()
     :  b -> ViewDist () * 2.0 * tan (0.5 * b -> ViewVertAngle ());
   Vect ovr = b -> ViewAim () . Cross (b -> ViewUp ()) . Norm ();
   Vect upp = ovr . Cross (b -> ViewAim ());
   thr += (x - 0.5) * wid * ovr  +  (y - 0.5) * hei * upp;
-  Vect frm = b -> IsPerspectiveTypeProjection ()  ?  b -> ViewLoc ()
+  Vect frm = b -> IsProjectionTypePerspective ()  ?  b -> ViewLoc ()
     :  thr - b -> ViewDist () * b -> ViewAim ();
 
 thr.SpewToStderr(); fprintf(stderr," on <%s>\n",leaf->maes->Name().c_str());

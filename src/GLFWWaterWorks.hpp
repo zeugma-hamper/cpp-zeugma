@@ -47,6 +47,11 @@ class GLFWWaterWorks : public ZePublicWaterWorks
   void SprayYowlRepeat (ZEYowlRepeatEvent *_zyre);
   void SprayYowlVanish (ZEYowlVanishEvent *_zyve);
 
+  bool PromoteMouseToSpatialOrthoStyle ()  const
+    { return m_mouse_to_spatial_ortho_style; }
+  void SetPromoteMouseToSpatialOrthoStyle (bool mtsos)
+    { m_mouse_to_spatial_ortho_style = mtsos; }
+
   // called by GLFW mouse callbacks
   void CreateZEMoveFromGLFW (GLFWwindow *_window, f64 _x, f64 _y);
   void CreateZEPressureFromGLFW (GLFWwindow *wind, int butt,
@@ -55,6 +60,7 @@ class GLFWWaterWorks : public ZePublicWaterWorks
  protected:
   MultiSprinkler *m_temp_sprinkler;
   MouseState m_mouse_state;
+  bool m_mouse_to_spatial_ortho_style;
 };
 
 }

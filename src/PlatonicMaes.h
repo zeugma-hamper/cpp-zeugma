@@ -35,6 +35,17 @@ class PlatonicMaes  :  public SpaceThing
         ideal_pixwid (-1), ideal_pixhei (-1)
     { }
 
+  PlatonicMaes (const PlatonicMaes &ma, bool follow)
+     :  SpaceThing (),
+        loc (follow  ?  ma.loc  :  ZoftVect (ma.loc.val)),
+        ovr (follow  ?  ma.ovr  :  ZoftVect (ma.ovr.val)),
+        upp (follow  ?  ma.upp  :  ZoftVect (ma.upp.val)),
+        wid (follow  ?  ma.wid  :  ZoftFloat (ma.wid.val)),
+        hei (follow  ?  ma.hei  :  ZoftFloat (ma.hei.val)),
+        ideal_pixwid (ma.ideal_pixwid),
+        ideal_pixhei (ma.ideal_pixhei)
+    { }
+
   const Vect &Loc ()  const
     { return loc.val; }
   const Vect &Over ()  const

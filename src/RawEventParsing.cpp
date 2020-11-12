@@ -474,15 +474,15 @@ void RawMouseParser::MouseMove (const std::string &nm, f64 x_nrm, f64 y_nrm,
   catch (std::out_of_range &exc) { }
 
   Vect thr = cam -> ViewLoc ()  +  cam -> ViewDist () * cam -> ViewAim ();
-  f64 wid = cam -> IsPerspectiveTypeOthographic ()  ?  cam -> ViewOrthoWid ()
+  f64 wid = cam -> IsProjectionTypeOrthographic ()  ?  cam -> ViewOrthoWid ()
     :  cam -> ViewDist () * 2.0 * tan (0.5 * cam -> ViewHorizAngle ());
-  f64 hei = cam -> IsPerspectiveTypeOthographic ()  ?  cam -> ViewOrthoHei ()
+  f64 hei = cam -> IsProjectionTypeOrthographic ()  ?  cam -> ViewOrthoHei ()
     :  cam -> ViewDist () * 2.0 * tan (0.5 * cam -> ViewVertAngle ());
   Vect ovr = cam -> ViewAim () . Cross (cam -> ViewUp ()) . Norm ();
   Vect upp = ovr . Cross (cam -> ViewAim ());
 
   thr += (x_nrm - 0.5) * wid * ovr  +  (y_nrm - 0.5) * hei * upp;
-  Vect frm = cam -> IsPerspectiveTypeProjection ()  ?  cam -> ViewLoc ()
+  Vect frm = cam -> IsProjectionTypePerspective ()  ?  cam -> ViewLoc ()
     :  thr - cam -> ViewDist () * cam -> ViewAim ();
 
   ZESpatialMoveEvent *smev

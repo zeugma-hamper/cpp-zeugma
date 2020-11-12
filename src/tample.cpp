@@ -36,6 +36,7 @@
 #include "SumZoft.h"
 
 //events
+#include <GLFWWaterWorks.hpp>
 #include <ZESpatialEvent.h>
 #include <ZEYowlEvent.h>
 #include <RawEventParsing.h>
@@ -57,6 +58,9 @@
 #include <stdio.h>
 
 #include <iostream>
+
+// it's us! right here!
+#include "Orksur.h"
 
 
 using namespace charm;
@@ -160,6 +164,7 @@ class Tampo final : public GraphicsApplication
   ch_ptr<Sensorium> sensy;
 
  public:
+//  ch_ptr <Orksur> ork;
   ZoftVect elev_transl;
   f64 elev_trans_mult;
   VideoRenderable *steenbeck;
@@ -354,6 +359,7 @@ i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
 
 Tampo::Tampo ()  :  GraphicsApplication (),
                     sensy {new Sensorium},
+//                    ork (NULL),
                     elev_trans_mult (77.0),
                     steenbeck (NULL)
 { AppendSpatialPhage (&m_event_sprinkler, sensy);
@@ -529,6 +535,8 @@ int main (int ac, char **av)
   assert (maes);
   PlatonicMaes *left = tamp . FindMaesByName ("left");
   assert (left);
+  PlatonicMaes *tabl = tamp . FindMaesByName ("table");
+  assert (tabl);
 
   f64 const total_height = 2.0 * maes -> Height();
   f64 const total_width = maes -> Width ();
@@ -538,6 +546,9 @@ int main (int ac, char **av)
   kawntent -> Translate (tamp . elev_transl);
   kawntent -> Translate (maes -> Loc ());
   omni_layer -> GetRootNode () -> AppendChild (kawntent);
+
+  Node *windshield = new Node;
+  omni_layer -> GetRootNode () -> AppendChild (windshield);
 
   Vect left_cntr
     = (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
@@ -565,7 +576,7 @@ int main (int ac, char **av)
   Node *splat = new Node;
   PolygonRenderable *polysplat = new PolygonRenderable;
   i64 nv = 14;
-  ZoftVect centz (maes -> Loc ());
+  SinuVect centz (1000.0 * maes -> Over (), 0.3, maes -> Loc ());
   for (i64 q = 0  ;  q < nv  ;  ++q)
     { f64 r = 0.3 * maes -> Height ();
       f64 theeeta = 2.0 * M_PI / (f64)nv * (f64)q;
@@ -577,7 +588,17 @@ int main (int ac, char **av)
     }
   splat -> AppendRenderable (polysplat);
 polysplat -> SetShouldStroke (true);
-  kawntent -> AppendChild (splat);
+  windshield -> AppendChild (splat);
+
+  ch_ptr <Orksur> orkp (new Orksur (*tabl));
+  windshield -> AppendChild (orkp . get ());
+  AppendSpatialPhage (&(tamp . GetSprinkler ()), orkp);
+  AppendYowlPhage (&(tamp . GetSprinkler ()), orkp);
+
+  for (i64 q = 0  ;  q < tamp . NumWaterWorkses ()  ;  ++q)
+    if (GLFWWaterWorks *ww
+        = dynamic_cast <GLFWWaterWorks *> (tamp . NthWaterWorks (q)))
+      ww -> SetPromoteMouseToSpatialOrthoStyle (true);
 
   tamp . Run ();
 

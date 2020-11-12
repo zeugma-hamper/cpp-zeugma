@@ -177,7 +177,8 @@ static void glfw_key_callback (GLFWwindow *window, int key,
 
 
 GLFWWaterWorks::GLFWWaterWorks (GLFWwindow *window)
-  : m_temp_sprinkler {nullptr}
+  : m_temp_sprinkler {nullptr},
+    m_mouse_to_spatial_ortho_style (false)
 { s_rmww_instance = this;
 
   glfwSetKeyCallback (window, glfw_key_callback);
@@ -249,19 +250,21 @@ void GLFWWaterWorks::CreateZEMoveFromGLFW (GLFWwindow *_window, f64 _x, f64 _y)
   _y = leaf->view.fb_pix_t - _y - 1;   // freakin' (0,0) at the top left...
   f64 const x_normed = _x / (f64)(leaf->view.fb_pix_r - leaf->view.fb_pix_l);
   f64 const y_normed = _y / (f64)(leaf->view.fb_pix_t - leaf->view.fb_pix_b);
-  Bolex *camera = leaf->cam;
+  Bolex *c = leaf->cam;
 
-  Vect thr = camera->ViewLoc ()  +  camera->ViewDist () * camera->ViewAim ();
-  f64 wid = camera->IsPerspectiveTypeOthographic ()  ?  camera->ViewOrthoWid ()
-    :  camera->ViewDist () * 2.0 * tan (0.5 * camera->ViewHorizAngle ());
-  f64 hei = camera->IsPerspectiveTypeOthographic ()  ?  camera->ViewOrthoHei ()
-    :  camera->ViewDist () * 2.0 * tan (0.5 * camera->ViewVertAngle ());
-  Vect ovr = camera->ViewAim () . Cross (camera->ViewUp ()) . Norm ();
-  Vect upp = ovr . Cross (camera->ViewAim ());
+  Vect thr = c -> ViewLoc ()  +  c -> ViewDist () * c -> ViewAim ();
+  f64 wid = c -> IsProjectionTypeOrthographic ()  ?  c -> ViewOrthoWid ()
+    :  c -> ViewDist () * 2.0 * tan (0.5 * c -> ViewHorizAngle ());
+  f64 hei = c -> IsProjectionTypeOrthographic ()  ?  c -> ViewOrthoHei ()
+    :  c -> ViewDist () * 2.0 * tan (0.5 * c -> ViewVertAngle ());
+  Vect ovr = c -> ViewAim () . Cross (c -> ViewUp ()) . Norm ();
+  Vect upp = ovr . Cross (c -> ViewAim ());
 
   thr += (x_normed - 0.5) * wid * ovr  +  (y_normed - 0.5) * hei * upp;
-  Vect frm = camera->IsPerspectiveTypeProjection ()  ?  camera->ViewLoc ()
-    :  thr - camera->ViewDist () * camera->ViewAim ();
+  Vect frm
+    = (c -> IsProjectionTypePerspective ()  &&  ! m_mouse_to_spatial_ortho_style)
+    ?  c -> ViewLoc ()
+    :  thr - c -> ViewDist () * c -> ViewAim ();
 
   ZESpatialMoveEvent smev (s_glfw_mouse_name, frm, (thr - frm) . Norm (), ovr);
 
@@ -307,5 +310,6 @@ void GLFWWaterWorks::CreateZEPressureFromGLFW (GLFWwindow *wind, int butt,
   m_mouse_state.event.AdoptParticulars(*spev);
   m_mouse_state.button_state = evlv_butt;
 }
+
 
 }
