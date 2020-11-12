@@ -57,6 +57,10 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   void Loop (f64 _from, f64 _to);
 
   void SetState (GstState _state);
+
+  f64 Duration () const;
+  gint64 DurationNanoseconds () const;
+
   bool SeekFull (f64 rate, GstFormat format, GstSeekFlags flags,
                  GstSeekType start_type, i64 start,
                  GstSeekType stop_type, i64 stop);
@@ -68,6 +72,7 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   void HandleStateChangedMessage (GstMessage *);
   void HandleSegmentDone (GstMessage *);
   void HandleAsyncDone (GstMessage *);
+  void HandleDuration (GstMessage *);
 
   std::unique_ptr<PipelineTerminus> m_terminus;
   GstElement *m_pipeline;
@@ -78,6 +83,7 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   GstState m_pending_state;
 
   f32 m_play_speed;
+  gint64 m_duration;
   bool m_awaiting_async_done;
   bool m_has_eos;
   bool m_has_queued_seek;

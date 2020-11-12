@@ -13,6 +13,7 @@ DecodePipeline::DecodePipeline ()
     m_media_state {GST_STATE_NULL},
     m_pending_state {GST_STATE_NULL},
     m_play_speed {1.0f},
+    m_duration {0},
     m_awaiting_async_done {false},
     m_has_eos {false},
     m_has_queued_seek {false}
@@ -35,10 +36,11 @@ void DecodePipeline::PollMessages ()
     return;
 
   GstMessageType const message_interest
-    = (GstMessageType) (GST_MESSAGE_EOS            |
-                        GST_MESSAGE_ERROR          |
-                        GST_MESSAGE_STATE_CHANGED  |
-                        GST_MESSAGE_SEGMENT_DONE   |
+    = (GstMessageType) (GST_MESSAGE_EOS              |
+                        GST_MESSAGE_ERROR            |
+                        GST_MESSAGE_STATE_CHANGED    |
+                        GST_MESSAGE_SEGMENT_DONE     |
+                        GST_MESSAGE_DURATION_CHANGED |
                         GST_MESSAGE_ASYNC_DONE);
 
   GstMessage *message;
@@ -56,6 +58,9 @@ void DecodePipeline::PollMessages ()
         break;
       case GST_MESSAGE_SEGMENT_DONE:
         HandleSegmentDone (message);
+        break;
+      case GST_MESSAGE_DURATION_CHANGED:
+        HandleDuration (message);
         break;
       case GST_MESSAGE_ASYNC_DONE:
         HandleAsyncDone (message);
@@ -99,7 +104,6 @@ bool DecodePipeline::OpenVideoFile (std::string_view _uri, PipelineTerminus *_te
 
   bool ret = m_terminus->OnStart (this);
   SetState(GST_STATE_PAUSED);
-
 
   GstState current, pending;
   GstStateChangeReturn scret = gst_element_get_state (m_pipeline, &current, &pending,
@@ -238,6 +242,16 @@ void DecodePipeline::SetState (GstState _state)
     m_awaiting_async_done = true;
 }
 
+f64 DecodePipeline::Duration () const
+{
+  return f64 (m_duration) / 1e9;
+}
+
+gint64 DecodePipeline::DurationNanoseconds () const
+{
+  return m_duration;
+}
+
 bool DecodePipeline::SeekFull (f64 _rate, GstFormat _format, GstSeekFlags _flags,
                                GstSeekType _start_type, i64 _start,
                                GstSeekType _stop_type, i64 _stop)
@@ -344,6 +358,24 @@ void DecodePipeline::HandleSegmentDone (GstMessage *)
   SeekFull (0.0f, GST_FORMAT_TIME, seek_flags,
             GST_SEEK_TYPE_SET, m_loop_status.loop_start,
             GST_SEEK_TYPE_SET, m_loop_status.loop_end);
+}
+
+void DecodePipeline::HandleDuration (GstMessage *)
+{
+  GstQuery *query = nullptr;
+  gboolean ret = false;
+
+  query = gst_query_new_duration (GST_FORMAT_TIME);
+  ret = gst_element_query (m_pipeline, query);
+  if (ret)
+    {
+      GstFormat format = GST_FORMAT_TIME;
+      gint64 duration = 0;
+      gst_query_parse_duration(query, &format, &duration);
+      m_duration = duration;
+    }
+
+  gst_query_unref(query);
 }
 
 void DecodePipeline::HandleAsyncDone (GstMessage *)
