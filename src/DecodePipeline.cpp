@@ -170,7 +170,7 @@ void DecodePipeline::Seek (double _ts)
 
   gint64 const seconds_to_ns = 1000000000;
 
-  gst_element_seek (m_pipeline, 1.0,
+  gst_element_seek (m_pipeline, m_play_speed,
                     GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE),
                     GST_SEEK_TYPE_SET, (gint64)(_ts * seconds_to_ns),
                     GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
@@ -240,6 +240,22 @@ void DecodePipeline::SetState (GstState _state)
 
   if (ret == GST_STATE_CHANGE_ASYNC)
     m_awaiting_async_done = true;
+}
+
+f64 DecodePipeline::CurrentTimestamp () const
+{
+  if (m_terminus)
+    return m_terminus->CurrentTimestamp ();
+
+  return 0.0;
+}
+
+gint64 DecodePipeline::CurrentTimestampNS () const
+{
+  if (m_terminus)
+    return m_terminus->CurrentTimestampNS ();
+
+  return 0;
 }
 
 f64 DecodePipeline::Duration () const

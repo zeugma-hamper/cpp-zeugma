@@ -49,14 +49,18 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   bool OpenMatteSequence (std::string_view _pattern, PipelineTerminus *_terminus);
 
   void Play ();
-  void Seek (f64 _ts);
   void Pause ();
+  void Seek (f64 _ts);
 
   void Step (u32 _distance);
 
   void Loop (f64 _from, f64 _to);
 
   void SetState (GstState _state);
+
+  // timestamp of the latest video buffer
+  f64 CurrentTimestamp () const;
+  gint64 CurrentTimestampNS () const;
 
   f64 Duration () const;
   gint64 DurationNanoseconds () const;

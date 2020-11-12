@@ -12,12 +12,23 @@ PipelineTerminus::PipelineTerminus ()
 PipelineTerminus::~PipelineTerminus ()
 { }
 
+f64 PipelineTerminus::CurrentTimestamp () const
+{
+  return f64 (CurrentTimestampNS()) / 1e9;
+}
+
+gint64 PipelineTerminus::CurrentTimestampNS () const
+{
+  return 0;
+}
+
 BasicPipelineTerminus::BasicPipelineTerminus (bool _enable_audio)
   : PipelineTerminus(),
     m_video_sink {nullptr},
     m_audio_sink {nullptr},
     m_sample_mutex {},
     m_sample {nullptr},
+    m_current_ts {0},
     m_enable_audio {_enable_audio}
 { }
 
@@ -97,6 +108,12 @@ gst_ptr<GstSample> BasicPipelineTerminus::FetchClearSample ()
     }
 
   return {};
+}
+
+gint64 BasicPipelineTerminus::CurrentTimestampNS () const
+{
+  std::unique_lock lock {m_sample_mutex};
+  return m_current_ts;
 }
 
 bool
@@ -207,6 +224,9 @@ void BasicPipelineTerminus::HandoffSample (GstSample *_sample)
 {
   std::unique_lock lock {m_sample_mutex};
   m_sample = gst_ptr<GstSample> {_sample};
+  GstBuffer *buffer = gst_sample_get_buffer (_sample);
+  if (GST_BUFFER_PTS_IS_VALID (buffer))
+    m_current_ts = GST_BUFFER_PTS (buffer);
 }
 
 static void basic_term_handle_eos (GstAppSink *, gpointer)

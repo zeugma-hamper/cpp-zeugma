@@ -339,6 +339,8 @@ i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
   static bool now_playing = true;
   auto seek_ts = [] () { static i32 i = 0; return ++i * 60.0; };
 
+  fprintf (stderr, "timestamp is %.3f\n", deep->CurrentTimestamp ());
+
   if (e -> Utterance ()  ==  "p")
     { if (now_playing)
         deep -> Pause ();

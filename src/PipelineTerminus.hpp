@@ -28,6 +28,9 @@ class PipelineTerminus
   virtual bool NewDecodedPad (DecodePipeline *, GstElement *, GstPad *, GstCaps *) = 0;
   virtual bool OnShutdown    (DecodePipeline *) = 0;
 
+  f64 CurrentTimestamp () const;
+  virtual gint64 CurrentTimestampNS () const;
+
   virtual void FlushNotify () = 0;
 
   virtual bool HasSink () const = 0;
@@ -52,6 +55,7 @@ class BasicPipelineTerminus : public PipelineTerminus
   gst_ptr<GstSample> FetchSample ();
   gst_ptr<GstSample> FetchClearSample ();
 
+  gint64 CurrentTimestampNS () const override;
 
   bool HandleAudioPad (DecodePipeline *, GstElement *, GstPad *, const char *);
   bool HandleVideoPad (DecodePipeline *, GstElement *, GstPad *, const char *);
@@ -60,8 +64,11 @@ class BasicPipelineTerminus : public PipelineTerminus
 
   GstElement *m_video_sink;
   GstElement *m_audio_sink;
-  std::mutex m_sample_mutex;
+
+  mutable std::mutex m_sample_mutex;
   gst_ptr<GstSample> m_sample;
+  gint64 m_current_ts;
+
   bool m_enable_audio;
 };
 
