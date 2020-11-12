@@ -333,16 +333,23 @@ i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
   const ch_ptr <DecodePipeline> deep
     = solo_tamp->steenbeck -> ItsDecodePipeline ();
 
+  if (! deep)
+    return 0;
+
   static bool now_playing = true;
+  auto seek_ts = [] () { static i32 i = 0; return ++i * 60.0; };
 
   if (e -> Utterance ()  ==  "p")
-    if (DecodePipeline *knob = deep . get ())
-      { if (now_playing)
-          knob -> Pause ();
-        else
-          knob -> Play ();
-        now_playing = ! now_playing;
-      }
+    { if (now_playing)
+        deep -> Pause ();
+      else
+        deep -> Play ();
+      now_playing = ! now_playing;
+    }
+  else if (e -> Utterance() == "s")
+    { deep -> Seek (seek_ts ());
+    }
+
   return 0;
 }
 
