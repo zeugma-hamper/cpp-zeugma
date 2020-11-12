@@ -17,6 +17,7 @@ namespace charm
   takes to execute. It can also be used manually, by calling
   `StopTimer` directly.
  */
+#if 1
 
 struct BlockTimer
 {
@@ -49,6 +50,30 @@ struct BlockTimer
   timepoint_t start_time;
   timepoint_t end_time;
 };
+
+#else
+
+struct BlockTimer
+{
+  using clock_t = std::chrono::high_resolution_clock;
+  using timepoint_t = clock_t::time_point;
+  using seconds_t = std::chrono::duration<f64>;
+
+  explicit BlockTimer (std::string_view)
+  { }
+
+  void StopTimer ()
+  { }
+
+  ~BlockTimer ()
+  { }
+
+  std::string descriptor;
+  timepoint_t start_time;
+  timepoint_t end_time;
+};
+
+#endif
 
 }
 

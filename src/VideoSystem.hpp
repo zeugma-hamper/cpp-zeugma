@@ -10,7 +10,8 @@
 #include <class_utils.hpp>
 #include <ch_ptr.hpp>
 
-#include <MatteLoader.hpp>
+// #include <MatteLoader.hpp>
+#include <MatteLoaderPool.hpp>
 
 #include <filesystem>
 #include <memory>
@@ -24,7 +25,7 @@ namespace charm
 class VideoRenderable;
 class MattedVideoRenderable;
 class DecodePipeline;
-class BasicPipelineTerminus;
+class TampVideoTerminus;
 class VideoSystem;
 
 //sketch
@@ -102,14 +103,15 @@ struct VideoPipeline
 {
   std::string uri;
   ch_ptr<DecodePipeline> pipeline;
-  BasicPipelineTerminus *terminus = nullptr;
+  TampVideoTerminus *terminus = nullptr;
   ch_weak_ptr<VideoTexture> texture;
   //for mattes
   i64 adjusted_loop_start_ts = -1;
   i64 adjusted_loop_end_ts = -1;
   fs::path matte_dir_path;
   i32 matte_frame_count;
-  std::unique_ptr<MatteLoaderBimg> matte_loader;
+  i32 matte_awaited = -1;
+  ch_ptr<MatteLoaderWorker> matte_worker;
 };
 
 struct VideoBrace
@@ -174,6 +176,7 @@ class VideoSystem
 
 
   GraphicsResources m_vgr;
+  std::unique_ptr<MatteLoaderPool> m_matte_pool;
   std::vector<VideoPipeline> m_pipelines;
 };
 

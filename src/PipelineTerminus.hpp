@@ -4,10 +4,12 @@
 #include <base_types.hpp>
 #include <class_utils.hpp>
 #include <gst_ptr.hpp>
+#include <ch_ptr.hpp>
 
 #include <gst/gst.h>
 #include <gst/video/video-frame.h>
 
+#include <atomic>
 #include <mutex>
 #include <vector>
 
@@ -24,53 +26,50 @@ class PipelineTerminus
 
   CHARM_DELETE_MOVE_COPY(PipelineTerminus);
 
+  std::string GetAcceptedCapsString () const;
+  virtual gst_ptr<GstCaps> GetAcceptedCaps () const = 0;
+  virtual bool Accepts (GstCaps *_caps) const = 0;
+
   virtual bool OnStart       (DecodePipeline *) = 0;
-  virtual bool NewDecodedPad (DecodePipeline *, GstElement *, GstPad *, GstCaps *) = 0;
+  virtual bool NewDecodedPad (DecodePipeline *, GstElement *, GstPad *) = 0;
   virtual bool OnShutdown    (DecodePipeline *) = 0;
 
   f64 CurrentTimestamp () const;
   virtual gint64 CurrentTimestampNS () const;
 
-  virtual void FlushNotify () = 0;
+  virtual void FlushNotify () {};
 
   virtual bool HasSink () const = 0;
 };
 
+enum class SampleStatus
+{
+  NoSample,
+  Preroll,
+  Play,
+};
 
-//Really, this only offers the ability to turn off or on audio.
 class BasicPipelineTerminus : public PipelineTerminus
 {
  public:
-  BasicPipelineTerminus (bool _enable_audio);
+  BasicPipelineTerminus (std::string_view _accepted_caps);
   ~BasicPipelineTerminus () override;
 
+  gst_ptr<GstCaps> GetAcceptedCaps () const override;
+  bool Accepts (GstCaps *_caps) const override;
+
   bool OnStart       (DecodePipeline *) override;
-  bool NewDecodedPad (DecodePipeline *, GstElement *, GstPad *, GstCaps *) override;
+  bool NewDecodedPad (DecodePipeline *, GstElement *, GstPad *) override;
   bool OnShutdown    (DecodePipeline *) override;
 
-  void FlushNotify () override;
+  virtual bool HandleDecodedPad (GstElement *, GstPad *, GstCaps *) = 0;
 
   bool HasSink () const override;
 
-  gst_ptr<GstSample> FetchSample ();
-  gst_ptr<GstSample> FetchClearSample ();
 
-  gint64 CurrentTimestampNS () const override;
-
-  bool HandleAudioPad (DecodePipeline *, GstElement *, GstPad *, const char *);
-  bool HandleVideoPad (DecodePipeline *, GstElement *, GstPad *, const char *);
-
-  void HandoffSample (GstSample *_sample);
-
+  gst_ptr<GstCaps> m_accepted_caps;
   DecodePipeline *m_pipeline;
-  GstElement *m_video_sink;
-  GstElement *m_audio_sink;
-
-  mutable std::mutex m_sample_mutex;
-  gst_ptr<GstSample> m_sample;
-  gint64 m_current_ts;
-
-  bool m_enable_audio;
+  GstElement *m_sink;
 };
 
 //helper struct to hold onto GstSample's ref until after upload

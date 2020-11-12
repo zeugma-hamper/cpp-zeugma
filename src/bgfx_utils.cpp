@@ -249,6 +249,20 @@ bimg_ptr LoadKTXImage (std::string_view _path, bx::Error *_error)
   return bimg_ptr {bimg::imageParseKtx (GetBxDefaultAllocator(), fl.ptr, fl.size, _error)};
 }
 
+bimg_ptr LoadBImage (std::string_view _path, bx::Error *_error)
+{
+  MappedFile fl {_path};
+  if (fl.ptr == nullptr)
+    return {};
+
+  return bimg_ptr {bimg::imageParseKtx (GetBxDefaultAllocator(), fl.ptr, fl.size, _error)};
+}
+
+void BGFXfree (void *_ptr, void *)
+{
+  free (_ptr);
+}
+
 void BGFXFatalMessage (const char *_filePath, uint16_t _line, bgfx::Fatal::Enum, const char *_str)
 {
   fprintf (stderr, "fatal error at %s:%u\n%s\n", _filePath, _line, _str);

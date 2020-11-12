@@ -43,12 +43,12 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   DecodePipeline ();
   ~DecodePipeline ();
 
-  CHARM_DELETE_COPY(DecodePipeline);
+  CHARM_DELETE_MOVE_COPY(DecodePipeline);
 
   void PollMessages ();
 
-  bool OpenVideoFile (std::string_view _uri, PipelineTerminus *_terminus);
-  bool OpenMatteSequence (std::string_view _pattern, PipelineTerminus *_terminus);
+  bool OpenVideoFile (std::string_view _uri, PipelineTerminus *_video_terminus,
+                      PipelineTerminus *_audio_terminus = nullptr);
 
   void Play ();
   void Pause ();
@@ -58,8 +58,6 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
 
   void Loop (f64 _from, f64 _to);
 
-  void SetState (GstState _state);
-
   // timestamp of the latest video buffer
   f64 CurrentTimestamp () const;
   gint64 CurrentTimestampNS () const;
@@ -67,11 +65,15 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   f64 Duration () const;
   gint64 DurationNanoseconds () const;
 
+  void SetPipelineState (GstState _state);
+
   bool SeekFull (f64 rate, GstFormat format, GstSeekFlags flags,
                  GstSeekType start_type, i64 start,
                  GstSeekType stop_type, i64 stop);
 
   void CleanUp ();
+
+  void NewDecodedPad (GstElement *_elem, GstPad *_pad);
 
   void HandleErrorMessage (GstMessage *);
   void HandleEosMessage (GstMessage *);
@@ -80,7 +82,8 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   void HandleAsyncDone (GstMessage *);
   void HandleDuration (GstMessage *);
 
-  std::unique_ptr<PipelineTerminus> m_terminus;
+  std::unique_ptr<PipelineTerminus> m_video_terminus;
+  std::unique_ptr<PipelineTerminus> m_audio_terminus;
   GstElement *m_pipeline;
   GstElement *m_uridecodebin;
   GstBus *m_bus;
@@ -88,8 +91,8 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   GstState m_media_state;
   GstState m_pending_state;
 
-  f32 m_play_speed;
   gint64 m_duration;
+  f32 m_play_speed;
   bool m_awaiting_async_done;
   bool m_has_eos;
   bool m_has_queued_seek;

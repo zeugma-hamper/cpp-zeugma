@@ -142,10 +142,8 @@ static void glfw_key_callback (GLFWwindow *window, int key,
 { (void)window;
   (void)scancode;
 
-  // current scheme results in one-byte 'keystrokes', but someday UTF-X?
-  char ch[2];
-  ch[1] = 0;
-  const char *ch_ptr = &ch[0];
+  char ch[2] = {0,0};
+  const char *ch_ptr = ch;
   if (mods & GLFW_MOD_SHIFT)
     { auto it = s_glfw_upper_map.find (key);
       if (it == s_glfw_upper_map.end ())

@@ -1,27 +1,49 @@
 #include <MatteLoaderPool.hpp>
 
-#include <algorithm>
+#include <Matte.hpp>
 
 #include <OpenImageIO/imageio.h>
+
+#include <gstreamer-1.0/gst/video/video-info.h>
+
+#include <algorithm>
+
+#include <BlockTimer.hpp>
+
+namespace fs = std::filesystem;
 
 namespace charm
 {
 
-MatteLoaderDispatcher::MatteLoaderDispatcher (std::vector<std::filesystem::path> &&_matte_paths)
-  : m_paths {std::move (_matte_paths)},
+MatteLoaderWorker::MatteLoaderWorker (f32 _start_time, u32 _frame_count,
+                                      fs::path const &_matte_dir)
+  : m_paths {},
+    m_starting_pts {_start_time},
+    m_starting_frame_id {-1},
     m_loader_pool {nullptr}
 {
-  m_job_queue.set_capacity(4);
+
+  m_load_job.frame_id = -1;
   m_result_queue.set_capacity(4);
+
+  m_paths.reserve (_frame_count);
+  {
+    auto const end = fs::directory_iterator {};
+    auto cur = fs::directory_iterator{_matte_dir};
+    for (; cur != end; ++cur)
+      m_paths.push_back(*cur);
+  }
+
+  std::sort (m_paths.begin (), m_paths.end ());
 }
 
-MatteLoaderDispatcher::~MatteLoaderDispatcher ()
+MatteLoaderWorker::~MatteLoaderWorker ()
 {
   m_loader_pool = nullptr;
 
   {
     std::unique_lock lock {m_job_mutex};
-    m_job_queue.clear();
+    m_load_job.frame_id = -1;
   }
 
   {
@@ -30,96 +52,155 @@ MatteLoaderDispatcher::~MatteLoaderDispatcher ()
   }
 }
 
-void MatteLoaderDispatcher::SetMatteLoaderPool (MatteLoaderPool *_pool)
+void MatteLoaderWorker::SetMatteLoaderPool (MatteLoaderPool *_pool)
 {
   m_loader_pool = _pool;
 }
 
 
-void MatteLoaderDispatcher::PushJob (u32 _frame)
+void MatteLoaderWorker::PushJob (u32 _frame, i32 fps_num, i32 fps_denom)
 {
-  u32 const fnum = _frame % m_paths.size ();
-  std::unique_lock lock {m_job_mutex};
-  for (LoadJob const &lj : m_job_queue)
-    if (lj.frame_id == fnum)
-      return;
+  {
+    std::unique_lock lock {m_result_mutex};
+    // already loaded so bail
+    for (szt i = 0; i < m_result_queue.size (); ++i)
+      if (m_result_queue[i].offset == _frame)
+        return;
+  }
 
-  LoadJob job{_frame, m_paths[fnum], {}};
-  LoadResult result{_frame, job.promise.get_future()};
-  m_job_queue.push_back (std::move (job));
+  // fprintf (stderr, "mlw push job: %u\n", _frame);
+  std::unique_lock lock {m_job_mutex};
+  if (m_starting_frame_id < 0)
+    {
+      m_starting_frame_id
+        = (i64)std::round (m_starting_pts * fps_num / fps_denom);
+      fprintf (stderr, "starting frame id is %ld from %.3f\n", m_starting_frame_id, m_starting_pts);
+    }
+
+  //if out of bounds
+  if (i64 (_frame) < m_starting_frame_id ||
+      _frame >= m_paths.size () + m_starting_frame_id)
+    return;
+
+  i64 const fnum = _frame;
+  i64 const prev_id = std::exchange (m_load_job.frame_id, fnum);
+  if (prev_id < 0)
+    m_loader_pool->SetReady(ch_from_this ());
   lock.unlock();
+}
+
+void MatteLoaderWorker::DoWork ()
+{
+  i64 frame_id = -1;
+  {
+    std::unique_lock lock {m_job_mutex};
+    frame_id = std::exchange(m_load_job.frame_id, -1);
+  }
+
+  if (frame_id < 0)
+    return;
+
+  // fprintf (stderr, "mlw: do work %ld\n", frame_id);
+
+  bgfx::TextureFormat::Enum const formats[5]{
+    bgfx::TextureFormat::Unknown,
+    bgfx::TextureFormat::R8,
+    bgfx::TextureFormat::RG8,
+    bgfx::TextureFormat::RGB8,
+    bgfx::TextureFormat::RGBA8};
+
+  u32 const index = u32 ((frame_id - m_starting_frame_id) % m_paths.size ());
+  auto &path = m_paths[index];
+
+  std::unique_ptr<OIIO::ImageInput> iinput =
+    OIIO::ImageInput::open(path.string());
+
+  if (!iinput)
+    {
+      fprintf(stderr, "error loading %s\n", path.c_str());
+      return;
+    }
+
+  OIIO::ImageSpec ispec = iinput->spec();
+  i32 const max_dim = 1 << 15;
+  i32 const max_channels = 4;
+  assert(ispec.width <= max_dim && ispec.height <= max_dim &&
+         ispec.nchannels < max_channels);
+
+  u32 size = ispec.width * ispec.height * ispec.nchannels;
+  u8_ptr data;
 
   {
-    std::unique_lock res_lock {m_result_mutex};
-    m_result_queue.push_back(std::move (result));
+    data = u8_ptr ((u8 *)malloc(size));
+    BlockTimer timer ("load image from disk");
+    iinput->read_image(0, 0, 0, 1, OIIO::TypeDesc::UINT8, data.get ());
+    iinput->close();
   }
+  {
+    std::unique_lock lock {m_result_mutex};
+    m_result_queue.push_back (MatteFrameUnique {u32 (frame_id),
+                                                formats[ispec.nchannels],
+                                                u32(ispec.width),
+                                                u32(ispec.height),
+                                                size,
+                                                std::move (data)});
+  }
+
+  // bimg_ptr img;
+  // {
+  //   BlockTimer load ("load frame from disk");
+  //   u32 const index = u32 ((frame_id - m_starting_frame_id) % m_paths.size ());
+  //   auto &path = m_paths[index];
+  //   bx::Error error;
+  //   img = LoadKTXImage(path.c_str(), &error);
+  //   if (! img)
+  //     return;
+  // }
+
+  // {
+  //   std::unique_lock lock {m_result_mutex};
+  //   m_result_queue.push_back (MatteFrameBimg {u32 (frame_id), std::move (img)});
+  // }
 }
 
-bool MatteLoaderDispatcher::HasJobs ()
-{
-  std::unique_lock lock {m_job_mutex};
-  return !m_job_queue.empty();
-}
-
-bool MatteLoaderDispatcher::PopJob (LoadJob &_job)
-{
-  std::unique_lock lock {m_job_mutex};
-  if (m_job_queue.empty())
-    return false;
-
-  _job = std::move (m_job_queue.front ());
-  m_job_queue.pop_front();
-  return true;
-}
-
-MatteLoaderDispatcher::LoadStatus
-MatteLoaderDispatcher::PopFrame (u32 _id, MatteFrameUnique &_frame)
+bool
+MatteLoaderWorker::PopFrame (u32 _id, MatteFrameUnique &_frame)
 {
   std::unique_lock lock {m_result_mutex};
 
   auto const end = m_result_queue.end ();
   for (auto cur = m_result_queue.begin (); cur != end; ++cur)
-    if (cur->frame_id == _id)
+    if (cur->offset == _id)
       {
-        if (! cur->frame.valid())
-          return LoadStatus::Loading;
-
-        _frame = cur->frame.get ();
-        m_result_queue.erase(cur);
-        return LoadStatus::Loaded;
+        _frame = std::exchange (*cur, {});
+        return true;
       }
 
-  return LoadStatus::NotLoading;
+  return false;
 }
 
-MatteLoaderDispatcher::LoadStatus
-MatteLoaderDispatcher::PopAndReleaseFrames (u32 _id, MatteFrameUnique &_frame)
+bool
+MatteLoaderWorker::PopAndReleaseFrames (u32 _id, MatteFrameUnique &_frame)
 {
   std::unique_lock lock {m_result_mutex};
 
   auto const end = m_result_queue.end ();
   for (auto cur = m_result_queue.begin (); cur != end; ++cur)
-    if (cur->frame_id == _id)
+    if (cur->offset == _id)
       {
-        if (! cur->frame.valid())
-          {
-            m_result_queue.erase(m_result_queue.begin (), cur);
-            return LoadStatus::Loading;
-          }
-
-        _frame = cur->frame.get ();
+        _frame = std::exchange (*cur, {});
         m_result_queue.erase(m_result_queue.begin (), cur+1);
-        return LoadStatus::Loaded;
+        return true;
       }
 
-  return LoadStatus::NotLoading;
+  m_result_queue.clear ();
+  return false;
 }
 
 static u64 const s_ml_pool_thread_count = 12u;
 
 MatteLoaderPool::MatteLoaderPool ()
-  : m_currently_loading {true},
-    m_dispatcher_current_index {0u}
+  : m_currently_loading {true}
 {
   m_loading_threads.reserve(s_ml_pool_thread_count);
   for (u64 i = 0; i < s_ml_pool_thread_count; ++i)
@@ -134,120 +215,48 @@ MatteLoaderPool::~MatteLoaderPool ()
 void MatteLoaderPool::ShutDown()
 {
   m_currently_loading.store (false);
-  m_dispatcher_cond_var.notify_all();
+  m_worker_cond_var.notify_all();
   for (std::thread &t : m_loading_threads)
     t.join ();
 
   m_loading_threads.clear ();
-  m_dispatchers.clear();
+  m_workers.clear();
 }
 
-void MatteLoaderPool::AddDispatcher (ch_weak_ptr<MatteLoaderDispatcher> const &_dispatcher)
+void MatteLoaderPool::SetReady (ch_ptr<MatteLoaderWorker> const &_worker)
 {
-  {
-    std::unique_lock lock {m_dispatcher_mutex};
-    m_dispatchers.push_back (_dispatcher);
-  }
+  if (! m_currently_loading.load ())
+    return;
 
-  m_dispatcher_cond_var.notify_one();
+  std::unique_lock lock {m_worker_mutex};
+  m_workers.push_back (ch_weak_ptr<MatteLoaderWorker>{_worker});
+  m_worker_cond_var.notify_one();
 }
 
-void MatteLoaderPool::AddDispatcher (ch_weak_ptr<MatteLoaderDispatcher> &&_dispatcher)
+ch_ptr<MatteLoaderWorker> MatteLoaderPool::NextWorker ()
 {
-  {
-    std::unique_lock lock {m_dispatcher_mutex};
-    m_dispatchers.push_back (std::move (_dispatcher));
-  }
-
-  m_dispatcher_cond_var.notify_one();
-}
-
-void MatteLoaderPool::NotifyOfJob()
-{
-  if (m_currently_loading.load())
-    m_dispatcher_cond_var.notify_one();
-}
-
-bool MatteLoaderPool::NextJob (MatteLoaderDispatcher::LoadJob &_job)
-{
-  // bog simple round robin at first
-
-  std::unique_lock lock {m_dispatcher_mutex};
-
-  auto remove_nulls = [&dp = m_dispatchers] ()
-  {
-    auto null_pred = [] (ch_weak_ptr<MatteLoaderDispatcher> const &_ptr) { return !_ptr; };
-    auto poofed = std::remove_if (dp.begin (), dp.end (), null_pred);
-    dp.erase(poofed, dp.end ());
-  };
-
+  std::unique_lock lock {m_worker_mutex};
   while (m_currently_loading.load())
     {
-      u64 &mdci = m_dispatcher_current_index;
-      u64 const count = m_dispatchers.size ();
-      u64 const start_index = mdci;
+      if (m_workers.size() > 0)
+        {
+          auto nxt = m_workers.front().lock();
+          m_workers.erase(m_workers.begin ());
+          return nxt;
+        }
 
-      for (; mdci < count; ++mdci)
-        if (auto dp = m_dispatchers[mdci].lock (); dp && dp->PopJob(_job))
-          {
-            ++mdci;
-            return true;
-          }
-
-      //made it through list, do some clean up
-      remove_nulls();
-      u64 const tidied_start_index = std::min (start_index, m_dispatchers.size ());
-
-      for (mdci = 0u; mdci < tidied_start_index; ++mdci)
-        if (auto dp = m_dispatchers[mdci].lock (); dp && dp->PopJob(_job))
-          {
-            ++mdci;
-            return true;
-          }
-
-
-      m_dispatcher_cond_var.wait (lock);
+      m_worker_cond_var.wait (lock);
     }
 
-  return false;
+  return {};
 }
 
 void MatteLoaderPool::LoadMattes (MatteLoaderPool *pool)
 {
-  MatteLoaderDispatcher::LoadJob job;
-  while (pool->NextJob(job))
+  while (pool->m_currently_loading.load ())
     {
-      bgfx::TextureFormat::Enum const formats[5]
-        { bgfx::TextureFormat::Unknown,
-          bgfx::TextureFormat::R8,
-          bgfx::TextureFormat::RG8,
-          bgfx::TextureFormat::RGB8,
-          bgfx::TextureFormat::RGBA8
-        };
-
-      std::unique_ptr<OIIO::ImageInput> iinput
-        = OIIO::ImageInput::open (job.path.string());
-
-      if (! iinput)
-        {
-          fprintf (stderr, "error loading %s\n", job.path.c_str());
-          continue;
-        }
-
-      OIIO::ImageSpec ispec = iinput->spec ();
-      i32 const max_dim = 1 << 15;
-      i32 const max_channels = 4;
-      assert (ispec.width <= max_dim && ispec.height <= max_dim && ispec.nchannels < max_channels);
-
-      u32 size = ispec.width * ispec.height * ispec.nchannels;
-      u8 *data = (u8 *)malloc (size);
-
-      iinput->read_image (OIIO::TypeDesc::UINT8, data);
-      iinput->close ();
-
-      MatteFrameUnique frame {job.frame_id, formats[ispec.nchannels],
-        u32(ispec.width), u32(ispec.height), size, u8_ptr{data}};
-      job.promise.set_value (std::move (frame));
+      if (ch_ptr<MatteLoaderWorker> worker = pool->NextWorker (); worker)
+        worker->DoWork ();
     }
 }
 

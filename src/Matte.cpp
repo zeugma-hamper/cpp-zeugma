@@ -252,6 +252,8 @@ const std::string FilmGeometry::s_name = "name";
 const std::string FilmGeometry::s_abbreviation = "abbreviation";
 const std::string FilmGeometry::s_directory_geometries = "directory_geometries";
 
+static const bool s_load_per_frame_geometry = false;
+
 v2f32 MatteDirGeometry::GetCenter () const
 {
   return dir_geometry.GetCenter ();
@@ -310,21 +312,24 @@ void MatteDirGeometry::from_toml (toml::value const &_v)
 {
   clip_path = toml::find<std::string> (_v, s_path);
   dir_geometry = toml::find<MatteGeometry> (_v, s_dir_geometry);
-  auto const &arr = toml::find<toml::array> (_v, s_frame_geometry);
-
-  std::array<u32, 7> matte_val;
-  for (auto &v : arr)
+  if (s_load_per_frame_geometry)
     {
-      matte_val = toml::get<std::array<u32, 7>> (v);
-      frame_geometry.emplace_back();
-      MatteGeometry &mg = frame_geometry.back ();
-      mg.index = matte_val[0];
-      mg.dimensions[0] = matte_val[1];
-      mg.dimensions[1] = matte_val[2];
-      mg.min[0] = matte_val[3];
-      mg.min[1] = matte_val[4];
-      mg.max[0] = matte_val[5];
-      mg.max[1] = matte_val[6];
+      auto const &arr = toml::find<toml::array> (_v, s_frame_geometry);
+
+      std::array<u32, 7> matte_val;
+      for (auto &v : arr)
+        {
+          matte_val = toml::get<std::array<u32, 7>> (v);
+          frame_geometry.emplace_back();
+          MatteGeometry &mg = frame_geometry.back ();
+          mg.index = matte_val[0];
+          mg.dimensions[0] = matte_val[1];
+          mg.dimensions[1] = matte_val[2];
+          mg.min[0] = matte_val[3];
+          mg.min[1] = matte_val[4];
+          mg.max[0] = matte_val[5];
+          mg.max[1] = matte_val[6];
+        }
     }
 }
 

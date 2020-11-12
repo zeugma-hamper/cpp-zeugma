@@ -10,6 +10,7 @@
 #include <bx/filepath.h>
 
 #include <memory>
+#include <string_view>
 #include <vector>
 
 namespace charm
@@ -61,6 +62,10 @@ void DeleteImageLeftOvers (void *, void *_user_data)
   T *left_overs = (T *)_user_data;
   delete left_overs;
 }
+
+//bgfx ReleaseFn is void (*) (void *ptr, void *user_data)
+//this makes `free` available as ReleaseFn
+void BGFXfree (void *_ptr, void *);
 
 void BGFXFatalMessage (const char *_filePath, uint16_t _line,
                        bgfx::Fatal::Enum, const char *_str);

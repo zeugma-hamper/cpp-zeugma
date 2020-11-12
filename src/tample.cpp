@@ -331,7 +331,7 @@ i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
 { if (! solo_tamp->steenbeck  ||  ! e)
     return -1;
   const ch_ptr <DecodePipeline> deep
-    = solo_tamp->steenbeck -> ItsDecodePipeline ();
+    = solo_tamp->steenbeck -> GetPipeline ();
 
   if (! deep)
     return 0;

@@ -42,10 +42,17 @@ VideoRenderable::~VideoRenderable ()
 {
 }
 
+ch_ptr<VideoTexture> const &VideoRenderable::GetVideoTexture () const
+{
+  return m_video_texture;
+}
 
-const ch_ptr <DecodePipeline> VideoRenderable::ItsDecodePipeline ()
-{ return VideoSystem::GetSystem ()
-    -> FindDecodePipeline (m_video_texture);
+ch_ptr<DecodePipeline> VideoRenderable::GetPipeline () const
+{
+  if (auto *system = VideoSystem::GetSystem(); system)
+    return system->FindDecodePipeline(GetVideoTexture ());
+
+  return {};
 }
 
 

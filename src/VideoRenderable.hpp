@@ -23,10 +23,8 @@ class VideoRenderable final : public Renderable
   VideoRenderable (FilmInfo const &_film);
   ~VideoRenderable ()  override;
 
-  const ch_ptr <VideoTexture> ItsVideoTexture ()
-    { return m_video_texture; }
-
-  const ch_ptr <DecodePipeline> ItsDecodePipeline ();
+  ch_ptr<VideoTexture> const &GetVideoTexture () const;
+  ch_ptr<DecodePipeline> GetPipeline () const;
 
   void Draw (u16 vyu_id) override;
 

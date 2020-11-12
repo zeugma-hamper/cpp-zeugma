@@ -40,6 +40,20 @@ MattedVideoRenderable::~MattedVideoRenderable ()
 {
 }
 
+ch_ptr<VideoTexture> const &MattedVideoRenderable::GetVideoTexture () const
+{
+  return m_video_texture;
+}
+
+ch_ptr<DecodePipeline> MattedVideoRenderable::GetPipeline () const
+{
+  if (auto *system = VideoSystem::GetSystem(); system)
+    return system->FindDecodePipeline(GetVideoTexture ());
+
+  return {};
+}
+
+
 void MattedVideoRenderable::Draw (u16 vyu_id)
 {
   if (! m_video_texture

@@ -8,9 +8,10 @@
 
 namespace charm
 {
-  class Bolex;
-  class PlatonicMaes;
-  class Layer;
+
+class Bolex;
+class PlatonicMaes;
+class Layer;
 
 Bolex *CameraFromMaes (const PlatonicMaes &m);
 

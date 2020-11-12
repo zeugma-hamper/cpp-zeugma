@@ -3,21 +3,26 @@
 
 #include <stdio.h>
 
+#include <assert.h>
+
 namespace charm {
 
+static const char *s_state_names[5] {"void pending", "null", "ready", "paused", "playing"};
+static const char *s_sc_return_names[4] {"failure", "success", "async", "no preroll"};
+
 DecodePipeline::DecodePipeline ()
-  : m_terminus {nullptr},
-    m_pipeline {nullptr},
+  : m_pipeline {nullptr},
     m_uridecodebin {nullptr},
     m_bus {nullptr},
     m_media_state {GST_STATE_NULL},
     m_pending_state {GST_STATE_NULL},
-    m_play_speed {1.0f},
     m_duration {0},
+    m_play_speed {1.0f},
     m_awaiting_async_done {false},
     m_has_eos {false},
     m_has_queued_seek {false}
-{ }
+{
+}
 
 DecodePipeline::~DecodePipeline ()
 {
@@ -74,16 +79,23 @@ void DecodePipeline::PollMessages ()
     }
 }
 
-bool DecodePipeline::OpenVideoFile (std::string_view _uri, PipelineTerminus *_term)
+bool DecodePipeline::OpenVideoFile (std::string_view _uri, PipelineTerminus *_video_terminus,
+                                    PipelineTerminus *_audio_terminus)
 {
-  if (_uri.empty() || ! _term)
+  if (_uri.empty() || ! _video_terminus)
     return false;
 
-  m_terminus = std::unique_ptr<PipelineTerminus> {_term};
+  m_video_terminus = std::unique_ptr<PipelineTerminus> {_video_terminus};
+  m_audio_terminus = std::unique_ptr<PipelineTerminus> {_audio_terminus};
   gst_init (NULL, NULL);
 
   m_pipeline = gst_pipeline_new ("decode-pipeline");
-  m_uridecodebin = gst_element_factory_make ("uridecodebin", "uridb");
+
+  GstElement *filesrc = gst_element_factory_make ("filesrc", "fsrc");
+  g_object_set (filesrc, "location", &_uri.data()[7], NULL);
+  gst_bin_add (GST_BIN (m_pipeline), filesrc);
+  gst_element_sync_state_with_parent(filesrc);
+  m_uridecodebin = gst_element_factory_make ("decodebin", "db");
 
   if (! m_pipeline || ! m_uridecodebin)
     {
@@ -91,19 +103,39 @@ bool DecodePipeline::OpenVideoFile (std::string_view _uri, PipelineTerminus *_te
       return false;
     }
 
+  gst_ptr<GstCaps> vid_caps = m_video_terminus->GetAcceptedCaps();
+  gst_ptr<GstCaps> raw_caps = gst_ptr {vid_caps ? gst_caps_copy(vid_caps.get ()) : gst_caps_new_empty()};
+  if (m_audio_terminus)
+    raw_caps = gst_ptr {gst_caps_merge (raw_caps.transfer (),
+                                        gst_caps_copy (m_audio_terminus->GetAcceptedCaps().get ()))};
+  else
+    raw_caps = gst_ptr {gst_caps_merge (raw_caps.transfer(),
+                                        gst_caps_from_string("audio/x-raw"))};
+
+  g_object_set (m_uridecodebin,
+                // "uri", _uri.data (),
+                "caps", raw_caps.get(),
+                "expose-all-streams", FALSE,
+                NULL);
+
   m_bus = gst_pipeline_get_bus(GST_PIPELINE(m_pipeline));
   gst_bin_add (GST_BIN (m_pipeline), m_uridecodebin);
-  gst_element_sync_state_with_parent(m_uridecodebin);
+  gst_element_link (filesrc, m_uridecodebin);
+  assert (gst_element_sync_state_with_parent(m_uridecodebin));
 
-  g_object_set (m_uridecodebin, "uri", _uri.data (), NULL);
 
   g_signal_connect (m_uridecodebin, "pad-added",
                     G_CALLBACK (db_pad_added_handler), this);
-  g_signal_connect (m_uridecodebin, "autoplug-continue",
-                    G_CALLBACK (db_autoplug_continue_handler), this);
+  // g_signal_connect (m_uridecodebin, "autoplug-continue",
+  //                   G_CALLBACK (db_autoplug_continue_handler), this);
 
-  bool ret = m_terminus->OnStart (this);
-  SetState(GST_STATE_PAUSED);
+  bool ret = m_video_terminus->OnStart (this);
+  if (m_audio_terminus)
+    ret = ret && m_audio_terminus->OnStart(this);
+
+  PollMessages();
+
+  Pause ();
 
   GstState current, pending;
   GstStateChangeReturn scret = gst_element_get_state (m_pipeline, &current, &pending,
@@ -111,75 +143,29 @@ bool DecodePipeline::OpenVideoFile (std::string_view _uri, PipelineTerminus *_te
   if (scret != GST_STATE_CHANGE_SUCCESS)
     fprintf (stderr, "pipeline couldn't get to PAUSED; returned %d\n", scret);
 
-  return ret;
-}
-
-bool DecodePipeline::OpenMatteSequence (std::string_view _pattern, PipelineTerminus *_term)
-{
-  if (_pattern.empty() || ! _term)
-    return false;
-
-  m_terminus = std::unique_ptr<PipelineTerminus> {_term};
-  gst_init (NULL, NULL);
-
-  m_pipeline = gst_pipeline_new("matte-pipeline");
-
-  GstElement *src = gst_element_factory_make("multifilesrc", "mf-src");
-  GstCaps *caps = gst_caps_from_string("image/tiff,framerate=(fraction)24/1");
-  g_object_set (G_OBJECT (src), "caps", caps, "index", 0,
-                "location", _pattern.data(),
-                "loop", TRUE, NULL);
-
-  //TODO: misleading naming
-  m_uridecodebin = gst_element_factory_make ("avdec_tiff", "dec-tiff");
-  gst_bin_add_many(GST_BIN (m_pipeline), src, m_uridecodebin, NULL);
-  gst_element_sync_state_with_parent(src);
-  gst_element_sync_state_with_parent(m_uridecodebin);
-
-  gst_element_link(src, m_uridecodebin);
-  GstElement *rate = gst_element_factory_make("videorate", "rater");
-  gst_bin_add (GST_BIN (m_pipeline), rate);
-  gst_element_sync_state_with_parent(rate);
-  gst_element_link(m_uridecodebin, rate);
-
-
-  GstPad *src_pad = gst_element_get_static_pad(rate, "src");
-  GstCaps *template_caps = gst_pad_get_pad_template_caps(src_pad);
-  bool ret = m_terminus->OnStart (this);
-  m_terminus->NewDecodedPad(this, m_uridecodebin, src_pad, template_caps);
-
-  // g_signal_connect (m_uridecodebin, "pad-added",
-  //                   G_CALLBACK (db_pad_added_handler), this);
-  // g_signal_connect (m_uridecodebin, "autoplug-continue",
-  //                   G_CALLBACK (db_autoplug_continue_handler), this);
-
-
-  SetState(GST_STATE_PAUSED);
+  PollMessages();
   return ret;
 }
 
 void DecodePipeline::Play ()
 {
-  SetState (GST_STATE_PLAYING);
+  this->SetPipelineState (GST_STATE_PLAYING);
 }
 
 void DecodePipeline::Seek (double _ts)
 {
-  if (! m_pipeline)
-    return;
-
   gint64 const seconds_to_ns = 1000000000;
 
-  gst_element_seek (m_pipeline, m_play_speed,
-                    GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE),
-                    GST_SEEK_TYPE_SET, (gint64)(_ts * seconds_to_ns),
-                    GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
+  SeekFull (m_play_speed,
+            GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE),
+            GST_SEEK_TYPE_SET, (gint64)(_ts * seconds_to_ns),
+            GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
 }
 
 
 void DecodePipeline::Pause ()
 {
-  SetState (GST_STATE_PAUSED);
+  this->SetPipelineState (GST_STATE_PAUSED);
 }
 
 // static void loop_seek (GstElement *_elem, gint64 _start_ts, gint64 _end_ts, bool _flush)
@@ -227,7 +213,7 @@ void DecodePipeline::Loop (f64 _from, f64 _to)
   m_loop_status.loop_end = to_ns;
 }
 
-void DecodePipeline::SetState (GstState _state)
+void DecodePipeline::SetPipelineState (GstState _state)
 {
   if (! m_pipeline)
     return;
@@ -244,16 +230,16 @@ void DecodePipeline::SetState (GstState _state)
 
 f64 DecodePipeline::CurrentTimestamp () const
 {
-  if (m_terminus)
-    return m_terminus->CurrentTimestamp ();
+  if (m_video_terminus)
+    return m_video_terminus->CurrentTimestamp ();
 
   return 0.0;
 }
 
 gint64 DecodePipeline::CurrentTimestampNS () const
 {
-  if (m_terminus)
-    return m_terminus->CurrentTimestampNS ();
+  if (m_video_terminus)
+    return m_video_terminus->CurrentTimestampNS ();
 
   return 0;
 }
@@ -272,7 +258,7 @@ bool DecodePipeline::SeekFull (f64 _rate, GstFormat _format, GstSeekFlags _flags
                                GstSeekType _start_type, i64 _start,
                                GstSeekType _stop_type, i64 _stop)
 {
-  if (m_media_state <= GST_STATE_READY || ! m_terminus->HasSink())
+  if (m_media_state <= GST_STATE_READY || ! m_video_terminus->HasSink())
     {
       if (m_pending_state <= GST_STATE_READY)
         return false;
@@ -289,8 +275,10 @@ bool DecodePipeline::SeekFull (f64 _rate, GstFormat _format, GstSeekFlags _flags
   if (_flags & GST_SEEK_FLAG_FLUSH)
     {
       m_awaiting_async_done = true;
-      if (m_terminus)
-        m_terminus->FlushNotify();
+      if (m_video_terminus)
+        m_video_terminus->FlushNotify();
+      if (m_audio_terminus)
+        m_audio_terminus->FlushNotify();
     }
 
   bool ret = gst_element_seek (m_pipeline, m_play_speed, _format, _flags,
@@ -304,10 +292,16 @@ bool DecodePipeline::SeekFull (f64 _rate, GstFormat _format, GstSeekFlags _flags
 
 void DecodePipeline::CleanUp ()
 {
-  if (m_terminus)
+  if (m_video_terminus)
     {
-      m_terminus->OnShutdown (this);
-      m_terminus.reset();
+      m_video_terminus->OnShutdown (this);
+      m_video_terminus.reset();
+    }
+
+  if (m_audio_terminus)
+    {
+      m_audio_terminus->OnShutdown (this);
+      m_audio_terminus.reset();
     }
 
   if (m_bus)
@@ -323,6 +317,15 @@ void DecodePipeline::CleanUp ()
   // not holding onto ref to m_uridecodebin
   m_uridecodebin = nullptr;
   m_pipeline = nullptr;
+}
+
+void DecodePipeline::NewDecodedPad (GstElement *_element, GstPad *_pad)
+{
+  gst_ptr<GstCaps> caps = gst_ptr {gst_pad_get_current_caps(_pad)};
+  if (m_video_terminus->Accepts(caps.get ()))
+    m_video_terminus->NewDecodedPad(this, _element, _pad);
+  else if (m_audio_terminus && m_audio_terminus->Accepts(caps.get ()))
+    m_audio_terminus->NewDecodedPad(this, _element, _pad);
 }
 
 void DecodePipeline::HandleErrorMessage (GstMessage *message)
@@ -348,6 +351,9 @@ void DecodePipeline::HandleStateChangedMessage (GstMessage *message)
 {
   GstState old_state, new_state, pend_state;
   gst_message_parse_state_changed(message, &old_state, &new_state, &pend_state);
+
+  if (m_pipeline != GST_ELEMENT (GST_MESSAGE_SRC (message)))
+    return;
 
   m_media_state = new_state;
 
@@ -399,11 +405,10 @@ void DecodePipeline::HandleAsyncDone (GstMessage *)
   m_awaiting_async_done = false;
 }
 
-
 /* This function will be called by the pad-added signal */
 static void db_pad_added_handler (GstElement *src, GstPad *new_pad, DecodePipeline *data)
 {
-  data->m_terminus->NewDecodedPad (data, src, new_pad, nullptr);
+  data->NewDecodedPad (src, new_pad);
 }
 
 static gboolean db_autoplug_continue_handler (GstElement *, GstPad *,

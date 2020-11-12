@@ -87,6 +87,9 @@ class MTReferenceCounter
   std::atomic<u64> m_counts;
 };
 
+template<typename T>
+class ch_ptr;
+
 template<typename T, typename ReferenceOps = ReferenceCounter>
 class CharmBase
 {
@@ -103,6 +106,8 @@ class CharmBase
 
   CharmBase (CharmBase const &) = delete;
   CharmBase &operator= (CharmBase const &) = delete;
+
+  ch_ptr<T> ch_from_this ();
 
   void add_reference ()
   {
@@ -458,6 +463,14 @@ class ch_weak_ptr
  private:
   T *m_pointer;
 };
+
+template<typename T, typename RO>
+ch_ptr<T> CharmBase<T, RO>::ch_from_this ()
+{
+  add_reference();
+  return ch_ptr<T>{static_cast<T *> (this)};
+}
+
 
 template<typename T, typename U>
 ch_ptr<T> dynamic_ch_cast (ch_ptr<U> const &_ptr)

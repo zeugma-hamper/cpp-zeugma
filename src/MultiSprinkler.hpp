@@ -112,7 +112,7 @@ template <typename T>
  ZeEvent::ProtoSprinkler::HOOKUP
 Sprinkler<T>::AppendHandler (EVT_HANDLER_FUNC &&_f)
 {
-  return sp.connect_extended (std::forward (_f));
+  return sp.connect_extended (std::forward<EVT_HANDLER_FUNC> (_f));
 }
 
 template<typename T>
@@ -211,9 +211,10 @@ template <typename T>
 ZeEvent::ProtoSprinkler::HOOKUP
 MultiSprinkler::AppendHandler (typename Sprinkler<T>::EVT_HANDLER_FUNC &&_func)
 {
-  Sprinkler <T> *sp = AssuredSprinklerForEventType <T> ();
+  using FUNC_TYPE = typename Sprinkler<T>::EVT_HANDLER_FUNC;
+  ch_ptr<Sprinkler <T>> sp = AssuredSprinklerForEventType <T> ();
   assert (sp);
-  return sp->AppendHandler (std::forward (_func));
+  return sp->AppendHandler (std::forward<FUNC_TYPE> (_func));
 }
 
 template<typename U, typename T>

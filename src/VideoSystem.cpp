@@ -5,6 +5,7 @@
 
 #include <DecodePipeline.hpp>
 #include <PipelineTerminus.hpp>
+#include <TampVideoTerminus.hpp>
 
 #include <BlockTimer.hpp>
 
@@ -40,7 +41,8 @@ VideoTexture::VideoTexture (VideoFormat _format, u64 _state, bgfx::ProgramHandle
 
 VideoTexture::~VideoTexture ()
 {
-  VideoSystem::GetSystem ()->DestroyVideo (this);
+  if (auto *system = VideoSystem::GetSystem(); system)
+    system->DestroyVideo (this);
 }
 
 u64 VideoTexture::GetDefaultState () const
@@ -188,6 +190,8 @@ VideoSystem::VideoSystem ()
 
   ps = CreateProgram ("matte_video_vs.bin", "matte_video_fs.bin", true);
   m_vgr.matte_program = ps.program;
+
+  //m_matte_pool = std::make_unique<MatteLoaderPool>();
 }
 
 VideoSystem::~VideoSystem ()
@@ -197,8 +201,8 @@ VideoSystem::~VideoSystem ()
   for (size_t i = 0; i < array_size (m_vgr.uniforms); ++i)
     bgfx::destroy (m_vgr.uniforms[i]);
 
-  for (VideoPipeline &pipe : m_pipelines)
-    pipe.pipeline->SetState (GST_STATE_NULL);
+  // for (VideoPipeline &pipe : m_pipelines)
+  //   pipe.pipeline->SetPipelineState (GST_STATE_NULL);
 
   m_pipelines.clear ();
 }
@@ -297,58 +301,67 @@ void VideoSystem::UploadFrames ()
 {
   for (VideoPipeline &pipe : m_pipelines)
     {
-      GstVideoInfo video_info;
-      gst_ptr<GstSample> sample = pipe.terminus->FetchClearSample();
-      if (! sample)
-        continue;
-
       auto texture = pipe.texture.lock ();
       if (! texture)
         continue;
 
-      upload_frame(sample, texture, &video_info);
-
-      if (pipe.matte_dir_path.empty())
-        continue;
-
-      GstBuffer *buffer = gst_sample_get_buffer (sample.get ());
-      guint64 pts = GST_BUFFER_PTS(buffer);
-
-      auto calc_dur = [&video_info] (gint64 n_frames) -> gint64
-      { return n_frames * GST_VIDEO_INFO_FPS_D(&video_info) * 1e9
-          / GST_VIDEO_INFO_FPS_N(&video_info); };
-
-      gint64 const frame_dur = calc_dur (1);
-      if (pipe.adjusted_loop_start_ts == -1 &&
-          pipe.pipeline->m_loop_status.loop_start <= i64 (pts) &&
-          i64 (pts) <= pipe.pipeline->m_loop_status.loop_start + frame_dur)
+      GstVideoInfo video_info;
+      gst_ptr<GstSample> sample = pipe.terminus->FetchClearSample();
+      if (sample)
         {
-          pipe.adjusted_loop_start_ts = i64 (pts);
-          pipe.adjusted_loop_end_ts
-            = pipe.adjusted_loop_start_ts + calc_dur (pipe.matte_frame_count);
+          upload_frame(sample, texture, &video_info);
+
+          if (pipe.matte_dir_path.empty())
+            continue;
+
+          GstBuffer *buffer = gst_sample_get_buffer (sample.get ());
+          guint64 pts = GST_BUFFER_PTS(buffer);
+
+          // auto calc_dur = [&video_info] (gint64 n_frames) -> gint64
+          // { return n_frames * GST_VIDEO_INFO_FPS_D(&video_info) * 1e9
+          //     / GST_VIDEO_INFO_FPS_N(&video_info); };
+
+          // gint64 const frame_dur = calc_dur (1);
+          // if (pipe.adjusted_loop_start_ts == -1 &&
+          //     pipe.pipeline->m_loop_status.loop_start <= i64 (pts) &&
+          //     i64 (pts) <= pipe.pipeline->m_loop_status.loop_start + frame_dur)
+          //   {
+          //     pipe.adjusted_loop_start_ts = i64 (pts);
+          //     pipe.adjusted_loop_end_ts
+          //       = pipe.adjusted_loop_start_ts + calc_dur (pipe.matte_frame_count);
+          //   }
+
+          // //TODO: set matte texture to pass through
+          // if (gint64(pts) < pipe.adjusted_loop_start_ts ||
+          //     gint64(pts) > pipe.adjusted_loop_end_ts + (frame_dur / 2))
+          //   continue;
+
+          //i expect looping here for now
+          //guint64 offset_ns = pts - pipe.adjusted_loop_start_ts;
+          guint64 frame_num = guint64 (std::round (pts * GST_VIDEO_INFO_FPS_N(&video_info)
+                                                   / GST_VIDEO_INFO_FPS_D(&video_info) / f64(1e9)));
+          pipe.matte_awaited = i32 (frame_num);
+          //printf ("pts: %f, now: %f, for %lu\n", pts/f64(1e9), offset_ns/f64(1e9), frame_num);
         }
 
-      //TODO: set matte texture to pass through
-      if (gint64(pts) < pipe.adjusted_loop_start_ts ||
-          gint64(pts) > pipe.adjusted_loop_end_ts + (frame_dur / 2))
-        continue;
-
-      //i expect looping here for now
-      guint64 offset_ns = pts - pipe.adjusted_loop_start_ts;
-      guint64 frame_num = guint64 (std::round (offset_ns * GST_VIDEO_INFO_FPS_N(&video_info)
-                                               / GST_VIDEO_INFO_FPS_D(&video_info) / f64(1e9)));
-      //printf ("pts: %f, now: %f, for %lu\n", pts/f64(1e9), offset_ns/f64(1e9), frame_num);
-
-      MatteFrameBimg mf = pipe.matte_loader->GetFrame(frame_num);
-      if (! mf.data)
+      if (pipe.matte_awaited >= 0)
         {
-          fprintf (stdout, "no matte for %lu which seems fishy\n", frame_num);
-          continue;
-        }
+          MatteFrameUnique mf;
+          if (! pipe.matte_worker->PopFrame(pipe.matte_awaited, mf))
+            {
+              fprintf (stdout, "no matte for %d which seems fishy\n", pipe.matte_awaited);
+              continue;
+            }
 
-      bimg::ImageContainer *image = mf.data.release();
-      update_or_create_texture(texture->GetNthTexture(3),
-                               BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE, image);
+          pipe.matte_awaited = -1;
+          // bimg::ImageContainer *image = mf.data.release();
+          // update_or_create_texture(texture->GetNthTexture(3),
+          //                          BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE, image);
+          u8 *data = mf.data.release();
+          bgfx::Memory const *mem = bgfx::makeRef(data, mf.data_size, BGFXfree);
+          update_or_create_texture(texture->GetNthTexture(3), mf.width, mf.height,
+                                   1, mf.width, BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE, mem);
+        }
     }
 }
 
@@ -360,9 +373,10 @@ void VideoSystem::PollMessages()
 
 VideoBrace VideoSystem::OpenVideo (std::string_view _uri)
 {
-  BasicPipelineTerminus *term = new BasicPipelineTerminus (false);
+  auto *video_term = new TampVideoTerminus;
+  auto *audio_term = new NullTerminus ("audio/x-raw");
   ch_ptr<DecodePipeline> dec {new DecodePipeline};
-  dec->OpenVideoFile (_uri, term);
+  dec->OpenVideoFile (_uri, video_term, audio_term);
   dec->Play ();
 
   ch_ptr<VideoTexture>
@@ -373,7 +387,7 @@ VideoBrace VideoSystem::OpenVideo (std::string_view _uri)
   VideoPipeline &pipe = m_pipelines.back ();
   pipe.uri = _uri;
   pipe.pipeline = dec;
-  pipe.terminus = term;
+  pipe.terminus = video_term;
   pipe.texture = txt;
 
   return {dec, txt};
@@ -404,7 +418,6 @@ void VideoSystem::DestroyVideo (VideoTexture *_texture)
       for (szt i = 0; i < 4; ++i)
         _texture->SetNthTexture(0, BGFX_INVALID_HANDLE);
 
-      cur->pipeline->SetState(GST_STATE_NULL);
       m_pipelines.erase(cur);
       break;
     }
@@ -416,7 +429,7 @@ VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
                                    i32 _frame_count, fs::path const &_matte_dir,
                                    v2i32 _min, v2i32 _max)
 {
-  BasicPipelineTerminus *term = new BasicPipelineTerminus (false);
+  auto *term = new TampVideoTerminus;
   ch_ptr<DecodePipeline> dec {new DecodePipeline};
   dec->OpenVideoFile (_uri, term);
   dec->Play ();
@@ -437,8 +450,10 @@ VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
   pipe.adjusted_loop_start_ts = -1;
   pipe.adjusted_loop_end_ts = -1;
   pipe.matte_frame_count = _frame_count;
-  pipe.matte_loader = std::make_unique<MatteLoaderBimg> ();
-  pipe.matte_loader->StartLoading (_matte_dir);
+
+  pipe.matte_worker = make_ch<MatteLoaderWorker> (_loop_start_ts, _frame_count, _matte_dir);
+  pipe.matte_worker->SetMatteLoaderPool(m_matte_pool.get ());
+  pipe.terminus->AddMatteWorker(pipe.matte_worker);
   pipe.matte_dir_path = _matte_dir;
 
   return {dec, txt};

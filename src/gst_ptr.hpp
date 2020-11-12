@@ -2,6 +2,7 @@
 #define SORRY_SEA_SIDE
 
 #include <gst/gst.h>
+#include <utility>
 
 namespace charm {
 
@@ -24,6 +25,25 @@ struct gst_ref_functions<GstElement>
   static GstElement *ref_sink (GstElement *e)
   {
     return reinterpret_cast<GstElement *> (gst_object_ref_sink(e));
+  }
+};
+
+template<>
+struct gst_ref_functions<GstPad>
+{
+  static GstPad *ref (GstPad *p)
+  {
+    return reinterpret_cast<GstPad *> (gst_object_ref(p));
+  }
+
+  static void unref (GstPad *p)
+  {
+    gst_object_unref (p);
+  }
+
+  static GstPad *ref_sink (GstPad *p)
+  {
+    return reinterpret_cast<GstPad *> (gst_object_ref_sink(p));
   }
 };
 
@@ -104,7 +124,7 @@ class gst_ptr
     : object {nullptr}
   { }
 
-  gst_ptr (gst_ptr_type _obj)
+  explicit gst_ptr (gst_ptr_type _obj)
     : object {_obj}
   { }
 
@@ -153,8 +173,7 @@ class gst_ptr
     if (object)
       ref_funcs::unref (object);
 
-    object = _ptr.get ();
-    _ptr.object = nullptr;
+    object = std::exchange (_ptr.object, nullptr);
     return *this;
   }
 
@@ -214,6 +233,11 @@ class gst_ptr
     if (object)
       ref_funcs::unref (object);
     object = ref_funcs::ref_sink (_new_object);
+  }
+
+  gst_ptr_type transfer ()
+  {
+    return std::exchange (object, nullptr);
   }
 
   void release ()

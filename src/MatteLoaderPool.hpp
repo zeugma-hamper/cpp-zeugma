@@ -13,7 +13,6 @@
 #include <mutex>
 #include <thread>
 
-
 namespace charm
 {
 
@@ -36,7 +35,7 @@ using u8_ptr = std::unique_ptr<u8, default_free<u8>>;
 
 struct MatteFrameUnique
 {
-  u32 offset = 0;
+  u32 offset = u32 (-1);
   bgfx::TextureFormat::Enum format;
   u32 width = 0;
   u32 height = 0;
@@ -44,54 +43,49 @@ struct MatteFrameUnique
   u8_ptr data;
 };
 
-class MatteLoaderPool;
+struct MatteFrameBimg
+{
+  u32 offset = 0;
+  bimg_ptr data;
+};
 
-class MatteLoaderDispatcher : public CharmBase<MatteLoaderDispatcher, MTReferenceCounter>
+class MatteLoaderPool;
+struct ClipInfo;
+
+class MatteLoaderWorker : public CharmBase<MatteLoaderWorker, MTReferenceCounter>
 {
  public:
-  enum class LoadStatus
-    {
-      NotLoading,
-      Loading,
-      Loaded
-    };
-
   struct LoadJob
   {
-    u32 frame_id;
-    std::filesystem::path path;
-    std::promise<MatteFrameUnique> promise;
+    i64 frame_id;
   };
 
-  struct LoadResult
-  {
-    u32 frame_id;
-    std::future<MatteFrameUnique> frame;
-  };
+  MatteLoaderWorker (f32 _start_time, u32 _frame_count,
+                     std::filesystem::path const &_matte_dir);
 
-  MatteLoaderDispatcher (std::vector<std::filesystem::path> &&_matte_paths);
+  CHARM_DELETE_MOVE_COPY(MatteLoaderWorker);
 
-  CHARM_DELETE_MOVE_COPY(MatteLoaderDispatcher);
-
-  ~MatteLoaderDispatcher ();
+  ~MatteLoaderWorker ();
 
   void SetMatteLoaderPool (MatteLoaderPool *_pool);
 
-  void PushJob (u32 _frame);
-  bool HasJobs ();
-  bool PopJob (LoadJob &_job);
+  void PushJob (u32 _frame, i32 fps_num, i32 fps_denom);
+  void DoWork ();
 
-  LoadStatus PopFrame (u32 _id, MatteFrameUnique &_frame);
-  LoadStatus PopAndReleaseFrames (u32 _id, MatteFrameUnique &_frame);
+  bool PopFrame (u32 _id, MatteFrameUnique &_frame);
+  bool PopAndReleaseFrames (u32 _id, MatteFrameUnique &_frame);
 
  protected:
   std::vector<std::filesystem::path> m_paths;
+  f32 m_starting_pts;
+  i64 m_starting_frame_id;
 
   std::mutex m_job_mutex;
-  boost::circular_buffer<LoadJob> m_job_queue;
+  LoadJob m_load_job;
 
   std::mutex m_result_mutex;
-  boost::circular_buffer<LoadResult> m_result_queue;
+  boost::circular_buffer<MatteFrameUnique> m_result_queue;
+  //boost::circular_buffer<MatteFrameBimg> m_result_queue;
 
   MatteLoaderPool *m_loader_pool;
 };
@@ -106,12 +100,9 @@ class MatteLoaderPool
 
   void ShutDown ();
 
-  void AddDispatcher (ch_weak_ptr<MatteLoaderDispatcher> const &_dispatcher);
-  void AddDispatcher (ch_weak_ptr<MatteLoaderDispatcher> &&_dispatcher);
+  void SetReady (ch_ptr<MatteLoaderWorker> const &_worker);
 
-  void NotifyOfJob ();
-
-  bool NextJob (MatteLoaderDispatcher::LoadJob &_job);
+  ch_ptr<MatteLoaderWorker> NextWorker ();
 
  protected:
   static void LoadMattes (MatteLoaderPool *pool);
@@ -119,10 +110,9 @@ class MatteLoaderPool
   std::atomic_bool m_currently_loading;
   std::vector<std::thread> m_loading_threads;
 
-  std::mutex m_dispatcher_mutex;
-  std::condition_variable m_dispatcher_cond_var;
-  std::vector<ch_weak_ptr<MatteLoaderDispatcher>> m_dispatchers;
-  u64 m_dispatcher_current_index;
+  std::mutex m_worker_mutex;
+  std::condition_variable m_worker_cond_var;
+  std::vector<ch_weak_ptr<MatteLoaderWorker>> m_workers;
 };
 
 }

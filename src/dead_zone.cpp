@@ -1,306 +1,104 @@
-#include <application.hpp>
-#include <base_types.hpp>
-#include <class_utils.hpp>
+#include <GraphicsApplication.hpp>
 
-#include <DecodePipeline.hpp>
-#include <FrameTime.hpp>
 #include <Layer.hpp>
+#include <Matte.hpp>
+#include <MattedVideoRenderable.hpp>
 #include <Node.hpp>
-#include <PipelineTerminus.hpp>
+#include <PlatonicMaes.h>
 #include <Renderable.hpp>
 #include <VideoRenderable.hpp>
-#include <MattedVideoRenderable.hpp>
-#include <VideoSystem.hpp>
+#include <ZEYowlEvent.h>
 
 #include <BlockTimer.hpp>
 
+#include <base_types.hpp>
+#include <class_utils.hpp>
 #include <bgfx_utils.hpp>
-
-#define GLFW_EXPOSE_NATIVE_X11
-#define GLFW_EXPOSE_NATIVE_GLX
-#include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
-
-#include <charm_glm.hpp>
 
 #include <string_view>
 
 #include <stdio.h>
 
-#include <Matte.hpp>
-
-#include <type_int.hpp>
 
 using namespace charm;
+namespace s2 = boost::signals2;
 
-class dead_zone final : public charm::Application
+static ch_weak_ptr<DecodePipeline> s_pipeline;
+static bool s_pipeline_is_playing = true;
+
+i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
 {
- public:
-  dead_zone ();
-  ~dead_zone () override final;
-
-  bool StartUp     () override final;
-  bool RunOneCycle () override final;
-  bool ShutDown    () override final;
-
-  bool InitWindowingAndGraphics ();
-  void ShutDownGraphics ();
-  void ShutDownSceneGraph ();
-  void Render ();
-
-  void UpdateSceneGraph (i64 ratch, f64 thyme);
-
-  static FrameTime *GetFrameTime ();
-
-  Layer &GetSceneLayer ();
-
- protected:
-
-  GLFWwindow *window;
-
-  Layer *m_scene_graph_layer;
-};
-
-
-
-#define ERROR_RETURN_VAL(MSG, VAL)                 \
-  {                                                \
-    fprintf (stderr, "%s\n", MSG);                 \
-    return VAL;                                    \
-  }
-
-#define ERROR_RETURN(MSG)                          \
-   {                                               \
-    fprintf (stderr, "%s\n", MSG);                 \
-    return;                                        \
-  }
-
-
-static void glfw_error_callback (int, const char *_msg)
-{
-  Application::StopRunning();
-
-  fprintf (stderr, "glfw error: %s\n", _msg);
-}
-
-//void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-static void glfw_key_callback(GLFWwindow *window, int key, int, int action, int)
-{
-  if ((key == GLFW_KEY_Q || key == GLFW_KEY_ESCAPE)
-      && action == GLFW_RELEASE)
+  fprintf (stderr, "handle key press\n");
+  if (auto pipe = s_pipeline.lock();
+      pipe && _event->Utterance() == "p")
     {
-      glfwSetWindowShouldClose (window, GLFW_TRUE);
-      Application::StopRunning();
+      GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipe->m_pipeline), GST_DEBUG_GRAPH_SHOW_ALL, "decode-pipeline-before");
+
+      if (s_pipeline_is_playing)
+        {
+          fprintf (stderr, "set to paused\n");
+          pipe->Pause();
+        }
+      else
+       {
+          fprintf (stderr, "set to playing\n");
+          pipe->Play();
+        }
+
+      s_pipeline_is_playing = !s_pipeline_is_playing;
+      GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipe->m_pipeline), GST_DEBUG_GRAPH_SHOW_ALL, "decode-pipeline-after");
     }
-}
 
-bool dead_zone::InitWindowingAndGraphics ()
-{
-  glfwSetErrorCallback(glfw_error_callback);
-  if (! glfwInit())
-    ERROR_RETURN_VAL ("error initializing glfw", false);
-
-  glfwWindowHint (GLFW_RED_BITS, 8);
-  glfwWindowHint (GLFW_GREEN_BITS, 8);
-  glfwWindowHint (GLFW_BLUE_BITS, 8);
-  glfwWindowHint (GLFW_DEPTH_BITS, 24);
-  glfwWindowHint (GLFW_STENCIL_BITS, 8);
-  glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 4);
-  glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 6);
-  glfwWindowHint (GLFW_CLIENT_API, GLFW_OPENGL_API);
-  glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-  GLFWwindow *window = glfwCreateWindow (1920, 1080, "dead zone", nullptr, nullptr);
-  if (! window)
-    ERROR_RETURN_VAL ("couldn't create window", false);
-
-  glfwSetKeyCallback(window, glfw_key_callback);
-
-  bgfx::renderFrame();
-  bgfx::Init init;
-
-  init.type = bgfx::RendererType::OpenGL;
-  init.platformData.ndt = glfwGetX11Display();
-  init.platformData.nwh = (void *)glfwGetX11Window(window);
-  init.platformData.context = glfwGetGLXContext(window);
-  int glfw_width, glfw_height;
-  glfwGetWindowSize(window, &glfw_width, &glfw_height);
-  init.resolution.width = glfw_width;
-  init.resolution.height = glfw_height;
-  init.resolution.reset = BGFX_RESET_VSYNC;
-  init.resolution.numBackBuffers = 1;
-
-  if (! bgfx::init (init))
-    ERROR_RETURN_VAL ("couldn't initialize bgfx", false);
-
-  bgfx::setViewRect(0, 0, 0, glfw_width, glfw_height);
-  bgfx::setViewScissor(0);
-  bgfx::setViewClear (0, BGFX_CLEAR_COLOR, 0x808080FF);
-  // use depth integer to order GPU draw submission
-  // drawables are enumerated by order in scene graph,
-  // so that id number is used as the depth.
-  bgfx::setViewMode (0, bgfx::ViewMode::DepthAscending);
-
-  glm::mat4 view_transform = glm::lookAt (glm::vec3 {0.0f, 0.0f, 10.0f},
-                                          glm::vec3 {0.0f, 0.0f, 2.0f},
-                                          glm::vec3 {0.0f, 1.0f, 0.0f});
-  glm::mat4 proj_transform = glm::perspectiveFov (glm::pi<float> ()/4.0f,
-                                                  1920.0f, 1080.0f, 0.5f, 10.0f);
-  bgfx::setViewTransform(0, glm::value_ptr (view_transform),
-                         glm::value_ptr (proj_transform));
-
-  return true;
-}
-
-void dead_zone::ShutDownGraphics ()
-{
-  bgfx::shutdown();
-  glfwTerminate();
-}
-
-void dead_zone::Render ()
-{
-  for (Renderable *r : m_scene_graph_layer->GetRenderables())
-    r->Update ();
-
-  bgfx::touch (0);
-
-  glm::mat4 view_transform = glm::lookAt (glm::vec3 {0.0f, 0.0f, 10.0f},
-                                          glm::vec3 {0.0f, 0.0f, 2.0f},
-                                          glm::vec3 {0.0f, 1.0f, 0.0f});
-  glm::mat4 proj_transform = glm::perspective (47.0f, 1920.0f/1080.0f, 0.5f, 10.0f);
-  bgfx::setViewTransform(0, glm::value_ptr (view_transform),
-                         glm::value_ptr (proj_transform));
-
-  for (Renderable *r : m_scene_graph_layer->GetRenderables())
-    r->Draw(0);
-
-  bgfx::frame ();
-}
-
-FrameTime *s_dead_zone_frame_time{nullptr};
-
-dead_zone::dead_zone ()
-  : window {nullptr},
-    m_scene_graph_layer {new Layer}
-{
-}
-
-dead_zone::~dead_zone ()
-{
-}
-
-bool dead_zone::StartUp ()
-{
-  s_dead_zone_frame_time = new FrameTime;
-  bool ret = InitWindowingAndGraphics();
-  VideoSystem::Initialize();
-
-  return ret;
-}
-
-Node *s_nodal = nullptr;
-
-bool dead_zone::RunOneCycle ()
-{
-  GetFrameTime()->UpdateTime();
-
-  glfwPollEvents();
-
-  VideoSystem *video_system = VideoSystem::GetSystem ();
-  video_system->PollMessages();
-  video_system->UploadFrames();
-
-  UpdateSceneGraph (-1, 0.0);
-
-  {
-    //BlockTimer ("render");
-    Render ();
-  }
-
-  return true;
-}
-
-void dead_zone::UpdateSceneGraph(i64 ratch, f64 thyme)
-{
-  m_scene_graph_layer->GetRootNode()
-    -> UpdateTransformsHierarchically (ratch, thyme);
-  m_scene_graph_layer->GetRootNode()->EnumerateGraph();
-}
-
-void dead_zone::ShutDownSceneGraph()
-{
-  delete m_scene_graph_layer;
-  m_scene_graph_layer = nullptr;
-}
-
-bool dead_zone::ShutDown ()
-{
-  ShutDownSceneGraph ();
-  VideoSystem::ShutDown();
-  ShutDownGraphics ();
-
-  delete s_dead_zone_frame_time;
-  s_dead_zone_frame_time = nullptr;
-
-  return true;
-}
-
-FrameTime *dead_zone::GetFrameTime ()
-{
-  return s_dead_zone_frame_time;
-}
-
-Layer &dead_zone::GetSceneLayer ()
-{
-  return *m_scene_graph_layer;
+  return 0;
 }
 
 int main (int, char **)
 {
-  dead_zone zone;
-  if (! zone.StartUp ())
+  GraphicsApplication dead_zone;
+  if (! dead_zone.StartUp ())
     return -1;
 
-  Layer &layer = zone.GetSceneLayer();
+  Layer *layer = dead_zone.GetSceneLayer();
 
-  s_nodal = new Node ();
-
-  s_nodal->SetLocalTransformation(glm::translate(glm::vec3{0.0f, 0.0f, 9.0f})
-                                  * glm::scale (glm::vec3 {10.0f}));
-
+  Node *nodal = new Node ();
+  PlatonicMaes *maes = dead_zone.FindMaesByName("front");
+  nodal->Scale (0.75 * maes->Width());
+  nodal->Translate (maes->Loc());
 
   std::vector<FilmInfo> configs = ReadFilmInfo ("../configs/film-config.toml");
   assert (configs.size () > 0);
 
-  std::vector<FilmGeometry> geom = ReadFileGeometry("../configs/mattes.toml");
-  assert (geom.size () > 0);
-  MergeFilmInfoGeometry(configs, geom);
-
-  //FilmInfo &film_info = configs[0];
-  FilmInfo &film_info = configs.back ();
+  FilmInfo &film_info = configs[4];
   assert (film_info.clips.size () > 0);
-  ClipInfo &clip_info = film_info.clips[0];
-
-  // std::string file
-  //   = "file:///home/blake/tlp/tamper-blu-mkv/the-fall-blu.mov";
-
-  std::string uri = std::string ("file://") + film_info.film_path.string ();
-  // MattedVideoRenderable *renderable
-  //   = new MattedVideoRenderable (film_info, clip_info);
   VideoRenderable *renderable = new VideoRenderable (film_info);
 
-  printf ("clip dims: [%u, %u] - [%u, %u]\n",
-          clip_info.geometry.dir_geometry.min[0],
-          clip_info.geometry.dir_geometry.min[1],
-          clip_info.geometry.dir_geometry.max[0],
-          clip_info.geometry.dir_geometry.max[1]);
-  //VideoRenderable *renderable = new VideoRenderable (uri);
+  // std::vector<FilmGeometry> geom = ReadFileGeometry("../configs/mattes.toml");
+  // assert (geom.size () > 0);
+  // MergeFilmInfoGeometry(configs, geom);
 
-  s_nodal->AppendRenderable(renderable);
-  layer.GetRootNode()->AppendChild(s_nodal);
+  // FilmInfo &film_info = configs[4];
+  // assert (film_info.clips.size () > 0);
+  // [[maybe_unused]] ClipInfo &clip_info = film_info.clips[0];
 
-  zone.Run ();
+  // MattedVideoRenderable *renderable
+  //   = new MattedVideoRenderable (film_info, clip_info);
+  // printf ("clip dims: [%u, %u] - [%u, %u]\n",
+  //         clip_info.geometry.dir_geometry.min[0],
+  //         clip_info.geometry.dir_geometry.min[1],
+  //         clip_info.geometry.dir_geometry.max[0],
+  //         clip_info.geometry.dir_geometry.max[1]);
+
+  s_pipeline = renderable->GetPipeline();
+  // s_pipeline.lock ()->Play ();
+
+  s2::connection key_conn = dead_zone.GetSprinkler().AppendHandler<ZEYowlAppearEvent>(&handle_key_press);
+
+  nodal->AppendRenderable(renderable);
+  layer->GetRootNode()->AppendChild(nodal);
+  CMVTrefoil *tr = dead_zone.FindRenderLeafByName("front");
+  tr->layers.push_back(layer);
+
+  dead_zone.Run ();
 
   return 0;
 }
