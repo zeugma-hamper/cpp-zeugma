@@ -81,7 +81,7 @@ class MatteLoaderWorker : public CharmBase<MatteLoaderWorker, MTReferenceCounter
   i64 m_starting_frame_id;
 
   std::mutex m_job_mutex;
-  LoadJob m_load_job;
+  boost::circular_buffer<LoadJob> m_load_jobs;
 
   std::mutex m_result_mutex;
   boost::circular_buffer<MatteFrameUnique> m_result_queue;

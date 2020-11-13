@@ -22,8 +22,7 @@ MatteLoaderWorker::MatteLoaderWorker (f32 _start_time, u32 _frame_count,
     m_starting_frame_id {-1},
     m_loader_pool {nullptr}
 {
-
-  m_load_job.frame_id = -1;
+  m_load_jobs.set_capacity (2);
   m_result_queue.set_capacity(4);
 
   m_paths.reserve (_frame_count);
@@ -43,7 +42,7 @@ MatteLoaderWorker::~MatteLoaderWorker ()
 
   {
     std::unique_lock lock {m_job_mutex};
-    m_load_job.frame_id = -1;
+    m_load_jobs.clear ();
   }
 
   {
@@ -82,11 +81,19 @@ void MatteLoaderWorker::PushJob (u32 _frame, i32 fps_num, i32 fps_denom)
       _frame >= m_paths.size () + m_starting_frame_id)
     return;
 
+  //if already scheduled to load
   i64 const fnum = _frame;
-  i64 const prev_id = std::exchange (m_load_job.frame_id, fnum);
-  if (prev_id < 0)
+  for (LoadJob const &lj : m_load_jobs)
+    if (lj.frame_id == fnum)
+      return;
+
+  //pop oldest job if full
+  if (m_load_jobs.size () == m_load_jobs.capacity())
+    m_load_jobs.pop_front();
+
+  m_load_jobs.push_back({fnum});
+  if (m_load_jobs.size () == 1)
     m_loader_pool->SetReady(ch_from_this ());
-  lock.unlock();
 }
 
 void MatteLoaderWorker::DoWork ()
@@ -94,7 +101,14 @@ void MatteLoaderWorker::DoWork ()
   i64 frame_id = -1;
   {
     std::unique_lock lock {m_job_mutex};
-    frame_id = std::exchange(m_load_job.frame_id, -1);
+    if (m_load_jobs.size () > 0)
+      {
+        frame_id = m_load_jobs.front ().frame_id;
+        m_load_jobs.pop_front();
+
+        if (m_load_jobs.size () > 0)
+          m_loader_pool->SetReady(ch_from_this ());
+      }
   }
 
   if (frame_id < 0)

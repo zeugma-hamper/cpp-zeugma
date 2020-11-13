@@ -192,7 +192,7 @@ VideoSystem::VideoSystem ()
   ps = CreateProgram ("matte_video_vs.bin", "matte_video_fs.bin", true);
   m_vgr.matte_program = ps.program;
 
-  //m_matte_pool = std::make_unique<MatteLoaderPool>();
+  m_matte_pool = std::make_unique<MatteLoaderPool>();
 }
 
 VideoSystem::~VideoSystem ()
@@ -425,7 +425,17 @@ VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
                                    i32 _frame_count, fs::path const &_matte_dir,
                                    v2i32 _min, v2i32 _max)
 {
+  // set up matte worker
+  m_pipelines.emplace_back();
+  VideoPipeline &pipe = m_pipelines.back ();
+  pipe.matte_worker = make_ch<MatteLoaderWorker> (_loop_start_ts, _frame_count, _matte_dir);
+  pipe.matte_worker->SetMatteLoaderPool(m_matte_pool.get ());
+
+  // add video terminus
   auto *term = new TampVideoTerminus;
+  term->AddMatteWorker(pipe.matte_worker);
+
+  // create media pipeline
   ch_ptr<DecodePipeline> dec {new DecodePipeline};
   dec->OpenVideoFile (_uri, term);
   dec->Play ();
@@ -437,8 +447,6 @@ VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
 
   txt->SetMatteDimensions(_min, _max);
 
-  m_pipelines.emplace_back();
-  VideoPipeline &pipe = m_pipelines.back ();
   pipe.uri = _uri;
   pipe.pipeline = dec;
   pipe.terminus = term;
@@ -446,10 +454,6 @@ VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
   pipe.adjusted_loop_start_ts = -1;
   pipe.adjusted_loop_end_ts = -1;
   pipe.matte_frame_count = _frame_count;
-
-  pipe.matte_worker = make_ch<MatteLoaderWorker> (_loop_start_ts, _frame_count, _matte_dir);
-  pipe.matte_worker->SetMatteLoaderPool(m_matte_pool.get ());
-  pipe.terminus->AddMatteWorker(pipe.matte_worker);
   pipe.matte_dir_path = _matte_dir;
 
   return {dec, txt};

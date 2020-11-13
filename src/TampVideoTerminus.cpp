@@ -132,8 +132,8 @@ void TampVideoTerminus::NotifyOfSample (SampleStatus _status, gst_ptr<GstSample>
 
   CacheCaps(gst_sample_get_caps (m_sample.get ()));
   UpdateFrameNumber();
-  UpdateWorkers();
   RemoveWorkerCruft();
+  UpdateWorkers();
 }
 
 void TampVideoTerminus::NotifyOfSample (SampleStatus _status, gst_ptr<GstSample> &&_sample)
@@ -144,8 +144,8 @@ void TampVideoTerminus::NotifyOfSample (SampleStatus _status, gst_ptr<GstSample>
 
   CacheCaps(gst_sample_get_caps (m_sample.get ()));
   UpdateFrameNumber();
-  UpdateWorkers();
   RemoveWorkerCruft();
+  UpdateWorkers();
 }
 
 void TampVideoTerminus::AddMatteWorker (ch_ptr<MatteLoaderWorker> const &_worker)
@@ -194,8 +194,12 @@ void TampVideoTerminus::UpdateWorkers ()
   for (ch_weak_ptr<MatteLoaderWorker> &wworker : m_matte_workers)
     {
       if (auto sworker = wworker.lock (); sworker)
-        sworker->PushJob (u32 (m_frame_number),
-                          m_video_info.fps_n, m_video_info.fps_d);
+        {
+          sworker->PushJob (u32 (m_frame_number),
+                            m_video_info.fps_n, m_video_info.fps_d);
+          sworker->PushJob (u32 (m_frame_number+1),
+                            m_video_info.fps_n, m_video_info.fps_d);
+        }
     }
 }
 
