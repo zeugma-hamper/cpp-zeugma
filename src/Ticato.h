@@ -6,6 +6,8 @@
 #include "Node.hpp"
 #include "Renderable.hpp"
 
+#include "Matte.hpp"
+
 
 using namespace charm;
 
@@ -15,6 +17,10 @@ class Ticato  :  public Zeubject
 
   Node *no;
   Renderable *re;
+  ZoftVect sca, loc;
+
+  Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm = -1,
+          i64 which_clip = -1);
 };
 
 

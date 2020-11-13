@@ -17,12 +17,12 @@ static const char *color_unif_s = "u_color";
 
 PolygonRenderable::PolygonRenderable ()  :  Renderable (),
                                             should_fill (true),
-                                            should_stroke (false),
+                                            should_edge (false),
                                             fill_iro { 1.0, 1.0, 0.0, 0.3 },
-                                            stroke_iro { 1.0, 1.0, 1.0, 1.0 },
+                                            edge_iro { 1.0, 1.0, 1.0, 1.0 },
                                             shad_prog {BGFX_INVALID_HANDLE},
                                             fill_vbuf {BGFX_INVALID_HANDLE},
-                                            stroke_vbuf {BGFX_INVALID_HANDLE}
+                                            edge_vbuf {BGFX_INVALID_HANDLE}
 { if (! tessy_obj)
     tessy_obj = gluNewTess ();
 
@@ -40,7 +40,7 @@ PolygonRenderable::PolygonRenderable ()  :  Renderable (),
 
   fill_vbuf
     = bgfx::createDynamicVertexBuffer (1001, layabout, BGFX_BUFFER_ALLOW_RESIZE);
-  stroke_vbuf
+  edge_vbuf
     = bgfx::createDynamicVertexBuffer (1001, layabout, BGFX_BUFFER_ALLOW_RESIZE);
 
   if (bgfx::isValid (vs)  &&  bgfx::isValid (fs))
@@ -53,7 +53,7 @@ PolygonRenderable::PolygonRenderable ()  :  Renderable (),
 
 PolygonRenderable::~PolygonRenderable ()
 { bgfx::destroy (fill_vbuf);
-  bgfx::destroy (stroke_vbuf);
+  bgfx::destroy (edge_vbuf);
   bgfx::destroy (shad_prog);
   bgfx::destroy (unif_primc);
 }
@@ -166,7 +166,7 @@ void PolygonRenderable::SpankularlyTesselate ()
 
   const bgfx::Memory *mimmy
     = bgfx::copy (raw_verts . data (), raw_verts . size () * sizeof (glm::vec3));
-  bgfx::update (stroke_vbuf, 0, mimmy);
+  bgfx::update (edge_vbuf, 0, mimmy);
 
   spanking_time = false;
 }
@@ -193,9 +193,9 @@ spanking_time = true;
       bgfx::submit (vyu_id, shad_prog, m_graph_id);
     }
 
-  if (should_stroke)
+  if (should_edge)
     { bgfx::setTransform (&(m_node -> GetAbsoluteTransformation ().model));
-      bgfx::setVertexBuffer (0, stroke_vbuf, 0, ts_vrt_cnt);
+      bgfx::setVertexBuffer (0, edge_vbuf, 0, ts_vrt_cnt);
       bgfx::setState (BGFX_STATE_WRITE_RGB
                       |  BGFX_STATE_PT_LINESTRIP
                       |  BGFX_STATE_LINEAA
@@ -203,7 +203,7 @@ spanking_time = true;
                                                 BGFX_STATE_BLEND_INV_SRC_ALPHA)
                       |  BGFX_STATE_WRITE_Z);
 
-      bgfx::setUniform (unif_primc, glm::value_ptr (stroke_iro));
+      bgfx::setUniform (unif_primc, glm::value_ptr (edge_iro));
 
       bgfx::submit (vyu_id, shad_prog, m_graph_id);
     }

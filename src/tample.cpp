@@ -61,6 +61,7 @@
 
 // it's us! right here!
 #include "Orksur.h"
+#include "Ticato.h"
 
 
 using namespace charm;
@@ -339,18 +340,17 @@ i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
   static bool now_playing = true;
   auto seek_ts = [] () { static i32 i = 0; return ++i * 60.0; };
 
-  fprintf (stderr, "timestamp is %.3f\n", deep->CurrentTimestamp ());
+  fprintf (stderr, "timestamp is %.3f\n", deep -> CurrentTimestamp ());
 
-  if (e -> Utterance ()  ==  "p")
+  if (e -> Utterance ()  ==  " ")
     { if (now_playing)
         deep -> Pause ();
       else
         deep -> Play ();
       now_playing = ! now_playing;
     }
-  else if (e -> Utterance() == "s")
-    { deep -> Seek (seek_ts ());
-    }
+  else if (e -> Utterance ()  ==  "s")
+    deep -> Seek (seek_ts ());
 
   return 0;
 }
@@ -383,8 +383,15 @@ Tampo::~Tampo ()
 
 static LoopFloat timey { 0.0, 1.0, 0.0 };
 
-bool Tampo::DoWhatThouWilt (i64, f64)
-{
+bool Tampo::DoWhatThouWilt (i64 ratch, f64 thyme)
+{ static MotherTime runt;
+  static i64 farr = ratch;
+
+  if (runt . DeltaTimeGlance ()  >=  5.0)
+    { fprintf (stderr, "%.1lf fps...\n",
+               f64((ratch - farr) / 8) / runt . DeltaTime ());
+      farr = ratch;
+    }
   // if (timey.val > 1.5)
   //   { Tampo::ROWP () . HooverCoordTransforms ();
   //     timey . BecomeLike (ZoftFloat (0.0));
@@ -533,9 +540,11 @@ int main (int ac, char **av)
     = ReadFilmInfo ("../configs/film-config.toml");
   assert (film_infos.size () > 0);
 /*
-  { BlockTimer bt ("loading geom");
+  { BlockTimer bt ("loading & merging geom");
+    BlockTimer slurpt ("slurping geom file");
     std::vector<FilmGeometry> geoms
       = ReadFileGeometry("../configs/mattes.toml");
+    slurpt . StopTimer ();
     assert (geoms . size ()  >  0);
     MergeFilmInfoGeometry (film_infos, geoms);
   }
@@ -596,7 +605,7 @@ int main (int ac, char **av)
       polysplat -> AppendVertex (voit);
     }
   splat -> AppendRenderable (polysplat);
-polysplat -> SetShouldStroke (true);
+polysplat -> SetShouldEdge (true);
   windshield -> AppendChild (splat);
 
   ch_ptr <Orksur> orkp (new Orksur (*tabl));
@@ -608,6 +617,13 @@ polysplat -> SetShouldStroke (true);
     if (GLFWWaterWorks *ww
         = dynamic_cast <GLFWWaterWorks *> (tamp . NthWaterWorks (q)))
       ww -> SetPromoteMouseToSpatialOrthoStyle (true);
+
+  Ticato *tic = new Ticato (film_infos);
+  tic->re -> SetOver (tabl -> Over ());
+  tic->re -> SetUp (tabl -> Up ());
+  tic->sca . Set (Vect (200.0));
+  tic->loc . Set (tabl -> Loc ());
+  windshield -> AppendChild (tic->no);
 
   tamp . Run ();
 

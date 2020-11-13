@@ -255,6 +255,8 @@ bool GraphicsApplication::RunOneCycle ()
   for (ZePublicWaterWorks *ww : m_event_drainage)
     ww->Drain (&m_event_sprinkler);
 
+  DoWhatThouWilt (m_global_ratchet, global_frame_thyme);
+
   if (ProtoZoftThingGuts::IsMassBreathing ())
     ProtoZoftThingGuts::MassBreather ()
       -> Inhale (m_global_ratchet, global_frame_thyme);

@@ -19,9 +19,13 @@ using namespace charm;
 
 struct Splort  :  Node
 { ZoftVect loc;
-  PolygonRenderable *ren;
-  Splort ()  :  Node (), ren (new PolygonRenderable)
-    { loc . MakeBecomeLikable ();  AppendRenderable (ren); }
+  PolygonRenderable *re1, *re2;
+  Splort ()  :  Node (),
+                re1 (new PolygonRenderable), re2 (new PolygonRenderable)
+    { loc . MakeBecomeLikable ();
+      AppendRenderable (re1);
+      AppendRenderable (re2);
+    }
 };
 
 

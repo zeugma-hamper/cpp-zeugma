@@ -10,6 +10,7 @@ const Vect Vect::xaxis (1.0, 0.0, 0.0);
 const Vect Vect::yaxis (0.0, 1.0, 0.0);
 const Vect Vect::zaxis (0.0, 0.0, 1.0);
 const Vect Vect::zerov (0.0, 0.0, 0.0);
+const Vect Vect::onesv (1.0, 1.0, 1.0);
 
 
 Vect &Vect::RotateSelfPreNormed (const Vect &axis, f64 rad_ang)

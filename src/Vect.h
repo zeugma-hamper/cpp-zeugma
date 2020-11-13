@@ -152,7 +152,7 @@ class Vect  :  public v3f64
     { Spew (stderr); }
 
   static const Vect xaxis, yaxis, zaxis;
-  static const Vect zerov;
+  static const Vect zerov, onesv;
 };
 
 

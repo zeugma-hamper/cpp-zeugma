@@ -24,8 +24,8 @@ namespace charm  {
 class PolygonRenderable  :  public Renderable
 { public:
   std::vector <ZoftVect> verts;
-  bool should_fill, should_stroke;
-  glm::vec4 fill_iro, stroke_iro;
+  bool should_fill, should_edge;
+  glm::vec4 fill_iro, edge_iro;
 //  std::vector <v3f64> packd_verts;
   bool spanking_time;
   static void *tessy_obj;
@@ -34,7 +34,7 @@ class PolygonRenderable  :  public Renderable
   i64 ts_vrt_cnt;
   bgfx::ProgramHandle shad_prog;
   bgfx::DynamicVertexBufferHandle fill_vbuf;
-  bgfx::DynamicVertexBufferHandle stroke_vbuf;
+  bgfx::DynamicVertexBufferHandle edge_vbuf;
   bgfx::UniformHandle unif_primc;
   GLenum gl_mode;
 
@@ -61,19 +61,19 @@ class PolygonRenderable  :  public Renderable
     { return should_fill; }
   void SetShouldFill (bool sf)
     { should_fill = sf;  }
-  bool ShouldStroke ()  const
-    { return should_stroke; }
-  void SetShouldStroke (bool ss)
-    { should_stroke = ss;  }
+  bool ShouldEdge ()  const
+    { return should_edge; }
+  void SetShouldEdge (bool ss)
+    { should_edge = ss;  }
 
   const glm::vec4 &FillColor ()
     { return fill_iro; }
   void SetFillColor (const glm::vec4 &c)
     { fill_iro = c; }
-  const glm::vec4 &StrokeColor ()
-    { return stroke_iro; }
-  void SetStrokeColor (const glm::vec4 &c)
-    { stroke_iro = c; }
+  const glm::vec4 &EdgeColor ()
+    { return edge_iro; }
+  void SetEdgeColor (const glm::vec4 &c)
+    { edge_iro = c; }
 
   void SpankularlyTesselate ();
   void Draw (u16 vyu_id)  override;

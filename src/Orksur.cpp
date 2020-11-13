@@ -12,14 +12,16 @@ Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false)
 Splort *Orksur::NewSplort (f64 rad, i64 num_verts)  const
 { Splort *spl = new Splort;
 
-  for (i64 q = 0  ;  q < num_verts  ;  ++q)
-    { f64 theeeta = 2.0 * M_PI / (f64)num_verts * (f64)q;
-      Vect radial = cos (theeeta) * ovr  +  sin (theeeta) * upp;
-      SinuVect arm (0.13 * rad * radial, 1.0 + 0.3 * drand48 (),
-                    0.333 * (1.0 + 2.0 * (q%2)) * rad * radial);
-      SumVect voitecks (spl->loc, arm);
-      spl->ren -> AppendVertex (voitecks);
-    }
+  for (i64 w = 0  ;  w < 2  ;  ++w)
+    for (i64 q = 0  ;  q < num_verts  ;  ++q)
+      { f64 theeeta = 2.0 * M_PI / (f64)num_verts * (f64)q  +  w * M_PI;
+        Vect radial = cos (theeeta) * ovr  +  sin (theeeta) * upp;
+        radial *= 0.5 * (w + 1.0);
+        SinuVect arm (0.065 * rad * radial, 5.0 + 0.7 * drand48 (),
+                      0.24 * (1.0 + 3.0 * (q%2)) * rad * radial);
+        SumVect voitecks (spl->loc, arm);
+        (w > 0 ? spl->re1 : spl->re2) -> AppendVertex (voitecks);
+      }
 
   return spl;
 }
@@ -33,7 +35,7 @@ i64 Orksur::ZESpatialMove (ZESpatialMoveEvent *e)
   Splort *s;
   try  { s = splorts . at (prv); }
   catch (const std::out_of_range &e)
-    { AppendChild (s = NewSplort (100.0));
+    { AppendChild (s = NewSplort (20.0));
       splorts[prv] = s;
     }
 
