@@ -155,7 +155,7 @@ std::vector<bgfx::UniformHandle> GetShaderUniforms (bgfx::ShaderHandle _sh)
 //   return handle;
 // }
 
-bgfx::TextureHandle CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags)
+TextureParticulars CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags)
 {
   std::unique_ptr<OIIO::ImageInput> iinput = OIIO::ImageInput::open (_path.getCPtr());
   if (! iinput)
@@ -183,13 +183,12 @@ bgfx::TextureHandle CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags)
 
   bgfx::updateTexture2D(handle, 0, 0, 0, 0, ispec.width, ispec.height, img_mem);
 
-  return handle;
+  return {handle, formats[ispec.nchannels], u32 (ispec.width), u32 (ispec.height)};
 }
 
 bgfx::TextureHandle UpdateWholeTexture2D (bgfx::TextureHandle _texture,
                                           bx::FilePath const &_path)
 {
-  BlockTimer dec ("decode image");
   std::unique_ptr<OIIO::ImageInput> iinput = OIIO::ImageInput::open (_path.getCPtr());
   if (! iinput)
     return {};
@@ -199,9 +198,7 @@ bgfx::TextureHandle UpdateWholeTexture2D (bgfx::TextureHandle _texture,
   bgfx::Memory const *img_mem = bgfx::alloc(ispec.width * ispec.height * ispec.nchannels);
 
   iinput->read_image (OIIO::TypeDesc::UINT8, img_mem->data);
-  dec.StopTimer();
 
-  BlockTimer ("upload texture");
   bgfx::updateTexture2D (_texture, 0, 0, 0, 0, ispec.width, ispec.height, img_mem);
 
   return _texture;

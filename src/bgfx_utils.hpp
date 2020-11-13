@@ -34,8 +34,16 @@ ProgramResiduals CreateProgram (bx::FilePath const &_vert_path,
 
 std::vector<bgfx::UniformHandle> GetShaderUniforms (bgfx::ShaderHandle _sh);
 
+struct TextureParticulars
+{
+  bgfx::TextureHandle handle = BGFX_INVALID_HANDLE;
+  bgfx::TextureFormat::Enum format = bgfx::TextureFormat::Unknown;
+  u32 width = 0;
+  u32 height = 0;
+};
+
 //Create a texture handle and decode image to texture, texture is mutable
-bgfx::TextureHandle CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags);
+TextureParticulars CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags);
 //Updates texture from image file. Format, size, etc. must match.
 bgfx::TextureHandle UpdateWholeTexture2D (bgfx::TextureHandle _texture,
                                           bx::FilePath const &_path);

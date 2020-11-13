@@ -8,14 +8,6 @@
 namespace charm
 {
 
-struct TextureParticulars
-{
-  bgfx::TextureHandle handle = BGFX_INVALID_HANDLE;
-  bgfx::TextureFormat::Enum format = bgfx::TextureFormat::Unknown;
-  u32 width = 0;
-  u32 height = 0;
-};
-
 class TexturedRenderable final : public Renderable
 {
  public:
