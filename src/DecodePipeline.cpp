@@ -7,7 +7,9 @@
 
 namespace charm {
 
+[[maybe_unused]]
 static const char *s_state_names[5] {"void pending", "null", "ready", "paused", "playing"};
+[[maybe_unused]]
 static const char *s_sc_return_names[4] {"failure", "success", "async", "no preroll"};
 
 DecodePipeline::DecodePipeline ()
@@ -184,6 +186,22 @@ void DecodePipeline::Pause ()
 //                     GST_SEEK_TYPE_SET, _start_ts,
 //                     GST_SEEK_TYPE_SET, _end_ts);
 // }
+
+DecodePipeline::MediaStatus DecodePipeline::GetStatus () const
+{
+  return DecodePipeline::MediaStatus (m_media_state);
+}
+
+DecodePipeline::MediaStatus DecodePipeline::GetPendingStatus () const
+{
+  return DecodePipeline::MediaStatus (m_pending_state);
+}
+
+bool DecodePipeline::IsInFlux () const
+{
+  return m_media_state != m_pending_state;
+}
+
 void DecodePipeline::Step (u32 _distance)
 {
   GstEvent *event = gst_event_new_step (GST_FORMAT_BUFFERS, _distance, 1.0, TRUE, FALSE);
@@ -213,19 +231,10 @@ void DecodePipeline::Loop (f64 _from, f64 _to)
   m_loop_status.loop_end = to_ns;
 }
 
-void DecodePipeline::SetPipelineState (GstState _state)
+bool DecodePipeline::IsLooping () const
 {
-  if (! m_pipeline)
-    return;
-
-  if (_state == m_media_state)
-    return;
-
-  GstStateChangeReturn ret = gst_element_set_state (m_pipeline, _state);
-  m_pending_state = _state;
-
-  if (ret == GST_STATE_CHANGE_ASYNC)
-    m_awaiting_async_done = true;
+  return m_loop_status.loop_start >= 0 &&
+    m_loop_status.loop_end >= 0;
 }
 
 f64 DecodePipeline::CurrentTimestamp () const
@@ -252,6 +261,21 @@ f64 DecodePipeline::Duration () const
 gint64 DecodePipeline::DurationNanoseconds () const
 {
   return m_duration;
+}
+
+void DecodePipeline::SetPipelineState (GstState _state)
+{
+  if (! m_pipeline)
+    return;
+
+  if (_state == m_media_state)
+    return;
+
+  GstStateChangeReturn ret = gst_element_set_state (m_pipeline, _state);
+  m_pending_state = _state;
+
+  if (ret == GST_STATE_CHANGE_ASYNC)
+    m_awaiting_async_done = true;
 }
 
 bool DecodePipeline::SeekFull (f64 _rate, GstFormat _format, GstSeekFlags _flags,
@@ -411,6 +435,7 @@ static void db_pad_added_handler (GstElement *src, GstPad *new_pad, DecodePipeli
   data->NewDecodedPad (src, new_pad);
 }
 
+[[maybe_unused]]
 static gboolean db_autoplug_continue_handler (GstElement *, GstPad *,
                                               GstCaps *, DecodePipeline *)
 {

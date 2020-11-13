@@ -40,6 +40,15 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
 {
   friend PipelineTerminus;
 
+  enum class MediaStatus
+  {
+    Void = 0, //shouldn't happen
+    Null, //shouldn't happen
+    Ready,
+    Paused,
+    Playing
+  };
+
   DecodePipeline ();
   ~DecodePipeline ();
 
@@ -54,9 +63,15 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   void Pause ();
   void Seek (f64 _ts);
 
+  MediaStatus GetStatus () const;
+  MediaStatus GetPendingStatus () const;
+  // true if status doesn't equal pending status
+  bool IsInFlux () const;
+
   void Step (u32 _distance);
 
   void Loop (f64 _from, f64 _to);
+  bool IsLooping () const;
 
   // timestamp of the latest video buffer
   f64 CurrentTimestamp () const;
