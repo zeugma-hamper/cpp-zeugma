@@ -171,6 +171,7 @@ VideoSystem *VideoSystem::GetSystem ()
 
 
 VideoSystem::VideoSystem ()
+  : m_upload_position {0u}
 {
   gst_init (nullptr, nullptr);
 
@@ -299,45 +300,25 @@ static void upload_frame (gst_ptr<GstSample> const &_sample,
 
 void VideoSystem::UploadFrames ()
 {
-  for (VideoPipeline &pipe : m_pipelines)
+  auto do_upload = [&] (VideoPipeline &pipe, szt &score)
     {
       auto texture = pipe.texture.lock ();
       if (! texture)
-        continue;
+        return;
 
       GstVideoInfo video_info;
       gst_ptr<GstSample> sample = pipe.terminus->FetchClearSample();
       if (sample)
         {
           upload_frame(sample, texture, &video_info);
+          score += 3;
 
           if (pipe.matte_dir_path.empty())
-            continue;
+            return;
 
           GstBuffer *buffer = gst_sample_get_buffer (sample.get ());
           guint64 pts = GST_BUFFER_PTS(buffer);
 
-          // auto calc_dur = [&video_info] (gint64 n_frames) -> gint64
-          // { return n_frames * GST_VIDEO_INFO_FPS_D(&video_info) * 1e9
-          //     / GST_VIDEO_INFO_FPS_N(&video_info); };
-
-          // gint64 const frame_dur = calc_dur (1);
-          // if (pipe.adjusted_loop_start_ts == -1 &&
-          //     pipe.pipeline->m_loop_status.loop_start <= i64 (pts) &&
-          //     i64 (pts) <= pipe.pipeline->m_loop_status.loop_start + frame_dur)
-          //   {
-          //     pipe.adjusted_loop_start_ts = i64 (pts);
-          //     pipe.adjusted_loop_end_ts
-          //       = pipe.adjusted_loop_start_ts + calc_dur (pipe.matte_frame_count);
-          //   }
-
-          // //TODO: set matte texture to pass through
-          // if (gint64(pts) < pipe.adjusted_loop_start_ts ||
-          //     gint64(pts) > pipe.adjusted_loop_end_ts + (frame_dur / 2))
-          //   continue;
-
-          //i expect looping here for now
-          //guint64 offset_ns = pts - pipe.adjusted_loop_start_ts;
           guint64 frame_num = guint64 (std::round (pts * GST_VIDEO_INFO_FPS_N(&video_info)
                                                    / GST_VIDEO_INFO_FPS_D(&video_info) / f64(1e9)));
           pipe.matte_awaited = i32 (frame_num);
@@ -350,7 +331,7 @@ void VideoSystem::UploadFrames ()
           if (! pipe.matte_worker->PopFrame(pipe.matte_awaited, mf))
             {
               fprintf (stdout, "no matte for %d which seems fishy\n", pipe.matte_awaited);
-              continue;
+              return;
             }
 
           pipe.matte_awaited = -1;
@@ -361,8 +342,23 @@ void VideoSystem::UploadFrames ()
           bgfx::Memory const *mem = bgfx::makeRef(data, mf.data_size, BGFXfree);
           update_or_create_texture(texture->GetNthTexture(3), mf.width, mf.height,
                                    1, mf.width, BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE, mem);
+          score += 1;
         }
+    };
+
+  szt const max_score = 10000u;
+  szt score = 0u;
+  szt const count = m_pipelines.size ();
+  m_upload_position = m_upload_position >= count ? 0 : m_upload_position;
+  for (szt i = 0; i < count; ++i)
+    {
+      do_upload(m_pipelines[m_upload_position], score);
+      m_upload_position = (m_upload_position + 1) % count;
+      if (score >= max_score)
+        break;
     }
+
+  // fprintf (stderr, "pos: %zu, score: %zu\n", m_upload_position, score);
 }
 
 void VideoSystem::PollMessages()

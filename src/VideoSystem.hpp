@@ -178,6 +178,7 @@ class VideoSystem
   GraphicsResources m_vgr;
   std::unique_ptr<MatteLoaderPool> m_matte_pool;
   std::vector<VideoPipeline> m_pipelines;
+  szt m_upload_position;
 };
 
 }
