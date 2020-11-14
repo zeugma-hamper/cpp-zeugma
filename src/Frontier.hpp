@@ -29,7 +29,7 @@ class Frontier
   virtual AABB GetLocalAABB  () const;
   virtual AABB GetGlobalAABB () const;
 
-  virtual bool CheckHit (Ray const &_ray, Vect *_hit_pt) const = 0;
+  virtual bool CheckHit (G::Ray const &_ray, Vect *_hit_pt) const = 0;
 
  protected:
   Node *m_node; //non-owning
@@ -43,7 +43,7 @@ class RectangleFrontier : public Frontier
 
   AABB GetLocalAABB  () const override;
   AABB GetGlobalAABB () const override;
-  bool CheckHit (Ray const &_ray, Vect *_hit_pt) const override;
+  bool CheckHit (G::Ray const &_ray, Vect *_hit_pt) const override;
 
  protected:
   Vect m_bl;
@@ -63,7 +63,7 @@ class RectRenderableFrontier : public Frontier
 
   AABB GetLocalAABB  () const override;
   AABB GetGlobalAABB () const override;
-  bool CheckHit (Ray const &_ray, Vect *_hit_pt) const override;
+  bool CheckHit (G::Ray const &_ray, Vect *_hit_pt) const override;
 
  protected:
   Renderable *m_renderable; //non-owning

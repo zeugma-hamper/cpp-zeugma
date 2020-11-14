@@ -8,6 +8,8 @@
 
 #include "Matte.hpp"
 
+#include "Zeubject.h"
+
 
 using namespace charm;
 

@@ -5,9 +5,9 @@
 namespace charm  {
 
 
-bool GeomFumble::RayPlaneIntersection (const Vect &frm, const Vect &aim,
-                                       const Vect &pnt, const Vect &nrm,
-                                       Vect *hit_pnt)
+bool G::RayPlaneIntersection (const Vect &frm, const Vect &aim,
+                              const Vect &pnt, const Vect &nrm,
+                              Vect *hit_pnt)
 { f64 t = aim . Dot (nrm);
   if (t  ==  0.0)
     return false;
@@ -20,9 +20,9 @@ bool GeomFumble::RayPlaneIntersection (const Vect &frm, const Vect &aim,
 }
 
 
-bool GeomFumble::LinePlaneIntersection (const Vect &frm, const Vect &aim,
-                                        const Vect &pnt, const Vect &nrm,
-                                        Vect *hit_pnt)
+bool G::LinePlaneIntersection (const Vect &frm, const Vect &aim,
+                               const Vect &pnt, const Vect &nrm,
+                               Vect *hit_pnt)
 { f64 t = aim . Dot (nrm);
   if (t  ==  0.0)
     return false;
@@ -33,10 +33,10 @@ bool GeomFumble::LinePlaneIntersection (const Vect &frm, const Vect &aim,
 }
 
 
-bool GeomFumble::RayRectIntersection (const Vect &frm, const Vect &aim,
-                                      const Vect &cnt,
-                                      const Vect &ovr, const Vect &upp,
-                                      f64 wid, f64 hei, Vect *hit_pnt)
+bool G::RayRectIntersection (const Vect &frm, const Vect &aim,
+                             const Vect &cnt,
+                             const Vect &ovr, const Vect &upp,
+                             f64 wid, f64 hei, Vect *hit_pnt)
 { Vect pee, p;
   if (! RayPlaneIntersection (frm, aim, cnt, ovr . Cross (upp), &pee))
     return false;
@@ -51,11 +51,11 @@ bool GeomFumble::RayRectIntersection (const Vect &frm, const Vect &aim,
 }
 
 
-bool GeomFumble::RayAnnulusIntersection (const Vect &frm, const Vect &aim,
-                                         const Vect &cnt, const Vect &e0,
-                                         const Vect &e1, f64 r1, f64 r2,
-                                         Vect *hit_pnt,
-                                         f64 *hit_rad, f64 *hit_phi)
+bool G::RayAnnulusIntersection (const Vect &frm, const Vect &aim,
+                                const Vect &cnt, const Vect &e0,
+                                const Vect &e1, f64 r1, f64 r2,
+                                Vect *hit_pnt,
+                                f64 *hit_rad, f64 *hit_phi)
 { Vect hit;
   if (! RayPlaneIntersection (frm, aim, cnt, e0 . Cross (e1), &hit))
     return false;
@@ -75,11 +75,11 @@ bool GeomFumble::RayAnnulusIntersection (const Vect &frm, const Vect &aim,
 }
 
 
-bool GeomFumble::LineAnnulusIntersection (const Vect &frm, const Vect &aim,
-                                          const Vect &cnt, const Vect &e0,
-                                          const Vect &e1, f64 r1, f64 r2,
-                                          Vect *hit_pnt,
-                                          f64 *hit_rad, f64 *hit_phi)
+bool G::LineAnnulusIntersection (const Vect &frm, const Vect &aim,
+                                 const Vect &cnt, const Vect &e0,
+                                 const Vect &e1, f64 r1, f64 r2,
+                                 Vect *hit_pnt,
+                                 f64 *hit_rad, f64 *hit_phi)
 { Vect hit;
   if (! LinePlaneIntersection (frm, aim, cnt, e0 . Cross (e1), &hit))
     return false;

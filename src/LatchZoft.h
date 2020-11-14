@@ -36,6 +36,7 @@ class LatchZoft  :  public ZoftThing<T>
 
 using LatchFloat = LatchZoft <f64>;
 using LatchVect = LatchZoft <Vect>;
+using LatchColor = LatchZoft <ZeColor>;
 
 
 }  // the bliss of permanent oblivion for namespace charm

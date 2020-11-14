@@ -85,6 +85,7 @@ class ScaleZoft  :  public ZoftThing <T>
 
 using ScaleFloat = ScaleZoft <f64>;
 using ScaleVect = ScaleZoft <Vect>;
+using ScaleColor = ScaleZoft <ZeColor>;
 
 
 }  // that'd be about all she wrote for namespace charm (thanks, 'her')

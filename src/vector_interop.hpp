@@ -6,6 +6,8 @@
 
 #include "Matrix44.h"
 
+#include "ZeColor.h"
+
 namespace charm
 {
 
@@ -43,6 +45,10 @@ inline Matrix44 from_glm (const glm::mat4 &m)
                    m[2][0], m[2][1], m[2][2], m[2][3],
                    m[3][0], m[3][1], m[3][2], m[3][3]);
 }
+
+
+inline glm::vec4 as_glm (const ZeColor &c)
+{ return {c.r, c.g, c.b, c.a}; }
 
 
 }  // namespace charm runs off the cliff, hangs in the air for a second, then...

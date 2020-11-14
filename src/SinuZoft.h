@@ -114,6 +114,7 @@ class SinuZoft  :  public ZoftThing <T>
 
 using SinuFloat = SinuZoft <f64>;
 using SinuVect = SinuZoft <Vect>;
+using SinuColor = SinuZoft <ZeColor>;
 
 
 }  //  so long; farewell; auf wiedersehen; goodbye... namespace charm

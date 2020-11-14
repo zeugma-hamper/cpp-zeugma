@@ -23,7 +23,7 @@ Node *Layer::GetRootNode ()
   return &m_root_node;
 }
 
-Frontier *Layer::FirstHitFrontier (Ray const &_ray, Vect *_hit_pt) const
+Frontier *Layer::FirstHitFrontier (G::Ray const &_ray, Vect *_hit_pt) const
 {
   for (Frontier *fr : m_frontiers)
     if (fr->CheckHit(_ray, _hit_pt))

@@ -7,6 +7,7 @@
 #include "MotherTime.h"
 #include "ProtoZoftThingGuts.h"
 #include <Vect.h>
+#include <ZeColor.h>
 
 #include <vector>
 #include <algorithm>
@@ -243,6 +244,7 @@ class ZoftThing
 
 using ZoftFloat = ZoftThing <f64>;
 using ZoftVect = ZoftThing <Vect>;
+using ZoftColor = ZoftThing <ZeColor>;
 
 extern const ZoftFloat ZoftFloat_zero;
 extern const ZoftVect ZoftVect_zero;

@@ -18,8 +18,6 @@ static const char *color_unif_s = "u_color";
 PolygonRenderable::PolygonRenderable ()  :  Renderable (),
                                             should_fill (true),
                                             should_edge (false),
-                                            fill_iro { 1.0, 1.0, 0.0, 0.3 },
-                                            edge_iro { 1.0, 1.0, 1.0, 1.0 },
                                             shad_prog {BGFX_INVALID_HANDLE},
                                             fill_vbuf {BGFX_INVALID_HANDLE},
                                             edge_vbuf {BGFX_INVALID_HANDLE}
@@ -188,14 +186,14 @@ spanking_time = true;
                                                 BGFX_STATE_BLEND_INV_SRC_ALPHA)
                       |  BGFX_STATE_WRITE_Z);
 
-      bgfx::setUniform (unif_primc, glm::value_ptr (fill_iro));
+      bgfx::setUniform (unif_primc, glm::value_ptr (as_glm (fill_iro)));
 
       bgfx::submit (vyu_id, shad_prog, m_graph_id);
     }
 
   if (should_edge)
     { bgfx::setTransform (&(m_node -> GetAbsoluteTransformation ().model));
-      bgfx::setVertexBuffer (0, edge_vbuf, 0, ts_vrt_cnt);
+      bgfx::setVertexBuffer (0, edge_vbuf, 0, 1 + verts . size ());
       bgfx::setState (BGFX_STATE_WRITE_RGB
                       |  BGFX_STATE_PT_LINESTRIP
                       |  BGFX_STATE_LINEAA
@@ -203,7 +201,7 @@ spanking_time = true;
                                                 BGFX_STATE_BLEND_INV_SRC_ALPHA)
                       |  BGFX_STATE_WRITE_Z);
 
-      bgfx::setUniform (unif_primc, glm::value_ptr (edge_iro));
+      bgfx::setUniform (unif_primc, glm::value_ptr (as_glm (edge_iro)));
 
       bgfx::submit (vyu_id, shad_prog, m_graph_id);
     }

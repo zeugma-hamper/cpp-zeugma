@@ -131,8 +131,10 @@ bool DecodePipeline::OpenVideoFile (std::string_view _uri, PipelineTerminus *_vi
   // g_signal_connect (m_uridecodebin, "autoplug-continue",
   //                   G_CALLBACK (db_autoplug_continue_handler), this);
 
-  bool ret = m_terminus->OnStart (this);
-  SetState(GST_STATE_PAUSED);
+  bool ret = m_video_terminus->OnStart (this);
+  if (m_audio_terminus)
+    ret = ret && m_audio_terminus->OnStart (this);
+  SetPipelineState(GST_STATE_PAUSED);
 
   GstState current, pending;
   GstStateChangeReturn scret = gst_element_get_state (m_pipeline, &current, &pending,

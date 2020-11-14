@@ -43,6 +43,8 @@ struct TextureParticulars
 };
 
 //Create a texture handle and decode image to texture, texture is mutable
+[[maybe_unused]]
+constexpr u64 const DefaultTextureFlags = BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE;
 TextureParticulars CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags);
 TextureParticulars CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags, bool _create_mipmaps);
 //Updates texture from image file. Format, size, etc. must match.

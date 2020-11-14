@@ -72,7 +72,7 @@ AABB RectangleFrontier::GetGlobalAABB () const
   return AABB {compwise_min(t_bl, t_tr), compwise_max(t_bl, t_tr)};
 }
 
-bool RectangleFrontier::CheckHit (Ray const &_ray, Vect *_hit_pt) const
+bool RectangleFrontier::CheckHit (G::Ray const &_ray, Vect *_hit_pt) const
 {
   if (! m_node)
     return false;
@@ -88,9 +88,9 @@ bool RectangleFrontier::CheckHit (Ray const &_ray, Vect *_hit_pt) const
   Vect const over = 0.5 * (diag_norm + tmp);
   Vect const up = 0.5 * (diag_norm - tmp);
 
-  return GeomFumble::RayRectIntersection(_ray.origin, _ray.dir,
-                                         0.5 * (t_tr + t_bl), over, up,
-                                         diag.Dot (over), diag.Dot (up), _hit_pt);
+  return G::RayRectIntersection(_ray.orgn, _ray.dir,
+                                0.5 * (t_tr + t_bl), over, up,
+                                diag.Dot (over), diag.Dot (up), _hit_pt);
 }
 
 
@@ -133,7 +133,7 @@ AABB RectRenderableFrontier::GetGlobalAABB () const
   return AABB {compwise_min(t_bl, t_tr), compwise_max(t_bl, t_tr)};
 }
 
-bool RectRenderableFrontier::CheckHit (Ray const &_ray, Vect *_hit_pt) const
+bool RectRenderableFrontier::CheckHit (G::Ray const &_ray, Vect *_hit_pt) const
 {
   if (! m_node  ||  ! m_renderable)
     return false;
@@ -142,9 +142,9 @@ bool RectRenderableFrontier::CheckHit (Ray const &_ray, Vect *_hit_pt) const
   // Vect const cent = 0.5 * (aabb.blf + aabb.trb);
   // f64 const width = std::fabs((aabb.trb - aabb.blf).Dot (m_renderable->Over ()));
   // f64 const height = std::fabs((aabb.trb - aabb.blf).Dot (m_renderable->Up ()));
-  // return GeomFumble::RayRectIntersection(_ray.origin, _ray.dir,
-  //                                        cent, m_renderable->Over (), m_renderable->Up (),
-  //                                        width, height, _hit_pt);
+  // return G::RayRectIntersection(_ray.orgn, _ray.dir,
+  //                               cent, m_renderable->Over (), m_renderable->Up (),
+  //                               width, height, _hit_pt);
 
   Matrix44 const m = from_glm (m_node -> GetAbsoluteTransformation ().model);
   Vect p = m . TransformVect (m_pos);
@@ -153,8 +153,8 @@ bool RectRenderableFrontier::CheckHit (Ray const &_ray, Vect *_hit_pt) const
   Vect u = m . TransformVect (m_hei * m_renderable -> Up ())  -  z;
   f64 ww = o . NormSelfReturningMag ();
   f64 hh = u . NormSelfReturningMag ();
-  return GeomFumble::RayRectIntersection (_ray.origin, _ray.dir,
-                                          p, o, u, ww, hh, _hit_pt);
+  return G::RayRectIntersection (_ray.orgn, _ray.dir,
+                                 p, o, u, ww, hh, _hit_pt);
 
   // GrapplerPile *const pl = m_node->UnsecuredGrapplerPile();
   // Vect const t_bl = pl ? pl->pnt_mat.TransformVect(m_bl) : m_bl;
@@ -166,9 +166,9 @@ bool RectRenderableFrontier::CheckHit (Ray const &_ray, Vect *_hit_pt) const
   // Vect const over = 0.5 * (diag_norm + tmp);
   // Vect const up = 0.5 * (diag_norm - tmp);
 
-  // return GeomFumble::RayRectIntersection(_ray.origin, _ray.dir,
-  //                                        0.5 * (t_tr + t_bl), over, up,
-  //                                        diag.Dot (over), diag.Dot (up), _hit_pt);
+  // return G::RayRectIntersection(_ray.orgn, _ray.dir,
+  //                               0.5 * (t_tr + t_bl), over, up,
+  //                               diag.Dot (over), diag.Dot (up), _hit_pt);
 }
 
 }

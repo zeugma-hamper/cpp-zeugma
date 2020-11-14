@@ -17,6 +17,7 @@
 #include <RectangleRenderable.hpp>
 #include <VideoRenderable.hpp>
 #include <MattedVideoRenderable.hpp>
+#include <TexturedRenderable.hpp>
 #include <PolygonRenderable.h>
 
 //base Ze
@@ -408,10 +409,10 @@ PlatonicMaes *Tampo::ClosestIntersectedMaes (const Vect &frm, const Vect &aim,
   i32 cnt = NumMaeses ();
   for (i32 q = 0  ;  q < cnt  ;  ++q)
     { PlatonicMaes *emm = NthMaes (q);
-      if (GeomFumble::RayRectIntersection (frm, aim,
-                                           emm -> Loc (), emm -> Over (),
-                                           emm -> Up (), emm -> Width (),
-                                           emm -> Height (), &hit))
+      if (G::RayRectIntersection (frm, aim,
+                                  emm -> Loc (), emm -> Over (),
+                                  emm -> Up (), emm -> Width (),
+                                  emm -> Height (), &hit))
         { f64 d = hit . DistFrom (frm);
           if (! close_m  ||  d < close_d)
             { close_m = emm;
@@ -604,8 +605,10 @@ int main (int ac, char **av)
       SumVect voit (arm, centz);
       polysplat -> AppendVertex (voit);
     }
+  polysplat -> SetFillColor (SinuZoft (ZeColor (0.0, 0.0, 0.5, 0.3), 6.0,
+                                       ZeColor (1.0, 1.0, 0.0, 0.3)));
   splat -> AppendRenderable (polysplat);
-polysplat -> SetShouldEdge (true);
+  polysplat -> SetShouldEdge (true);
   windshield -> AppendChild (splat);
 
   ch_ptr <Orksur> orkp (new Orksur (*tabl));
@@ -617,13 +620,21 @@ polysplat -> SetShouldEdge (true);
     if (GLFWWaterWorks *ww
         = dynamic_cast <GLFWWaterWorks *> (tamp . NthWaterWorks (q)))
       ww -> SetPromoteMouseToSpatialOrthoStyle (true);
-
+/*
   Ticato *tic = new Ticato (film_infos);
   tic->re -> SetOver (tabl -> Over ());
   tic->re -> SetUp (tabl -> Up ());
   tic->sca . Set (Vect (200.0));
   tic->loc . Set (tabl -> Loc ());
   windshield -> AppendChild (tic->no);
+*/
+
+  TextureParticulars tipi = CreateTexture2D ("/tmp/blap.png", DefaultTextureFlags);
+  TexturedRenderable *texre = new TexturedRenderable (tipi);
+  Node *texno = new Node (texre);
+  texno -> Scale (1300.0);
+  texno -> Translate (maes -> Loc ());
+  windshield -> AppendChild (texno);
 
   tamp . Run ();
 

@@ -91,6 +91,7 @@ class SumZoft  :  public ZoftThing <T>
 
 using SumFloat = SumZoft <f64>;
 using SumVect = SumZoft <Vect>;
+using SumColor = SumZoft <ZeColor>;
 
 
 }  // end o' the line for namespace charm

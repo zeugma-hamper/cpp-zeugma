@@ -216,6 +216,7 @@ class InterpZoft  :  public ZoftThing <T>
 
 using InterpFloat = InterpZoft <f64>;
 using InterpVect = InterpZoft <Vect>;
+using InterpColor = InterpZoft <ZeColor>;
 
 
 }  // et tu, bjarne? then fall, namespace charm!

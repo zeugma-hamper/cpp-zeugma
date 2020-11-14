@@ -25,8 +25,7 @@ class PolygonRenderable  :  public Renderable
 { public:
   std::vector <ZoftVect> verts;
   bool should_fill, should_edge;
-  glm::vec4 fill_iro, edge_iro;
-//  std::vector <v3f64> packd_verts;
+  ZoftColor fill_iro, edge_iro;
   bool spanking_time;
   static void *tessy_obj;
   std::vector <glm::vec3> raw_verts;
@@ -66,14 +65,23 @@ class PolygonRenderable  :  public Renderable
   void SetShouldEdge (bool ss)
     { should_edge = ss;  }
 
-  const glm::vec4 &FillColor ()
+  const ZeColor &FillColor ()
+    { return fill_iro.val; }
+  ZoftColor &FillColorZoft ()
     { return fill_iro; }
-  void SetFillColor (const glm::vec4 &c)
-    { fill_iro = c; }
-  const glm::vec4 &EdgeColor ()
+  void SetFillColor (const ZeColor &c)
+    { fill_iro . Set (c); }
+  void SetFillColor (const ZoftColor &zc)
+    { fill_iro . BecomeLike (zc); }
+
+  const ZeColor &EdgeColor ()
+    { return edge_iro.val; }
+  ZoftColor &EdgeColorZoft ()
     { return edge_iro; }
-  void SetEdgeColor (const glm::vec4 &c)
-    { edge_iro = c; }
+  void SetEdgeColor (const ZeColor &c)
+    { edge_iro . Set (c); }
+  void SetEdgeColor (const ZoftColor &zc)
+    { edge_iro . BecomeLike (zc); }
 
   void SpankularlyTesselate ();
   void Draw (u16 vyu_id)  override;

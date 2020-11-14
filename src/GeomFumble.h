@@ -10,31 +10,65 @@
 
 namespace charm  {
 
-namespace GeomFumble
+
+namespace G
 {
-  bool RayPlaneIntersection (const Vect &frm, const Vect &aim,
-                             const Vect &pnt, const Vect &nrm,
-                             Vect *hit_pnt);
-  bool LinePlaneIntersection (const Vect &frm, const Vect &aim,
-                              const Vect &pnt, const Vect &nrm,
-                              Vect *hit_pnt);
 
-  bool RayRectIntersection (const Vect &frm, const Vect &aim,
-                            const Vect &cnt,
-                            const Vect &ovr, const Vect &upp,
-                            f64 wid, f64 hei, Vect *hit_pnt);
 
-  bool RayAnnulusIntersection (const Vect &frm, const Vect &aim,
-                               const Vect &cnt, const Vect &e0,
-                               const Vect &e1, f64 r1, f64 r2,
-                               Vect *hit_pnt,
-                               f64 *hit_rad = NULL, f64 *hit_phi = NULL);
+struct Sphere
+{ Vect cnt;
+  f64 rad;
+};
 
-  bool LineAnnulusIntersection (const Vect &frm, const Vect &aim,
-                                const Vect &cnt, const Vect &e0,
-                                const Vect &e1, f64 r1, f64 r2,
-                                Vect *hit_pnt,
-                                f64 *hit_rad = NULL, f64 *hit_phi = NULL);
+
+struct Plane
+{ Vect cnt;
+  Vect nrm;
+};
+
+
+struct Ray
+{ Vect orgn;
+  Vect dir;
+
+  Ray ()
+    { }
+  //expect _dir to be normalized
+  Ray (Vect const &_origin, Vect const &_dir)
+     : orgn {_origin},
+       dir {_dir}
+    { }
+
+  CHARM_DEFAULT_MOVE_COPY(Ray);
+
+  bool IsValid () const
+    { return (dir . AutoDot ()  >  0.0005); }
+};
+
+
+bool RayPlaneIntersection (const Vect &frm, const Vect &aim,
+                           const Vect &pnt, const Vect &nrm,
+                           Vect *hit_pnt);
+bool LinePlaneIntersection (const Vect &frm, const Vect &aim,
+                            const Vect &pnt, const Vect &nrm,
+                            Vect *hit_pnt);
+
+bool RayRectIntersection (const Vect &frm, const Vect &aim,
+                          const Vect &cnt,
+                          const Vect &ovr, const Vect &upp,
+                          f64 wid, f64 hei, Vect *hit_pnt);
+
+bool RayAnnulusIntersection (const Vect &frm, const Vect &aim,
+                             const Vect &cnt, const Vect &e0,
+                             const Vect &e1, f64 r1, f64 r2,
+                             Vect *hit_pnt,
+                             f64 *hit_rad = NULL, f64 *hit_phi = NULL);
+
+bool LineAnnulusIntersection (const Vect &frm, const Vect &aim,
+                              const Vect &cnt, const Vect &e0,
+                              const Vect &e1, f64 r1, f64 r2,
+                              Vect *hit_pnt,
+                              f64 *hit_rad = NULL, f64 *hit_phi = NULL);
 }
 
 struct AABB
@@ -56,27 +90,8 @@ struct AABB
 };
 
 
-struct Ray
-{
-  Ray ()
-  { }
-
-  //expected _dir to be normalized
-  Ray (Vect const &_origin, Vect const &_dir)
-    : origin {_origin},
-      dir {_dir}
-  { }
-
-  CHARM_DEFAULT_MOVE_COPY(Ray);
-
-  bool IsValid () const
-  {
-    return dir.AutoDot() > 0.0005;
-  }
-
-  Vect origin;
-  Vect dir;
-};
 
 }  // alas, poor namespace charm! i knew it, horatio, a fellow of infinite jest,
+
+
 #endif

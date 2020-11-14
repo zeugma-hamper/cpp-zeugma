@@ -816,10 +816,10 @@ PlatonicMaes *TriDemo::ClosestIntersectedMaes (const Vect &frm, const Vect &aim,
   i32 cnt = NumMaeses ();
   for (i32 q = 0  ;  q < cnt  ;  ++q)
     { PlatonicMaes *emm = NthMaes (q);
-      if (GeomFumble::RayRectIntersection (frm, aim,
-                                           emm -> Loc (), emm -> Over (),
-                                           emm -> Up (), emm -> Width (),
-                                           emm -> Height (), &hit))
+      if (G::RayRectIntersection (frm, aim,
+                                  emm -> Loc (), emm -> Over (),
+                                  emm -> Up (), emm -> Width (),
+                                  emm -> Height (), &hit))
         { f64 d = hit . DistFrom (frm);
           if (! close_m  ||  d < close_d)
             { close_m = emm;

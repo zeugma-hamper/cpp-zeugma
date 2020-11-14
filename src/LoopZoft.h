@@ -152,6 +152,7 @@ class LoopZoft  :  public ZoftThing <T>
 
 using LoopFloat = LoopZoft <f64>;
 using LoopVect = LoopZoft <Vect>;
+using LoopColor = LoopZoft <ZeColor>;
 
 
 }  // this has gone far enough, namespace charm. now git. scram.

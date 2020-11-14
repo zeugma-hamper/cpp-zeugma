@@ -5,6 +5,8 @@
 #include "class_utils.hpp"
 #include "Node.hpp"
 
+#include "GeomFumble.h"
+
 #include <charm_glm.hpp>
 
 #include <vector>
@@ -16,7 +18,6 @@ namespace charm
 class Frontier;
 class Renderable;
 class Node;
-class Ray;
 
 class Layer
 {
@@ -31,7 +32,7 @@ class Layer
 
   Node *GetRootNode ();
 
-  Frontier *FirstHitFrontier (Ray const &_ray, Vect *hit_pt) const;
+  Frontier *FirstHitFrontier (G::Ray const &_ray, Vect *hit_pt) const;
 
   std::vector<Renderable *> &GetRenderables ();
   std::vector<Frontier *> &GetFrontiers ();

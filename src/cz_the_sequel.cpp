@@ -755,10 +755,10 @@ void dead_zone::FlatulateCursor (ZESpatialMoveEvent *e)
   for (i32 q = 0  ;  q < cnt  ;  ++q)
     {
       PlatonicMaes *emm = NthMaes (q);
-      if (GeomFumble::RayRectIntersection (e->Loc (), e->Aim (),
-                                           emm->Loc (), emm->Over (), emm->Up (),
-                                           emm->Width (), emm->Height (),
-                                           &hit))
+      if (G::RayRectIntersection (e->Loc (), e->Aim (),
+                                  emm->Loc (), emm->Over (), emm->Up (),
+                                  emm->Width (), emm->Height (),
+                                  &hit))
         {
           f64 d = hit.DistFrom(e->Loc ());
           if (! close_m  ||  d < close_d)
