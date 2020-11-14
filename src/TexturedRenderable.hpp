@@ -28,6 +28,7 @@ class TexturedRenderable final : public Renderable
   bgfx::VertexBufferHandle m_vbuffer;
   bgfx::UniformHandle m_uni_over;
   bgfx::UniformHandle m_uni_up;
+  bgfx::UniformHandle m_uni_wh;
   bgfx::UniformHandle m_uni_texture;
   TextureParticulars m_particulars;
 

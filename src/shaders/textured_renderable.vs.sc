@@ -7,13 +7,14 @@ $output v_uv
 
 uniform vec4 u_over;
 uniform vec4 u_up;
+uniform vec4 u_wh;
 
 // requires normalized orientation vectors
 void main()
 {
-  vec4 norm = calculate_norm (u_over/wh.x, u_up/wh.y);
+  vec4 norm = calculate_norm (u_over/u_wh.x, u_up/u_wh.y);
   mat4 rot = make_rot_matrix (u_over, u_up, norm);
 
-  gl_Position =  = mul (u_modelViewProj, mul (rot, a_position));
+  gl_Position = mul (u_modelViewProj, mul (rot, vec4 (a_position, 1.0)));
   v_uv = a_texcoord0;
 }
