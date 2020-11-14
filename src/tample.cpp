@@ -171,6 +171,8 @@ class Tampo final : public GraphicsApplication
   ZoftVect elev_transl;
   f64 elev_trans_mult;
   VideoRenderable *steenbeck;
+  AtomicFreezone *freezo;
+  Node *texxyno;
 };
 
 
@@ -372,7 +374,9 @@ Tampo::Tampo ()  :  GraphicsApplication (),
                     sensy {new Sensorium},
 //                    ork (NULL),
                     elev_trans_mult (77.0),
-                    steenbeck (NULL)
+                    steenbeck (NULL),
+                    texxyno (NULL),
+                    freezo (NULL)
 { AppendSpatialPhage (&m_event_sprinkler, sensy);
   AppendYowlPhage (&m_event_sprinkler, sensy);
   elev_transl . MakeBecomeLikable ();
@@ -383,21 +387,27 @@ Tampo::~Tampo ()
 { }
 
 
-static LoopFloat timey { 0.0, 1.0, 0.0 };
-
 bool Tampo::DoWhatThouWilt (i64 ratch, f64 thyme)
 { static MotherTime runt;
   static i64 farr = ratch;
+  static LoopFloat timey { 0.0, 1.0, 0.0 };
 
   if (runt . DeltaTimeGlance ()  >=  5.0)
     { fprintf (stderr, "%.1lf fps...\n",
                f64((ratch - farr) / 8) / runt . DeltaTime ());
       farr = ratch;
     }
-  // if (timey.val > 1.5)
-  //   { Tampo::ROWP () . HooverCoordTransforms ();
-  //     timey . BecomeLike (ZoftFloat (0.0));
-  //   }
+
+  if (texxyno  &&  timey.val > 2.5)
+    { if (Node *par = texxyno -> Parent ())
+        { par -> ExciseChild (texxyno);
+          delete texxyno;
+          texxyno = NULL;
+        }
+    }
+
+  if (freezo  &&  timey.val > 3.0)
+    freezo -> Inhale (ratch, thyme);
   return true;
 }
 
@@ -541,7 +551,7 @@ int main (int ac, char **av)
   std::vector <FilmInfo> film_infos
     = ReadFilmInfo ("../configs/film-config.toml");
   assert (film_infos.size () > 0);
-
+/*
   { BlockTimer bt ("loading & merging geom");
     BlockTimer slurpt ("slurping geom file");
     std::vector<FilmGeometry> geoms
@@ -550,7 +560,7 @@ int main (int ac, char **av)
     assert (geoms . size ()  >  0);
     MergeFilmInfoGeometry (film_infos, geoms);
   }
-
+*/
   PlatonicMaes *maes = tamp . FindMaesByName ("front");
   assert (maes);
   PlatonicMaes *left = tamp . FindMaesByName ("left");
@@ -628,20 +638,22 @@ int main (int ac, char **av)
   tic->sca . Set (Vect (200.0));
   tic->loc . Set (tabl -> Loc ());
   windshield -> AppendChild (tic->no);
-
+*/
   TextureParticulars tipi = CreateTexture2D ("/tmp/blap.png", DefaultTextureFlags);
   TexturedRenderable *texre = new TexturedRenderable (tipi);
-  Node *texno = new Node (texre);
+  Node *texno = (tamp.texxyno = new Node (texre));
   texno -> Scale (1300.0);
   texno -> Translate (maes -> Loc ());
   windshield -> AppendChild (texno);
-*/
 
-  AtomicFreezone *afz = new AtomicFreezone;
+/*
+  AtomicFreezone *afz = (tamp.freezo = new AtomicFreezone);
   afz->cineganz = &film_infos;
   afz->field_amok = kawntent;
   afz->atom_count_goal = 35.0;
   afz->inter_arrival_t = 4.0;
+  afz->min_speed = 50.0;
+  afz->max_speed = 200.0;
 
   PlatonicMaes *plams[2] = { left, maes };
   for (PlatonicMaes *emm  :  plams)
@@ -651,11 +663,11 @@ int main (int ac, char **av)
       v = 0.1 * emm->hei.val * emm->upp.val;
       Vect b = l - v;
       Vect t = l + v;
-      afz->meander . push_back (Swath { {l, r}, {b, t}, emm });
+      afz -> AppendSwath (new Swath ({l, r}, {b, t}, emm));
     }
 
   afz -> PopulateFromScratch ();
-
+*/
   tamp . Run ();
 
   return 0;

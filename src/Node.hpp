@@ -97,6 +97,8 @@ class Node
 
   void ClearTransforms ();
 
+  Node *Parent ();
+
   // node takes ownership of child nodes
   void  AppendChild (Node *_node);
   // excise with feeling (deletes)

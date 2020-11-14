@@ -243,6 +243,9 @@ void Node::ClearTransforms ()
 
 
 
+Node *Node::Parent ()
+{ return m_parent; }
+
 //node takes ownership of child nodes
 void Node::AppendChild (Node *_node)
 {

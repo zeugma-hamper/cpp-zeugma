@@ -17,6 +17,11 @@ struct Swath
 { G::Segment prone;
   G::Segment plumb;
   PlatonicMaes *supporting_maes;
+  Swath *nxt, *prv;
+  Swath ()  :  supporting_maes (NULL), nxt (NULL), prv (NULL)  { }
+  Swath (const G::Segment &ro, const G::Segment &lu, PlatonicMaes *ma)
+     :  prone (ro), plumb (lu), supporting_maes (ma), nxt (NULL), prv (NULL)
+    { }
 };
 
 
@@ -27,12 +32,19 @@ class AtomicFreezone  :  public Zeubject
   Node *field_amok;
   f64 atom_count_goal;
   f64 inter_arrival_t;
+  f64 max_speed, min_speed;
+  f64 prev_time;
 
-  std::vector <Swath> meander;
+  std::vector <Swath *> meander;
   f64 meander_len;
   G::Plane over_lid, undr_lid;
 
+  void AppendSwath (Swath *sw);
+  Swath *SwathFor (PlatonicMaes *ma);
+
   void PopulateFromScratch ();
+
+  void PerambulizeAtoms (f64 dt);
 
   i64 Inhale (i64 ratchet, f64 thyme)  override;
 };

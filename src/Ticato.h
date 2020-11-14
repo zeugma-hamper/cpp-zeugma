@@ -9,6 +9,7 @@
 #include "Matte.hpp"
 
 #include "Zeubject.h"
+#include "MotherTime.h"
 
 #include "PlatonicMaes.h"
 
@@ -22,6 +23,7 @@ class Ticato  :  public Zeubject
   Node *no;
   Renderable *re;
   ZoftVect sca, loc;
+  ZoftVect vel;
   PlatonicMaes *cur_maes;
 
   Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm = -1,
@@ -32,6 +34,11 @@ class Ticato  :  public Zeubject
         { re -> SetOver (cur_maes -> Over ());
           re -> SetUp (cur_maes -> Up ());
         }
+    }
+
+  void SetAndAlignToMaes (PlatonicMaes *ma)
+    { if (ma)
+        { cur_maes = ma;  AlignToMaes (); }
     }
 };
 
