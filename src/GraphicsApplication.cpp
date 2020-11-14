@@ -307,14 +307,19 @@ void GraphicsApplication::RemoveWaterWorks (ZePublicWaterWorks *_pub)
   if (! _pub)
     return;
 
-  m_event_drainage.erase (std::find (m_event_drainage.begin (), m_event_drainage.end (), _pub));
+  m_event_drainage.erase (std::find (m_event_drainage.begin (), m_event_drainage.end (), _pub),
+                          m_event_drainage.end ());
   delete _pub;
 }
 
 ZePublicWaterWorks *GraphicsApplication::ExciseWaterWorks (ZePublicWaterWorks *_pub)
 {
   auto const it = std::find (m_event_drainage.begin (), m_event_drainage.end (), _pub);
-  ZePublicWaterWorks *ww = it != m_event_drainage.end () ? *it : nullptr;
+
+  if (it == m_event_drainage.end ())
+    return nullptr;
+
+  ZePublicWaterWorks *ww = *it;
   m_event_drainage.erase (it);
 
   return ww;

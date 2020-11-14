@@ -21,7 +21,8 @@ Node::Node ()
     m_parent {nullptr},
     m_graps {nullptr},
     m_frontier {nullptr},
-    m_id {0u}
+    m_id {0u},
+    m_local_tx_dirty_flag {true}
 {
 }
 

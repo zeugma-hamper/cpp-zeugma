@@ -54,12 +54,14 @@ void Layer::SortFrontiers ()
 
 void Layer::RemoveFrontier (Frontier *_frontier)
 {
-  m_frontiers.erase (std::remove (m_frontiers.begin (), m_frontiers.end (), _frontier));
+  m_frontiers.erase (std::remove (m_frontiers.begin (), m_frontiers.end (), _frontier),
+                     m_frontiers.end ());
 }
 
 void Layer::RemoveRenderable (Renderable *_rend)
 {
-  m_renderables.erase (std::remove (m_renderables.begin (), m_renderables.end (), _rend));
+  m_renderables.erase (std::remove (m_renderables.begin (), m_renderables.end (), _rend),
+                       m_renderables.end ());
 }
 
 void Layer::RemoveRenderables (std::vector<Renderable *> const &_rends)
