@@ -20,22 +20,33 @@ struct Sphere
   f64 rad;
 };
 
-
 struct Plane
-{ Vect cnt;
+{ Vect pnt;
   Vect nrm;
+};
+
+struct Segment
+{ Vect pt1;
+  Vect pt2;
+  f64 Length ()  const
+    { return pt1 . DistFrom (pt2); }
+};
+
+struct Line
+{ Vect pnt;
+  Vect dir;
 };
 
 
 struct Ray
-{ Vect orgn;
+{ Vect orig;
   Vect dir;
 
   Ray ()
     { }
   //expect _dir to be normalized
   Ray (Vect const &_origin, Vect const &_dir)
-     : orgn {_origin},
+     : orig {_origin},
        dir {_dir}
     { }
 

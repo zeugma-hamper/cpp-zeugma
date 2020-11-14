@@ -88,7 +88,7 @@ bool RectangleFrontier::CheckHit (G::Ray const &_ray, Vect *_hit_pt) const
   Vect const over = 0.5 * (diag_norm + tmp);
   Vect const up = 0.5 * (diag_norm - tmp);
 
-  return G::RayRectIntersection(_ray.orgn, _ray.dir,
+  return G::RayRectIntersection(_ray.orig, _ray.dir,
                                 0.5 * (t_tr + t_bl), over, up,
                                 diag.Dot (over), diag.Dot (up), _hit_pt);
 }
@@ -142,7 +142,7 @@ bool RectRenderableFrontier::CheckHit (G::Ray const &_ray, Vect *_hit_pt) const
   // Vect const cent = 0.5 * (aabb.blf + aabb.trb);
   // f64 const width = std::fabs((aabb.trb - aabb.blf).Dot (m_renderable->Over ()));
   // f64 const height = std::fabs((aabb.trb - aabb.blf).Dot (m_renderable->Up ()));
-  // return G::RayRectIntersection(_ray.orgn, _ray.dir,
+  // return G::RayRectIntersection(_ray.orig, _ray.dir,
   //                               cent, m_renderable->Over (), m_renderable->Up (),
   //                               width, height, _hit_pt);
 
@@ -153,7 +153,7 @@ bool RectRenderableFrontier::CheckHit (G::Ray const &_ray, Vect *_hit_pt) const
   Vect u = m . TransformVect (m_hei * m_renderable -> Up ())  -  z;
   f64 ww = o . NormSelfReturningMag ();
   f64 hh = u . NormSelfReturningMag ();
-  return G::RayRectIntersection (_ray.orgn, _ray.dir,
+  return G::RayRectIntersection (_ray.orig, _ray.dir,
                                  p, o, u, ww, hh, _hit_pt);
 
   // GrapplerPile *const pl = m_node->UnsecuredGrapplerPile();
@@ -166,7 +166,7 @@ bool RectRenderableFrontier::CheckHit (G::Ray const &_ray, Vect *_hit_pt) const
   // Vect const over = 0.5 * (diag_norm + tmp);
   // Vect const up = 0.5 * (diag_norm - tmp);
 
-  // return G::RayRectIntersection(_ray.orgn, _ray.dir,
+  // return G::RayRectIntersection(_ray.orig, _ray.dir,
   //                               0.5 * (t_tr + t_bl), over, up,
   //                               diag.Dot (over), diag.Dot (up), _hit_pt);
 }

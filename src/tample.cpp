@@ -63,6 +63,7 @@
 // it's us! right here!
 #include "Orksur.h"
 #include "Ticato.h"
+#include "AtomicFreezone.h"
 
 
 using namespace charm;
@@ -540,7 +541,7 @@ int main (int ac, char **av)
   std::vector <FilmInfo> film_infos
     = ReadFilmInfo ("../configs/film-config.toml");
   assert (film_infos.size () > 0);
-/*
+
   { BlockTimer bt ("loading & merging geom");
     BlockTimer slurpt ("slurping geom file");
     std::vector<FilmGeometry> geoms
@@ -549,7 +550,7 @@ int main (int ac, char **av)
     assert (geoms . size ()  >  0);
     MergeFilmInfoGeometry (film_infos, geoms);
   }
-*/
+
   PlatonicMaes *maes = tamp . FindMaesByName ("front");
   assert (maes);
   PlatonicMaes *left = tamp . FindMaesByName ("left");
@@ -563,7 +564,6 @@ int main (int ac, char **av)
 
   Node *kawntent = new Node;
   kawntent -> Translate (tamp . elev_transl);
-  kawntent -> Translate (maes -> Loc ());
   omni_layer -> GetRootNode () -> AppendChild (kawntent);
 
   Node *windshield = new Node;
@@ -590,6 +590,7 @@ int main (int ac, char **av)
   tamp.steenbeck = new VideoRenderable (film_infos[4]);
   Node *drive_in = new Node (tamp.steenbeck);
   drive_in -> Scale (0.7 * total_width);
+  drive_in -> Translate (maes -> Loc ());
   kawntent -> AppendChild (drive_in);
 
   Node *splat = new Node;
@@ -627,7 +628,6 @@ int main (int ac, char **av)
   tic->sca . Set (Vect (200.0));
   tic->loc . Set (tabl -> Loc ());
   windshield -> AppendChild (tic->no);
-*/
 
   TextureParticulars tipi = CreateTexture2D ("/tmp/blap.png", DefaultTextureFlags);
   TexturedRenderable *texre = new TexturedRenderable (tipi);
@@ -635,6 +635,26 @@ int main (int ac, char **av)
   texno -> Scale (1300.0);
   texno -> Translate (maes -> Loc ());
   windshield -> AppendChild (texno);
+*/
+
+  AtomicFreezone *afz = new AtomicFreezone;
+  afz->cineganz = &film_infos;
+  afz->field_amok = kawntent;
+  afz->atom_count_goal = 35.0;
+  afz->inter_arrival_t = 4.0;
+
+  PlatonicMaes *plams[2] = { left, maes };
+  for (PlatonicMaes *emm  :  plams)
+    { Vect v = 0.5 * emm->wid.val * emm->ovr.val;
+      Vect l = emm->loc.val - v;
+      Vect r = l + 2.0 * v;
+      v = 0.1 * emm->hei.val * emm->upp.val;
+      Vect b = l - v;
+      Vect t = l + v;
+      afz->meander . push_back (Swath { {l, r}, {b, t}, emm });
+    }
+
+  afz -> PopulateFromScratch ();
 
   tamp . Run ();
 
