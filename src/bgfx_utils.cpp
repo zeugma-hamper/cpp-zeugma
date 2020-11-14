@@ -10,6 +10,8 @@
 #include <bx/file.h>
 #include <bx/filepath.h>
 
+#include <OpenImageIO/imagebuf.h>
+#include <OpenImageIO/imagebufalgo.h>
 #include <OpenImageIO/imageio.h>
 
 #include <sys/mman.h>
@@ -157,11 +159,16 @@ std::vector<bgfx::UniformHandle> GetShaderUniforms (bgfx::ShaderHandle _sh)
 
 TextureParticulars CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags)
 {
-  std::unique_ptr<OIIO::ImageInput> iinput = OIIO::ImageInput::open (_path.getCPtr());
-  if (! iinput)
+  return CreateTexture2D(_path, _bgfx_flags, false);
+}
+
+TextureParticulars CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags, bool _create_mipmaps)
+{
+  OIIO::ImageBuf image (_path.getCPtr());
+  if (! image.initialized())
     return {};
 
-  OIIO::ImageSpec ispec = iinput->spec ();
+  OIIO::ImageSpec ispec = image.spec ();
 
   bgfx::TextureFormat::Enum formats[5]
     { bgfx::TextureFormat::Unknown,
@@ -173,19 +180,35 @@ TextureParticulars CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags)
 
   bgfx::TextureInfo tinfo;
   bgfx::calcTextureSize(tinfo, ispec.width, ispec.height, 1, false,
-                        false, 1, formats[ispec.nchannels]);
-
+                        _create_mipmaps, 1, formats[ispec.nchannels]);
 
   bgfx::Memory const *img_mem = bgfx::alloc(tinfo.storageSize);
-
-  iinput->read_image (OIIO::TypeDesc::UINT8, img_mem->data);
 
   // in bgfx, if texture is created with valid memory pointer, then the texture is immutable.
   // here, create with null pointer, then upload so texture is mutable.
   bgfx::TextureHandle handle = bgfx::createTexture2D(ispec.width, ispec.height,
-                                                     false, 1,
+                                                     _create_mipmaps, 1,
                                                      formats[ispec.nchannels],
                                                      _bgfx_flags, nullptr);
+
+  ispec.set_format(OIIO::TypeDesc::UINT8);
+  OIIO::ImageBuf output (ispec, img_mem->data);
+  output.copy (image);
+
+  if (_create_mipmaps)
+    {
+      u8 *data_ptr = img_mem->data + (ispec.width * ispec.height * ispec.nchannels);
+      for (u32 i = 1; i < tinfo.numMips; ++i)
+        {
+          OIIO::ROI roi (0, std::max (ispec.roi().xend/2, 1),
+                         0, std::max (ispec.roi().yend/2, 1));
+          ispec.set_roi (roi);
+          OIIO::ImageBuf mip (ispec, data_ptr);
+          if (! OIIO::ImageBufAlgo::resize (mip, image, "", 0.0f, roi))
+            fprintf (stderr, "failed to create mip %u\n", i);
+          data_ptr += (ispec.width * ispec.height * ispec.nchannels);
+        }
+    }
 
   bgfx::updateTexture2D(handle, 0, 0, 0, 0, ispec.width, ispec.height, img_mem);
 

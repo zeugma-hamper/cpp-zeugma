@@ -44,6 +44,7 @@ struct TextureParticulars
 
 //Create a texture handle and decode image to texture, texture is mutable
 TextureParticulars CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags);
+TextureParticulars CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags, bool _create_mipmaps);
 //Updates texture from image file. Format, size, etc. must match.
 bgfx::TextureHandle UpdateWholeTexture2D (bgfx::TextureHandle _texture,
                                           bx::FilePath const &_path);
