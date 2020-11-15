@@ -26,7 +26,7 @@ Ticato *AtomicFreezone::InstanitateAtom (const Vect &loc, PlatonicMaes *mae,
 { Ticato *tic = new Ticato (*cineganz);
   tic->cur_maes = mae;
   tic -> AlignToMaes ();
-  tic->sca . SetHard (300.0);
+  tic->sca . SetHard (400.0 + drand48 () * 300.0);
   tic->loc . SetHard (loc);
   f64 spd = min_speed + drand48 () * (max_speed - min_speed);
   spd *= (direc == 0)  ?  (drand48 () > 0.5 ? 1.0 : -1.0)  :  direc;

@@ -600,7 +600,8 @@ int main (int ac, char **av)
   tamp.steenbeck = new VideoRenderable (film_infos[4]);
   Node *drive_in = new Node (tamp.steenbeck);
   drive_in -> Scale (0.7 * total_width);
-  drive_in -> Translate (maes -> Loc ());
+  drive_in -> Translate (maes -> Loc ()
+                         - 0.9 * maes -> Height () * maes -> Up ());
   kawntent -> AppendChild (drive_in);
 
   Node *splat = new Node;
@@ -620,7 +621,7 @@ int main (int ac, char **av)
                                        ZeColor (1.0, 1.0, 0.0, 0.3)));
   splat -> AppendRenderable (polysplat);
   polysplat -> SetShouldEdge (true);
-  windshield -> AppendChild (splat);
+//  windshield -> AppendChild (splat);
 
   ch_ptr <Orksur> orkp (new Orksur (*tabl));
   windshield -> AppendChild (orkp . get ());
@@ -649,10 +650,10 @@ int main (int ac, char **av)
   AtomicFreezone *afz = (tamp.freezo = new AtomicFreezone);
   afz->cineganz = &film_infos;
   afz->field_amok = kawntent;
-  afz->atom_count_goal = 25.0;
+  afz->atom_count_goal = 45.0;
   afz->inter_arrival_t = 5.0;
-  afz->min_speed = 150.0;
-  afz->max_speed = 600.0;
+  afz->min_speed = 50.0;
+  afz->max_speed = 250.0;
 
   PlatonicMaes *plams[2] = { left, maes };
   for (PlatonicMaes *emm  :  plams)
@@ -665,7 +666,7 @@ int main (int ac, char **av)
       afz -> AppendSwath (new Swath ({l, r}, {b, t}, emm));
     }
 
-  afz -> PopulateFromScratch ();
+//  afz -> PopulateFromScratch ();
 
   tamp . Run ();
 
