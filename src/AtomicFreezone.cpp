@@ -39,11 +39,11 @@ void AtomicFreezone::PopulateFromScratch ()
             tic = new Ticato (*cineganz);
             tic->cur_maes = sw->supporting_maes;
             tic -> AlignToMaes ();
-            tic->sca . Set (300.0);
-            tic->loc . Set (rone_p + lumb_p - sw->prone.pt1);
+            tic->sca . SetHard (300.0);
+            tic->loc . SetHard (rone_p + lumb_p - sw->prone.pt1);
             f64 spd = (drand48 () > 0.5 ? 1.0 : -1.0)
               * (min_speed + drand48 () * (max_speed - min_speed));
-            tic->vel . Set (Vect (spd, 0.0, 0.0));
+            tic->vel . SetHard (Vect (spd, 0.0, 0.0));
             field_amok -> AppendChild (tic->no);
             atoms . push_back (tic);
             break;
@@ -55,8 +55,9 @@ void AtomicFreezone::PopulateFromScratch ()
 
 
 void AtomicFreezone::PerambulizeAtoms (f64 dt)
-{ for (auto it = atoms . begin ()  ;  it != atoms . end ()  ;  ++it)
-    if (Ticato *tic = *it)
+{ std::vector <Ticato *> *mort = NULL;
+  for (Ticato *tic  :  atoms)
+    if (tic)
       { f64 vx = tic->vel.val.x;
         const Vect &ovr = tic->cur_maes -> Over ();
         Vect newloc = tic->loc.val  +  dt * vx * ovr;
@@ -71,24 +72,36 @@ void AtomicFreezone::PerambulizeAtoms (f64 dt)
             continue;
           }
 
-        // by this time, we've run off the end of our former maes
+        // at this point, we've run off the end of our present maes
         if (curth)
           { Vect n = curth->supporting_maes -> Norm ();
             f64 t = (newloc - curth->supporting_maes->loc) . Dot (n);
-            newloc -= t * n;
+            newloc -= t * n;  // get back on the plane, jack
             tic->loc . Set (newloc);
             tic -> SetAndAlignToMaes (curth->supporting_maes);
             continue;
           }
         // now, here, sadly, tic is homeless and must be raptured
+fprintf(stderr,"WHACKING! WHACKING, I TELL YOU!\n");
+        if (! mort)
+          mort = new std::vector <Ticato *> ();
+        mort -> push_back (tic);
         if (Node *par = tic->no -> Parent ())
-          { par -> ExciseChild (tic->no);
+          { par -> RemoveChild (tic->no);
             tic->no = NULL;
             tic->re = NULL;
           }
-        atoms . erase (it);
-        // delete tic;
       }
+  // disgusting. here it comes:
+  if (! mort)
+    return;
+  auto pr = [mort] (Ticato *ti) -> bool
+    { return std::find (mort->begin (), mort->end (), ti) != mort->end (); };
+  atoms . erase (std::remove_if (atoms.begin (), atoms.end (), pr),
+                 atoms.end ());
+  for (Ticato *tic  :  *mort)
+    delete tic;
+  delete mort;
 }
 
 

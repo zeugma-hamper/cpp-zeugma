@@ -29,6 +29,11 @@ class Ticato  :  public Zeubject
   Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm = -1,
           i64 which_clip = -1);
 
+  ~Ticato ()  override
+    {
+      fprintf (stderr, "Is <%p> really gonna jelly up the sidewalk?\n", this);
+    }
+
   void AlignToMaes ()
     { if (cur_maes)
         { re -> SetOver (cur_maes -> Over ());

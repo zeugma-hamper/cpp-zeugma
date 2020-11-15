@@ -398,7 +398,7 @@ bool Tampo::DoWhatThouWilt (i64 ratch, f64 thyme)
       farr = ratch;
     }
 
-  if (texxyno  &&  timey.val > 2.5)
+  if (texxyno  &&  timey.val > 1.5)
     { if (Node *par = texxyno -> Parent ())
         { par -> ExciseChild (texxyno);
           delete texxyno;
@@ -406,7 +406,7 @@ bool Tampo::DoWhatThouWilt (i64 ratch, f64 thyme)
         }
     }
 
-  if (freezo  &&  timey.val > 3.0)
+  if (freezo)//  &&  timey.val > 3.0)
     freezo -> Inhale (ratch, thyme);
   return true;
 }
@@ -551,7 +551,7 @@ int main (int ac, char **av)
   std::vector <FilmInfo> film_infos
     = ReadFilmInfo ("../configs/film-config.toml");
   assert (film_infos.size () > 0);
-/*
+
   { BlockTimer bt ("loading & merging geom");
     BlockTimer slurpt ("slurping geom file");
     std::vector<FilmGeometry> geoms
@@ -560,7 +560,7 @@ int main (int ac, char **av)
     assert (geoms . size ()  >  0);
     MergeFilmInfoGeometry (film_infos, geoms);
   }
-*/
+
   PlatonicMaes *maes = tamp . FindMaesByName ("front");
   assert (maes);
   PlatonicMaes *left = tamp . FindMaesByName ("left");
@@ -646,14 +646,13 @@ int main (int ac, char **av)
   texno -> Translate (maes -> Loc ());
   windshield -> AppendChild (texno);
 
-/*
   AtomicFreezone *afz = (tamp.freezo = new AtomicFreezone);
   afz->cineganz = &film_infos;
   afz->field_amok = kawntent;
-  afz->atom_count_goal = 35.0;
+  afz->atom_count_goal = 25.0;
   afz->inter_arrival_t = 4.0;
-  afz->min_speed = 50.0;
-  afz->max_speed = 200.0;
+  afz->min_speed = 150.0;
+  afz->max_speed = 600.0;
 
   PlatonicMaes *plams[2] = { left, maes };
   for (PlatonicMaes *emm  :  plams)
@@ -667,7 +666,7 @@ int main (int ac, char **av)
     }
 
   afz -> PopulateFromScratch ();
-*/
+
   tamp . Run ();
 
   return 0;

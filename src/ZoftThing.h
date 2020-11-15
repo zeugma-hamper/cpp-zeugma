@@ -158,6 +158,17 @@ class ZoftThing
       return *this;
     }
 
+  ZoftThing &SetHard (const T &v)
+    { if (! guts)
+        val = v;
+      else if (LatchGuts <T> *lg = dynamic_cast <LatchGuts <T> *> (guts))
+        val = lg->latchval = v;
+      else
+        return *this;
+      just_changed = true;
+      return *this;
+    }
+
   ZoftThing &operator = (const T &v)
     { return Set (v); }
   ZoftThing &operator = (ZoftThing &z)
