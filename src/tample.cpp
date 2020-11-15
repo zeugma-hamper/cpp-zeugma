@@ -596,14 +596,16 @@ int main (int ac, char **av)
       cursoresques . push_back (c);
       c->crs_pos = maes -> Loc ();
     }
-
+/*
   tamp.steenbeck = new VideoRenderable (film_infos[4]);
   Node *drive_in = new Node (tamp.steenbeck);
   drive_in -> Scale (0.7 * total_width);
   drive_in -> Translate (maes -> Loc ()
                          - 0.9 * maes -> Height () * maes -> Up ());
   kawntent -> AppendChild (drive_in);
+*/
 
+/*
   Node *splat = new Node;
   PolygonRenderable *polysplat = new PolygonRenderable;
   i64 nv = 14;
@@ -627,18 +629,22 @@ int main (int ac, char **av)
   windshield -> AppendChild (orkp . get ());
   AppendSpatialPhage (&(tamp . GetSprinkler ()), orkp);
   AppendYowlPhage (&(tamp . GetSprinkler ()), orkp);
-
+*/
   for (i64 q = 0  ;  q < tamp . NumWaterWorkses ()  ;  ++q)
     if (GLFWWaterWorks *ww
         = dynamic_cast <GLFWWaterWorks *> (tamp . NthWaterWorks (q)))
       ww -> SetPromoteMouseToSpatialOrthoStyle (true);
 /*
-  Ticato *tic = new Ticato (film_infos);
-  tic->re -> SetOver (tabl -> Over ());
-  tic->re -> SetUp (tabl -> Up ());
-  tic->sca . Set (Vect (200.0));
-  tic->loc . Set (tabl -> Loc ());
-  windshield -> AppendChild (tic->no);
+  for (int q = 0  ;  q < 25  ;  ++q)
+    { Ticato *tic = new Ticato (film_infos);
+      tic->re -> SetOver (maes -> Over ());
+      tic->re -> SetUp (maes -> Up ());
+      tic->sca . Set (Vect (200.0));
+      tic->loc . Set (maes -> Loc ()
+                      + (drand48 () - 0.5) * 6000.0 * maes -> Over ()
+                      + (drand48 () - 0.5) * 6000.0 * maes -> Up ());
+      windshield -> AppendChild (tic->no);
+    }
 */
   TextureParticulars tipi = CreateTexture2D ("/tmp/blap.png", DefaultTextureFlags);
   TexturedRenderable *texre = new TexturedRenderable (tipi);
@@ -666,7 +672,7 @@ int main (int ac, char **av)
       afz -> AppendSwath (new Swath ({l, r}, {b, t}, emm));
     }
 
-//  afz -> PopulateFromScratch ();
+  afz -> PopulateFromScratch ();
 
   tamp . Run ();
 

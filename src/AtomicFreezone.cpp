@@ -21,6 +21,24 @@ Swath *AtomicFreezone::SwathFor (PlatonicMaes *ma)
 }
 
 
+void AtomicFreezone::DetachAndDisposeOfAtom (Ticato *icat)
+{ if (! icat)
+    return;
+  if (Node *par = icat->no -> Parent ())
+    { par -> RemoveChild (icat->no);
+      icat->no = NULL;
+      icat->re = NULL;
+    }
+  auto it = std::find (atoms . begin (), atoms . end (), icat);
+  if (it  ==  atoms . end ())
+    { fprintf (stderr, "DisposeOfAtom() called with an atom-not-among-us...\n");
+      return;
+    }
+  atoms . erase (it);
+  delete icat;
+}
+
+
 Ticato *AtomicFreezone::InstanitateAtom (const Vect &loc, PlatonicMaes *mae,
                                          i32 direc)
 { Ticato *tic = new Ticato (*cineganz);
@@ -105,20 +123,11 @@ fprintf(stderr,"WHACKING! WHACKING, I TELL YOU!\n");
         if (! mort)
           mort = new std::vector <Ticato *> ();
         mort -> push_back (tic);
-        if (Node *par = tic->no -> Parent ())
-          { par -> RemoveChild (tic->no);
-            tic->no = NULL;
-            tic->re = NULL;
-          }
       }
-  // disgusting. here it comes:
+
   if (mort)
-    { auto pr = [mort] (Ticato *ti) -> bool
-        { return std::find (mort->begin (), mort->end (), ti) != mort->end (); };
-      atoms . erase (std::remove_if (atoms.begin (), atoms.end (), pr),
-                     atoms.end ());
-      for (Ticato *tic  :  *mort)
-        delete tic;
+    { for (Ticato *tic  :  *mort)
+        DetachAndDisposeOfAtom (tic);
       delete mort;
     }
 }
@@ -130,7 +139,9 @@ i64 AtomicFreezone::Inhale (i64, f64 thyme)
 
   if (atoms . size ()  <  atom_count_goal)
     if (drand48 ()  <  dt / inter_arrival_t)
+{fprintf(stderr,"O. O, O. O O O! SPAWNY-SPAWN SPAWN-SPAWNING!\n");
       SpontaneouslyGenerateAtomAtBoundary ();
+}
 
   prev_time = thyme;
   return 0;
