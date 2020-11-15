@@ -21,6 +21,33 @@ Swath *AtomicFreezone::SwathFor (PlatonicMaes *ma)
 }
 
 
+Ticato *AtomicFreezone::InstanitateAtom (const Vect &loc, PlatonicMaes *mae,
+                                         i32 direc)
+{ Ticato *tic = new Ticato (*cineganz);
+  tic->cur_maes = mae;
+  tic -> AlignToMaes ();
+  tic->sca . SetHard (300.0);
+  tic->loc . SetHard (loc);
+  f64 spd = min_speed + drand48 () * (max_speed - min_speed);
+  spd *= (direc == 0)  ?  (drand48 () > 0.5 ? 1.0 : -1.0)  :  direc;
+  tic->vel . SetHard (Vect (spd, 0.0, 0.0));
+  field_amok -> AppendChild (tic->no);
+  atoms . push_back (tic);
+  return tic;
+}
+
+
+void AtomicFreezone::SpontaneouslyGenerateAtomAtBoundary ()
+{ i64 which_coast = drand48 () < 0.5  ?  0  :  1;
+  Swath *sw = meander[which_coast * (meander . size () - 1)];
+  Vect rone_p = which_coast  ?  sw->prone.pt2  :  sw->prone.pt1;
+  f64 t = drand48 ();
+  Vect lumb_p = sw->plumb.pt1  +  t * (sw->plumb.pt2 - sw->plumb.pt1);
+  InstanitateAtom (rone_p + lumb_p - sw->prone.pt1, sw->supporting_maes,
+                   which_coast > 0  ?  -1  :  1);
+}
+
+
 void AtomicFreezone::PopulateFromScratch ()
 { meander_len = 0.0;
   for (Swath *sw  :  meander)
@@ -36,16 +63,8 @@ void AtomicFreezone::PopulateFromScratch ()
             Vect rone_p = sw->prone.pt1  +  t * (sw->prone.pt2 - sw->prone.pt1);
             t = drand48 ();
             Vect lumb_p = sw->plumb.pt1  +  t * (sw->plumb.pt2 - sw->plumb.pt1);
-            tic = new Ticato (*cineganz);
-            tic->cur_maes = sw->supporting_maes;
-            tic -> AlignToMaes ();
-            tic->sca . SetHard (300.0);
-            tic->loc . SetHard (rone_p + lumb_p - sw->prone.pt1);
-            f64 spd = (drand48 () > 0.5 ? 1.0 : -1.0)
-              * (min_speed + drand48 () * (max_speed - min_speed));
-            tic->vel . SetHard (Vect (spd, 0.0, 0.0));
-            field_amok -> AppendChild (tic->no);
-            atoms . push_back (tic);
+            tic = InstanitateAtom (rone_p + lumb_p - sw->prone.pt1,
+                                   sw->supporting_maes, 0);
             break;
           }
         else
@@ -93,20 +112,25 @@ fprintf(stderr,"WHACKING! WHACKING, I TELL YOU!\n");
           }
       }
   // disgusting. here it comes:
-  if (! mort)
-    return;
-  auto pr = [mort] (Ticato *ti) -> bool
-    { return std::find (mort->begin (), mort->end (), ti) != mort->end (); };
-  atoms . erase (std::remove_if (atoms.begin (), atoms.end (), pr),
-                 atoms.end ());
-  for (Ticato *tic  :  *mort)
-    delete tic;
-  delete mort;
+  if (mort)
+    { auto pr = [mort] (Ticato *ti) -> bool
+        { return std::find (mort->begin (), mort->end (), ti) != mort->end (); };
+      atoms . erase (std::remove_if (atoms.begin (), atoms.end (), pr),
+                     atoms.end ());
+      for (Ticato *tic  :  *mort)
+        delete tic;
+      delete mort;
+    }
 }
 
 
 i64 AtomicFreezone::Inhale (i64, f64 thyme)
-{ PerambulizeAtoms (thyme - prev_time);
+{ float dt = thyme - prev_time;
+  PerambulizeAtoms (dt);
+
+  if (atoms . size ()  <  atom_count_goal)
+    if (drand48 ()  <  dt / inter_arrival_t)
+      SpontaneouslyGenerateAtomAtBoundary ();
 
   prev_time = thyme;
   return 0;

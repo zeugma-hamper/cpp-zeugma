@@ -650,7 +650,7 @@ int main (int ac, char **av)
   afz->cineganz = &film_infos;
   afz->field_amok = kawntent;
   afz->atom_count_goal = 25.0;
-  afz->inter_arrival_t = 4.0;
+  afz->inter_arrival_t = 5.0;
   afz->min_speed = 150.0;
   afz->max_speed = 600.0;
 

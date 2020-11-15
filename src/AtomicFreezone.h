@@ -42,6 +42,8 @@ class AtomicFreezone  :  public Zeubject
   void AppendSwath (Swath *sw);
   Swath *SwathFor (PlatonicMaes *ma);
 
+  Ticato *InstanitateAtom (const Vect &loc, PlatonicMaes *mae, i32 direc = 0);
+  void SpontaneouslyGenerateAtomAtBoundary ();
   void PopulateFromScratch ();
 
   void PerambulizeAtoms (f64 dt);
