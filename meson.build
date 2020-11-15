@@ -170,7 +170,9 @@ gst_video_dep = dependency ('gstreamer-video-1.0')
 
 ##### CHARM #####
 lib_sources = ['src/application.cpp',
+               'src/Alignifer.cpp',
                'src/Bolex.cpp',
+               'src/CoGrappler.cpp',
                'src/CMVTrefoil.cpp',
                'src/DecodePipeline.cpp',
                'src/FlatRenderable.cpp',

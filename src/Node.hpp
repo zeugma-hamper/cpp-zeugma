@@ -57,6 +57,10 @@ class Node
   GrapplerPile *AssuredGrapplerPile ();
   GrapplerPile *UnsecuredGrapplerPile ();
 
+  void AppendGrappler (Grappler *g)
+    { AssuredGrapplerPile () -> AppendGrappler (g); }
+  Grappler *FindGrappler (const std::string &nm);
+
   Grappler *Translate (const Vect &tr);
   inline Grappler *Translate (f64 dx, f64 dy, f64 dz)
     { return Translate (Vect (dx, dy, dz)); }

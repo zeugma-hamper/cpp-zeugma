@@ -43,6 +43,9 @@
 #include <RawEventParsing.h>
 #include <GeomFumble.h>
 
+//UI
+#include "Alignifer.h"
+
 //etc.
 #include <BlockTimer.hpp>
 
@@ -68,31 +71,33 @@
 
 using namespace charm;
 
-// oy. also: oy.
-class Cursoresque;
-// how about some more oy?
-std::vector <Cursoresque *> cursoresques;
 // don't forget: oy.
 bool extra_poo = [] () { srand48 (32123);  return true; } ();
 
 
-class Cursoresque  :  public Zeubject
+class Cursoresque  :  public Alignifer
 { public:
-  Node *crs_nod;
-  Renderable *crs_rnd;
-  ZoftVect crs_pos;
-  Cursoresque (f64 sz)  :  Zeubject (),
-                           crs_nod (new Node),
-                           crs_rnd (new RectangleRenderable)
-    { crs_nod -> AppendRenderable (crs_rnd);
-      f64 ltime = 0.55 - 0.1 * drand48 ();
-      crs_nod -> Rotate (ZoftVect (Vect::zaxis),
-                         LoopFloat (0.0, 2.0 * M_PI / ltime, ltime));
-      crs_nod -> Scale (sz);
-      crs_pos . MakeBecomeLikable ();
-      crs_nod -> Translate (crs_pos);
+  PolygonRenderable *crs_re1,  *crs_re2;
+  Cursoresque (f64 sz, i64 nv = 6)  :  Alignifer (),
+                                       crs_re1 (new PolygonRenderable),
+                                       crs_re2 (new PolygonRenderable)
+    { AppendRenderable (crs_re1);
+      AppendRenderable (crs_re2);
+      for (i64 w = 0  ;  w < 2  ;  ++w)
+        for (i64 q = 0  ;  q < nv  ;  ++q)
+          { f64 theeeta = 2.0 * M_PI / (f64)nv * (f64)q  +  w * M_PI;
+            Vect radial = (0.5 * (w + 1.0))
+              *  (cos (theeeta) * Vect::xaxis  +  sin (theeeta) * Vect::yaxis);
+            SinuVect arm (0.065 * radial, 5.0 + 0.7 * drand48 (),
+                          0.24 * (1.0 + 3.0 * (q%2)) * radial);
+            (w > 0 ? crs_re1 : crs_re2) -> AppendVertex (arm);
+          }
+      ScaleZoft () = Vect (sz);
     }
 };
+
+
+std::vector <Cursoresque *> cursoresques;
 
 
 class Sensorium  :  public Zeubject, public ZESpatialPhagy, public ZEYowlPhagy
@@ -474,9 +479,8 @@ void Tampo::FlatulateCursor (ZESpatialMoveEvent *e)
   Vect hit;
   if (PlatonicMaes *emm = ClosestIntersectedMaes (e -> Loc (), e -> Aim (),
                                                   &hit))
-    { crs->crs_pos = hit;
-      crs->crs_rnd -> SetOver (emm -> Over ());
-      crs->crs_rnd -> SetUp (emm -> Up ());
+    { crs -> LocZoft () . Set (hit);
+      crs ->AlignToMaes (emm);
     }
 }
 
@@ -591,10 +595,10 @@ int main (int ac, char **av)
 
   for (int q = 0  ;  q < 3  ;  ++q)
     { Cursoresque *c = new Cursoresque (0.015 * maes -> Height ());
-      omni_layer -> GetRootNode () -> AppendChild (c->crs_nod);
+      omni_layer -> GetRootNode () -> AppendChild (c);
 
       cursoresques . push_back (c);
-      c->crs_pos = maes -> Loc ();
+      c -> LocZoft () = maes -> Loc ();
     }
 /*
   tamp.steenbeck = new VideoRenderable (film_infos[4]);

@@ -159,6 +159,12 @@ GrapplerPile *Node::UnsecuredGrapplerPile ()
 { return m_graps; }
 
 
+Grappler *Node::FindGrappler (const std::string &nm)
+{ GrapplerPile *gp = UnsecuredGrapplerPile ();
+  return gp  ?  gp -> FindGrappler (nm) :  NULL;
+}
+
+
 Grappler *Node::Translate (const Vect &tr)
 { Grappler *g = new TrGrappler (tr);
   AssuredGrapplerPile () -> AppendGrappler (g);
