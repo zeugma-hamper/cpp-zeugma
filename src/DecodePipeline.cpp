@@ -313,6 +313,9 @@ bool DecodePipeline::SeekFull (f64 _rate, GstFormat _format, GstSeekFlags _flags
 
 void DecodePipeline::CleanUp ()
 {
+  if (m_pipeline)
+    gst_element_set_state (m_pipeline, GST_STATE_NULL);
+
   if (m_video_terminus)
     {
       m_video_terminus->OnShutdown (this);
@@ -330,10 +333,7 @@ void DecodePipeline::CleanUp ()
   m_bus = nullptr;
 
   if (m_pipeline)
-    {
-      gst_element_set_state (m_pipeline, GST_STATE_NULL);
-      gst_object_unref (m_pipeline);
-    }
+    gst_object_unref (m_pipeline);
 
   // not holding onto ref to m_uridecodebin
   m_uridecodebin = nullptr;

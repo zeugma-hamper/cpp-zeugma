@@ -41,8 +41,16 @@ VideoTexture::VideoTexture (VideoFormat _format, u64 _state, bgfx::ProgramHandle
 
 VideoTexture::~VideoTexture ()
 {
+  fprintf (stderr, "destroying video\n");
   if (auto *system = VideoSystem::GetSystem(); system)
     system->DestroyVideo (this);
+
+  for (szt i = 0; i < array_size (textures); ++i)
+    if (bgfx::isValid(textures[i]))
+      {
+        bgfx::destroy (textures[i]);
+        textures[i] = BGFX_INVALID_HANDLE;
+      }
 }
 
 u64 VideoTexture::GetDefaultState () const
@@ -202,9 +210,6 @@ VideoSystem::~VideoSystem ()
   for (size_t i = 0; i < array_size (m_vgr.uniforms); ++i)
     bgfx::destroy (m_vgr.uniforms[i]);
 
-  // for (VideoPipeline &pipe : m_pipelines)
-  //   pipe.pipeline->SetPipelineState (GST_STATE_NULL);
-
   m_pipelines.clear ();
 }
 
@@ -346,6 +351,12 @@ void VideoSystem::UploadFrames ()
         }
     };
 
+  auto pred_null_texture = [] (VideoPipeline const &pipe) { return pipe.texture.expired(); };
+
+  auto const it = std::remove_if (m_pipelines.begin (), m_pipelines.end (), pred_null_texture);
+  fprintf (stderr, "distance is %ld\n", std::distance (it, m_pipelines.end ()));
+  m_pipelines.erase (it, m_pipelines.end ());
+
   szt const max_score = 10000u;
   szt score = 0u;
   szt const count = m_pipelines.size ();
@@ -410,9 +421,6 @@ void VideoSystem::DestroyVideo (VideoTexture *_texture)
     {
       if (cur->texture != _texture)
         continue;
-
-      for (szt i = 0; i < 4; ++i)
-        _texture->SetNthTexture(0, BGFX_INVALID_HANDLE);
 
       m_pipelines.erase(cur);
       break;

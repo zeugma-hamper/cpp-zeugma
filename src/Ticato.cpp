@@ -22,12 +22,12 @@ Ticato::Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm, i64 which_clip)
 
   const ClipInfo &clinf = finf.clips[which_clip];
 
-MattedVideoRenderable *curre, *prere = NULL;
-for (int q = 0  ;  q < 1  ;  ++q) {                  // <---- adjust loop count
-  curre = new MattedVideoRenderable (finf, clinf);   // to witness mem-devour;
-if (prere)  delete prere;                            // '3' on the hades cyn
-prere = curre;                                       // blows out memory and
-} re = curre;                                        // dies in seconds
+  MattedVideoRenderable *curre, *prere = NULL;
+  for (int q = 0  ;  q < 3  ;  ++q) {                  // <---- adjust loop count
+    curre = new MattedVideoRenderable (finf, clinf);   // to witness mem-devour;
+    if (prere)  delete prere;                            // '3' on the hades cyn
+    prere = curre;                                       // blows out memory and
+  } re = curre;                                        // dies in seconds
 
   (no = new Node) -> AppendRenderable (re);
   sca . MakeBecomeLikable ();

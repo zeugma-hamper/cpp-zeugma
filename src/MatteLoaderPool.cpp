@@ -146,7 +146,7 @@ void MatteLoaderWorker::DoWork ()
 
   {
     data = u8_ptr ((u8 *)malloc(size));
-    BlockTimer timer ("load image from disk");
+    //BlockTimer timer ("load image from disk");
     iinput->read_image(0, 0, 0, 1, OIIO::TypeDesc::UINT8, data.get ());
     iinput->close();
   }
