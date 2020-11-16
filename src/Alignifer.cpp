@@ -9,7 +9,7 @@
 using namespace charm;
 
 
-Alignifer::Alignifer ()  :  Node (), Zeubject ()
+Alignifer::Alignifer ()  :  Zeubject (), Node (), sca (Vect::onesv)
 { loc . MakeBecomeLikable ();
   sca . MakeBecomeLikable ();
 

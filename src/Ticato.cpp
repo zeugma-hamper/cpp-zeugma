@@ -9,8 +9,7 @@ i64 ze_rand (i64 h, i64 l = 0)
 
 
 Ticato::Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm, i64 which_clip)
-  :  Zeubject (), no (NULL), re (NULL), fr (NULL),
-     sca (Vect (1.0, 1.0, 1.0)), cur_maes (NULL)
+  :  Alignifer (), re (NULL), fr (NULL), cur_maes (NULL)
 { if (which_fimm  <  0)
     which_fimm = ze_rand (fimmz . size ());
 
@@ -24,13 +23,8 @@ Ticato::Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm, i64 which_clip)
 
   re = new MattedVideoRenderable (finf, clinf);
   fr = new RectRenderableFrontier (re, Vect::zerov, 1.0, 1.0);
-  (no = new Node) -> AppendRenderable (re);
-  no -> SetFrontier (fr);
-
-  sca . MakeBecomeLikable ();
-  loc . MakeBecomeLikable ();
-  no -> Scale (sca);
-  no -> Translate (loc);
+  AppendRenderable (re);
+  SetFrontier (fr);
 }
 
 
@@ -46,10 +40,24 @@ bool Ticato::BeNotHoveredBy (const std::string &prov)
     { if (hvrr . empty ())
         return false;
     }
-  if (hvrr  !=  prov)
-    { hvrr . clear ();
-      return false;
-    }
+  bool ret = (hvrr == prov);
   hvrr . clear ();
+  return ret;
+}
+
+bool Ticato::BeYankedBy (const std::string &prov)
+{ if (! ynkr . empty ())
+    return false;
+  ynkr = prov;
   return true;
+}
+
+bool Ticato::BeNotYankedBy (const std::string &prov)
+{ if (prov . empty ())
+    { if (ynkr . empty ())
+        return false;
+    }
+  bool ret = (ynkr == prov);
+  ynkr . clear ();
+  return ret;
 }

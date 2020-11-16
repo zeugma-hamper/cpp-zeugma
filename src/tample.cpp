@@ -162,8 +162,6 @@ class Tampo final : public GraphicsApplication
 
   bool DoWhatThouWilt (i64 ratch, f64 thyme)  override;
 
-  PlatonicMaes *ClosestIntersectedMaes (const Vect &frm, const Vect &aim,
-                                        Vect *hit_point = NULL);
   Frontier *IntersectedFrontier (const Vect &frm, const Vect &aim,
                                  Vect *hit_point = NULL);
   void FlatulateCursor (ZESpatialMoveEvent *e);
@@ -174,11 +172,11 @@ class Tampo final : public GraphicsApplication
   ch_ptr<Sensorium> sensy;
 
  public:
-//  ch_ptr <Orksur> ork;
   ZoftVect elev_transl;
   f64 elev_trans_mult;
   VideoRenderable *steenbeck;
   ch_ptr <AtomicFreezone> freezo;
+  ch_ptr <Orksur> orksu;
   Node *texxyno;
 };
 
@@ -380,7 +378,6 @@ i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
 
 Tampo::Tampo ()  :  GraphicsApplication (),
                     sensy (new Sensorium),
-//                    ork (NULL),
                     elev_trans_mult (77.0),
                     steenbeck (NULL),
                     texxyno (NULL)
@@ -416,32 +413,6 @@ bool Tampo::DoWhatThouWilt (i64 ratch, f64 thyme)
   if (freezo)//  &&  timey.val > 3.0)
     freezo -> Inhale (ratch, thyme);
   return true;
-}
-
-PlatonicMaes *Tampo::ClosestIntersectedMaes (const Vect &frm, const Vect &aim,
-                                             Vect *hit_point)
-{ PlatonicMaes *close_m = NULL;
-  Vect close_p, hit;
-  f64 close_d;
-
-  i32 cnt = NumMaeses ();
-  for (i32 q = 0  ;  q < cnt  ;  ++q)
-    { PlatonicMaes *emm = NthMaes (q);
-      if (G::RayRectIntersection (frm, aim,
-                                  emm -> Loc (), emm -> Over (),
-                                  emm -> Up (), emm -> Width (),
-                                  emm -> Height (), &hit))
-        { f64 d = hit . DistFrom (frm);
-          if (! close_m  ||  d < close_d)
-            { close_m = emm;
-              close_p = hit;
-              close_d = d;
-            }
-        }
-    }
-  if (hit_point)
-    *hit_point = close_p;
-  return close_m;
 }
 
 Frontier *Tampo::IntersectedFrontier (const Vect &frm, const Vect &aim,
@@ -630,12 +601,13 @@ int main (int ac, char **av)
   splat -> AppendRenderable (polysplat);
   polysplat -> SetShouldEdge (true);
 //  windshield -> AppendChild (splat);
-
-  ch_ptr <Orksur> orkp (new Orksur (*tabl));
-  windshield -> AppendChild (orkp . get ());
-  AppendSpatialPhage (&(tamp . GetSprinkler ()), orkp);
-  AppendYowlPhage (&(tamp . GetSprinkler ()), orkp);
 */
+  Orksur *orkp = new Orksur (*tabl);
+  tamp.orksu = ch_ptr <Orksur> (orkp);
+  windshield -> AppendChild (orkp);
+  AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.orksu);
+  AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.orksu);
+
   for (i64 q = 0  ;  q < tamp . NumWaterWorkses ()  ;  ++q)
     if (GLFWWaterWorks *ww
         = dynamic_cast <GLFWWaterWorks *> (tamp . NthWaterWorks (q)))

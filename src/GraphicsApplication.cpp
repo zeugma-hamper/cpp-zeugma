@@ -376,6 +376,34 @@ PlatonicMaes *GraphicsApplication::FindMaesByName (std::string_view _name) const
   return nullptr;
 }
 
+PlatonicMaes *GraphicsApplication::ClosestIntersectedMaes (const Vect &frm,
+                                                           const Vect &aim,
+                                                           Vect *hit_point)
+{ PlatonicMaes *close_m = NULL;
+  Vect close_p, hit;
+  f64 close_d;
+
+  i32 cnt = NumMaeses ();
+  for (i32 q = 0  ;  q < cnt  ;  ++q)
+    { PlatonicMaes *emm = NthMaes (q);
+      if (G::RayRectIntersection (frm, aim,
+                                  emm -> Loc (), emm -> Over (),
+                                  emm -> Up (), emm -> Width (),
+                                  emm -> Height (), &hit))
+        { f64 d = hit . DistFrom (frm);
+          if (! close_m  ||  d < close_d)
+            { close_m = emm;
+              close_p = hit;
+              close_d = d;
+            }
+        }
+    }
+  if (hit_point)
+    *hit_point = close_p;
+  return close_m;
+}
+
+
 i32 GraphicsApplication::NumRenderLeaves ()  const
 {
   return i32 (m_trefoils.size ());

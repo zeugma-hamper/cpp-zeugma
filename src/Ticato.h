@@ -9,7 +9,7 @@
 
 #include "Matte.hpp"
 
-#include "Zeubject.h"
+#include "Alignifer.h"
 #include "MotherTime.h"
 
 #include "PlatonicMaes.h"
@@ -20,16 +20,14 @@
 using namespace charm;
 
 
-class Ticato  :  public Zeubject
+class Ticato  :  public Alignifer
 { public:
-
-  Node *no;
   Renderable *re;
   RectRenderableFrontier *fr;
-  ZoftVect sca, loc;
   ZoftVect vel;
   PlatonicMaes *cur_maes;
   std::string hvrr;
+  std::string ynkr;
 
   Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm = -1,
           i64 which_clip = -1);
@@ -38,6 +36,11 @@ class Ticato  :  public Zeubject
     {
       fprintf (stderr, "Is <%p> really gonna jelly up the sidewalk?\n", this);
     }
+
+  PlatonicMaes *CurMaes ()  const
+    { return cur_maes; }
+  void SetCurMaes (PlatonicMaes *ma)
+    { cur_maes = ma; }
 
   void AlignToMaes ()
     { if (cur_maes)
@@ -55,6 +58,11 @@ class Ticato  :  public Zeubject
     { return hvrr; }
   bool BeHoveredBy (const std::string &prov);
   bool BeNotHoveredBy (const std::string &prov);
+
+  const std::string CurYanker ()  const
+    { return ynkr; }
+  bool BeYankedBy (const std::string &prov);
+  bool BeNotYankedBy (const std::string &prov);
 };
 
 

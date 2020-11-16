@@ -13,7 +13,7 @@
 namespace charm  {
 
 
-class Alignifer  :  public Node, public Zeubject
+class Alignifer  :  public Zeubject, public Node
 { public:
   ZoftVect loc;
   ZoftVect sca;

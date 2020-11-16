@@ -1,6 +1,8 @@
 
 #include "AtomicFreezone.h"
 
+#include <GraphicsApplication.hpp>
+
 
 void AtomicFreezone::AppendSwath (Swath *sw)
 { if (! sw)
@@ -34,18 +36,16 @@ Ticato *AtomicFreezone::FirstHitAtom (const G::Ray &ra, Vect *hitp)
 void AtomicFreezone::DetachAndDisposeOfAtom (Ticato *icat)
 { if (! icat)
     return;
-  if (Node *par = icat->no -> Parent ())
-    { par -> RemoveChild (icat->no);
-      icat->no = NULL;
-      icat->re = NULL;
-    }
   auto it = std::find (atoms . begin (), atoms . end (), icat);
   if (it  ==  atoms . end ())
     { fprintf (stderr, "DisposeOfAtom() called with an atom-not-among-us...\n");
       return;
     }
   atoms . erase (it);
-  delete icat;
+  if (Node *par = icat -> Parent ())
+    par -> RemoveChild (icat);
+  else
+    delete icat;
 }
 
 
@@ -59,7 +59,7 @@ Ticato *AtomicFreezone::InstanitateAtom (const Vect &loc, PlatonicMaes *mae,
   f64 spd = min_speed + drand48 () * (max_speed - min_speed);
   spd *= (direc == 0)  ?  (drand48 () > 0.5 ? 1.0 : -1.0)  :  direc;
   tic->vel . SetHard (Vect (spd, 0.0, 0.0));
-  field_amok -> AppendChild (tic->no);
+  field_amok -> AppendChild (tic);
   atoms . push_back (tic);
   return tic;
 }
@@ -105,7 +105,10 @@ void AtomicFreezone::PerambulizeAtoms (f64 dt)
 { std::vector <Ticato *> *mort = NULL;
   for (Ticato *tic  :  atoms)
     if (tic)
-      { f64 vx = tic->vel.val.x;
+      { if (! tic -> CurYanker () . empty ())
+          continue;
+
+        f64 vx = tic->vel.val.x;
         const Vect &ovr = tic->cur_maes -> Over ();
         Vect newloc = tic->loc.val  +  dt * vx * ovr;
 
@@ -148,7 +151,18 @@ i64 AtomicFreezone::ZESpatialMove (ZESpatialMoveEvent *e)
     return -1;
   Vect hit (INITLESS);
   const std::string &prv = e -> Provenance ();
-  if (Ticato *tic = FirstHitAtom (G::Ray {e -> Loc (), e -> Aim ()}, &hit))
+  if (Ticato *tic = AtomYankedBy (prv))
+    { if (GraphicsApplication *g = GraphicsApplication::GetApplication ())
+        { Vect hit (INITLESS);
+          if (PlatonicMaes *maes
+              = g -> ClosestIntersectedMaes (e -> Loc (), e -> Aim (), &hit))
+            { tic -> LocZoft () . Set (hit);
+              if (maes  !=  tic -> CurMaes ())
+                tic -> SetAndAlignToMaes (maes);
+            }
+        }
+    }
+  else if (Ticato *tic = FirstHitAtom (G::Ray {e -> Loc (), e -> Aim ()}, &hit))
     { auto it = hoverers . find (prv);
       if (it  ==  hoverers . end ())
         { tic -> BeHoveredBy (prv);
@@ -176,12 +190,35 @@ i64 AtomicFreezone::ZESpatialMove (ZESpatialMoveEvent *e)
 
 
 i64 AtomicFreezone::ZESpatialHarden (ZESpatialHardenEvent *e)
-{fprintf (stderr, "CLICKsterism -- oh yes. you don't want to believe, but...\n");
+{ if (! e)
+    return -1;
+  const std::string &prv = e -> Provenance ();
+  if (Ticato *tic = AtomHoveredBy (prv))
+    { tic -> BeNotHoveredBy (prv);
+      tic -> BeYankedBy (prv);
+      yankers[prv] = tic;
+      auto it = hoverers . find (prv);
+      if (it  !=  hoverers . end ())
+        hoverers . erase (it);
+    }
+  else
+    fprintf (stderr, "baseless CLICKsterism. here in AFreezo's SpHarden...\n");
   return 0;
 }
 
 i64 AtomicFreezone::ZESpatialSoften (ZESpatialSoftenEvent *e)
-{fprintf (stderr, "... and like that, CLICKY was gone.\n");
+{ if (! e)
+    return -1;
+  const std::string &prv = e -> Provenance ();
+  if (Ticato *tic = AtomYankedBy (prv))
+    { tic -> BeNotYankedBy (prv);
+      // should we immediately return to hovering? a hard one... but no.
+      auto it = yankers . find (prv);
+      if (it  !=  yankers . end ())
+        yankers . erase (it);
+    }
+  else
+    fprintf (stderr, "... and like that, CLICKY is gone from hovering.\n");
   return 0;
 }
 
