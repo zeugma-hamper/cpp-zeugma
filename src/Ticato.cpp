@@ -9,7 +9,7 @@ i64 ze_rand (i64 h, i64 l = 0)
 
 
 Ticato::Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm, i64 which_clip)
-  :  Zeubject (), no (NULL), re (NULL),
+  :  Zeubject (), no (NULL), re (NULL), fr (NULL),
      sca (Vect (1.0, 1.0, 1.0)), cur_maes (NULL)
 { if (which_fimm  <  0)
     which_fimm = ze_rand (fimmz . size ());
@@ -22,16 +22,34 @@ Ticato::Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm, i64 which_clip)
 
   const ClipInfo &clinf = finf.clips[which_clip];
 
-  MattedVideoRenderable *curre, *prere = NULL;
-  for (int q = 0  ;  q < 3  ;  ++q) {                  // <---- adjust loop count
-    curre = new MattedVideoRenderable (finf, clinf);   // to witness mem-devour;
-    if (prere)  delete prere;                            // '3' on the hades cyn
-    prere = curre;                                       // blows out memory and
-  } re = curre;                                        // dies in seconds
-
+  re = new MattedVideoRenderable (finf, clinf);
+  fr = new RectRenderableFrontier (re, Vect::zerov, 1.0, 1.0);
   (no = new Node) -> AppendRenderable (re);
+  no -> SetFrontier (fr);
+
   sca . MakeBecomeLikable ();
   loc . MakeBecomeLikable ();
   no -> Scale (sca);
   no -> Translate (loc);
+}
+
+
+bool Ticato::BeHoveredBy (const std::string &prov)
+{ if (! hvrr . empty ())
+    return false;
+  hvrr = prov;
+  return true;
+}
+
+bool Ticato::BeNotHoveredBy (const std::string &prov)
+{ if (prov . empty ())
+    { if (hvrr . empty ())
+        return false;
+    }
+  if (hvrr  !=  prov)
+    { hvrr . clear ();
+      return false;
+    }
+  hvrr . clear ();
+  return true;
 }

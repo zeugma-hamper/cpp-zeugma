@@ -27,8 +27,6 @@ bool _Matrix44_beget_static_items ()
   return well_and_truly_done;
 }
 
-InitFreeLiving INITLESS;
-
 
 #define MPT_CPY(PFR, PTO, TFR, TTO)             \
   do                                            \

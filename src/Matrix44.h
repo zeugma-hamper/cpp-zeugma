@@ -11,10 +11,6 @@
 namespace charm  {
 
 
-struct InitFreeLiving { };
-extern InitFreeLiving INITLESS;
-
-
 class Matrix44
 { public:
 

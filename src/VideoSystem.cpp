@@ -354,7 +354,7 @@ void VideoSystem::UploadFrames ()
   auto pred_null_texture = [] (VideoPipeline const &pipe) { return pipe.texture.expired(); };
 
   auto const it = std::remove_if (m_pipelines.begin (), m_pipelines.end (), pred_null_texture);
-  fprintf (stderr, "distance is %ld\n", std::distance (it, m_pipelines.end ()));
+//  fprintf (stderr, "distance is %ld\n", std::distance (it, m_pipelines.end ()));
   m_pipelines.erase (it, m_pipelines.end ());
 
   szt const max_score = 10000u;

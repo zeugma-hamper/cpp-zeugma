@@ -195,6 +195,14 @@ typedef struct {
   };
 } v4u64;
 
+//
+////
+//
+
+
+struct InitFreeLiving { };
+extern InitFreeLiving INITLESS;
+
 
 }
 

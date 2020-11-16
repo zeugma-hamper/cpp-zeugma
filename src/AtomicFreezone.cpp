@@ -21,6 +21,16 @@ Swath *AtomicFreezone::SwathFor (PlatonicMaes *ma)
 }
 
 
+Ticato *AtomicFreezone::FirstHitAtom (const G::Ray &ra, Vect *hitp)
+{ auto omega = atoms . rend ();
+  for (auto it = atoms . rbegin ()  ;  it != omega  ;  ++it)
+    if (Ticato *tic = *it)
+      if (tic->fr  &&  tic->fr -> CheckHit (ra, hitp))
+          return tic;
+  return NULL;
+}
+
+
 void AtomicFreezone::DetachAndDisposeOfAtom (Ticato *icat)
 { if (! icat)
     return;
@@ -130,6 +140,49 @@ fprintf(stderr,"WHACKING! WHACKING, I TELL YOU!\n");
         DetachAndDisposeOfAtom (tic);
       delete mort;
     }
+}
+
+
+i64 AtomicFreezone::ZESpatialMove (ZESpatialMoveEvent *e)
+{ if (! e)
+    return -1;
+  Vect hit (INITLESS);
+  const std::string &prv = e -> Provenance ();
+  if (Ticato *tic = FirstHitAtom (G::Ray {e -> Loc (), e -> Aim ()}, &hit))
+    { auto it = hoverers . find (prv);
+      if (it  ==  hoverers . end ())
+        { tic -> BeHoveredBy (prv);
+          hoverers[prv] = tic;
+          fprintf (stderr, "hovering athwart <%p>\n", tic);
+        }
+      else if (it->second  !=  tic)
+        { it->second -> BeNotHoveredBy (prv);
+          tic -> BeHoveredBy (prv);
+          hoverers[prv] = tic;  // jumped from one to 'nother with naught between
+        }
+      else
+        ;  // already hovering
+    }
+  else
+    { auto it = hoverers . find (prv);
+      if (it  !=  hoverers . end ())
+        { it->second -> BeNotHoveredBy (prv);
+          fprintf (stderr, "Lo! abandoning <%p>\n", it->second);
+          hoverers . erase (it);
+        }
+    }
+  return 0;
+}
+
+
+i64 AtomicFreezone::ZESpatialHarden (ZESpatialHardenEvent *e)
+{fprintf (stderr, "CLICKsterism -- oh yes. you don't want to believe, but...\n");
+  return 0;
+}
+
+i64 AtomicFreezone::ZESpatialSoften (ZESpatialSoftenEvent *e)
+{fprintf (stderr, "... and like that, CLICKY was gone.\n");
+  return 0;
 }
 
 

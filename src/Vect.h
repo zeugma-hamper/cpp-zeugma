@@ -16,6 +16,7 @@ namespace charm
 class Vect  :  public v3f64
 { public:
   Vect ()  { x = y = z = 0.0; }
+  explicit Vect (InitFreeLiving)  { }
   Vect (f64 eks, f64 wye, f64 zee)
     { x = eks;  y = wye;  z = zee; }
   Vect (f64 mono)

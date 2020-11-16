@@ -1,3 +1,4 @@
+
 #include "Layer.hpp"
 
 #include <algorithm>
@@ -5,7 +6,9 @@
 #include <Frontier.hpp>
 #include <Node.hpp>
 
+
 namespace charm {
+
 
 Layer::Layer ()
   : m_root_node {}
@@ -74,4 +77,6 @@ void Layer::RemoveRenderables (std::vector<Renderable *> const &_rends)
   m_renderables.erase (std::remove_if (m_renderables.begin (), m_renderables.end (), pred),
                        m_renderables.end ());
 }
+
+
 }

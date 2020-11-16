@@ -77,12 +77,14 @@ bool extra_poo = [] () { srand48 (32123);  return true; } ();
 
 class Cursoresque  :  public Alignifer
 { public:
-  PolygonRenderable *crs_re1,  *crs_re2;
+  PolygonRenderable *re1,  *re2;
   Cursoresque (f64 sz, i64 nv = 6)  :  Alignifer (),
-                                       crs_re1 (new PolygonRenderable),
-                                       crs_re2 (new PolygonRenderable)
-    { AppendRenderable (crs_re1);
-      AppendRenderable (crs_re2);
+                                       re1 (new PolygonRenderable),
+                                       re2 (new PolygonRenderable)
+    { AppendRenderable (re1);
+      AppendRenderable (re2);
+      re1 -> SetFillColor (ZeColor (1.0, 0.5));
+      re2 -> SetFillColor (ZeColor (1.0, 0.5));
       for (i64 w = 0  ;  w < 2  ;  ++w)
         for (i64 q = 0  ;  q < nv  ;  ++q)
           { f64 theeeta = 2.0 * M_PI / (f64)nv * (f64)q  +  w * M_PI;
@@ -90,7 +92,7 @@ class Cursoresque  :  public Alignifer
               *  (cos (theeeta) * Vect::xaxis  +  sin (theeeta) * Vect::yaxis);
             SinuVect arm (0.065 * radial, 5.0 + 0.7 * drand48 (),
                           0.24 * (1.0 + 3.0 * (q%2)) * radial);
-            (w > 0 ? crs_re1 : crs_re2) -> AppendVertex (arm);
+            (w > 0 ? re1 : re2) -> AppendVertex (arm);
           }
       ScaleZoft () = Vect (sz);
     }
@@ -176,7 +178,7 @@ class Tampo final : public GraphicsApplication
   ZoftVect elev_transl;
   f64 elev_trans_mult;
   VideoRenderable *steenbeck;
-  AtomicFreezone *freezo;
+  ch_ptr <AtomicFreezone> freezo;
   Node *texxyno;
 };
 
@@ -202,23 +204,24 @@ i64 Sensorium::ZESpatialMove (ZESpatialMoveEvent *e)
       return 0;
     }
 
-  Tampo *instance = (Tampo *)GraphicsApplication::GetApplication();
+  Tampo *tam = (Tampo *)GraphicsApplication::GetApplication();
 
-  if (instance)
-    instance -> FlatulateCursor (e);
+  if (tam)
+    tam -> FlatulateCursor (e);
 
   recentest_pos[e -> Provenance ()] = e -> Loc ();
   if (elevating)
     { Vect newpos = AveragePos ();
       Vect offset = newpos - elev_prevpos;
       offset = offset . Dot (Vect::yaxis) * Vect::yaxis;
-      if (instance)
-        instance -> AccrueElevatorOffset (offset);
+      if (tam)
+        tam -> AccrueElevatorOffset (offset);
       elev_prevpos = newpos;
     }
   else
-    { auto it = rupaul_map . find (e -> Provenance ());
-/*      if (it != rupaul_map . end ())
+    {
+/*    auto it = rupaul_map . find (e -> Provenance ());
+      if (it != rupaul_map . end ())
         { QuadroPod &qu = it->second;
           Vect hit;
           Tampo *app = (Tampo *)GraphicsApplication::GetApplication();
@@ -242,7 +245,7 @@ i64 Sensorium::ZESpatialMove (ZESpatialMoveEvent *e)
         } */
     }
 
-  if (PlatonicMaes *emm = instance -> FindMaesByName ("table"))
+  if (PlatonicMaes *emm = tam -> FindMaesByName ("table"))
     { Vect p = e -> Loc ();
       p -= emm -> Loc ();
       f64 wid = emm -> Width (), hei = emm -> Height ();
@@ -376,12 +379,11 @@ i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
 
 
 Tampo::Tampo ()  :  GraphicsApplication (),
-                    sensy {new Sensorium},
+                    sensy (new Sensorium),
 //                    ork (NULL),
                     elev_trans_mult (77.0),
                     steenbeck (NULL),
-                    texxyno (NULL),
-                    freezo (NULL)
+                    texxyno (NULL)
 { AppendSpatialPhage (&m_event_sprinkler, sensy);
   AppendYowlPhage (&m_event_sprinkler, sensy);
   elev_transl . MakeBecomeLikable ();
@@ -657,7 +659,8 @@ int main (int ac, char **av)
   texno -> Translate (maes -> Loc ());
   windshield -> AppendChild (texno);
 
-  AtomicFreezone *afz = (tamp.freezo = new AtomicFreezone);
+  AtomicFreezone *afz = new AtomicFreezone;
+  tamp.freezo = ch_ptr <AtomicFreezone> (afz);
   afz->cineganz = &film_infos;
   afz->field_amok = kawntent;
   afz->atom_count_goal = 45.0;
@@ -676,7 +679,9 @@ int main (int ac, char **av)
       afz -> AppendSwath (new Swath ({l, r}, {b, t}, emm));
     }
 
-  afz -> PopulateFromScratch ();
+//  afz -> PopulateFromScratch ();
+  AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.freezo);
+  AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.freezo);
 
   tamp . Run ();
 

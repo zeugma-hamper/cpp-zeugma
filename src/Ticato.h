@@ -5,6 +5,7 @@
 
 #include "Node.hpp"
 #include "Renderable.hpp"
+#include "Frontier.hpp"
 
 #include "Matte.hpp"
 
@@ -12,6 +13,8 @@
 #include "MotherTime.h"
 
 #include "PlatonicMaes.h"
+
+#include <string>
 
 
 using namespace charm;
@@ -22,9 +25,11 @@ class Ticato  :  public Zeubject
 
   Node *no;
   Renderable *re;
+  RectRenderableFrontier *fr;
   ZoftVect sca, loc;
   ZoftVect vel;
   PlatonicMaes *cur_maes;
+  std::string hvrr;
 
   Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm = -1,
           i64 which_clip = -1);
@@ -45,6 +50,11 @@ class Ticato  :  public Zeubject
     { if (ma)
         { cur_maes = ma;  AlignToMaes (); }
     }
+
+  const std::string CurHoverer ()  const
+    { return hvrr; }
+  bool BeHoveredBy (const std::string &prov);
+  bool BeNotHoveredBy (const std::string &prov);
 };
 
 
