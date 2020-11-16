@@ -9,7 +9,10 @@
 #include "PolygonRenderable.h"
 
 #include "ZESpatialEvent.h"
+#include "ZEBulletinEvent.h"
 #include "ZEYowlEvent.h"
+
+#include "Ticato.h"
 
 #include <unordered_map>
 
@@ -30,8 +33,12 @@ struct Splort  :  Node
 
 
 class Orksur  :  public PlatonicMaes, public Node,
-                 public ZESpatialPhagy, public ZEYowlPhagy
+                 public ZESpatialPhagy, public ZEYowlPhagy,
+                 public ZEBulletinPhagy
 { public:
+  const PlatonicMaes *underlying_maes;
+  std::vector <Ticato *> players;
+  std::vector <Ticato *> inchoates;
   std::unordered_map <std::string, Splort *> splorts;
 
   Orksur (const PlatonicMaes &ma);
@@ -39,6 +46,8 @@ class Orksur  :  public PlatonicMaes, public Node,
   Splort *NewSplort (f64 rad, i64 num_verts = 6)  const;
 
   i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
+
+  i64 ZEBulletin (ZEBulletinEvent *e)  override;
 };
 
 

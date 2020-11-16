@@ -38,6 +38,7 @@
 
 //events
 #include <GLFWWaterWorks.hpp>
+#include <ZEBulletinEvent.h>
 #include <ZESpatialEvent.h>
 #include <ZEYowlEvent.h>
 #include <RawEventParsing.h>
@@ -607,6 +608,7 @@ int main (int ac, char **av)
   windshield -> AppendChild (orkp);
   AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.orksu);
   AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.orksu);
+  AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.orksu);
 
   for (i64 q = 0  ;  q < tamp . NumWaterWorkses ()  ;  ++q)
     if (GLFWWaterWorks *ww

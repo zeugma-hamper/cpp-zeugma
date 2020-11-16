@@ -5,7 +5,8 @@
 #include "SumZoft.h"
 
 
-Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false)
+Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
+                                            underlying_maes (&ma)
 { }
 
 
@@ -45,5 +46,27 @@ i64 Orksur::ZESpatialMove (ZESpatialMoveEvent *e)
   Vect proj = p  -  t * n;
   s->loc . Set (proj);
 
+  return 0;
+}
+
+
+i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
+{ if (! e)
+    return -1;
+  ZEBObjPhrase *phr;
+  Ticato *tic;
+
+  if (e -> Says ("drag-maes-change"))
+    if (tic = dynamic_cast <Ticato *> (e -> ObjByTag ("dragee")))
+      if (e -> ObjByTag ("to-maes")  ==  underlying_maes)
+        { auto it = std::find (inchoates . begin (), inchoates . end (), tic);
+          if (it == inchoates . end ())
+            inchoates . push_back (tic);
+        }
+      else if (e -> ObjByTag ("from-maes")  ==  underlying_maes)
+        { auto it = std::find (inchoates . begin (), inchoates . end (), tic);
+          if (it  != inchoates . end ())
+            inchoates . erase (it);
+        }
   return 0;
 }

@@ -14,4 +14,4 @@ MultiSprinkler::~MultiSprinkler ()
 }
 
 
-}  // a crochet hook pulling namespace charm's brain out through its nose
+}  // a royal crochet hook pulling namespace charm's brain out through its nose

@@ -1,6 +1,8 @@
 
 #include "AtomicFreezone.h"
 
+#include "ZEBulletinEvent.h"
+
 #include <GraphicsApplication.hpp>
 
 
@@ -158,7 +160,17 @@ i64 AtomicFreezone::ZESpatialMove (ZESpatialMoveEvent *e)
               = g -> ClosestIntersectedMaes (e -> Loc (), e -> Aim (), &hit))
             { tic -> LocZoft () . Set (hit);
               if (maes  !=  tic -> CurMaes ())
-                tic -> SetAndAlignToMaes (maes);
+                { ZEBulletinEvent *bev
+                    = new ZEBulletinEvent ("drag-maes-change");
+                  bev -> AppendObjPhrase ("dragee", tic);
+                  bev -> AppendObjPhrase ("from-maes", tic -> CurMaes ());
+                  bev -> AppendObjPhrase ("to-maes", maes);
+                  bev -> SetForebearEvent (e);
+                  GraphicsApplication::GetApplication ()
+                    -> GetSprinkler () . Spray (bev);
+                  delete bev;
+                  tic -> SetAndAlignToMaes (maes);
+                }
             }
         }
     }
