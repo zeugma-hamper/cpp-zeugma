@@ -3,6 +3,8 @@
 #include <DecodePipeline.hpp>
 #include <MatteLoaderPool.hpp>
 
+#include <vector_utils.hpp>
+
 #include <gst/app/gstappsink.h>
 
 #include <algorithm>
@@ -16,6 +18,7 @@ TampVideoTerminus::TampVideoTerminus ()
   : BasicPipelineTerminus("video/x-raw,format=I420"),
     m_sample_mutex {},
     m_sample_status {SampleStatus::NoSample},
+    m_frame_pts {-1},
     m_frame_number {-1},
     m_has_eos {false}
 { }
@@ -98,6 +101,18 @@ void TampVideoTerminus::FlushNotify ()
   m_sample.reset ();
 }
 
+gint64 TampVideoTerminus::CurrentTimestampNS () const
+{
+  std::unique_lock {m_sample_mutex};
+  return m_frame_pts;
+}
+
+i64 TampVideoTerminus::CurrentFrameNumber () const
+{
+  std::unique_lock {m_sample_mutex};
+  return m_frame_number;
+}
+
 SampleStatus TampVideoTerminus::HasSample ()
 {
   std::unique_lock lock (m_sample_mutex);
@@ -163,9 +178,10 @@ void TampVideoTerminus::RemoveMatteLoaderWorker (ch_ptr<MatteLoaderWorker> const
     return;
 
   std::unique_lock lock {m_sample_mutex};
-  auto const ret
-    = std::remove (m_matte_workers.begin (), m_matte_workers.end (), _worker);
-  m_matte_workers.erase (ret, m_matte_workers.end ());
+
+  auto pred = [&_worker] (ch_weak_ptr<MatteLoaderWorker> const &_ww)
+  { return _worker.get () == _ww.get_unchecked(); };
+  FindIfErase (m_matte_workers, pred);
 }
 
 void TampVideoTerminus::CacheCaps (GstCaps *_caps)
@@ -183,10 +199,14 @@ void TampVideoTerminus::UpdateFrameNumber ()
     return;
 
   GstBuffer *buffer = gst_sample_get_buffer (m_sample.get ());
-  gint64 pts = GST_BUFFER_PTS(buffer);
+  if (! GST_BUFFER_PTS_IS_VALID(buffer))
+    return;
+
+  m_frame_pts = GST_BUFFER_PTS(buffer);
   assert (m_video_info.fps_d != 0);
-  m_frame_number = (i64) gst_util_uint64_scale_round(1, pts * GST_VIDEO_INFO_FPS_N(&m_video_info),
-                                                     GST_SECOND * GST_VIDEO_INFO_FPS_D(&m_video_info));
+  m_frame_number
+    = (i64) gst_util_uint64_scale_round(1, m_frame_pts * GST_VIDEO_INFO_FPS_N(&m_video_info),
+                                        GST_SECOND * GST_VIDEO_INFO_FPS_D(&m_video_info));
 }
 
 void TampVideoTerminus::UpdateWorkers ()
@@ -205,10 +225,9 @@ void TampVideoTerminus::UpdateWorkers ()
 
 void TampVideoTerminus::RemoveWorkerCruft ()
 {
-  auto iter = std::remove_if (m_matte_workers.begin (), m_matte_workers.end (),
-                              [] (ch_weak_ptr<MatteLoaderWorker> const &ww)
-                              { return ww.expired(); });
-  m_matte_workers.erase (iter, m_matte_workers.end ());
+  auto pred = [] (ch_weak_ptr<MatteLoaderWorker> const &ww)
+  { return ww.expired(); };
+  RemoveIfErase(m_matte_workers, pred);
 }
 
 static void video_term_handle_eos (GstAppSink *, gpointer _terminus)

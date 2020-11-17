@@ -18,6 +18,10 @@ class TampVideoTerminus : public BasicPipelineTerminus
 
   void FlushNotify () override;
 
+  gint64 CurrentTimestampNS () const override;
+
+  i64 CurrentFrameNumber () const;
+
   SampleStatus HasSample ();
   gst_ptr<GstSample> FetchSample ();
   gst_ptr<GstSample> FetchClearSample ();
@@ -36,11 +40,12 @@ class TampVideoTerminus : public BasicPipelineTerminus
   void UpdateWorkers ();
   void RemoveWorkerCruft ();
 
-  std::mutex m_sample_mutex;
+  mutable std::mutex m_sample_mutex;
   SampleStatus m_sample_status;
   gst_ptr<GstSample> m_sample;
   gst_ptr<GstCaps> m_caps;
   GstVideoInfo m_video_info;
+  i64 m_frame_pts;
   i64 m_frame_number;
   bool m_has_eos;
 

@@ -32,7 +32,8 @@ i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
   if (auto pipe = s_pipeline.lock();
       pipe && _event->Utterance() == "p")
     {
-      GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipe->m_pipeline), GST_DEBUG_GRAPH_SHOW_ALL, "decode-pipeline-before");
+      GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipe->m_pipeline),
+                                         GST_DEBUG_GRAPH_SHOW_ALL, "decode-pipeline-before");
 
       if (s_pipeline_is_playing)
         {
@@ -46,7 +47,8 @@ i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
         }
 
       s_pipeline_is_playing = !s_pipeline_is_playing;
-      GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipe->m_pipeline), GST_DEBUG_GRAPH_SHOW_ALL, "decode-pipeline-after");
+      GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipe->m_pipeline),
+                                         GST_DEBUG_GRAPH_SHOW_ALL, "decode-pipeline-after");
     }
 
   return 0;
@@ -68,28 +70,27 @@ int main (int, char **)
   std::vector<FilmInfo> configs = ReadFilmInfo ("../configs/film-config.toml");
   assert (configs.size () > 0);
 
-  FilmInfo &film_info = configs[4];
-  assert (film_info.clips.size () > 0);
-  VideoRenderable *renderable = new VideoRenderable (film_info);
-
-  // std::vector<FilmGeometry> geom = ReadFileGeometry("../configs/mattes.toml");
-  // assert (geom.size () > 0);
-  // MergeFilmInfoGeometry(configs, geom);
-
   // FilmInfo &film_info = configs[4];
   // assert (film_info.clips.size () > 0);
-  // [[maybe_unused]] ClipInfo &clip_info = film_info.clips[0];
+  // VideoRenderable *renderable = new VideoRenderable (film_info);
 
-  // MattedVideoRenderable *renderable
-  //   = new MattedVideoRenderable (film_info, clip_info);
-  // printf ("clip dims: [%u, %u] - [%u, %u]\n",
-  //         clip_info.geometry.dir_geometry.min[0],
-  //         clip_info.geometry.dir_geometry.min[1],
-  //         clip_info.geometry.dir_geometry.max[0],
-  //         clip_info.geometry.dir_geometry.max[1]);
+  std::vector<FilmGeometry> geom = ReadFileGeometry("../configs/mattes.toml");
+  assert (geom.size () > 0);
+  MergeFilmInfoGeometry(configs, geom);
+
+  FilmInfo &film_info = configs[4];
+  assert (film_info.clips.size () > 0);
+  [[maybe_unused]] ClipInfo &clip_info = film_info.clips[1];
+
+  MattedVideoRenderable *renderable
+    = new MattedVideoRenderable (film_info, clip_info);
+  printf ("clip dims: [%u, %u] - [%u, %u]\n",
+          clip_info.geometry.dir_geometry.min[0],
+          clip_info.geometry.dir_geometry.min[1],
+          clip_info.geometry.dir_geometry.max[0],
+          clip_info.geometry.dir_geometry.max[1]);
 
   s_pipeline = renderable->GetPipeline();
-  // s_pipeline.lock ()->Play ();
 
   s2::connection key_conn = dead_zone.GetSprinkler().AppendHandler<ZEYowlAppearEvent>(&handle_key_press);
 
