@@ -329,6 +329,7 @@ tri_cleanup_exec = executable ('tri_cleanup',
 tample_exec = executable ('tample',
                            sources : ['src/tample.cpp',
                                       'src/AtomicFreezone.cpp',
+                                      'src/GraumanPalace.cpp',
                                       'src/Orksur.cpp',
                                       'src/Ticato.cpp'],
                            dependencies : [charm_dep, glu_dep])

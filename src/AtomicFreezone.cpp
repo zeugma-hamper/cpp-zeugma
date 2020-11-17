@@ -219,6 +219,7 @@ i64 AtomicFreezone::ZESpatialHarden (ZESpatialHardenEvent *e)
   return 0;
 }
 
+
 i64 AtomicFreezone::ZESpatialSoften (ZESpatialSoftenEvent *e)
 { if (! e)
     return -1;
@@ -256,9 +257,7 @@ i64 AtomicFreezone::Inhale (i64, f64 thyme)
 
   if (atoms . size ()  <  atom_count_goal)
     if (drand48 ()  <  dt / inter_arrival_t)
-{fprintf(stderr,"O. O, O. O O O! SPAWNY-SPAWN SPAWN-SPAWNING!\n");
       SpontaneouslyGenerateAtomAtBoundary ();
-}
 
   prev_time = thyme;
   return 0;

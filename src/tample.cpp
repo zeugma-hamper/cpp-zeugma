@@ -68,6 +68,7 @@
 #include "Orksur.h"
 #include "Ticato.h"
 #include "AtomicFreezone.h"
+#include "GraumanPalace.h"
 
 
 using namespace charm;
@@ -561,11 +562,6 @@ int main (int ac, char **av)
     = (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
        -  0.5 * maes -> Width () * maes -> Over ()
        +  maes -> Loc () . Dot (maes -> Up ()) * maes -> Up ());
-  // elements_band = new ElementsBand (total_width, band_height, film_infos,
-  //                                   *left, left_cntr);
-  // elements_band->Translate (tamp . elev_transl);
-
-  // ee_layer -> GetRootNode () -> AppendChild (elements_band);
 
   for (int q = 0  ;  q < 3  ;  ++q)
     { Cursoresque *c = new Cursoresque (0.015 * maes -> Height ());
@@ -579,9 +575,14 @@ int main (int ac, char **av)
   Node *drive_in = new Node (tamp.steenbeck);
   drive_in -> Scale (0.7 * total_width);
   drive_in -> Translate (maes -> Loc ()
-                         - 0.9 * maes -> Height () * maes -> Up ());
+                         - 0.5 * maes -> Height () * maes -> Up ());
   kawntent -> AppendChild (drive_in);
 */
+
+  GraumanPalace *grau_egyp = new GraumanPalace;
+  grau_egyp -> ImportExhibitionRoster (film_infos);
+  grau_egyp -> Translate (maes -> Loc ());
+  kawntent -> AppendChild (grau_egyp);
 
 /*
   Node *splat = new Node;
