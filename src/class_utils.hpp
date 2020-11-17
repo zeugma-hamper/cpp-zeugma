@@ -2,6 +2,8 @@
 #ifndef BORING_NAME_MAKE_FUN_LATER
 #define BORING_NAME_MAKE_FUN_LATER
 
+#include <base_types.hpp>
+
 #include <string.h>
 
 #define CHARM_DELETE_MOVE(KLASS) \
@@ -35,6 +37,12 @@ template<typename T>
 void ZeroStruct (T &_str)
 {
   memset (&_str, 0, sizeof (T));
+}
+
+template<typename T, szt N>
+constexpr szt ArraySize (T const (&)[N])
+{
+  return N;
 }
 
 }
