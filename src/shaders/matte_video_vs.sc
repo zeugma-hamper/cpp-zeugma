@@ -5,8 +5,15 @@ $output v_uv
 uniform vec4 u_dimensions;
 uniform vec4 u_matte_dimensions;
 
+uniform vec4 u_flags;
+
 uniform vec4 u_over;
 uniform vec4 u_up;
+
+#define MATTE 0.0
+#define VIDEO 1.0
+
+#define SIZE_REFERENT u_flags.x
 
 void main()
 {
@@ -19,11 +26,21 @@ void main()
                                vec2 (0.0, 1.0),
                                vec2 (1.0, 0.0),
                                vec2 (1.0, 1.0));
+  vec2 ll, tr;
+  vec2 uv, wh;
 
-  vec2 min = u_matte_dimensions.xy / u_dimensions.xy;
-  vec2 max = u_matte_dimensions.zw / u_dimensions.xy;
-  vec2 uv = min + ((max - min) * uvs[gl_VertexID]);
-  vec2 wh = u_matte_dimensions.zw - u_matte_dimensions.xy;
+  if (SIZE_REFERENT == MATTE)
+    {
+      ll = u_matte_dimensions.xy / u_dimensions.xy;
+      tr = u_matte_dimensions.zw / u_dimensions.xy;
+      uv = ll + ((tr - ll) * uvs[gl_VertexID]);
+      wh = u_matte_dimensions.zw - u_matte_dimensions.xy;
+    }
+  else //SIZE_REFERENT == VIDEO
+    {
+      uv = uvs[gl_VertexID];
+      wh = u_dimensions.xy;
+    }
 
   vec4 norm = vec4 (cross (u_over.xyz, u_up.xyz), 0.0);
   mat4 rot = mat4 (u_over, u_up, norm, vec4 (0.0, 0.0, 0.0, 1.0));
