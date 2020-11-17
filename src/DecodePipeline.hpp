@@ -63,6 +63,8 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   void Pause ();
   void Seek (f64 _ts);
 
+  void TrickModeSeek (f64 _ts, f64 _rate = 10.0);
+
   MediaStatus GetStatus () const;
   MediaStatus GetPendingStatus () const;
   // true if status doesn't equal pending status
@@ -108,6 +110,8 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
 
   gint64 m_duration;
   f32 m_play_speed;
+  gint64 m_segment_start;
+  gint64 m_segment_end;
   bool m_awaiting_async_done;
   bool m_has_eos;
   bool m_has_queued_seek;
