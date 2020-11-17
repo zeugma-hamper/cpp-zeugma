@@ -57,16 +57,28 @@ i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
   Ticato *tic;
 
   if (e -> Says ("drag-maes-change"))
-    if (tic = dynamic_cast <Ticato *> (e -> ObjByTag ("dragee")))
-      if (e -> ObjByTag ("to-maes")  ==  underlying_maes)
-        { auto it = std::find (inchoates . begin (), inchoates . end (), tic);
-          if (it == inchoates . end ())
-            inchoates . push_back (tic);
-        }
-      else if (e -> ObjByTag ("from-maes")  ==  underlying_maes)
-        { auto it = std::find (inchoates . begin (), inchoates . end (), tic);
-          if (it  != inchoates . end ())
-            inchoates . erase (it);
-        }
+    { if (tic = dynamic_cast <Ticato *> (e -> ObjByTag ("dragee")))
+        if (e -> ObjByTag ("to-maes")  ==  underlying_maes)
+          { auto it = std::find (inchoates . begin (), inchoates . end (), tic);
+            if (it == inchoates . end ())
+              inchoates . push_back (tic);
+          }
+        else if (e -> ObjByTag ("from-maes")  ==  underlying_maes)
+          { auto it = std::find (inchoates . begin (), inchoates . end (), tic);
+            if (it  != inchoates . end ())
+              inchoates . erase (it);
+          }
+    }
+  else if (e -> Says ("atom-deposit"))
+    { if (tic = dynamic_cast <Ticato *> (e -> ObjByTag ("inbound-atom")))
+        if (e -> ObjByTag ("onto-maes")  ==  underlying_maes)
+          { auto it = std::find (players . begin (), players . end (), tic);
+            if (it  !=  players . end ())
+              { // again, something plentifully wrong; why's it already here?
+                assert (2 == 3);
+              }
+            players . push_back (tic);
+          }
+    }
   return 0;
 }

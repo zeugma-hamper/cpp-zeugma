@@ -41,8 +41,8 @@ class AtomicFreezone  :  public Zeubject,
   f64 max_speed, min_speed;
   f64 prev_time;
 
-  std::map <std::string, Ticato *> hoverers;
-  std::map <std::string, Ticato *> yankers;
+  std::map <std::string, Ticato *> hoverees;
+  std::map <std::string, Ticato *> yankees;
 
   std::vector <Swath *> meander;
   f64 meander_len;
@@ -54,12 +54,12 @@ class AtomicFreezone  :  public Zeubject,
   Ticato *FirstHitAtom (const G::Ray &ra, Vect *hitp);
 
   Ticato *AtomHoveredBy (const std::string &prv)
-    { auto it = hoverers . find (prv);
-      return (it == hoverers . end ())  ?  NULL  :  it->second;
+    { auto it = hoverees . find (prv);
+      return (it == hoverees . end ())  ?  NULL  :  it->second;
     }
   Ticato *AtomYankedBy (const std::string &prv)
-    { auto it = yankers . find (prv);
-      return (it == yankers . end ())  ?  NULL  :  it->second;
+    { auto it = yankees . find (prv);
+      return (it == yankees . end ())  ?  NULL  :  it->second;
     }
 
   void DetachAndDisposeOfAtom (Ticato *icat);

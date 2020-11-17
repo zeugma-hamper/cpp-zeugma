@@ -115,6 +115,7 @@ void AtomicFreezone::PerambulizeAtoms (f64 dt)
         Vect newloc = tic->loc.val  +  dt * vx * ovr;
 
         Swath *curth = SwathFor (tic->cur_maes);
+assert (curth != NULL);
         if (vx < 0.0  &&  (newloc - curth->prone.pt1) . Dot (ovr)  <  0.0)
           curth = curth->prv;
         else if (vx > 0.0  &&  (newloc - curth->prone.pt2) . Dot (ovr)  >  0.0)
@@ -175,26 +176,26 @@ i64 AtomicFreezone::ZESpatialMove (ZESpatialMoveEvent *e)
         }
     }
   else if (Ticato *tic = FirstHitAtom (G::Ray {e -> Loc (), e -> Aim ()}, &hit))
-    { auto it = hoverers . find (prv);
-      if (it  ==  hoverers . end ())
+    { auto it = hoverees . find (prv);
+      if (it  ==  hoverees . end ())
         { tic -> BeHoveredBy (prv);
-          hoverers[prv] = tic;
+          hoverees[prv] = tic;
           fprintf (stderr, "hovering athwart <%p>\n", tic);
         }
       else if (it->second  !=  tic)
         { it->second -> BeNotHoveredBy (prv);
           tic -> BeHoveredBy (prv);
-          hoverers[prv] = tic;  // jumped from one to 'nother with naught between
+          hoverees[prv] = tic;  // jumped from one to 'nother with naught between
         }
       else
         ;  // already hovering
     }
   else
-    { auto it = hoverers . find (prv);
-      if (it  !=  hoverers . end ())
+    { auto it = hoverees . find (prv);
+      if (it  !=  hoverees . end ())
         { it->second -> BeNotHoveredBy (prv);
           fprintf (stderr, "Lo! abandoning <%p>\n", it->second);
-          hoverers . erase (it);
+          hoverees . erase (it);
         }
     }
   return 0;
@@ -208,10 +209,10 @@ i64 AtomicFreezone::ZESpatialHarden (ZESpatialHardenEvent *e)
   if (Ticato *tic = AtomHoveredBy (prv))
     { tic -> BeNotHoveredBy (prv);
       tic -> BeYankedBy (prv);
-      yankers[prv] = tic;
-      auto it = hoverers . find (prv);
-      if (it  !=  hoverers . end ())
-        hoverers . erase (it);
+      yankees[prv] = tic;
+      auto it = hoverees . find (prv);
+      if (it  !=  hoverees . end ())
+        hoverees . erase (it);
     }
   else
     fprintf (stderr, "baseless CLICKsterism. here in AFreezo's SpHarden...\n");
@@ -225,9 +226,23 @@ i64 AtomicFreezone::ZESpatialSoften (ZESpatialSoftenEvent *e)
   if (Ticato *tic = AtomYankedBy (prv))
     { tic -> BeNotYankedBy (prv);
       // should we immediately return to hovering? a hard one... but no.
-      auto it = yankers . find (prv);
-      if (it  !=  yankers . end ())
-        yankers . erase (it);
+      auto it = yankees . find (prv);
+assert (it != yankees . end ());
+      yankees . erase (it);
+      PlatonicMaes *onto_maes = tic -> CurMaes ();
+      if (! SwathFor (onto_maes))
+        { ZEBulletinEvent *bev = new ZEBulletinEvent ("atom-deposit");
+          bev -> AppendObjPhrase ("inbound-atom", tic);
+          bev -> AppendObjPhrase ("from-zone", this);
+          bev -> AppendObjPhrase ("onto-maes", onto_maes);
+          bev -> SetForebearEvent (e);
+          GraphicsApplication::GetApplication ()
+            -> GetSprinkler () . Spray (bev);
+          delete bev;
+          auto iitt = std::find (atoms . begin (), atoms . end (), tic);
+assert (iitt  !=  atoms . end ());
+          atoms . erase (iitt);
+        }
     }
   else
     fprintf (stderr, "... and like that, CLICKY is gone from hovering.\n");
