@@ -170,15 +170,14 @@ class Tampo final : public GraphicsApplication
 
   void AccrueElevatorOffset (const Vect &off);
 
- protected:
-  ch_ptr<Sensorium> sensy;
-
  public:
   ZoftVect elev_transl;
   f64 elev_trans_mult;
   VideoRenderable *steenbeck;
   ch_ptr <AtomicFreezone> freezo;
   ch_ptr <Orksur> orksu;
+  ch_ptr<Sensorium> sensy;
+  ch_ptr<GraumanPalace> gegyp;
   Node *texxyno;
 };
 
@@ -583,6 +582,12 @@ int main (int ac, char **av)
   grau_egyp -> ImportExhibitionRoster (film_infos);
   grau_egyp -> Translate (maes -> Loc ());
   kawntent -> AppendChild (grau_egyp);
+
+  tamp.gegyp = ch_ptr <GraumanPalace> (grau_egyp);
+  AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
+  AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
+  AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
+
 
 /*
   Node *splat = new Node;
