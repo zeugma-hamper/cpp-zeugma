@@ -31,9 +31,9 @@ class ProtoZoftThingGuts  :  public Zeubject
   static VelvetLung *mass_breather;
   static VelvetLung *sole_mass_breather;
 
-  static inline bool IsMassBreathing ()
+  static bool IsMassBreathing ()
     { return (mass_breather != NULL); }
-  static inline VelvetLung *MassBreather ()
+  static VelvetLung *MassBreather ()
     { return mass_breather; }
   static VelvetLung *InstallMassBreather (VelvetLung *vl)
     { if (vl != NULL  &&  vl != sole_mass_breather)

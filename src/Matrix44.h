@@ -38,12 +38,12 @@ class Matrix44
 
   Matrix44 &Load (f64 *a);
   Matrix44 &Load (f32 *a);
-  inline Matrix44 &Load (f64 a00, f64 a01, f64 a02, f64 a03,
-                         f64 a10, f64 a11, f64 a12, f64 a13,
-                         f64 a20, f64 a21, f64 a22, f64 a23,
-                         f64 a30, f64 a31, f64 a32, f64 a33);
+  Matrix44 &Load (f64 a00, f64 a01, f64 a02, f64 a03,
+                  f64 a10, f64 a11, f64 a12, f64 a13,
+                  f64 a20, f64 a21, f64 a22, f64 a23,
+                  f64 a30, f64 a31, f64 a32, f64 a33);
   Matrix44 &Load (const Matrix44 &m);
-  inline Matrix44 &operator = (const Matrix44 &m)
+  Matrix44 &operator = (const Matrix44 &m)
     { return Load (m); }
 
   bool operator == (const Matrix44 &m)  const;
@@ -58,19 +58,19 @@ class Matrix44
   Matrix44 &MulSelfBy (const Matrix44 &m);
   Matrix44 &PreMulSelfBy (const Matrix44 &m);
 
-  inline Matrix44 operator + (const Matrix44 &m)  const
+  Matrix44 operator + (const Matrix44 &m)  const
     { return Add (m); }
-  inline Matrix44 &operator += (const Matrix44 &m)
+  Matrix44 &operator += (const Matrix44 &m)
     { return AddToSelf (m); }
 
-  inline Matrix44 operator - (const Matrix44 &m)  const
+  Matrix44 operator - (const Matrix44 &m)  const
     { return Sub (m); }
-  inline Matrix44 &operator -= (const Matrix44 &m)
+  Matrix44 &operator -= (const Matrix44 &m)
     { return SubFromSelf (m); }
 
-  inline Matrix44 operator * (const Matrix44 &m)  const
+  Matrix44 operator * (const Matrix44 &m)  const
     { return Mul (m); }
-  inline Matrix44 &operator *= (const Matrix44 &m)
+  Matrix44 &operator *= (const Matrix44 &m)
     { return MulSelfBy (m); }
 
 
@@ -79,25 +79,25 @@ class Matrix44
 
 
   Matrix44 &LoadScale (f64 s0, f64 s1, f64 s2);
-  inline Matrix44 &LoadScale (f64 s)
+  Matrix44 &LoadScale (f64 s)
     { return LoadScale (s, s, s); }
   Matrix44 &LoadScaleAbout (f64 s0, f64 s1, f64 s2, const Vect &c);
-  inline Matrix44 &LoadScaleAbout (f64 s, const Vect &c)
+  Matrix44 &LoadScaleAbout (f64 s, const Vect &c)
     { return LoadScaleAbout (s, s, s, c); }
 
   Matrix44 &LoadTranslation (f64 t0, f64 t1, f64 t2);
-  inline Matrix44 &LoadTranslation (const Vect &t)
+  Matrix44 &LoadTranslation (const Vect &t)
     { return LoadTranslation (t.x, t.y, t.z); }
 
   Matrix44 &LoadRotationPreNormed (const Vect &axs, f64 ang);
-  inline Matrix44 &LoadRotation (Vect axs, f64 ang)
+  Matrix44 &LoadRotation (Vect axs, f64 ang)
     { axs . NormSelf ();
       return LoadRotationPreNormed (axs, ang);
     }
 
   Matrix44 &LoadRotationAboutPreNormed (const Vect &axs, f64 ang,
                                         const Vect &cnt);
-  inline Matrix44 &LoadRotationAbout (Vect &axs, f64 ang, const Vect &cnt)
+  Matrix44 &LoadRotationAbout (Vect &axs, f64 ang, const Vect &cnt)
     { axs . NormSelf ();
       return LoadRotationAboutPreNormed (axs, ang, cnt);
     }

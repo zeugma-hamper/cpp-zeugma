@@ -112,11 +112,11 @@ class Vect  :  public v3f64
 
   f64 AngleWith (const Vect &v)  const
     { return acos (Norm () . Dot (v . Norm ())); }
-  inline f64 DegAngleWith (const Vect &v)  const
+  f64 DegAngleWith (const Vect &v)  const
     { return 180.0 / M_PI * AngleWith (v); }
 
   Vect &RotateSelfPreNormed (const Vect &axis, f64 rad_ang);
-  inline Vect &RotateSelf (Vect axis, f64 rad_ang)
+  Vect &RotateSelf (Vect axis, f64 rad_ang)
     { axis . NormSelf ();
       return RotateSelfPreNormed (axis, rad_ang);
     }

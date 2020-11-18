@@ -66,7 +66,7 @@ class ZeColor
 
   ZeColor operator * (f32 s)  const
     { return ZeColor (r*s, g*s, b*s, a*s); }
-  inline friend ZeColor operator * (f32 s, const ZeColor &self)
+  friend ZeColor operator * (f32 s, const ZeColor &self)
     { return self * s; }
   ZeColor &operator *= (f32 s)
     { r *= s;  g *= s;  b *= s;  g *= s;  return *this; }

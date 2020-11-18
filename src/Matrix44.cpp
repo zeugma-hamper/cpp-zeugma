@@ -102,10 +102,10 @@ Matrix44 &Matrix44::Load (f32 *a)
   return *this;
 }
 
-inline Matrix44 &Matrix44::Load (f64 a00, f64 a01, f64 a02, f64 a03,
-                                 f64 a10, f64 a11, f64 a12, f64 a13,
-                                 f64 a20, f64 a21, f64 a22, f64 a23,
-                                 f64 a30, f64 a31, f64 a32, f64 a33)
+Matrix44 &Matrix44::Load (f64 a00, f64 a01, f64 a02, f64 a03,
+                          f64 a10, f64 a11, f64 a12, f64 a13,
+                          f64 a20, f64 a21, f64 a22, f64 a23,
+                          f64 a30, f64 a31, f64 a32, f64 a33)
 { m[0][0] = a00;  m[0][1] = a01;  m[0][2] = a02;  m[0][3] = a03;
   m[1][0] = a10;  m[1][1] = a11;  m[1][2] = a12;  m[1][3] = a13;
   m[2][0] = a20;  m[2][1] = a21;  m[2][2] = a22;  m[2][3] = a23;

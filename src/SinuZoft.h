@@ -59,7 +59,7 @@ class SinuZoft  :  public ZoftThing <T>
 
   using GutsTyp = ZGuts <T>;
 
-  inline GutsTyp *GutsIfOrigType ()
+  GutsTyp *GutsIfOrigType ()
     { return dynamic_cast <GutsTyp *> (this -> Guts ()); }
 
   static ZGuts <T> *NewGuts ()
