@@ -12,6 +12,26 @@ namespace charm
 {
 
 namespace fs = std::filesystem;
+
+MattedVideoRenderable::MattedVideoRenderable ()
+  : Renderable (),
+    m_bgfx_state {0},
+    m_size_referent {SizeReferent::Matte},
+    m_enable_matte {true}
+{
+  EnableMatte();
+}
+
+MattedVideoRenderable::MattedVideoRenderable (ch_ptr<VideoTexture> const &_texture)
+  : Renderable (),
+    m_video_texture {_texture},
+    m_bgfx_state {0},
+    m_size_referent {SizeReferent::Matte},
+    m_enable_matte {true}
+{
+  EnableMatte ();
+}
+
 MattedVideoRenderable::MattedVideoRenderable (std::string_view _path,
                                               f64 _loop_start_ts, f64 _loop_end_ts,
                                               std::string_view _matte_pattern)
@@ -68,9 +88,65 @@ ch_ptr<DecodePipeline> MattedVideoRenderable::GetPipeline () const
   return {};
 }
 
+MattedVideoRenderable *MattedVideoRenderable::DuplicateVideoOnly () const
+{
+  auto *system = VideoSystem::GetSystem();
+  if (!system)
+    return nullptr;
+
+  ch_ptr<VideoPipeline> pipeline = system->FindVideoPipeline(m_video_texture);
+  VideoBrace brace = system->DuplicateVideo(pipeline);
+  if (! brace.video_texture)
+    return nullptr;
+
+  MattedVideoRenderable *mvr = new MattedVideoRenderable;
+  mvr->m_bgfx_state = system->GetGraphicsResources().basic_state;
+  mvr->m_size_referent = SizeReferent::Video;
+  mvr->m_enable_matte = false;
+  mvr->m_video_texture = brace.video_texture;
+
+  return mvr;
+}
+
+MattedVideoRenderable *MattedVideoRenderable::DuplicateWithActiveMatte () const
+{
+  auto *system = VideoSystem::GetSystem();
+  if (!system)
+    return nullptr;
+
+  ch_ptr<VideoPipeline> pipeline = system->FindVideoPipeline(m_video_texture);
+  return DuplicateWithMatte (pipeline->active_matte);
+}
+
+MattedVideoRenderable *MattedVideoRenderable::DuplicateWithMatte (i64 _matted_index) const
+{
+  auto *system = VideoSystem::GetSystem();
+  if (!system)
+    return nullptr;
+
+  ch_ptr<VideoPipeline> pipeline = system->FindVideoPipeline(m_video_texture);
+  VideoBrace brace = system->DuplicateMatte(pipeline, _matted_index);
+  if (! brace.video_texture)
+    return nullptr;
+
+  MattedVideoRenderable *mvr = new MattedVideoRenderable;
+  mvr->m_bgfx_state = system->GetGraphicsResources().matte_state;
+  mvr->m_size_referent = m_size_referent;
+  mvr->m_enable_matte = m_enable_matte;
+  mvr->m_video_texture = brace.video_texture;
+
+  return mvr;
+}
+
+
 void MattedVideoRenderable::SetEnableMatte (bool _tf)
 {
   m_enable_matte = _tf;
+
+  VideoSystem *system = VideoSystem::GetSystem ();
+  assert (system);
+  u64 const state = m_enable_matte ? system->GetMatteBGFXState() : system->GetVideoBGFXState();
+  m_bgfx_state = state | BGFX_STATE_PT_TRISTRIP;
 }
 
 bool MattedVideoRenderable::GetEnableMatte () const
@@ -100,14 +176,11 @@ SizeReferent MattedVideoRenderable::GetSizeReferent () const
 
 void MattedVideoRenderable::Draw (u16 vyu_id)
 {
-  fprintf (stderr, "mvr: in draw\n");
   if (! m_video_texture
       || ! bgfx::isValid(m_video_texture->GetNthTexture(0))
       || (GetEnableMatte()
           && ! bgfx::isValid(m_video_texture->GetNthTexture(3))))
     return;
-
-  fprintf (stderr, "mvr: after sanity check\n");
 
   bgfx::setTransform(&m_node->GetAbsoluteTransformation().model);
 

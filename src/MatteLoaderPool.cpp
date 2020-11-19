@@ -98,6 +98,7 @@ void MatteLoaderWorker::PushJob (u32 _frame, i32 fps_num, i32 fps_denom)
 
 void MatteLoaderWorker::DoWork ()
 {
+  fprintf (stderr, "maybe doing work\n");
   i64 frame_id = -1;
   {
     std::unique_lock lock {m_job_mutex};
@@ -114,7 +115,7 @@ void MatteLoaderWorker::DoWork ()
   if (frame_id < 0)
     return;
 
-  // fprintf (stderr, "mlw: do work %ld\n", frame_id);
+  fprintf (stderr, "mlw: do work %ld\n", frame_id);
 
   bgfx::TextureFormat::Enum const formats[5]{
     bgfx::TextureFormat::Unknown,
@@ -223,7 +224,7 @@ MatteLoaderPool::MatteLoaderPool ()
 
 MatteLoaderPool::~MatteLoaderPool ()
 {
-  assert (! m_currently_loading.load ());
+  ShutDown ();
 }
 
 void MatteLoaderPool::ShutDown()

@@ -63,6 +63,7 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   void Pause ();
   void Seek (f64 _ts);
 
+  void SetPlaySpeed (f32 _speed, bool _trick_play = false);
   void TrickModeSeek (f64 _ts, f64 _rate = 10.0);
 
   MediaStatus GetStatus () const;
@@ -81,6 +82,8 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
 
   f64 Duration () const;
   gint64 DurationNanoseconds () const;
+
+  f32 PlaySpeed () const;
 
   void SetPipelineState (GstState _state);
 

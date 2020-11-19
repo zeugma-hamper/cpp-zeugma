@@ -36,8 +36,8 @@ VideoTexture::VideoTexture (VideoFormat _format, bgfx::ProgramHandle _program,
 VideoTexture::~VideoTexture ()
 {
   fprintf (stderr, "destroying video\n");
-  if (auto *system = VideoSystem::GetSystem(); system)
-    system->DestroyVideo (this);
+  // if (auto *system = VideoSystem::GetSystem(); system)
+  //   system->DestroyVideo (this);
 
   for (szt i = 0; i < ArraySize (textures); ++i)
     if (bgfx::isValid(textures[i]))
@@ -193,13 +193,15 @@ ch_ptr<VideoTexture> VideoPipeline::OpenFile (std::string_view _path)
   return ret;
 }
 
-bool VideoPipeline::AddMatte (f64 _loop_start_ts, i32 _frame_count,
-                              fs::path const &_matte_dir,
+bool VideoPipeline::AddMatte (f64 _loop_start_ts, f64 _loop_end_ts,
+                              i32 _frame_count, fs::path const &_matte_dir,
                               v2i32 _min, v2i32 _max)
 {
   auto *system = VideoSystem::GetSystem();
   assert (system);
-  MattePipeline pipe = system->CreateMattePipeline(_loop_start_ts, _frame_count, _matte_dir, _min, _max);
+  MattePipeline pipe
+    = system->CreateMattePipeline(_loop_start_ts, _loop_end_ts,
+                                  _frame_count, _matte_dir, _min, _max);
   terminus->AddMatteWorker(pipe.worker);
 
   if (mattes.size () == 0)
@@ -250,13 +252,12 @@ void VideoPipeline::ClearMattes ()
   if (curr_matte < 0)
     return;
 
+  current_matte = -1;
   active_matte = -1;
+  mattes.clear();
   ch_ptr<VideoTexture> text = GetVideoTexture ();
   if (! text)
-    {
-      mattes.clear();
-      return;
-    }
+    return;
 
   bgfx::Memory const *mem = bgfx::alloc(4);
   memset (mem->data, 0, 4);
@@ -352,24 +353,24 @@ static void update_or_create_texture (bgfx::TextureHandle &_handle, u16 _width, 
   bgfx::updateTexture2D(_handle, 0, 0, 0, 0, _width, _height, _mem, _stride);
 }
 
-static void ReleaseBimgImageContainer (void *, void *_container)
-{
-  auto *cont = reinterpret_cast<bimg::ImageContainer *> (_container);
-  bimg::imageFree (cont);
-}
+// static void ReleaseBimgImageContainer (void *, void *_container)
+// {
+//   auto *cont = reinterpret_cast<bimg::ImageContainer *> (_container);
+//   bimg::imageFree (cont);
+// }
 
-static void update_or_create_texture (bgfx::TextureHandle &_handle, u64 _flags, bimg::ImageContainer *_image)
-{
-  if (! bgfx::isValid(_handle))
-    {
-      _handle = bgfx::createTexture2D (_image->m_width, _image->m_height, false, 1,
-                                       (bgfx::TextureFormat::Enum)_image->m_format, _flags);
-    }
+// TODO retry compressed textures later
+// static void update_or_create_texture (bgfx::TextureHandle &_handle, u64 _flags, bimg::ImageContainer *_image)
+// {
+//   if (! bgfx::isValid(_handle))
+//     {
+//       _handle = bgfx::createTexture2D (_image->m_width, _image->m_height, false, 1,
+//                                        (bgfx::TextureFormat::Enum)_image->m_format, _flags);
+//     }
 
-  bgfx::Memory const *mem = bgfx::makeRef(_image->m_data, _image->m_size, ReleaseBimgImageContainer, _image);
-  bgfx::updateTexture2D(_handle, 0, 0, 0, 0, _image->m_width, _image->m_height, mem);
-}
-
+//   bgfx::Memory const *mem = bgfx::makeRef(_image->m_data, _image->m_size, ReleaseBimgImageContainer, _image);
+//   bgfx::updateTexture2D(_handle, 0, 0, 0, 0, _image->m_width, _image->m_height, mem);
+// }
 
 static void upload_frame (gst_ptr<GstSample> const &_sample,
                           ch_ptr<VideoTexture> const &_textures,
@@ -378,7 +379,7 @@ static void upload_frame (gst_ptr<GstSample> const &_sample,
   GstCaps *sample_caps = gst_sample_get_caps(_sample.get ());
   GstVideoInfo stack_video_info;
   GstVideoInfo *video_info = _video_info ? _video_info : &stack_video_info;
-  int width, height, components, stride;
+  int width, height, stride;
 
   if (! sample_caps)
     return;
@@ -397,7 +398,6 @@ static void upload_frame (gst_ptr<GstSample> const &_sample,
 
   width = GST_VIDEO_INFO_WIDTH (video_info);
   height = GST_VIDEO_INFO_HEIGHT (video_info);
-  components = GST_VIDEO_INFO_N_COMPONENTS (video_info);
   _textures->SetDimensions({width, height});
 
   //RGB is all one plane
@@ -476,10 +476,11 @@ void VideoSystem::UploadFrames ()
         return;
 
       // fprintf (stderr, "attempting to upload frame\n");
-      // if looking for new matte but don't have it, then bail
+      // if not looking for new frame and not switching, then bail
       if (matte.awaited < 0 && ! force_new_texture)
         return;
 
+      // if looking for new matte but don't have it, then bail
       if (matte.awaited >= 0 && ! matte.worker->PopFrame(matte.awaited, matte.last_popped_frame))
         {
           fprintf (stdout, "no matte for %d which seems fishy\n", matte.awaited);
@@ -550,13 +551,15 @@ ch_ptr<VideoTexture> VideoSystem::CreateVideoTexture (VideoFormat _format)
   return txt;
 }
 
-MattePipeline VideoSystem::CreateMattePipeline (f64 _loop_start_ts, i32 _frame_count,
-                                                fs::path const &_matte_dir,
+MattePipeline VideoSystem::CreateMattePipeline (f64 _loop_start_ts, f64 _loop_end_ts,
+                                                i32 _frame_count, fs::path const &_matte_dir,
                                                 v2i32 _min, v2i32 _max)
 {
   MattePipeline matte;
   matte.worker = make_ch<MatteLoaderWorker> (_loop_start_ts, _frame_count, _matte_dir);
   matte.worker->SetMatteLoaderPool(m_matte_pool.get ());
+  matte.start_timestamp = _loop_start_ts;
+  matte.end_timestamp = _loop_end_ts;
   matte.roi_min = _min;
   matte.roi_max = _max;
   matte.frame_count = _frame_count;
@@ -575,6 +578,65 @@ VideoBrace VideoSystem::OpenVideoFile (std::string_view _path)
     return {};
 
   m_pipelines.push_back(pipeline);
+  return {pipeline, text};
+}
+
+VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
+                                   f64 _loop_start_ts, f64 _loop_end_ts,
+                                   i32 _frame_count, fs::path const &_matte_dir,
+                                   v2i32 _min, v2i32 _max)
+{
+  ch_ptr<VideoPipeline> pipeline = make_ch<VideoPipeline> ();
+
+  ch_ptr<VideoTexture> text = pipeline->OpenFile(_uri);
+  if (! text)
+    return {};
+
+  pipeline->AddMatte(_loop_start_ts, _loop_end_ts,
+                     _frame_count, _matte_dir, _min, _max);
+  pipeline->GetDecoder()->Loop(_loop_start_ts, _loop_end_ts);
+
+  m_pipelines.push_back(pipeline);
+
+  return {pipeline, text};
+}
+
+VideoBrace VideoSystem::DuplicateVideo (ch_ptr<VideoPipeline> const &_pipeline)
+{
+  ch_ptr<VideoPipeline> pipeline = make_ch<VideoPipeline> ();
+
+  ch_ptr<VideoTexture> text = pipeline->OpenFile(_pipeline->path);
+  if (! text)
+    return {};
+
+  m_pipelines.push_back (pipeline);
+
+  return {pipeline, text};
+}
+
+VideoBrace VideoSystem::DuplicateMatte (ch_ptr<VideoPipeline> const &_pipeline,
+                                        i64 _matte_index)
+{
+  if (_matte_index >= i64 (_pipeline->mattes.size ()) ||
+      _matte_index < 0)
+    return {};
+
+  ch_ptr<VideoPipeline> pipeline = make_ch<VideoPipeline> ();
+
+  ch_ptr<VideoTexture> text = pipeline->OpenFile(_pipeline->path);
+  if (! text)
+    return {};
+
+  MattePipeline const &matte = _pipeline->mattes[_matte_index];
+
+  pipeline->AddMatte(matte.start_timestamp, matte.end_timestamp,
+                     matte.frame_count, matte.dir_path,
+                     matte.roi_min, matte.roi_max);
+
+  pipeline->GetDecoder()->Loop(matte.start_timestamp, matte.end_timestamp);
+
+  m_pipelines.push_back(pipeline);
+
   return {pipeline, text};
 }
 
@@ -613,24 +675,6 @@ void VideoSystem::DestroyVideo (VideoTexture *_texture)
 }
 
 
-VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
-                                   f64 _loop_start_ts, f64 _loop_end_ts,
-                                   i32 _frame_count, fs::path const &_matte_dir,
-                                   v2i32 _min, v2i32 _max)
-{
-  ch_ptr<VideoPipeline> pipeline = make_ch<VideoPipeline> ();
-
-  ch_ptr<VideoTexture> text = pipeline->OpenFile(_uri);
-  if (! text)
-    return {};
-
-  pipeline->AddMatte(_loop_start_ts, _frame_count, _matte_dir, _min, _max);
-  pipeline->GetDecoder()->Loop(_loop_start_ts, _loop_end_ts);
-
-  m_pipelines.push_back(pipeline);
-
-  return {pipeline, text};
-}
 
 bgfx::TextureHandle VideoSystem::GetBlackTexture () const
 {

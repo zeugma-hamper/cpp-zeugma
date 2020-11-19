@@ -97,6 +97,8 @@ namespace fs = std::filesystem;
 struct MattePipeline
 {
   fs::path dir_path;
+  f64 start_timestamp = -1.0;
+  f64 end_timestamp = -1.0;
   i32 frame_count = 0;
   i32 awaited = -1;
   v2i32 roi_min {0, 0};
@@ -112,8 +114,8 @@ class VideoPipeline : public CharmBase<VideoPipeline>
   ~VideoPipeline ();
 
   ch_ptr<VideoTexture> OpenFile (std::string_view _path);
-  bool AddMatte (f64 _loop_start_ts, i32 _frame_count,
-                 fs::path const &_matte_dir,
+  bool AddMatte (f64 _loop_start_ts, f64 _loop_end_ts,
+                 i32 _frame_count, fs::path const &_matte_dir,
                  v2i32 _min, v2i32 _max);
 
   ch_ptr<DecodePipeline> const &GetDecoder ();
@@ -184,13 +186,23 @@ class VideoSystem
 
   ch_ptr<DecodePipeline> CreateDecodePipeline (std::string_view _uri);
   ch_ptr<VideoTexture> CreateVideoTexture (VideoFormat _format);
-  MattePipeline CreateMattePipeline (f64 _loop_start_ts, i32 _frame_count,
-                                     fs::path const &_matte_dir,
+  MattePipeline CreateMattePipeline (f64 _loop_start_ts, f64 _loop_end_ts,
+                                     i32 _frame_count, fs::path const &_matte_dir,
                                      v2i32 _min, v2i32 _max);
 
 
 
   VideoBrace OpenVideoFile (std::string_view _path);
+
+  // see MattePathPattern in Matte.hpp
+  VideoBrace OpenMatte (std::string_view _uri,
+                        f64 _loop_start_ts, f64 _loop_end_ts,
+                        i32 _frame_count, fs::path const &_matte_dir,
+                        v2i32 _min, v2i32 _max);
+
+  VideoBrace DuplicateVideo (ch_ptr<VideoPipeline> const &_pipeline);
+  VideoBrace DuplicateMatte (ch_ptr<VideoPipeline> const &_pipeline,
+                             i64 _matte_index);
 
   ch_ptr<DecodePipeline> FindDecodePipeline (ch_ptr<VideoTexture> const &_texture);
   ch_ptr<VideoPipeline> FindVideoPipeline (ch_ptr<VideoTexture> const &_texture);
@@ -198,11 +210,6 @@ class VideoSystem
   //NOTE: this is internal. you shouldn't need to call this.
   void DestroyVideo (VideoTexture *_texture);
 
-  // see MattePathPattern in Matte.hpp
-  VideoBrace OpenMatte (std::string_view _uri,
-                        f64 _loop_start_ts, f64 _loop_end_ts,
-                        i32 _frame_count, fs::path const &_matte_dir,
-                        v2i32 _min, v2i32 _max);
 
   //access to some generally useful graphics resources, do not free these
   bgfx::TextureHandle GetBlackTexture () const;

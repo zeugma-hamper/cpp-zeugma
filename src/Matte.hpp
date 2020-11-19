@@ -131,6 +131,24 @@ struct FilmInfo
   std::vector<ClipInfo> clips;
 };
 
+class FilmCatalog
+{
+ public:
+  FilmCatalog ();
+
+  CHARM_DEFAULT_MOVE(FilmCatalog);
+  CHARM_DELETE_COPY(FilmCatalog);
+
+  bool LoadFilmInfo (std::filesystem::path const &_path);
+  bool LoadFilmGeometry (std::filesystem::path const &_path);
+
+
+
+ private:
+  std::vector<FilmInfo> m_films;
+};
+
+
 std::vector<FilmInfo>
 ReadFilmInfo (std::filesystem::path const &_path);
 

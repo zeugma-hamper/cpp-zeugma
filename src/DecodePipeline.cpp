@@ -155,6 +155,16 @@ void DecodePipeline::Play ()
 
 void DecodePipeline::Seek (double _ts)
 {
+  if (IsLooping())
+    {
+      SeekFull (m_play_speed,
+                GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE),
+                GST_SEEK_TYPE_SET, 0,
+                GST_SEEK_TYPE_END, 0);
+
+      m_loop_status = LoopStatus{};
+    }
+
   gint64 const seconds_to_ns = 1000000000;
 
   SeekFull (m_play_speed,
@@ -185,6 +195,27 @@ void DecodePipeline::Pause ()
 //                     GST_SEEK_TYPE_SET, _start_ts,
 //                     GST_SEEK_TYPE_SET, _end_ts);
 // }
+void DecodePipeline::SetPlaySpeed (f32 _speed, bool _trick_play)
+{
+  gint64 ts = 0;
+  if (! gst_element_query_position(m_pipeline, GST_FORMAT_TIME, &ts))
+    {
+      fprintf (stderr, "couldn't query position. bailing.\n");
+      return;
+    }
+
+  GstSeekFlags flags = (GstSeekFlags) (GST_SEEK_FLAG_FLUSH |
+                                       GST_SEEK_FLAG_ACCURATE);
+  if (_trick_play)
+    flags = (GstSeekFlags) (flags | GST_SEEK_FLAG_TRICKMODE |
+                             GST_SEEK_FLAG_TRICKMODE_NO_AUDIO);
+
+  if (_speed > 0)
+    SeekFull(_speed, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, ts, GST_SEEK_TYPE_END, 0);
+  else
+    SeekFull(_speed, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, ts, GST_SEEK_TYPE_SET, 0);
+}
+
 void DecodePipeline::TrickModeSeek (f64 _ts, f64 _rate)
 {
   f64 const rate = _rate < 0.0 ? -_rate : _rate;
@@ -290,6 +321,11 @@ f64 DecodePipeline::Duration () const
 gint64 DecodePipeline::DurationNanoseconds () const
 {
   return m_duration;
+}
+
+f32 DecodePipeline::PlaySpeed () const
+{
+  return m_play_speed;
 }
 
 void DecodePipeline::SetPipelineState (GstState _state)

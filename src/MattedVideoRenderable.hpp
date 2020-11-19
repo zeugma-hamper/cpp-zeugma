@@ -27,6 +27,7 @@ class MattedVideoRenderable final : public Renderable
 {
  public:
 
+  MattedVideoRenderable (ch_ptr<VideoTexture> const &_texture);
   MattedVideoRenderable (std::string_view _uri,
                          f64 _loop_start_ts, f64 _loop_end_ts,
                          std::string_view _matte_pattern);
@@ -35,6 +36,10 @@ class MattedVideoRenderable final : public Renderable
 
   ch_ptr<VideoTexture> const &GetVideoTexture () const;
   ch_ptr<DecodePipeline> GetPipeline () const;
+
+  MattedVideoRenderable *DuplicateVideoOnly () const;
+  MattedVideoRenderable *DuplicateWithActiveMatte () const;
+  MattedVideoRenderable *DuplicateWithMatte (i64 _matted_index) const;
 
   void SetEnableMatte (bool _tf);
   bool GetEnableMatte () const;
@@ -50,6 +55,9 @@ class MattedVideoRenderable final : public Renderable
   void Draw (u16 vyu_id) override;
 
  private:
+
+  MattedVideoRenderable ();
+
   ch_ptr<VideoTexture> m_video_texture;
   u64 m_bgfx_state;
   SizeReferent m_size_referent;
