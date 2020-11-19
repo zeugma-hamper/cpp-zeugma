@@ -3,6 +3,8 @@
 
 #include <VideoSystem.hpp>
 
+#include <vector_interop.hpp>
+
 
 GraumanPalace::GraumanPalace ()  :  Zeubject (), Node (),
                                     backing_maes (NULL),
@@ -10,7 +12,7 @@ GraumanPalace::GraumanPalace ()  :  Zeubject (), Node (),
                                     ovr (Vect::xaxis), upp (Vect::yaxis),
                                     nrm (Vect::zaxis), slider (new Node),
                                     now_showing (0),
-                                    pb_depth_scale (10.0), pb_slide_scale (5.0),
+                                    pb_depth_scale (30.0), pb_slide_scale (20.0),
                                     pb_max_push (-50000.0), pb_max_pull (5000.0)
 { AppendChild (slider);
 
@@ -85,12 +87,7 @@ void GraumanPalace::ImportExhibitionRoster (const std::vector <FilmInfo> &fimmz)
       SilverScreen *sisc = new SilverScreen (vire, finf);
       screens . push_back (sisc);
       sisc -> AppendRenderable (vire);
-/*
-      ch_ptr <DecodePipeline> depi = vire -> GetPipeline ();
-      f64 dur = depi -> Duration ();
-      depi -> Seek (0.314159265359 * dur);
-      depi -> Pause ();
-*/
+
       slider -> AppendChild (sisc);
       sisc -> Scale (flick_wid);
       sisc -> Translate ((f64)q * flick_spacing * Over ());
@@ -118,7 +115,8 @@ i64 GraumanPalace::ZESpatialMove (ZESpatialMoveEvent *e)
   if (e -> Provenance ()  ==  effecting_pushback)
     { Vect offset = e -> Loc ()  -  pb_estab_loc;
       f64 puba = pb_depth_scale * nrm . Dot (offset);
-      f64 latr = pb_slide_scale * ovr . Dot (offset);
+      f64 latr = -pb_estab_flick * flick_spacing
+                  +  pb_slide_scale * ovr . Dot (offset);
       // impose translational limits here...
       if (puba > pb_max_pull)
         puba = pb_max_pull;
@@ -141,10 +139,35 @@ i64 GraumanPalace::ZESpatialHarden (ZESpatialHardenEvent *e)
   if (eym . Dot (upp)  >  0.8)  // pointing noticeably heavenward..
     { effecting_pushback = e -> Provenance ();
       pb_estab_loc = e -> Loc ();
+      pb_estab_flick = now_showing;
       EngagePushback ();
     }
   else if (eym . Dot (ovr)  >  0.8)  // to the right!
     { TogglePlayPause (); }
+  else if (SilverScreen *s = CurSilverScreen ())
+    { Vect hit;
+      if (s->vren
+          &&  s->frtr -> CheckHit (G::Ray (e -> Loc (), e -> Aim ()), &hit))
+         {fprintf (stderr, "hit CINEMA! namely <%s>! and at ",
+                   s->finf.name . c_str ());
+           hit . SpewToStderr ();  fprintf (stderr, "\n");
+           Vect rig = 0.5 * s->vren -> Over ();
+           Vect lef = -rig;
+           Matrix44 m = from_glm (s -> GetAbsoluteTransformation ().model);
+           m . TransformVectInPlace (lef);
+           m . TransformVectInPlace (rig);
+           f64 ww = rig . DistFrom (lef);
+           f64 t = (hit - lef) . Dot ((rig - lef) . Norm ());
+           if (ww  !=  0.0)
+             t /= ww;
+           fprintf (stderr, "HEY! HEY YOU! YEAH, YOU! WELL GUESS WHAT: TEE "
+                    " = %.2lf\n", t);
+           ch_ptr<DecodePipeline> depi = s->vren -> GetPipeline ();
+           f64 dur = depi -> Duration ();
+           if (t < 0.0)  t = 0.0;  else if (t > 1.0) t = 1.0;
+           depi -> Seek (t * dur);
+         }
+    }
   return 0;
 }
 

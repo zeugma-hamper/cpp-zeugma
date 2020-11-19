@@ -17,6 +17,8 @@
 #include <Matte.hpp>
 #include <VideoRenderable.hpp>
 
+#include <Frontier.hpp>
+
 #include <vector>
 
 
@@ -25,15 +27,18 @@ using namespace charm;
 
 class SilverScreen  :  public Node
 { public:
-  VideoRenderable *vren;
   const FilmInfo &finf;
+  VideoRenderable *vren;
+  RectRenderableFrontier *frtr;
 
   const std::string &Name ()
     { return finf.name; }
 
   SilverScreen (VideoRenderable *vr,
                 const FilmInfo &fi)  :  Node (), vren (vr), finf (fi)
-    { }
+    { frtr = new RectRenderableFrontier (vr, Vect::zerov, 1.0, 1.0);
+      SetFrontier (frtr);
+    }
 };
 
 
@@ -53,6 +58,7 @@ class GraumanPalace  :  public Zeubject, public Node,
 
   std::string effecting_pushback;
   Vect pb_estab_loc;
+  i64 pb_estab_flick;
   f64 pb_depth_scale, pb_slide_scale;
   f64 pb_max_push, pb_max_pull;
 
