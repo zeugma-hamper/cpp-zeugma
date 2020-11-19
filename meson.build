@@ -183,6 +183,7 @@ lib_sources = ['src/application.cpp',
                'src/GraphicsApplication.cpp',
                'src/Grappler.cpp',
                'src/GrapplerPile.cpp',
+               'src/GridRenderable.cpp',
                'src/interp-funcs.cpp',
                'src/IronLung.cpp',
                'src/Layer.cpp',
@@ -276,6 +277,11 @@ shaders = [
    'src/shaders/basic_varying.def.sc', 'textured_renderable.vs.bin'],
   ['fragment', 'src/shaders/textured_renderable.fs.sc',
    'src/shaders/basic_varying.def.sc', 'textured_renderable.fs.bin'],
+  # gridularness
+  ['vertex',   'src/shaders/grid_vs.sc',
+   'src/shaders/basic_varying.def.sc', 'grid_vs.bin'],
+  ['fragment', 'src/shaders/grid_fs.sc',
+   'src/shaders/basic_varying.def.sc', 'grid_fs.bin'],
 ]
 
 foreach shader : shaders

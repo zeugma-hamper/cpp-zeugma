@@ -19,6 +19,7 @@
 #include <MattedVideoRenderable.hpp>
 #include <TexturedRenderable.hpp>
 #include <PolygonRenderable.h>
+#include <GridRenderable.h>
 
 //base Ze
 #include <Zeubject.h>
@@ -662,6 +663,18 @@ int main (int ac, char **av)
 //  afz -> PopulateFromScratch ();
   AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.freezo);
   AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.freezo);
+
+GridRenderable *griddy = new GridRenderable;
+Node *gridno = new Node (griddy);
+griddy -> SetCenter (tabl -> Loc ());
+griddy -> SetOver (tabl -> Over ());
+griddy -> SetUp (tabl -> Up ());
+griddy -> SetWidth (0.5 * tabl -> Width ());
+griddy -> SetHeight (0.5 * tabl -> Height ());
+griddy -> SetWarp (0.1 * tabl -> Over ());
+griddy -> SetWeft (0.1 * tabl -> Up ());
+griddy -> SetGridColor (ZeColor (1.0, 0.0, 1.0, 0.5));
+//kawntent -> AppendChild (gridno);
 
   tamp . Run ();
 
