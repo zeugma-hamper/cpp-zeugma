@@ -94,7 +94,7 @@ class Cursoresque  :  public Alignifer
           { f64 theeeta = 2.0 * M_PI / (f64)nv * (f64)q  +  w * M_PI;
             Vect radial = (0.5 * (w + 1.0))
               *  (cos (theeeta) * Vect::xaxis  +  sin (theeeta) * Vect::yaxis);
-            SinuVect arm (0.065 * radial, 5.0 + 0.7 * drand48 (),
+            SinuVect arm (0.065 * radial, 0.8 + 0.11 * drand48 (),
                           0.24 * (1.0 + 3.0 * (q%2)) * radial);
             (w > 0 ? re1 : re2) -> AppendVertex (arm);
           }
@@ -637,6 +637,8 @@ int main (int ac, char **av)
   TextureParticulars tipi
     = CreateTexture2D ("/tmp/SIGN.jpg", DefaultTextureFlags);
   TexturedRenderable *texre = new TexturedRenderable (tipi);
+  texre -> AdjColorZoft ()
+    . BecomeLike (SinuColor (ZeColor (0.0, 0.5), 1.0, ZeColor (1.0, 0.5)));
   Node *texno = (tamp.texxyno = new Node (texre));
   texno -> Scale (1300.0);
   texno -> Translate (maes -> Loc ());

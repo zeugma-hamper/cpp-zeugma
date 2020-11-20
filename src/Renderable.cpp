@@ -25,17 +25,28 @@ const Vect &Renderable::Over ()  const
 const Vect &Renderable::Up ()  const
 { return m_up.val; }
 
+const ZeColor &Renderable::AdjColor ()  const
+{ return m_adjc.val; }
+
+
 void Renderable::SetOver (const Vect &o)
 { m_over = o; }
 
 void Renderable::SetUp (const Vect &u)
 { m_up = u; }
 
+void Renderable::SetAdjColor (const ZeColor &c)
+{ m_adjc = c; }
+
+
 ZoftVect &Renderable::OverZoft ()
 { return m_over; }
 
 ZoftVect &Renderable::UpZoft ()
 { return m_up; }
+
+ZoftColor &Renderable::AdjColorZoft ()
+{ return m_adjc; }
 
 
 void Renderable::Update ()

@@ -20,6 +20,7 @@ TexturedRenderable::TexturedRenderable ()
   m_uni_up = bgfx::createUniform("u_up", bgfx::UniformType::Vec4);
   m_uni_wh = bgfx::createUniform("u_wh", bgfx::UniformType::Vec4);
   m_uni_texture = bgfx::createUniform("u_texture", bgfx::UniformType::Sampler);
+  m_uni_adj_iro = bgfx::createUniform("u_adjc", bgfx::UniformType::Vec4);
 
   ProgramResiduals pr = CreateProgram("textured_renderable.vs.bin", "textured_renderable.fs.bin", true);
   m_program = pr.program;
@@ -54,8 +55,11 @@ void TexturedRenderable::Draw (u16 _view_id)
   if (! bgfx::isValid (m_particulars.handle))
     return;
 
-  u64 state = BGFX_STATE_WRITE_RGB |
-    BGFX_STATE_PT_TRISTRIP;
+  u64 state =
+    BGFX_STATE_WRITE_RGB  |
+    BGFX_STATE_PT_TRISTRIP  |
+    BGFX_STATE_BLEND_FUNC (BGFX_STATE_BLEND_SRC_ALPHA,
+                           BGFX_STATE_BLEND_INV_SRC_ALPHA);
 
   // TODO: better alpha existence check
   if (m_particulars.format == bgfx::TextureFormat::RGBA8)
@@ -70,10 +74,12 @@ void TexturedRenderable::Draw (u16 _view_id)
   glm::vec4 const wh = glm::vec4 (f32 (m_particulars.width),
                                   f32 (m_particulars.height),
                                   1.0f, 1.0f);
+  glm::vec4 const ac = as_glm (m_adjc.val);
 
-  bgfx::setUniform(m_uni_over, &over);
-  bgfx::setUniform(m_uni_up, &up);
-  bgfx::setUniform(m_uni_wh, &wh);
+  bgfx::setUniform (m_uni_over, &over);
+  bgfx::setUniform (m_uni_up, &up);
+  bgfx::setUniform (m_uni_wh, &wh);
+  bgfx::setUniform (m_uni_adj_iro, &ac);
   bgfx::setTexture (0, m_uni_texture, m_particulars.handle);
 
 
