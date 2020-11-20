@@ -193,7 +193,7 @@ TextureParticulars CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags, 
 
   ispec.set_format(OIIO::TypeDesc::UINT8);
   OIIO::ImageBuf output (ispec, img_mem->data);
-  output.copy (image);
+  output.copy_pixels (image);
 
   if (_create_mipmaps)
     {
