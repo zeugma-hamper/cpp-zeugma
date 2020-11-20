@@ -208,7 +208,13 @@ TextureParticulars CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags, 
 
           OIIO::ImageBuf mip (mip_spec, img_mem->data);
           if (! OIIO::ImageBufAlgo::resize (mip, output))
-            fprintf (stderr, "failed to create mip %u\n", i);
+            {
+              // update anyway to free bgfx memory
+              bgfx::updateTexture2D(handle, 0, i, 0, 0, mip_spec.width, mip_spec.height, img_mem);
+              bgfx::destroy (handle);
+              fprintf (stderr, "%s: failed to create mip %u\n", _path.getCPtr(), i);
+              return {};
+            }
           bgfx::updateTexture2D(handle, 0, i, 0, 0, mip_spec.width, mip_spec.height, img_mem);
         }
     }
