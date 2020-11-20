@@ -1,4 +1,7 @@
 
+$input wrld_p
+
+
 #include <bgfx_shader.sh>
 
 
@@ -11,6 +14,7 @@ layout(location = 0) out vec4 out_color;
 
 
 void main()
-{
-  out_color = u_color;
+{ float tx = mod (wrld_p.x * 0.01, 1.0);
+  float ty = mod (wrld_p.y * 0.01, 1.0);;
+  out_color = tx * ty * u_color;
 }

@@ -41,7 +41,7 @@ GridRenderable::GridRenderable ()  :  Renderable (), wid (10.0), hei (10.0),
 
   unif_gridc = bgfx::createUniform (color_unif_s, bgfx::UniformType::Vec4);
   unif_warp = bgfx::createUniform (warp_unif_s, bgfx::UniformType::Vec4);
-  unif_weft = bgfx::createUniform (warp_unif_s, bgfx::UniformType::Vec4);
+  unif_weft = bgfx::createUniform (weft_unif_s, bgfx::UniformType::Vec4);
  }
 
 
@@ -76,10 +76,10 @@ void GridRenderable::Draw (u16 vyu_id)
                                             BGFX_STATE_BLEND_INV_SRC_ALPHA));
 //                  |  BGFX_STATE_WRITE_Z);
   bgfx::setUniform (unif_gridc, glm::value_ptr (as_glm (grid_iro)));
-  glm::vec4 wa = { warp.val.x, warp.val.y, warp.val.z, 0.0 };
-  glm::vec4 we = { weft.val.x, weft.val.y, weft.val.z, 0.0 };
-  bgfx::setUniform (unif_warp, glm::value_ptr (wa));
-  bgfx::setUniform (unif_weft, glm::value_ptr (we));
+  glm::vec4 wrp = {warp.val.x, warp.val.y, warp.val.z, 0.0};
+  glm::vec4 wft = {weft.val.x, weft.val.y, weft.val.z, 0.0};
+  bgfx::setUniform (unif_warp, glm::value_ptr (wrp));
+  bgfx::setUniform (unif_weft, glm::value_ptr (wft));
 
   bgfx::submit (vyu_id, shad_prog, m_graph_id);
 }

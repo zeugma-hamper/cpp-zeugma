@@ -405,7 +405,7 @@ bool Tampo::DoWhatThouWilt (i64 ratch, f64 thyme)
       farr = ratch;
     }
 
-  if (texxyno  &&  timey.val > 1.5)
+  if (texxyno  &&  timey.val > 8.5)
     { if (Node *par = texxyno -> Parent ())
         { par -> ExciseChild (texxyno);
           delete texxyno;
@@ -634,7 +634,8 @@ int main (int ac, char **av)
       windshield -> AppendChild (tic->no);
     }
 */
-  TextureParticulars tipi = CreateTexture2D ("/tmp/blap.png", DefaultTextureFlags);
+  TextureParticulars tipi
+    = CreateTexture2D ("/tmp/SIGN.jpg", DefaultTextureFlags);
   TexturedRenderable *texre = new TexturedRenderable (tipi);
   Node *texno = (tamp.texxyno = new Node (texre));
   texno -> Scale (1300.0);
@@ -675,13 +676,7 @@ griddy -> SetHeight (0.5 * tabl -> Height ());
 griddy -> SetWarp (0.1 * tabl -> Over ());
 griddy -> SetWeft (0.1 * tabl -> Up ());
 griddy -> SetGridColor (ZeColor (1.0, 0.0, 1.0, 0.5));
-//kawntent -> AppendChild (gridno);
-
-LinePileRenderable *lpr = new LinePileRenderable;
-Node *lipino = new Node (lpr);
-lpr -> AppendLine (tabl -> CornerTL (), tabl -> CornerBR ());
-lpr -> AppendLine (tabl -> CornerBL (), tabl -> CornerTR ());
-kawntent -> AppendChild (lipino);
+kawntent -> AppendChild (gridno);
 
   tamp . Run ();
 

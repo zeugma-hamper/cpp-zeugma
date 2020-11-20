@@ -280,9 +280,9 @@ shaders = [
    'src/shaders/basic_varying.def.sc', 'textured_renderable.fs.bin'],
   # gridularness
   ['vertex',   'src/shaders/grid_vs.sc',
-   'src/shaders/basic_varying.def.sc', 'grid_vs.bin'],
+   'src/shaders/grid_varying.def.sc', 'grid_vs.bin'],
   ['fragment', 'src/shaders/grid_fs.sc',
-   'src/shaders/basic_varying.def.sc', 'grid_fs.bin'],
+   'src/shaders/grid_varying.def.sc', 'grid_fs.bin'],
 ]
 
 foreach shader : shaders
