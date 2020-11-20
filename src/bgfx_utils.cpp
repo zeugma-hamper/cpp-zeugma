@@ -173,8 +173,6 @@ TextureParticulars CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags, 
   bgfx::calcTextureSize(tinfo, ispec.width, ispec.height, 1, false,
                         _create_mipmaps, 1, formats[ispec.nchannels]);
 
-  bgfx::Memory const *img_mem = bgfx::alloc(tinfo.storageSize);
-
   // in bgfx, if texture is created with valid memory pointer, then the texture is immutable.
   // here, create with null pointer, then upload so texture is mutable.
   bgfx::TextureHandle handle = bgfx::createTexture2D(ispec.width, ispec.height,
@@ -182,26 +180,29 @@ TextureParticulars CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags, 
                                                      formats[ispec.nchannels],
                                                      _bgfx_flags, nullptr);
 
+  bgfx::Memory const *img_mem = bgfx::alloc(ispec.width * ispec.height * ispec.nchannels);
+
   ispec.set_format(OIIO::TypeDesc::UINT8);
   OIIO::ImageBuf output (ispec, img_mem->data);
-  output.copy (image);
+  output.copy_pixels (image);
+  bgfx::updateTexture2D(handle, 0, 0, 0, 0, ispec.width, ispec.height, img_mem);
 
   if (_create_mipmaps)
     {
-      u8 *data_ptr = img_mem->data + (ispec.width * ispec.height * ispec.nchannels);
+      OIIO::ImageSpec mip_spec{ispec};
       for (u32 i = 1; i < tinfo.numMips; ++i)
         {
-          OIIO::ROI roi (0, std::max (ispec.roi().xend/2, 1),
-                         0, std::max (ispec.roi().yend/2, 1));
-          ispec.set_roi (roi);
-          OIIO::ImageBuf mip (ispec, data_ptr);
-          if (! OIIO::ImageBufAlgo::resize (mip, image, "", 0.0f, roi))
+          mip_spec = OIIO::ImageSpec(std::max (mip_spec.roi().xend/2, 1),
+                                     std::max (mip_spec.roi().yend/2, 1),
+                                     mip_spec.nchannels, OIIO::TypeDesc::UINT8);
+          img_mem = bgfx::alloc(mip_spec.width * mip_spec.height * mip_spec.nchannels);
+
+          OIIO::ImageBuf mip (mip_spec, img_mem->data);
+          if (! OIIO::ImageBufAlgo::resize (mip, output))
             fprintf (stderr, "failed to create mip %u\n", i);
-          data_ptr += (ispec.width * ispec.height * ispec.nchannels);
+          bgfx::updateTexture2D(handle, 0, i, 0, 0, mip_spec.width, mip_spec.height, img_mem);
         }
     }
-
-  bgfx::updateTexture2D(handle, 0, 0, 0, 0, ispec.width, ispec.height, img_mem);
 
   return {handle, formats[ispec.nchannels], u32 (ispec.width), u32 (ispec.height)};
 }
