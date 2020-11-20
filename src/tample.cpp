@@ -18,6 +18,7 @@
 #include <VideoRenderable.hpp>
 #include <MattedVideoRenderable.hpp>
 #include <TexturedRenderable.hpp>
+#include <LinePileRenderable.h>
 #include <PolygonRenderable.h>
 #include <GridRenderable.h>
 
@@ -675,6 +676,12 @@ griddy -> SetWarp (0.1 * tabl -> Over ());
 griddy -> SetWeft (0.1 * tabl -> Up ());
 griddy -> SetGridColor (ZeColor (1.0, 0.0, 1.0, 0.5));
 //kawntent -> AppendChild (gridno);
+
+LinePileRenderable *lpr = new LinePileRenderable;
+Node *lipino = new Node (lpr);
+lpr -> AppendLine (tabl -> CornerTL (), tabl -> CornerBR ());
+lpr -> AppendLine (tabl -> CornerBL (), tabl -> CornerTR ());
+kawntent -> AppendChild (lipino);
 
   tamp . Run ();
 
