@@ -6,6 +6,7 @@
 #include <Node.hpp>
 #include <PlatonicMaes.h>
 #include <Renderable.hpp>
+#include <TexturedRenderable.hpp>
 #include <VideoRenderable.hpp>
 #include <ZEYowlEvent.h>
 
@@ -31,6 +32,7 @@ static bool s_pipeline_is_playing = true;
 static std::vector<FilmInfo> s_films;
 static u64 s_film_index = 4;
 static u64 s_clip_index = 1;
+static boost::signals2::connection s_seg_done;
 
 //increment val mod max
 template<typename T>
@@ -92,7 +94,7 @@ i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
       s_renderable = renderable;
       s_pipeline_is_playing = true;
     }
-  else if (utt == "a" || utt == "d")
+  else if (utt == "a" || utt == "d") //previous/next clip
     {
       if (utt == "a")
         mod_dec_index(s_clip_index, s_films[s_film_index].clips.size ());
@@ -115,6 +117,53 @@ i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
           pipe->GetDecoder()->Loop(ci.start_time, ci.start_time + ci.duration);
           s_renderable->EnableMatte();
         }
+    }
+  else if (utt == "z" || utt == "c")
+    {
+      if (utt == "z")
+        mod_dec_index(s_clip_index, s_films[s_film_index].clips.size ());
+      else
+        mod_inc_index(s_clip_index, s_films[s_film_index].clips.size ());
+
+
+      auto pipe = s_pipeline.ref ();
+      if (pipe)
+        {
+          pipe->ClearMattes();
+          ClipInfo &ci = s_films[s_film_index].clips[s_clip_index];
+          pipe->GetDecoder()->TrickModeSeek(ci.start_time, 120.0);
+          // so this works pretty well, but the fast playback is (i
+          // think) hiding a discontinuity. segment done message is
+          // sent quite a bit before the last frame of the segment
+          // reaches the pipeline sink. will probably need something
+          // tighter for audio sync.
+          auto seg_done_cb = [pipe, ci] (boost::signals2::connection conn,
+                                         DecodePipeline *dec, SegmentDoneBehavior sdb)
+          {
+            v2i32 min = v2i32 {i32 (ci.geometry.dir_geometry.min[0]),
+              i32 (ci.geometry.dir_geometry.min[1])};
+            v2i32 max = v2i32 {i32 (ci.geometry.dir_geometry.max[0]),
+              i32 (ci.geometry.dir_geometry.max[1])};
+            pipe->AddMatte(ci.start_time, ci.start_time + ci.duration,
+                           ci.frame_count, ci.directory, min, max);
+            pipe->SetActiveMatte(0);
+            pipe->GetDecoder()->Loop(ci.start_time, ci.start_time + ci.duration, 1.0f);
+            s_renderable->EnableMatte();
+            conn.disconnect();
+          };
+          s_seg_done = pipe->GetDecoder()->AddSegmentDoneExCallback(std::move (seg_done_cb));
+        }
+    }
+  else if (utt == "e")
+    {
+      auto pipe = s_pipeline.ref ();
+      f32 const ps = pipe->GetDecoder()->PlaySpeed();
+      pipe->GetDecoder()->SetPlaySpeed(ps + 5.0f);
+    }
+  else if (utt == "f")
+    {
+      auto pipe = s_pipeline.ref ();
+      pipe->GetDecoder()->Step(1);
     }
   else if (utt == "p") //toggle play/pause
     {
@@ -140,6 +189,54 @@ i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
           pipe->ClearMattes();
           s_renderable->DisableMatte ();
           pipe->GetDecoder()->Seek(pos);
+        }
+    }
+  else if (utt == "i") // loop over first three clips of itmfl
+    {
+      s_film_index = 5;
+      s_clip_index = 0;
+      FilmInfo &film_info = s_films[s_film_index];
+
+      s_renderable_owner->RemoveRenderable(s_renderable);
+
+      auto *video_system = VideoSystem::GetSystem();
+      VideoBrace const brace = video_system->OpenVideoFile (film_info.film_path.string());
+
+      MattedVideoRenderable *renderable
+        = new MattedVideoRenderable (brace.video_texture);
+      renderable->SetEnableMatte(true);
+      renderable->SetSizeReferent(SizeReferent::Video);
+      s_pipeline = brace.control_pipeline;
+      s_renderable_owner->AppendRenderable (renderable);
+      s_renderable = renderable;
+      s_pipeline_is_playing = true;
+
+      auto pipe = s_pipeline.ref ();
+      if (pipe)
+        {
+          for (szt i = 0; i < 3; ++i)
+            {
+              ClipInfo &ci = film_info.clips[i];
+              v2i32 min = v2i32 {i32 (ci.geometry.dir_geometry.min[0]),
+                i32 (ci.geometry.dir_geometry.min[1])};
+              v2i32 max = v2i32 {i32 (ci.geometry.dir_geometry.max[0]),
+                i32 (ci.geometry.dir_geometry.max[1])};
+              pipe->AddMatte(ci.start_time, ci.start_time + ci.duration,
+                             ci.frame_count, ci.directory, min, max);
+            }
+          ClipInfo &ci = film_info.clips[0];
+          pipe->SetActiveMatte(0);
+          pipe->GetDecoder()->Loop(ci.start_time, ci.start_time + ci.duration, 1.0f);
+        }
+    }
+  else if (utt == "j")
+    {
+      auto pipe = s_pipeline.ref ();
+      if (pipe)
+        {
+          i64 am = pipe->active_matte;
+          mod_inc_index(am, pipe->MatteCount());
+          pipe->SetActiveMatte(am);
         }
     }
 

@@ -5,6 +5,8 @@
 #include <class_utils.hpp>
 #include <ch_ptr.hpp>
 
+#include <boost/signals2/signal.hpp>
+
 #include <gst/gst.h>
 #include <gst/video/video-info.h>
 
@@ -35,6 +37,21 @@ struct QueuedSeek
   GstSeekType stop_type;
   i64 stop;
 };
+
+enum class SegmentDoneBehavior
+{
+  NotLooping,
+  Looping
+};
+
+struct DecodePipeline;
+using SegmentDoneSignal = boost::signals2::signal<void (DecodePipeline *, SegmentDoneBehavior)>;
+using SegmentDoneCallback = SegmentDoneSignal::slot_function_type;
+using SegmentDoneExCallback = SegmentDoneSignal::extended_slot_function_type;
+
+using EOSSignal = boost::signals2::signal<void (DecodePipeline *)>;
+using EOSCallback = EOSSignal::slot_function_type;
+using EOSExCallback = EOSSignal::extended_slot_function_type;
 
 struct DecodePipeline : public CharmBase<DecodePipeline>
 {
@@ -73,7 +90,9 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
 
   void Step (u32 _distance);
 
-  void Loop (f64 _from, f64 _to);
+  // pass _play_speed as something other than 0.0f to change speed
+  // of playback when pipeline is next in PLAY state
+  void Loop (f64 _from, f64 _to, f32 _play_speed = 0.0f);
   bool IsLooping () const;
 
   // timestamp of the latest video buffer
@@ -102,6 +121,11 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   void HandleAsyncDone (GstMessage *);
   void HandleDuration (GstMessage *);
 
+  boost::signals2::connection AddSegmentDoneCallback (SegmentDoneCallback &&_cb);
+  boost::signals2::connection AddSegmentDoneExCallback (SegmentDoneExCallback &&_cb);
+  boost::signals2::connection AddEOSCallback (EOSCallback &&_cb);
+  boost::signals2::connection AddEOSExCallback (EOSExCallback &&_cb);
+
   std::unique_ptr<PipelineTerminus> m_video_terminus;
   std::unique_ptr<PipelineTerminus> m_audio_terminus;
   GstElement *m_pipeline;
@@ -120,6 +144,8 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   bool m_has_queued_seek;
   LoopStatus m_loop_status;
   QueuedSeek m_queued_seek;
+  SegmentDoneSignal m_segment_done_signal;
+  EOSSignal m_eos_signal;
 };
 
 }

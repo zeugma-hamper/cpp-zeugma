@@ -157,18 +157,26 @@ void DecodePipeline::Seek (double _ts)
 {
   if (IsLooping())
     {
+      gint64 current_ts = 0;
+      if (! gst_element_query_position(m_pipeline, GST_FORMAT_TIME, &current_ts))
+        {
+          fprintf (stderr, "couldn't query position. bailing.\n");
+          return;
+        }
       SeekFull (m_play_speed,
                 GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE),
                 GST_SEEK_TYPE_SET, 0,
                 GST_SEEK_TYPE_END, 0);
-
-      m_loop_status = LoopStatus{};
     }
 
   gint64 const seconds_to_ns = 1000000000;
 
   SeekFull (m_play_speed,
-            GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE),
+            // GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_SNAP_AFTER |
+            //                                 GST_SEEK_FLAG_FLUSH),
+            GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_SNAP_AFTER |
+                                            GST_SEEK_FLAG_FLUSH |
+                                            GST_SEEK_FLAG_ACCURATE),
             GST_SEEK_TYPE_SET, (gint64)(_ts * seconds_to_ns),
             GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
 }
@@ -235,12 +243,12 @@ void DecodePipeline::TrickModeSeek (f64 _ts, f64 _rate)
                                        GST_SEEK_FLAG_TRICKMODE | GST_SEEK_FLAG_TRICKMODE_NO_AUDIO |
                                        GST_SEEK_FLAG_SEGMENT);
 
-  if (ts < current_ts)
+  if (current_ts < ts)
     {
       SeekFull(rate, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, current_ts, GST_SEEK_TYPE_SET, ts);
       m_play_speed = rate;
     }
-  else if (ts > current_ts)
+  else if (ts < current_ts)
     {
       SeekFull(-rate, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, ts, GST_SEEK_TYPE_SET, current_ts);
       m_play_speed = -rate;
@@ -269,7 +277,7 @@ void DecodePipeline::Step (u32 _distance)
 }
 
 
-void DecodePipeline::Loop (f64 _from, f64 _to)
+void DecodePipeline::Loop (f64 _from, f64 _to, f32 _play_speed)
 {
   if (! m_pipeline)
     return;
@@ -283,7 +291,7 @@ void DecodePipeline::Loop (f64 _from, f64 _to)
                                                  GST_SEEK_FLAG_ACCURATE |
                                                  GST_SEEK_FLAG_FLUSH);
 
-  SeekFull(0.0f, GST_FORMAT_TIME, seek_flags,
+  SeekFull(_play_speed, GST_FORMAT_TIME, seek_flags,
            GST_SEEK_TYPE_SET, from_ns,
            GST_SEEK_TYPE_SET, to_ns);
 
@@ -439,6 +447,7 @@ void DecodePipeline::HandleErrorMessage (GstMessage *message)
 
 void DecodePipeline::HandleEosMessage (GstMessage *)
 {
+  m_eos_signal (this);
   m_has_eos = true;
 }
 
@@ -463,18 +472,46 @@ void DecodePipeline::HandleStateChangedMessage (GstMessage *message)
 
 void DecodePipeline::HandleSegmentDone (GstMessage *)
 {
-  //looping got cancelled
+  fprintf (stderr, "got segment done!\n");
+  //looping got cancelled, clear segment
   if (m_loop_status.loop_start < 0 ||
       m_loop_status.loop_end < 0)
-    return;
+    {
+      gint64 current_ts = 0;
+      if (! gst_element_query_position(m_pipeline, GST_FORMAT_TIME, &current_ts))
+        {
+          fprintf (stderr, "couldn't query position. bailing.\n");
+          return;
+        }
+
+      SeekFull (m_play_speed,
+                GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE),
+                GST_SEEK_TYPE_SET, 0,
+                GST_SEEK_TYPE_END, 0);
+
+      SeekFull (m_play_speed,
+                GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_ACCURATE),
+                GST_SEEK_TYPE_SET, current_ts,
+                GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
+      Pause ();
+
+      m_segment_done_signal (this, SegmentDoneBehavior::NotLooping);
+      return;
+    }
+
+
 
   //continue looping
-  GstSeekFlags const seek_flags
+  GstSeekFlags seek_flags
     = (GstSeekFlags)(GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE);
+  if (m_pending_state != GST_STATE_PLAYING)
+    seek_flags = (GstSeekFlags)(seek_flags | GST_SEEK_FLAG_FLUSH);
 
   SeekFull (0.0f, GST_FORMAT_TIME, seek_flags,
             GST_SEEK_TYPE_SET, m_loop_status.loop_start,
             GST_SEEK_TYPE_SET, m_loop_status.loop_end);
+
+  m_segment_done_signal (this, SegmentDoneBehavior::Looping);
 }
 
 void DecodePipeline::HandleDuration (GstMessage *)
@@ -502,6 +539,30 @@ void DecodePipeline::HandleDuration (GstMessage *)
 void DecodePipeline::HandleAsyncDone (GstMessage *)
 {
   m_awaiting_async_done = false;
+}
+
+boost::signals2::connection
+DecodePipeline::AddSegmentDoneCallback (SegmentDoneCallback &&_cb)
+{
+  return m_segment_done_signal.connect (std::forward<SegmentDoneCallback> (_cb));
+}
+
+boost::signals2::connection
+DecodePipeline::AddSegmentDoneExCallback (SegmentDoneExCallback &&_cb)
+{
+  return m_segment_done_signal.connect_extended (std::forward<SegmentDoneExCallback> (_cb));
+}
+
+boost::signals2::connection
+DecodePipeline::AddEOSCallback (EOSCallback &&_cb)
+{
+  return m_eos_signal.connect (std::forward<EOSCallback> (_cb));
+}
+
+boost::signals2::connection
+DecodePipeline::AddEOSExCallback (EOSExCallback &&_cb)
+{
+  return m_eos_signal.connect_extended (std::forward<EOSExCallback> (_cb));
 }
 
 /* This function will be called by the pad-added signal */

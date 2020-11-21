@@ -451,7 +451,7 @@ void VideoSystem::UploadFrames ()
                                                    / GST_VIDEO_INFO_FPS_D(&video_info) / f64(1e9)));
           for (MattePipeline &matte : pipe->mattes)
             matte.awaited = i32 (frame_num);
-          printf ("pts: %f, pf %lu\n", pts/f64(1e9), frame_num);
+          //printf ("pts: %f, pf %lu\n", pts/f64(1e9), frame_num);
         }
 
       // check if available mattes
@@ -503,8 +503,6 @@ void VideoSystem::UploadFrames ()
       update_or_create_texture(texture->GetNthTexture(3), mf.width, mf.height,
                                1, mf.width, BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE, mem);
       score += 1;
-      fprintf (stderr, "matte uploaded\n");
-
     };
 
   auto pred_null_texture
