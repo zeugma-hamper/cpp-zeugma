@@ -3,15 +3,22 @@
 
 #include <PipelineTerminus.hpp>
 
+#include <boost/signals2/signal.hpp>
+
 namespace charm
 {
 
-class MatteLoaderWorker;
+//buffer, video info, pts, frame number
+using BufferSignal = boost::signals2::signal<void (GstBuffer *, GstVideoInfo *, i64, i64)>;
+using BufferCallback = BufferSignal::slot_function_type;
+using BufferExCallback = BufferSignal::extended_slot_function_type;
+using SignalConnection = boost::signals2::connection;
 
 class TampVideoTerminus : public BasicPipelineTerminus
 {
  public:
   TampVideoTerminus ();
+  ~TampVideoTerminus () override;
 
   bool HandleDecodedPad (GstElement *_element, GstPad *_pad, GstCaps *_caps) override;
   bool OnShutdown (DecodePipeline *_dec) override;
@@ -30,15 +37,16 @@ class TampVideoTerminus : public BasicPipelineTerminus
   void NotifyOfSample (SampleStatus _status, gst_ptr<GstSample> &&_sample);
   void NotifyOfSample (SampleStatus _status, gst_ptr<GstSample> const &_sample);
 
-  void AddMatteWorker (ch_ptr<MatteLoaderWorker> const &_worker);
-  void RemoveMatteLoaderWorker (ch_ptr<MatteLoaderWorker> const &_worker);
+  SignalConnection AddBufferCallback (BufferCallback &&_cb);
+  SignalConnection AddBufferExCallback (BufferExCallback &&_cb);
 
-
-  //call with sample_mutex;
+  //call with m_sample_mutex;
   void CacheCaps (GstCaps *_caps);
   void UpdateFrameNumber ();
-  void UpdateWorkers ();
-  void RemoveWorkerCruft ();
+  void ExerciseBufferCallback ();
+  gst_ptr<GstSample> FetchSampleInternal ();
+  gst_ptr<GstSample> FetchClearSampleInternal ();
+
 
   mutable std::mutex m_sample_mutex;
   SampleStatus m_sample_status;
@@ -48,8 +56,7 @@ class TampVideoTerminus : public BasicPipelineTerminus
   i64 m_frame_pts;
   i64 m_frame_number;
   bool m_has_eos;
-
-  std::vector<ch_weak_ptr<MatteLoaderWorker>> m_matte_workers;
+  BufferSignal m_buffer_signal;
 };
 
 class NullTerminus : public BasicPipelineTerminus

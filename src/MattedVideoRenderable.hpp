@@ -47,6 +47,12 @@ class MattedVideoRenderable final : public Renderable
   void EnableMatte ();
   void DisableMatte ();
 
+  void SetEnableMixColor (bool _tf);
+  bool GetEnableMixColor () const;
+
+  void SetMixColor (glm::vec4 const &_color);
+  glm::vec4 GetMixColor () const;
+
   // Matte clips and scales to the matte's region of interest
   // Video scales matte to video size and aspect
   void SetSizeReferent (SizeReferent _ref);
@@ -62,6 +68,8 @@ class MattedVideoRenderable final : public Renderable
   u64 m_bgfx_state;
   SizeReferent m_size_referent;
   bool m_enable_matte;
+  bool m_enable_mix_color;
+  glm::vec4 m_mix_color;
 };
 
 

@@ -7,11 +7,16 @@
 
 #include <MatteLoaderPool.hpp>
 
+#include <boost/signals2/signal.hpp>
+
 #include <filesystem>
 #include <memory>
 #include <string_view>
 #include <string>
 #include <vector>
+
+#include <gst/gst.h>
+#include <gst/video/video-info.h>
 
 namespace charm
 {
@@ -66,6 +71,7 @@ class VideoTexture : public CharmBase<VideoTexture>
   bgfx::UniformHandle const &GetFlagsUniform () const;
   bgfx::UniformHandle const &GetOverUniform () const;
   bgfx::UniformHandle const &GetUpUniform () const;
+  bgfx::UniformHandle const &GetMixColorUniform () const;
   bgfx::ProgramHandle const &GetProgram () const;
 
  protected:
@@ -75,14 +81,15 @@ class VideoTexture : public CharmBase<VideoTexture>
   v2i32 matte_min = {-1, -1};
   v2i32 matte_max = {-1, -1};
   bgfx::ProgramHandle program  = BGFX_INVALID_HANDLE;
-  bgfx::UniformHandle uniforms[9] = {BGFX_INVALID_HANDLE,
-                                     BGFX_INVALID_HANDLE,
-                                     BGFX_INVALID_HANDLE,
-                                     BGFX_INVALID_HANDLE,
-                                     BGFX_INVALID_HANDLE,
-                                     BGFX_INVALID_HANDLE,
-                                     BGFX_INVALID_HANDLE,
-                                     BGFX_INVALID_HANDLE};
+  bgfx::UniformHandle uniforms[10] = {BGFX_INVALID_HANDLE,
+                                      BGFX_INVALID_HANDLE,
+                                      BGFX_INVALID_HANDLE,
+                                      BGFX_INVALID_HANDLE,
+                                      BGFX_INVALID_HANDLE,
+                                      BGFX_INVALID_HANDLE,
+                                      BGFX_INVALID_HANDLE,
+                                      BGFX_INVALID_HANDLE,
+                                      BGFX_INVALID_HANDLE};
   //at most 4 for Y, U, V, A/matte
   //this is the only graphic resource VideoTexture owns,
   //everything else is owned by VideoSystem
@@ -128,10 +135,17 @@ class VideoPipeline : public CharmBase<VideoPipeline>
 
   void ClearMattes ();
 
+  // called by Terminus from the streaming thread
+  void NewBufferCallback (GstBuffer *_buffer, GstVideoInfo *_info,
+                          i64 _pts, i64 _frame_number);
+
   std::string path;
   ch_ptr<DecodePipeline> pipeline;
   TampVideoTerminus *terminus = nullptr;
   ch_weak_ptr<VideoTexture> texture;
+  boost::signals2::connection buffer_connection;
+
+  std::mutex m_matte_lock; //heh
   std::vector<MattePipeline> mattes;
   i64 active_matte = -1;
   i64 current_matte = -1;
@@ -158,15 +172,16 @@ class VideoSystem
                                                   BGFX_STATE_BLEND_INV_SRC_ALPHA);
     bgfx::ProgramHandle matte_program = BGFX_INVALID_HANDLE;
 
-    bgfx::UniformHandle uniforms[9] = {BGFX_INVALID_HANDLE, //video texture 0
-                                       BGFX_INVALID_HANDLE, //video texture 1
-                                       BGFX_INVALID_HANDLE, //video texture 2
-                                       BGFX_INVALID_HANDLE, //video matte
-                                       BGFX_INVALID_HANDLE, //dimensions
-                                       BGFX_INVALID_HANDLE, //matte dimensions
-                                       BGFX_INVALID_HANDLE, //over
-                                       BGFX_INVALID_HANDLE, //up
-                                       BGFX_INVALID_HANDLE};//flags
+    bgfx::UniformHandle uniforms[10] = {BGFX_INVALID_HANDLE, //video texture 0
+                                        BGFX_INVALID_HANDLE, //video texture 1
+                                        BGFX_INVALID_HANDLE, //video texture 2
+                                        BGFX_INVALID_HANDLE, //video matte
+                                        BGFX_INVALID_HANDLE, //dimensions
+                                        BGFX_INVALID_HANDLE, //matte dimensions
+                                        BGFX_INVALID_HANDLE, //over
+                                        BGFX_INVALID_HANDLE, //up
+                                        BGFX_INVALID_HANDLE, //flags
+                                        BGFX_INVALID_HANDLE};//mix color
 
     bgfx::TextureHandle black_texture;
     bgfx::TextureHandle white_texture;
@@ -226,8 +241,8 @@ class VideoSystem
 
 
   GraphicsResources m_vgr;
-  std::unique_ptr<MatteLoaderPool> m_matte_pool;
   std::vector<ch_ptr<VideoPipeline>> m_pipelines;
+  std::unique_ptr<MatteLoaderPool> m_matte_pool;
   szt m_upload_position;
 };
 

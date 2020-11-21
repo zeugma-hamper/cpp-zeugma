@@ -27,7 +27,7 @@ VideoTexture::VideoTexture (VideoFormat _format, bgfx::ProgramHandle _program,
   for (size_t i = 0; i < ArraySize (textures); ++i)
     textures[i] = BGFX_INVALID_HANDLE;
 
-  assert (_uni_count <= 9);
+  assert (_uni_count <= 10);
 
   for (size_t i = 0; i < _uni_count; ++i)
     uniforms[i] = _unis[i];
@@ -156,6 +156,11 @@ bgfx::UniformHandle const &VideoTexture::GetUpUniform () const
   return uniforms[7];
 }
 
+bgfx::UniformHandle const &VideoTexture::GetMixColorUniform () const
+{
+  return uniforms[9];
+}
+
 bgfx::ProgramHandle const &VideoTexture::GetProgram () const
 {
   return program;
@@ -166,12 +171,14 @@ bgfx::ProgramHandle const &VideoTexture::GetProgram () const
 
 VideoPipeline::VideoPipeline ()
   : terminus {nullptr},
-    active_matte {0}
+    active_matte {-1},
+    current_matte {-1}
 {
 }
 
 VideoPipeline::~VideoPipeline ()
 {
+  buffer_connection.disconnect();
 }
 
 ch_ptr<VideoTexture> VideoPipeline::OpenFile (std::string_view _path)
@@ -185,10 +192,13 @@ ch_ptr<VideoTexture> VideoPipeline::OpenFile (std::string_view _path)
   ch_ptr<VideoTexture> ret = system->CreateVideoTexture (VideoFormat::I420);
   texture = ret;
 
-  pipeline->Play ();
-
   path = _path;
   terminus = dynamic_cast<TampVideoTerminus *> (pipeline->m_video_terminus.get ());
+  auto buffer_cb = [t = this] (GstBuffer *b, GstVideoInfo *vi, i64 pts, i64 fn)
+    { t->NewBufferCallback(b, vi, pts, fn); };
+  terminus->AddBufferCallback(std::move (buffer_cb));
+
+  pipeline->Play ();
 
   return ret;
 }
@@ -202,12 +212,14 @@ bool VideoPipeline::AddMatte (f64 _loop_start_ts, f64 _loop_end_ts,
   MattePipeline pipe
     = system->CreateMattePipeline(_loop_start_ts, _loop_end_ts,
                                   _frame_count, _matte_dir, _min, _max);
-  terminus->AddMatteWorker(pipe.worker);
 
   if (mattes.size () == 0)
     active_matte = 0;
 
-  mattes.push_back(std::move (pipe));
+  {
+    std::unique_lock lock {m_matte_lock};
+    mattes.push_back(std::move (pipe));
+  }
 
   return true;
 }
@@ -254,7 +266,10 @@ void VideoPipeline::ClearMattes ()
 
   current_matte = -1;
   active_matte = -1;
-  mattes.clear();
+  {
+    std::unique_lock lock {m_matte_lock};
+    mattes.clear();
+  }
   ch_ptr<VideoTexture> text = GetVideoTexture ();
   if (! text)
     return;
@@ -264,6 +279,18 @@ void VideoPipeline::ClearMattes ()
   bgfx::TextureHandle handle = bgfx::createTexture2D(2, 2, false, 1, bgfx::TextureFormat::R8);
   text->SetNthTexture(3, handle);
   return;
+}
+
+void VideoPipeline::NewBufferCallback (GstBuffer *,  GstVideoInfo *_info,
+                                       i64, i64 _frame_number)
+{
+  std::unique_lock lock {m_matte_lock};
+
+  for (MattePipeline &matte : mattes)
+    {
+      matte.worker->PushJob(u32 (_frame_number), _info->fps_n, _info->fps_d);
+      matte.worker->PushJob(u32 (_frame_number+1), _info->fps_n, _info->fps_d);
+    }
 }
 
 
@@ -303,6 +330,7 @@ VideoSystem::VideoSystem ()
   m_vgr.uniforms[6] = bgfx::createUniform("u_over", bgfx::UniformType::Vec4);
   m_vgr.uniforms[7] = bgfx::createUniform("u_up",   bgfx::UniformType::Vec4);
   m_vgr.uniforms[8] = bgfx::createUniform("u_flags",   bgfx::UniformType::Vec4);
+  m_vgr.uniforms[9] = bgfx::createUniform("u_mix_color",   bgfx::UniformType::Vec4);
 
   ProgramResiduals ps = CreateProgram ("video_vs.bin", "video_fs.bin", true);
   m_vgr.basic_program = ps.program;

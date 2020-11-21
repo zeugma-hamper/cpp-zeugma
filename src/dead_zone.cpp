@@ -69,6 +69,7 @@ i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
 
   if (utt == "q") //quit
     {
+      s_pipeline.reset ();
       GraphicsApplication::GetApplication()->StopRunning();
     }
   else if (utt == "w" || utt == "s") //previous/next video
@@ -116,6 +117,7 @@ i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
           pipe->SetActiveMatte(0);
           pipe->GetDecoder()->Loop(ci.start_time, ci.start_time + ci.duration);
           s_renderable->EnableMatte();
+          s_renderable->SetEnableMixColor(true);
         }
     }
   else if (utt == "z" || utt == "c")
@@ -149,6 +151,7 @@ i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
             pipe->SetActiveMatte(0);
             pipe->GetDecoder()->Loop(ci.start_time, ci.start_time + ci.duration, 1.0f);
             s_renderable->EnableMatte();
+            s_renderable->SetEnableMixColor(true);
             conn.disconnect();
           };
           s_seg_done = pipe->GetDecoder()->AddSegmentDoneExCallback(std::move (seg_done_cb));
@@ -272,7 +275,7 @@ int main (int, char **)
   [[maybe_unused]] ClipInfo &clip_info = film_info.clips[s_clip_index];
 
   auto *video_system = VideoSystem::GetSystem();
-  VideoBrace const brace = video_system->OpenVideoFile (film_info.film_path.string());
+  VideoBrace brace = video_system->OpenVideoFile (film_info.film_path.string());
 
   MattedVideoRenderable *renderable
     = new MattedVideoRenderable (brace.video_texture);
@@ -286,6 +289,7 @@ int main (int, char **)
   //         clip_info.geometry.dir_geometry.max[1]);
   s_renderable = renderable;
   s_renderable_owner = nodal;
+  brace = VideoBrace{};
 
   s2::connection key_conn = dead_zone.GetSprinkler().AppendHandler<ZEYowlAppearEvent>(&handle_key_press);
 

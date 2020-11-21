@@ -17,27 +17,23 @@ MattedVideoRenderable::MattedVideoRenderable ()
   : Renderable (),
     m_bgfx_state {0},
     m_size_referent {SizeReferent::Matte},
-    m_enable_matte {true}
+    m_enable_matte {true},
+    m_enable_mix_color {false},
+    m_mix_color {0.5f, 0.5f, 0.5f, 1.0f}
 {
   EnableMatte();
 }
 
 MattedVideoRenderable::MattedVideoRenderable (ch_ptr<VideoTexture> const &_texture)
-  : Renderable (),
-    m_video_texture {_texture},
-    m_bgfx_state {0},
-    m_size_referent {SizeReferent::Matte},
-    m_enable_matte {true}
+  : MattedVideoRenderable ()
 {
-  EnableMatte ();
+  m_video_texture = _texture;
 }
 
 MattedVideoRenderable::MattedVideoRenderable (std::string_view _path,
                                               f64 _loop_start_ts, f64 _loop_end_ts,
                                               std::string_view _matte_pattern)
-  : Renderable (),
-    m_size_referent {SizeReferent::Matte},
-    m_enable_matte {true}
+  : MattedVideoRenderable ()
 {
   VideoSystem *system = VideoSystem::GetSystem ();
   assert (system);
@@ -51,9 +47,7 @@ MattedVideoRenderable::MattedVideoRenderable (std::string_view _path,
 }
 
 MattedVideoRenderable::MattedVideoRenderable (FilmInfo const &_film, ClipInfo const &_clip)
-  : Renderable (),
-    m_size_referent {SizeReferent::Matte},
-    m_enable_matte {true}
+  : MattedVideoRenderable ()
 {
   VideoSystem *system = VideoSystem::GetSystem ();
   assert (system);
@@ -164,6 +158,26 @@ void MattedVideoRenderable::DisableMatte ()
   SetEnableMatte(false);
 }
 
+void MattedVideoRenderable::SetEnableMixColor (bool _tf)
+{
+  m_enable_mix_color = _tf;
+}
+
+bool MattedVideoRenderable::GetEnableMixColor () const
+{
+  return m_enable_mix_color;
+}
+
+void MattedVideoRenderable::SetMixColor (glm::vec4 const &_color)
+{
+  m_mix_color = _color;
+}
+
+glm::vec4 MattedVideoRenderable::GetMixColor () const
+{
+  return m_mix_color;
+}
+
 void MattedVideoRenderable::SetSizeReferent (SizeReferent _ref)
 {
   m_size_referent = _ref;
@@ -197,8 +211,10 @@ void MattedVideoRenderable::Draw (u16 vyu_id)
   bgfx::setUniform(m_video_texture->GetDimensionUniform(), glm::value_ptr (vid_dim));
   bgfx::setUniform(m_video_texture->GetMatteDimUniform(),  glm::value_ptr (matte_dim));
 
-  glm::vec4 const flags {f32 (m_size_referent), 0.0f, 0.0f, 0.0f};
+  glm::vec4 const flags {f32 (m_size_referent),
+                         GetEnableMixColor() ? 1.0f : 0.0f, 0.0f, 0.0f};
   bgfx::setUniform(m_video_texture->GetFlagsUniform(), glm::value_ptr (flags));
+  bgfx::setUniform(m_video_texture->GetMixColorUniform(), glm::value_ptr (m_mix_color));
 
   glm::vec4 const over = glm::vec4 (as_glm (m_over), 0.0f);
   glm::vec4 const up = glm::vec4 (as_glm (m_up), 0.0f);

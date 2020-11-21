@@ -395,8 +395,15 @@ bool DecodePipeline::SeekFull (f64 _rate, GstFormat _format, GstSeekFlags _flags
 
 void DecodePipeline::CleanUp ()
 {
+  m_segment_done_signal.disconnect_all_slots();
+  m_eos_signal.disconnect_all_slots();
+
   if (m_pipeline)
-    gst_element_set_state (m_pipeline, GST_STATE_NULL);
+    {
+      gst_element_set_state (m_pipeline, GST_STATE_NULL);
+      GstState state, pstate;
+      gst_element_get_state (m_pipeline, &state, &pstate, GST_CLOCK_TIME_NONE);
+    }
 
   if (m_video_terminus)
     {
