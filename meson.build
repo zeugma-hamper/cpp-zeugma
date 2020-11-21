@@ -307,9 +307,9 @@ chud_zone_exec = executable ('chud-zone',
                              sources : ['src/chud-zone.cpp'],
                              dependencies : [charm_dep])
 
-cz_the_sequel_exec = executable ('cz_the_sequel',
-                             sources : ['src/cz_the_sequel.cpp'],
-                             dependencies : [charm_dep])
+# cz_the_sequel_exec = executable ('cz_the_sequel',
+#                              sources : ['src/cz_the_sequel.cpp'],
+#                              dependencies : [charm_dep])
 
 tri_demo_exec = executable ('tri_demo',
                             sources : ['src/tri_demo.cpp',
@@ -317,11 +317,11 @@ tri_demo_exec = executable ('tri_demo',
                                        'src/TriBand.cpp'],
                             dependencies : [charm_dep, glu_dep])
 
-tri_cleanup_exec = executable ('tri_cleanup',
-                            sources : ['src/tri_cleanup.cpp',
-                                       'src/Collage.cpp',
-                                       'src/TriBand.cpp'],
-                            dependencies : [charm_dep])
+# tri_cleanup_exec = executable ('tri_cleanup',
+#                             sources : ['src/tri_cleanup.cpp',
+#                                        'src/Collage.cpp',
+#                                        'src/TriBand.cpp'],
+#                             dependencies : [charm_dep])
 
 tample_exec = executable ('tample',
                            sources : ['src/tample.cpp',
