@@ -3,6 +3,9 @@
 
 #include "ZEBulletinEvent.h"
 
+#include "SinuZoft.h"
+#include "ScGrappler.h"
+
 #include <GraphicsApplication.hpp>
 
 
@@ -58,11 +61,14 @@ Ticato *AtomicFreezone::InstanitateAtom (const Vect &loc, PlatonicMaes *mae,
   tic -> AlignToMaes ();
   tic->sca . SetHard (400.0 + drand48 () * 300.0);
   tic->loc . SetHard (loc);
+
   f64 spd = min_speed + drand48 () * (max_speed - min_speed);
   spd *= (direc == 0)  ?  (drand48 () > 0.5 ? 1.0 : -1.0)  :  direc;
   tic->vel . SetHard (Vect (spd, 0.0, 0.0));
+
   field_amok -> AppendChild (tic);
   atoms . push_back (tic);
+
   return tic;
 }
 

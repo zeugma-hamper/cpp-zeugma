@@ -4,6 +4,8 @@
 #include "SinuZoft.h"
 #include "SumZoft.h"
 
+#include "tamparams.h"
+
 
 Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
                                             underlying_maes (&ma),
@@ -192,12 +194,17 @@ i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
         if (e -> ObjByTag ("to-maes")  ==  underlying_maes)
           { auto it = std::find (inchoates . begin (), inchoates . end (), tic);
             if (it == inchoates . end ())
-              inchoates . push_back (tic);
+              { inchoates . push_back (tic);
+                tic->accom_sca
+                  . Set (Vect (Tamparams::Current ()->table_scale_factor));
+              }
           }
         else if (e -> ObjByTag ("from-maes")  ==  underlying_maes)
           { auto it = std::find (inchoates . begin (), inchoates . end (), tic);
             if (it  != inchoates . end ())
-              inchoates . erase (it);
+              { inchoates . erase (it);
+                tic->accom_sca . Set (Vect (1.0));
+              }
           }
     }
   else if (e -> Says ("atom-deposit"))
@@ -209,6 +216,8 @@ i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
                 assert (2 == 3);
               }
             players . push_back (tic);
+            tic->accom_sca
+              . Set (Vect (Tamparams::Current ()->table_scale_factor));
           }
     }
   return 0;

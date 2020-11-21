@@ -1,6 +1,8 @@
 
 #include "Ticato.h"
 
+#include "ScGrappler.h"
+
 #include "MattedVideoRenderable.hpp"
 
 
@@ -9,7 +11,7 @@ i64 ze_rand (i64 h, i64 l = 0)
 
 
 Ticato::Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm, i64 which_clip)
-  :  Alignifer (), re (NULL), fr (NULL), cur_maes (NULL)
+  :  Alignifer (), re (NULL), fr (NULL), accom_sca (1.0), cur_maes (NULL)
 { if (which_fimm  <  0)
     which_fimm = ze_rand (fimmz . size ());
 
@@ -25,6 +27,17 @@ Ticato::Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm, i64 which_clip)
   fr = new RectRenderableFrontier (re, Vect::zerov, 1.0, 1.0);
   AppendRenderable (re);
   SetFrontier (fr);
+
+  accom_sca . MakeBecomeLikable ();
+  if (GrapplerPile *gp = UnsecuredGrapplerPile ())
+    { i64 ind = gp -> IndexForGrappler (gp -> FindGrappler ("loc"));
+      ScGrappler *scg = new ScGrappler (accom_sca);
+      scg -> SetName ("accom-scale");
+      if (ind  >=  0)
+        gp -> InsertGrappler (scg, ind);
+      else
+        gp -> AppendGrappler (scg);
+    }
 }
 
 

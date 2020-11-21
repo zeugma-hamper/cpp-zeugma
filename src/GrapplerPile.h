@@ -29,7 +29,8 @@ class GrapplerPile  :  public Grappler
 
   i64 GrapplerCount ()  const;
   Grappler *NthGrappler (i64 ind)  const;
-  i64 FindGrappler (Grappler *g)  const;
+  i64 IndexForGrappler (Grappler *g)  const;
+  i64 IndexForGrappler (const std::string &nm)  const;
   Grappler *FindGrappler (const std::string &nm)  const;
 
   GrapplerPile &AppendGrappler (Grappler *g);

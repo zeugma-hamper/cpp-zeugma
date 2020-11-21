@@ -25,6 +25,7 @@ class Ticato  :  public Alignifer
   Renderable *re;
   RectRenderableFrontier *fr;
   ZoftVect vel;
+  ZoftVect accom_sca;
   PlatonicMaes *cur_maes;
   std::string hvrr;
   std::string ynkr;
