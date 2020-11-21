@@ -7,8 +7,8 @@
 
 Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
                                             underlying_maes (&ma),
-                                            sentient_dist (300.0),
-                                            contact_dist (50.0)
+                                            sentient_dist (200.0),
+                                            contact_dist (25.0)
 { }
 
 
@@ -66,10 +66,6 @@ i64 Orksur::ZESpatialMove (ZESpatialMoveEvent *e)
   Vect troff = CornerTR () - proj;
   s->re -> ClearAllLines ();
 
-  auto heff = hoverees . find (prv);
-  auto geff = graspees . find (prv);
-assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
-
   const Vect &o = ovr.val, &u = upp.val;
   f64 l = o . Dot (bloff), r = o . Dot (troff);
   if (l < 0.0  ||  r < 0.0)
@@ -87,7 +83,12 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
     aa = 1.0;
   s->re -> SetLinesColor (ZeColor (1.0, 0.5 * (1.0 - aa)));
 
-  if (tt  >  sentient_dist)
+  auto heff = hoverees . find (prv);
+  auto geff = graspees . find (prv);
+assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
+  Ticato *ca = ClosestAtom (proj);
+
+  if (! ca  ||  tt  >  sentient_dist)
     { if (heff  !=  hoverees . end ())
         { hoverees . erase (heff);
           // and whatever else's polite on un-hover
@@ -99,43 +100,13 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
       return 0;
     }
 
-  Ticato *ca = ClosestAtom (proj);
-  if (tt > contact_dist)
-    { if (geff  !=  graspees . end ())
-        { graspees . erase (geff);   // plus whatever else to detach grasping
-          hoverees[prv] = { ca, Vect::zerov };
-        }
-      else if (heff  !=  hoverees . end ())
-        { if (heff->second.tic  !=  ca)
-            { // adios, other-tic
-              heff->second.tic = ca;
-            }
-          // glow or other hover-y appurtenances
-        }
-      else
-        { hoverees[prv] = { ca, Vect::zerov };
-          // plus: hello hoveree!
-        }
-/*
-      if (heff and heff == tic)
-        update position;
-      else if (heff and heff != tic)
-        release other and make heff be tic;
-      else if (geff)  // whether geff is tic or not!
-        remove geff and add heff;
-      else // weren't nuthin' nowhere
-        add heff;
-*/
-    }
-  else
+  if (tt  <=  contact_dist)
     { if (geff  !=  graspees . end ())
         { if (geff->second.tic  ==  ca)
             { ca -> LocZoft () . Set (proj + geff->second.gropoff);
             }
-          else // this acknowledged extermely odd: already grasping not-ca?
-            { // something else to release 'other' atom?
-              geff->second.tic = ca;
-              geff->second.gropoff = ca -> Loc () - proj;
+          else // i.e. a different atom is 'closer', but...
+            { // ... too bad! we're modally grasping an atom already
             }
         }
       else if (heff  !=  hoverees . end ())
@@ -176,6 +147,33 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
         // what if somebody else is grasping tic?
         remove heff and add geff;
       else add geff;
+*/
+    }
+  else  // we're between contact and hover
+    { if (geff  !=  graspees . end ())
+        { graspees . erase (geff);   // plus whatever else to detach grasping
+          hoverees[prv] = { ca, Vect::zerov };
+        }
+      else if (heff  !=  hoverees . end ())
+        { if (heff->second.tic  !=  ca)
+            { // adios, other-tic
+              heff->second.tic = ca;
+            }
+          // glow or other hover-y appurtenances
+        }
+      else
+        { hoverees[prv] = { ca, Vect::zerov };
+          // plus: hello hoveree!
+        }
+/*
+      if (heff and heff == tic)
+        update position;
+      else if (heff and heff != tic)
+        release other and make heff be tic;
+      else if (geff)  // whether geff is tic or not!
+        remove geff and add heff;
+      else // weren't nuthin' nowhere
+        add heff;
 */
     }
 

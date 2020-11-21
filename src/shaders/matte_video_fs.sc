@@ -1,7 +1,10 @@
+
 $input v_uv
 
 #include <bgfx_shader.sh>
 #include <yuv.sh>
+
+uniform vec4 u_adjc;
 
 SAMPLER2D (u_video_texture0, 0);
 SAMPLER2D (u_video_texture1, 1);
@@ -22,5 +25,8 @@ void main()
                    texture2D (u_video_texture1, v_uv).r,
                    texture2D (u_video_texture2, v_uv).r);
 
+//  vec4 adjjy = vec4 (1.0, 1.0, 1.0, 1.0);
+//  out_color = adjjy * vec4 (convert_bt601_scaled (yuv), alpha);
   out_color = vec4 (convert_bt601_scaled (yuv), alpha);
+//  out_color = u_adjc * vec4 (convert_bt601_scaled (yuv), alpha);
 }

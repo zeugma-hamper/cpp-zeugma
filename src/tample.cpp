@@ -678,7 +678,7 @@ griddy -> SetHeight (0.5 * tabl -> Height ());
 griddy -> SetWarp (0.1 * tabl -> Over ());
 griddy -> SetWeft (0.1 * tabl -> Up ());
 griddy -> SetGridColor (ZeColor (1.0, 0.0, 1.0, 0.5));
-kawntent -> AppendChild (gridno);
+//kawntent -> AppendChild (gridno);
 
   tamp . Run ();
 

@@ -1,11 +1,13 @@
+
 #include <TexturedRenderable.hpp>
 
 #include <Node.hpp>
 
 #include <vector_interop.hpp>
 
-namespace charm
-{
+
+namespace charm  {
+
 
 TexturedRenderable::TexturedRenderable ()
   : Renderable (),
@@ -16,13 +18,14 @@ TexturedRenderable::TexturedRenderable ()
     m_uni_texture {BGFX_INVALID_HANDLE},
     m_particulars {}
 {
-  m_uni_over = bgfx::createUniform("u_over", bgfx::UniformType::Vec4);
-  m_uni_up = bgfx::createUniform("u_up", bgfx::UniformType::Vec4);
-  m_uni_wh = bgfx::createUniform("u_wh", bgfx::UniformType::Vec4);
-  m_uni_texture = bgfx::createUniform("u_texture", bgfx::UniformType::Sampler);
-  m_uni_adj_iro = bgfx::createUniform("u_adjc", bgfx::UniformType::Vec4);
+  m_uni_over = bgfx::createUniform ("u_over", bgfx::UniformType::Vec4);
+  m_uni_up = bgfx::createUniform ("u_up", bgfx::UniformType::Vec4);
+  m_uni_wh = bgfx::createUniform ("u_wh", bgfx::UniformType::Vec4);
+  m_uni_texture = bgfx::createUniform ("u_texture", bgfx::UniformType::Sampler);
+  m_uni_adj_iro = bgfx::createUniform ("u_adjc", bgfx::UniformType::Vec4);
 
-  ProgramResiduals pr = CreateProgram("textured_renderable.vs.bin", "textured_renderable.fs.bin", true);
+  ProgramResiduals pr = CreateProgram ("textured_renderable.vs.bin",
+                                       "textured_renderable.fs.bin", true);
   m_program = pr.program;
 }
 
@@ -45,10 +48,12 @@ void TexturedRenderable::SetTexture (TextureParticulars const &_tp)
     AdaptGeometryToTexture();
 }
 
+
 TextureParticulars const &TexturedRenderable::GetTexture () const
 {
   return m_particulars;
 }
+
 
 void TexturedRenderable::Draw (u16 _view_id)
 {
@@ -65,8 +70,9 @@ void TexturedRenderable::Draw (u16 _view_id)
   if (m_particulars.format == bgfx::TextureFormat::RGBA8)
     state |= BGFX_STATE_WRITE_A;
 
-  bgfx::setTransform(glm::value_ptr (m_node->GetAbsoluteTransformation ().model));
-  bgfx::setVertexBuffer(0, m_vbuffer, 0, 4);
+  bgfx::setTransform
+    (glm::value_ptr (m_node->GetAbsoluteTransformation ().model));
+  bgfx::setVertexBuffer (0, m_vbuffer, 0, 4);
   bgfx::setState (state);
 
   glm::vec4 const over = glm::vec4 (as_glm (m_over), 0.0f);
@@ -81,7 +87,6 @@ void TexturedRenderable::Draw (u16 _view_id)
   bgfx::setUniform (m_uni_wh, &wh);
   bgfx::setUniform (m_uni_adj_iro, &ac);
   bgfx::setTexture (0, m_uni_texture, m_particulars.handle);
-
 
   bgfx::submit (_view_id, m_program, m_graph_id);
 }
@@ -125,5 +130,6 @@ void TexturedRenderable::AdaptGeometryToTexture ()
   const bgfx::Memory *vb_mem = bgfx::copy (combined, 4 * sizeof (uv_vertex));
   m_vbuffer = bgfx::createVertexBuffer(vb_mem, layout);
 }
+
 
 }
