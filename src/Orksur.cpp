@@ -47,6 +47,22 @@ Ticato *Orksur::ClosestAtom (const Vect &p)
 }
 
 
+void Orksur::DistinguishHoverees ()
+{ static ZeColor fullc (1.0, 1.0);
+  static ZeColor fadec (0.4, 1.0);
+
+  bool never_mind = (hoverees . size ()  ==  0);
+  for (Ticato *tic  :  players)
+    if (tic)
+      tic->re -> SetAdjColor (never_mind ? fullc : fadec);
+
+  for (auto &f  :  hoverees)
+    if (f.second.tic)
+      f.second.tic->re -> SetAdjColor (fullc);
+}
+
+
+
 i64 Orksur::ZESpatialMove (ZESpatialMoveEvent *e)
 { if (! e)
     return -1;
@@ -100,6 +116,7 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
         { graspees . erase (geff);
           // plus other leave-taking gubbish
         }
+      DistinguishHoverees ();
       return 0;
     }
 
@@ -141,16 +158,6 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
               hoverees[prv] = { ca, Vect::zerov };
             }
         }
-/*
-      if (geff and geff == tic)
-        update position;
-      else if (geff and geff != tic)
-        uh...;
-      else if (heff and (heff == tic or heff != tif))
-        // what if somebody else is grasping tic?
-        remove heff and add geff;
-      else add geff;
-*/
     }
   else  // we're between contact and hover
     { if (geff  !=  graspees . end ())
@@ -168,18 +175,9 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
         { hoverees[prv] = { ca, Vect::zerov };
           // plus: hello hoveree!
         }
-/*
-      if (heff and heff == tic)
-        update position;
-      else if (heff and heff != tic)
-        release other and make heff be tic;
-      else if (geff)  // whether geff is tic or not!
-        remove geff and add heff;
-      else // weren't nuthin' nowhere
-        add heff;
-*/
     }
 
+  DistinguishHoverees ();
   return 0;
 }
 

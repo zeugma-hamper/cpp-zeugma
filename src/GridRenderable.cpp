@@ -20,13 +20,17 @@ GridRenderable::GridRenderable ()  :  Renderable (), wid (10.0), hei (10.0),
                                       warp (Vect::xaxis), weft (Vect::yaxis),
                                       shad_prog {BGFX_INVALID_HANDLE},
                                       vbuf {BGFX_INVALID_HANDLE}
-{ bx::FilePath shader_path = "grid_vs.bin";
+{ unif_gridc = bgfx::createUniform (color_unif_s, bgfx::UniformType::Vec4);
+  unif_warp = bgfx::createUniform (warp_unif_s, bgfx::UniformType::Vec4);
+  unif_weft = bgfx::createUniform (weft_unif_s, bgfx::UniformType::Vec4);
+
+  bx::FilePath shader_path = "grid_vs.bin";
   bgfx::ShaderHandle vs = CreateShader (shader_path);
-  shader_path = bx::StringView("grid_fs.bin");
+  shader_path = bx::StringView ("grid_fs.bin");
   bgfx::ShaderHandle fs = CreateShader (shader_path);
 
   if (bgfx::isValid (vs)  &&  bgfx::isValid (fs))
-    shad_prog = bgfx::createProgram(vs, fs, true);
+    shad_prog = bgfx::createProgram (vs, fs, true);
   else
     { bgfx::destroy (vs);
       bgfx::destroy (fs);
@@ -38,10 +42,6 @@ GridRenderable::GridRenderable ()  :  Renderable (), wid (10.0), hei (10.0),
     . end ();
 
   vbuf = bgfx::createDynamicVertexBuffer (4, lout, BGFX_BUFFER_ALLOW_RESIZE);
-
-  unif_gridc = bgfx::createUniform (color_unif_s, bgfx::UniformType::Vec4);
-  unif_warp = bgfx::createUniform (warp_unif_s, bgfx::UniformType::Vec4);
-  unif_weft = bgfx::createUniform (weft_unif_s, bgfx::UniformType::Vec4);
  }
 
 

@@ -520,9 +520,9 @@ int main (int ac, char **av)
       if (! leaf->maes)
         continue;
 
-      if (leaf->maes -> Name () == "front")
+      if (leaf->maes -> Name ()  ==  "front")
         leaf->layers . push_back (front_layer);
-      else if (leaf->maes -> Name () == "left")
+      else if (leaf->maes -> Name ()  ==  "left")
         leaf->layers . push_back (left_layer);
 
       //ee_layer goes on all
@@ -679,7 +679,7 @@ griddy -> SetHeight (0.5 * tabl -> Height ());
 griddy -> SetWarp (0.1 * tabl -> Over ());
 griddy -> SetWeft (0.1 * tabl -> Up ());
 griddy -> SetGridColor (ZeColor (1.0, 0.0, 1.0, 0.5));
-//kawntent -> AppendChild (gridno);
+kawntent -> AppendChild (gridno);
 
   tamp . Run ();
 

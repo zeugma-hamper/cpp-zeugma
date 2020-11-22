@@ -60,6 +60,8 @@ class Orksur  :  public PlatonicMaes, public Node,
   i64 NumGraspees ()  const
     { return graspees . size (); }
 
+  void DistinguishHoverees ();
+
   i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
 
   i64 ZEBulletin (ZEBulletinEvent *e)  override;

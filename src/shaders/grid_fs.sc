@@ -14,7 +14,7 @@ layout(location = 0) out vec4 out_color;
 
 
 void main()
-{ float tx = mod (wrld_p.x * 0.01, 1.0);
-  float ty = mod (wrld_p.y * 0.01, 1.0);;
+{ float tx = mod (dot (wrld_p, u_warp), 1.0);
+  float ty = mod (dot (wrld_p, u_weft), 1.0);;
   out_color = tx * ty * u_color;
 }
