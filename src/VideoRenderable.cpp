@@ -26,8 +26,6 @@ VideoRenderable::VideoRenderable (std::string_view _uri)
 
   VideoBrace brace = system->OpenVideo (_uri);
   m_video_texture = brace.video_texture;
-
-  m_uni_adj_iro = bgfx::createUniform ("u_adjc", bgfx::UniformType::Vec4);
 }
 
 VideoRenderable::VideoRenderable (FilmInfo const &_fm)
@@ -38,8 +36,6 @@ VideoRenderable::VideoRenderable (FilmInfo const &_fm)
 
   VideoBrace brace = system->OpenVideo (std::string ("file://") + _fm.film_path.string ());
   m_video_texture = brace.video_texture;
-
-  m_uni_adj_iro = bgfx::createUniform ("u_adjc", bgfx::UniformType::Vec4);
 }
 
 VideoRenderable::~VideoRenderable ()
@@ -81,7 +77,7 @@ void VideoRenderable::Draw (u16 vyu_id)
   glm::vec4 const ac (1.0, 1.0, 1.0, 1.0); //= as_glm (m_adjc.val);
   bgfx::setUniform (m_video_texture->GetOverUniform(), &over);
   bgfx::setUniform (m_video_texture->GetUpUniform(), &up);
-  bgfx::setUniform (m_uni_adj_iro, glm::value_ptr (ac));
+  bgfx::setUniform (m_video_texture->GetAdjColorUniform(), glm::value_ptr (ac));
 
   bgfx::submit(vyu_id, m_video_texture->GetProgram ());
 }

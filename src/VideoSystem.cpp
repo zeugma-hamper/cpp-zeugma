@@ -33,7 +33,7 @@ VideoTexture::VideoTexture (VideoFormat _format, u64 _state, bgfx::ProgramHandle
   for (size_t i = 0; i < array_size (textures); ++i)
     textures[i] = BGFX_INVALID_HANDLE;
 
-  assert (_uni_count <= 8);
+  assert (_uni_count <= 9);
 
   for (size_t i = 0; i < _uni_count; ++i)
     uniforms[i] = _unis[i];
@@ -156,6 +156,11 @@ bgfx::UniformHandle const &VideoTexture::GetUpUniform () const
   return uniforms[7];
 }
 
+bgfx::UniformHandle const &VideoTexture::GetAdjColorUniform () const
+{
+  return uniforms[8];
+}
+
 bgfx::ProgramHandle const &VideoTexture::GetProgram () const
 {
   return program;
@@ -193,6 +198,7 @@ VideoSystem::VideoSystem ()
   m_vgr.uniforms[5] = bgfx::createUniform("u_matte_dimensions", bgfx::UniformType::Vec4);
   m_vgr.uniforms[6] = bgfx::createUniform("u_over", bgfx::UniformType::Vec4);
   m_vgr.uniforms[7] = bgfx::createUniform("u_up",   bgfx::UniformType::Vec4);
+  m_vgr.uniforms[8] = bgfx::createUniform("u_adj_color",   bgfx::UniformType::Vec4);
 
   ProgramResiduals ps = CreateProgram ("video_vs.bin", "video_fs.bin", true);
   m_vgr.basic_program = ps.program;

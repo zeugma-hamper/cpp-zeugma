@@ -73,6 +73,7 @@ class VideoTexture : public CharmBase<VideoTexture>
   bgfx::UniformHandle const &GetMatteDimUniform () const;
   bgfx::UniformHandle const &GetOverUniform () const;
   bgfx::UniformHandle const &GetUpUniform () const;
+  bgfx::UniformHandle const &GetAdjColorUniform () const;
   bgfx::ProgramHandle const &GetProgram () const;
 
  protected:
@@ -83,7 +84,8 @@ class VideoTexture : public CharmBase<VideoTexture>
   v2i32 matte_min = {-1, -1};
   v2i32 matte_max = {-1, -1};
   bgfx::ProgramHandle program  = BGFX_INVALID_HANDLE;
-  bgfx::UniformHandle uniforms[8] = {BGFX_INVALID_HANDLE,
+  bgfx::UniformHandle uniforms[9] = {BGFX_INVALID_HANDLE,
+                                     BGFX_INVALID_HANDLE,
                                      BGFX_INVALID_HANDLE,
                                      BGFX_INVALID_HANDLE,
                                      BGFX_INVALID_HANDLE,
@@ -135,7 +137,8 @@ class VideoSystem
                                                   BGFX_STATE_BLEND_INV_SRC_ALPHA);
     bgfx::ProgramHandle matte_program = BGFX_INVALID_HANDLE;
 
-    bgfx::UniformHandle uniforms[8] = {BGFX_INVALID_HANDLE,
+    bgfx::UniformHandle uniforms[9] = {BGFX_INVALID_HANDLE,
+                                       BGFX_INVALID_HANDLE,
                                        BGFX_INVALID_HANDLE,
                                        BGFX_INVALID_HANDLE,
                                        BGFX_INVALID_HANDLE,
