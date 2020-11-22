@@ -15,8 +15,8 @@
 
 
 
-namespace charm
-{
+namespace charm  {
+
 
 VideoRenderable::VideoRenderable (std::string_view _uri)
   : Renderable (),
@@ -34,13 +34,15 @@ VideoRenderable::VideoRenderable (FilmInfo const &_fm)
 {
   VideoSystem *system = VideoSystem::GetSystem();
 
-  VideoBrace brace = system->OpenVideo (std::string ("file://") + _fm.film_path.string ());
+  VideoBrace brace
+    = system->OpenVideo (std::string ("file://") + _fm.film_path.string ());
   m_video_texture = brace.video_texture;
 }
 
+
 VideoRenderable::~VideoRenderable ()
-{
-}
+{ }
+
 
 ch_ptr<VideoTexture> const &VideoRenderable::GetVideoTexture () const
 {
@@ -81,5 +83,6 @@ void VideoRenderable::Draw (u16 vyu_id)
 
   bgfx::submit(vyu_id, m_video_texture->GetProgram ());
 }
+
 
 }

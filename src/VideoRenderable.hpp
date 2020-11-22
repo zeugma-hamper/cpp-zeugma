@@ -33,7 +33,6 @@ class VideoRenderable final : public Renderable
 
  private:
   ch_ptr<VideoTexture> m_video_texture;
-  bgfx::UniformHandle m_uni_adj_iro;
 };
 
 

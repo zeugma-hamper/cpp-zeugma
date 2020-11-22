@@ -26,7 +26,6 @@ MattedVideoRenderable::MattedVideoRenderable (std::string_view _uri,
     -> OpenMatte (_uri, _loop_start_ts, _loop_end_ts, -1, _matte_pattern,
                   v2i32{-1, -1}, v2i32{-1, -1});
   m_video_texture = brace.video_texture;
-  m_uni_adj_iro = bgfx::createUniform ("u_adjc", bgfx::UniformType::Vec4);
 }
 
 
@@ -44,12 +43,11 @@ MattedVideoRenderable::MattedVideoRenderable (FilmInfo const &_film,
                   _clip.start_time, _clip.start_time + _clip.duration,
                   _clip.frame_count, _clip.directory, min, max);
   m_video_texture = brace.video_texture;
-  m_uni_adj_iro = bgfx::createUniform("u_adjc", bgfx::UniformType::Vec4);
 }
 
 
 MattedVideoRenderable::~MattedVideoRenderable ()
-{ bgfx::destroy (m_uni_adj_iro); }
+{ }
 
 
 ch_ptr<VideoTexture> const &MattedVideoRenderable::GetVideoTexture () const

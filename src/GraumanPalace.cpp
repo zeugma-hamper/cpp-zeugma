@@ -83,7 +83,7 @@ void GraumanPalace::ImportExhibitionRoster (const std::vector <FilmInfo> &fimmz)
         continue;  // is this even possible? doubt it; but just in case...
       vire -> SetOver (Over ());
       vire -> SetUp (Up ());
-
+vire->SetAdjColor(ZeColor(1.0,1.0,0.1,1.0));
       SilverScreen *sisc = new SilverScreen (vire, finf);
       screens . push_back (sisc);
       sisc -> AppendRenderable (vire);
