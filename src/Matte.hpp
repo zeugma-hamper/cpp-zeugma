@@ -124,6 +124,13 @@ struct ClipInfo
 
 struct FilmInfo
 {
+  i64 GetClipCount () const;
+  ClipInfo const &GetNthClip (i64 _nth) const;
+  std::vector<ClipInfo> const &GetClips () const;
+
+  std::vector<ClipInfo const *> GetClipsAfter (ClipInfo const *_clip, f64 _within = 0.0) const;
+  std::vector<ClipInfo const *> GetClipsAfter (f64 _ts, f64 _within = 0.0) const;
+
   std::filesystem::path film_path;
   std::filesystem::path clip_path;
   std::string name;
@@ -142,10 +149,16 @@ class FilmCatalog
   bool LoadFilmInfo (std::filesystem::path const &_path);
   bool LoadFilmGeometry (std::filesystem::path const &_path);
 
-
+  i64 GetFilmCount () const;
+  FilmInfo const &GetNthFilm (i64 _nth) const;
+  std::vector<FilmInfo> const &GetFilms () const;
+  FilmInfo const *FindFilmByName (std::string_view _name) const;
+  FilmInfo const *FindFilmByAbbreviation (std::string_view _abbrev) const;
 
  private:
   std::vector<FilmInfo> m_films;
+  bool m_loaded_films;
+  bool m_loaded_geometry;
 };
 
 

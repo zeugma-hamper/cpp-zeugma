@@ -373,6 +373,126 @@ void FilmGeometry::from_toml (toml::value const & _v)
   Sort ();
 }
 
+i64 FilmInfo::GetClipCount () const
+{
+  return i64 (clips.size ());
+}
+
+ClipInfo const &FilmInfo::GetNthClip (i64 _nth) const
+{
+  assert (_nth >= 0);
+  return clips[_nth];
+}
+
+std::vector<ClipInfo> const &FilmInfo::GetClips () const
+{
+  return clips;
+}
+
+std::vector<ClipInfo const *> FilmInfo::GetClipsAfter (ClipInfo const *_clip, f64 _within) const
+{
+  return GetClipsAfter (_clip->start_time + _clip->duration, _within);
+}
+
+std::vector<ClipInfo const *> FilmInfo::GetClipsAfter (f64 _ts, f64 _within) const
+{
+  std::vector<ClipInfo const *> ret;
+
+  auto in_range = [] (ClipInfo const &ci, f64 ts)
+  { return (ci.start_time <= ts && ts < ci.start_time + ci.duration); };
+
+  auto close_enough = [] (ClipInfo const &base, ClipInfo const &ci, f64 within)
+  { return (ci.start_time - base.start_time) <= within + 0.00005;  };
+
+  auto end = clips.end ();
+  for (auto cur = clips.begin(); cur != end; ++cur)
+    if (in_range(*cur, _ts))
+      {
+        ClipInfo const &base = *cur;
+        ret.push_back (&base);
+        ++cur;
+        for (; cur != end; ++cur)
+          {
+            if (close_enough (base, *cur, _within))
+              ret.push_back(&*cur);
+            else
+              return ret;
+          }
+
+      }
+
+  return ret;
+}
+
+
+FilmCatalog::FilmCatalog ()
+  : m_loaded_films {false},
+    m_loaded_geometry {false}
+{
+}
+
+bool FilmCatalog::LoadFilmInfo (std::filesystem::path const &_path)
+{
+  assert (! m_loaded_films);
+
+  m_films = ReadFilmInfo(_path);
+  if (m_films.size ())
+    {
+      m_loaded_films = true;
+      return true;
+    }
+
+  return false;
+}
+
+bool FilmCatalog::LoadFilmGeometry (std::filesystem::path const &_path)
+{
+  assert (m_loaded_films);
+  assert (! m_loaded_geometry);
+
+  std::vector<FilmGeometry> geom = ReadFileGeometry(_path);
+  if (geom.size () == 0)
+    return false;
+
+  MergeFilmInfoGeometry(m_films, geom);
+  m_loaded_geometry = true;
+  return true;
+}
+
+i64 FilmCatalog::GetFilmCount () const
+{
+  return i64 (m_films.size ());
+}
+
+FilmInfo const &FilmCatalog::GetNthFilm (i64 _nth) const
+{
+  assert (_nth >= 0);
+  return m_films[_nth];
+}
+
+std::vector<FilmInfo> const &FilmCatalog::GetFilms () const
+{
+  return m_films;
+}
+
+FilmInfo const *FilmCatalog::FindFilmByName (std::string_view _name) const
+{
+  for (auto const &fm : m_films)
+    if (fm.name == _name)
+      return &fm;
+
+  return nullptr;
+}
+
+FilmInfo const *FilmCatalog::FindFilmByAbbreviation (std::string_view _abbrev) const
+{
+  for (auto const &fm : m_films)
+    if (fm.abbreviation == _abbrev)
+      return &fm;
+
+  return nullptr;
+}
+
 std::vector<FilmGeometry>
 ReadFileGeometry (std::filesystem::path const &_path)
 {
