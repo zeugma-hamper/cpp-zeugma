@@ -207,10 +207,11 @@ bool ReadWindowTOMLFile (std::string_view _file, WindowTOML &_window,
   try
     {
       auto config = toml::parse (_file);
-      std::vector<WindowTOML> wins
-        = toml::find<std::vector<WindowTOML>> (config, s_window_toml_file_windows);
+      std::vector<WindowTOML> wins = toml::find <std::vector <WindowTOML>>
+        (config, s_window_toml_file_windows);
       _window = std::move (wins[0]);
-      _views = toml::find<std::vector<TrefoilTOML>> (config, s_window_toml_file_trefoils);
+      _views = toml::find <std::vector <TrefoilTOML>>
+        (config, s_window_toml_file_trefoils);
     }
   catch (std::runtime_error &_error)
     {

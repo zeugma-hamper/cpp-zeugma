@@ -41,6 +41,7 @@ class Orksur  :  public PlatonicMaes, public Node,
   struct Fondlish { Ticato *tic;  Vect gropoff; };
 
   const PlatonicMaes *underlying_maes;
+  Node *collage;
   std::vector <Ticato *> players;
   std::vector <Ticato *> inchoates;
   std::unordered_map <std::string, Splort *> splorts;

@@ -37,6 +37,7 @@
 #include <LoopZoft.h>
 #include "SinuZoft.h"
 #include "SumZoft.h"
+#include "TrGrappler.h"
 
 //events
 #include <GLFWWaterWorks.hpp>

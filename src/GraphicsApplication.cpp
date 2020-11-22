@@ -75,14 +75,14 @@ bool GraphicsApplication::InitWindowingAndGraphics ()
   GLFWWaterWorks *glfw_ww = new GLFWWaterWorks (window);
   AppendWaterWorks (glfw_ww);
   //call poll events, basically
-  glfw_ww->Drain (&m_event_sprinkler);
+  glfw_ww -> Drain (&m_event_sprinkler);
 
-  glfwSetWindowPos(window, win.pos[0], win.pos[1]);
-  glfwSetWindowSize(window, win.size[0], win.size[1]);
+  glfwSetWindowPos (window, win.pos[0], win.pos[1]);
+  glfwSetWindowSize (window, win.size[0], win.size[1]);
   int glfw_width, glfw_height;
-  glfwGetWindowSize(window, &glfw_width, &glfw_height);
+  glfwGetWindowSize (window, &glfw_width, &glfw_height);
 
-  bgfx::renderFrame();
+  bgfx::renderFrame ();
   bgfx::Init init;
 
   init.type = bgfx::RendererType::OpenGL;
@@ -118,13 +118,16 @@ bool GraphicsApplication::InitWindowingAndGraphics ()
   i32 const num_maes = NumMaesesFromTOML(maes_path);
   fprintf (stderr, "num maes is %d\n", num_maes);
 
-
   for (i32 i = 0; i < num_maes; ++i)
-    if (PlatonicMaes *mm = MaesFromTOML(maes_path, i); mm)
+    if (PlatonicMaes *mm = MaesFromTOML (maes_path, i); mm)
       m_maes.push_back (mm);
 
   f64 width_scale = glfw_width / f64 (max_dimensions[0]);
   f64 height_scale = glfw_height / f64 (max_dimensions[1]);
+  if (width_scale  <  height_scale)
+    height_scale = width_scale;
+  else
+    width_scale = height_scale;
 
   fprintf (stdout, "scaling views by (%.3f, %.3f)\n", width_scale, height_scale);
   i32 const tsize = i32 (trefoils.size ());

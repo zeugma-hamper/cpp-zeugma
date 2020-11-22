@@ -9,9 +9,10 @@
 
 Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
                                             underlying_maes (&ma),
+                                            collage (new Node),
                                             sentient_dist (200.0),
                                             contact_dist (25.0)
-{ }
+{ AppendChild (collage); }
 
 
 /*
@@ -215,6 +216,7 @@ i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
               { // again, something plentifully wrong; why's it already here?
                 assert (2 == 3);
               }
+            collage -> AppendChild (tic);  // excises from former parent, see?
             players . push_back (tic);
             tic->accom_sca
               . Set (Vect (Tamparams::Current ()->table_scale_factor));

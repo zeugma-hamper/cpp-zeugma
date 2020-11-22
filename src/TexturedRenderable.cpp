@@ -91,6 +91,11 @@ void TexturedRenderable::Draw (u16 _view_id)
   bgfx::submit (_view_id, m_program, m_graph_id);
 }
 
+
+//
+// protected method(s) below
+//
+
 void TexturedRenderable::AdaptGeometryToTexture ()
 {
   // i don't expect this to happen often
