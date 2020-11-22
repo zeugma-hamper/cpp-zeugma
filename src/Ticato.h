@@ -29,14 +29,13 @@ class Ticato  :  public Alignifer
   PlatonicMaes *cur_maes;
   std::string hvrr;
   std::string ynkr;
+  Node *from_node;
 
   Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm = -1,
           i64 which_clip = -1);
 
   ~Ticato ()  override
-    {
-      fprintf (stderr, "Is <%p> really gonna jelly up the sidewalk?\n", this);
-    }
+    { }
 
   PlatonicMaes *CurMaes ()  const
     { return cur_maes; }

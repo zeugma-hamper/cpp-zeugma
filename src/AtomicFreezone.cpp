@@ -6,6 +6,8 @@
 #include "SinuZoft.h"
 #include "ScGrappler.h"
 
+#include "tamparams.h"
+
 #include <GraphicsApplication.hpp>
 
 
@@ -142,7 +144,6 @@ assert (curth != NULL);
             continue;
           }
         // now, here, sadly, tic is homeless and must be raptured
-fprintf(stderr,"WHACKING! WHACKING, I TELL YOU!\n");
         if (! mort)
           mort = new std::vector <Ticato *> ();
         mort -> push_back (tic);
@@ -201,7 +202,7 @@ i64 AtomicFreezone::ZESpatialMove (ZESpatialMoveEvent *e)
     { auto it = hoverees . find (prv);
       if (it  !=  hoverees . end ())
         { it->second -> BeNotHoveredBy (prv);
-          fprintf (stderr, "Lo! abandoning <%p>\n", it->second);
+          fprintf (stderr, "Lo: abandoning <%p>\n", it->second);
           hoverees . erase (it);
         }
     }
@@ -220,6 +221,10 @@ i64 AtomicFreezone::ZESpatialHarden (ZESpatialHardenEvent *e)
       auto it = hoverees . find (prv);
       if (it  !=  hoverees . end ())
         hoverees . erase (it);
+      if (Node *conv = Tamparams::Current ()->conveyor)
+        { tic->from_node = tic -> Parent ();
+          conv -> AppendChild (tic);
+        }
     }
   else
     fprintf (stderr, "baseless CLICKsterism. here in AFreezo's SpHarden...\n");
@@ -233,7 +238,15 @@ i64 AtomicFreezone::ZESpatialSoften (ZESpatialSoftenEvent *e)
   const std::string &prv = e -> Provenance ();
   if (Ticato *tic = AtomYankedBy (prv))
     { tic -> BeNotYankedBy (prv);
-      // should we immediately return to hovering? a hard one... but no.
+      // we dont' return to hovering because (among other things) we may
+      // now be on a different surface with different hover semantics/mechanics
+      if (tic->from_node)
+        { tic->from_node -> AppendChild (tic);
+          tic->from_node = NULL;
+          // that is: put us back where we were in the scene graph, knowing
+          // that the recipient of the bulletin event immediately following
+          // may rip us away once more to locate us elsegraphular
+        }
       auto it = yankees . find (prv);
 assert (it != yankees . end ());
       yankees . erase (it);

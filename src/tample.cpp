@@ -72,9 +72,11 @@
 #include "Ticato.h"
 #include "AtomicFreezone.h"
 #include "GraumanPalace.h"
+#include "tamparams.h"
 
 
 using namespace charm;
+
 
 // don't forget: oy.
 bool extra_poo = [] () { srand48 (32123);  return true; } ();
@@ -508,10 +510,10 @@ int main (int ac, char **av)
   if (! tamp . StartUp ())
     return -1;
 
-  Layer *front_layer = tamp . GetSceneLayer();
-  Layer *left_layer = new Layer ();
-  tamp . AppendSceneLayer (left_layer);
-  Layer *omni_layer = new Layer ();
+  Layer *omni_layer = tamp . GetSceneLayer();
+  Layer *walls_layer = new Layer ();
+  tamp . AppendSceneLayer (walls_layer);
+  Layer *table_layer = new Layer ();
   tamp . AppendSceneLayer (omni_layer);
 
   i32 const leaf_count = tamp . NumRenderLeaves();
@@ -521,9 +523,11 @@ int main (int ac, char **av)
         continue;
 
       if (leaf->maes -> Name ()  ==  "front")
-        leaf->layers . push_back (front_layer);
-      else if (leaf->maes -> Name ()  ==  "left")
-        leaf->layers . push_back (left_layer);
+        leaf->layers . push_back (walls_layer);
+      if (leaf->maes -> Name ()  ==  "left")
+        leaf->layers . push_back (walls_layer);
+      if (leaf->maes -> Name ()  ==  "table")
+        leaf->layers . push_back (table_layer);
 
       //ee_layer goes on all
       leaf->layers . push_back (omni_layer);
@@ -535,7 +539,7 @@ int main (int ac, char **av)
 
   { BlockTimer bt ("loading & merging geom");
     BlockTimer slurpt ("slurping geom file");
-    std::vector<FilmGeometry> geoms
+    std::vector <FilmGeometry> geoms
       = ReadFileGeometry("../configs/mattes.toml");
     slurpt . StopTimer ();
     assert (geoms . size ()  >  0);
@@ -553,12 +557,22 @@ int main (int ac, char **av)
   f64 const total_width = maes -> Width ();
   f64 const band_height = total_height / 3.0;
 
-  Node *kawntent = new Node;
-  kawntent -> Translate (tamp . elev_transl);
-  omni_layer -> GetRootNode () -> AppendChild (kawntent);
+  Node *g_wallpaper = new Node;
+  g_wallpaper -> Translate (tamp . elev_transl);
+  walls_layer -> GetRootNode () -> AppendChild (g_wallpaper);
+  Tamparams::Current ()->wallpaper = g_wallpaper;
 
-  Node *windshield = new Node;
-  omni_layer -> GetRootNode () -> AppendChild (windshield);
+  Node *g_tablecloth = new Node;
+  table_layer -> GetRootNode () -> AppendChild (g_tablecloth);
+  Tamparams::Current ()->tablecloth = g_tablecloth;
+
+  Node *g_conveyor = new Node;
+  omni_layer -> GetRootNode () -> AppendChild (g_conveyor);
+  Tamparams::Current ()->conveyor = g_conveyor;
+
+  Node *g_windshield = new Node;
+  omni_layer -> GetRootNode () -> AppendChild (g_windshield);
+  Tamparams::Current ()->windshield = g_windshield;
 
   Vect left_cntr
     = (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
@@ -567,24 +581,16 @@ int main (int ac, char **av)
 
   for (int q = 0  ;  q < 3  ;  ++q)
     { Cursoresque *c = new Cursoresque (0.015 * maes -> Height ());
-      omni_layer -> GetRootNode () -> AppendChild (c);
+      g_windshield -> AppendChild (c);
 
       cursoresques . push_back (c);
       c -> LocZoft () = maes -> Loc ();
     }
-/*
-  tamp.steenbeck = new VideoRenderable (film_infos[4]);
-  Node *drive_in = new Node (tamp.steenbeck);
-  drive_in -> Scale (0.7 * total_width);
-  drive_in -> Translate (maes -> Loc ()
-                         - 0.5 * maes -> Height () * maes -> Up ());
-  kawntent -> AppendChild (drive_in);
-*/
 
   GraumanPalace *grau_egyp = new GraumanPalace;
   grau_egyp -> ImportExhibitionRoster (film_infos);
   grau_egyp -> Translate (maes -> Loc ());
-  kawntent -> AppendChild (grau_egyp);
+  g_wallpaper -> AppendChild (grau_egyp);
 
   tamp.gegyp = ch_ptr <GraumanPalace> (grau_egyp);
   AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
@@ -610,11 +616,11 @@ int main (int ac, char **av)
                                        ZeColor (1.0, 1.0, 0.0, 0.3)));
   splat -> AppendRenderable (polysplat);
   polysplat -> SetShouldEdge (true);
-//  windshield -> AppendChild (splat);
+//  g_windshield -> AppendChild (splat);
 */
   Orksur *orkp = new Orksur (*tabl);
   tamp.orksu = ch_ptr <Orksur> (orkp);
-  windshield -> AppendChild (orkp);
+  g_tablecloth -> AppendChild (orkp);
   AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.orksu);
   AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.orksu);
   AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.orksu);
@@ -623,18 +629,7 @@ int main (int ac, char **av)
     if (GLFWWaterWorks *ww
         = dynamic_cast <GLFWWaterWorks *> (tamp . NthWaterWorks (q)))
       ww -> SetPromoteMouseToSpatialOrthoStyle (true);
-/*
-  for (int q = 0  ;  q < 25  ;  ++q)
-    { Ticato *tic = new Ticato (film_infos);
-      tic->re -> SetOver (maes -> Over ());
-      tic->re -> SetUp (maes -> Up ());
-      tic->sca . Set (Vect (200.0));
-      tic->loc . Set (maes -> Loc ()
-                      + (drand48 () - 0.5) * 6000.0 * maes -> Over ()
-                      + (drand48 () - 0.5) * 6000.0 * maes -> Up ());
-      windshield -> AppendChild (tic->no);
-    }
-*/
+
   TextureParticulars tipi
     = CreateTexture2D ("/tmp/SIGN.jpg", DefaultTextureFlags);
   TexturedRenderable *texre = new TexturedRenderable (tipi);
@@ -643,12 +638,12 @@ int main (int ac, char **av)
   Node *texno = (tamp.texxyno = new Node (texre));
   texno -> Scale (1300.0);
   texno -> Translate (maes -> Loc ());
-  windshield -> AppendChild (texno);
+  g_wallpaper -> AppendChild (texno);
 
   AtomicFreezone *afz = new AtomicFreezone;
   tamp.freezo = ch_ptr <AtomicFreezone> (afz);
   afz->cineganz = &film_infos;
-  afz->field_amok = kawntent;
+  afz->field_amok = g_wallpaper;
   afz->atom_count_goal = 45.0;
   afz->inter_arrival_t = 5.0;
   afz->min_speed = 50.0;
@@ -679,7 +674,7 @@ griddy -> SetHeight (0.5 * tabl -> Height ());
 griddy -> SetWarp (0.1 * tabl -> Over ());
 griddy -> SetWeft (0.1 * tabl -> Up ());
 griddy -> SetGridColor (ZeColor (1.0, 0.0, 1.0, 0.5));
-kawntent -> AppendChild (gridno);
+g_tablecloth -> AppendChild (gridno);
 
   tamp . Run ();
 

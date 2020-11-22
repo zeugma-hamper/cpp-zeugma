@@ -11,7 +11,8 @@ i64 ze_rand (i64 h, i64 l = 0)
 
 
 Ticato::Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm, i64 which_clip)
-  :  Alignifer (), re (NULL), fr (NULL), accom_sca (1.0), cur_maes (NULL)
+  :  Alignifer (), re (NULL), fr (NULL), accom_sca (1.0), cur_maes (NULL),
+     from_node (NULL)
 { if (which_fimm  <  0)
     which_fimm = ze_rand (fimmz . size ());
 
