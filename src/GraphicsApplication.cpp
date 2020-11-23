@@ -213,7 +213,8 @@ void GraphicsApplication::Render ()
 
       for (Layer *l : leaf->layers)
         for (Renderable *r  :  l->GetRenderables())
-          r -> Draw (vuid);
+          if (r -> ShouldDraw ())
+            r -> Draw (vuid);
     }
 
   bgfx::frame ();
