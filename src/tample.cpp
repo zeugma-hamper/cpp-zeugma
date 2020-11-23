@@ -38,6 +38,7 @@
 #include "SinuZoft.h"
 #include "SumZoft.h"
 #include "TrGrappler.h"
+#include "ScGrappler.h"
 
 //events
 #include <GLFWWaterWorks.hpp>
@@ -345,29 +346,18 @@ i64 Sensorium::ZESpatialSoften (ZESpatialSoftenEvent *e)
 
 
 i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
-{ if (! solo_tamp->steenbeck  ||  ! e)
-    return -1;
-  const ch_ptr <DecodePipeline> deep
-    = solo_tamp->steenbeck -> GetPipeline ();
-
-  if (! deep)
-    return 0;
-
-  static bool now_playing = true;
-  auto seek_ts = [] () { static i32 i = 0; return ++i * 60.0; };
-
-  fprintf (stderr, "timestamp is %.3f\n", deep -> CurrentTimestamp ());
-
-  if (e -> Utterance ()  ==  " ")
-    { if (now_playing)
-        deep -> Pause ();
-      else
-        deep -> Play ();
-      now_playing = ! now_playing;
+{ if (e -> Utterance ()  ==  "0")
+    { InterpVect &rs = Tamparams::Current ()->room_scaler;
+      rs . Reverse ();
+      rs . Commence ();
     }
-  else if (e -> Utterance ()  ==  "s")
-    deep -> Seek (seek_ts ());
-
+  else if (e -> Utterance ()  ==  "1")
+    { static bool cur_vis = false;
+      cur_vis = ! cur_vis;
+      for (Node *no  :  Tamparams::Current ()->construction_marks)
+        if (no)
+          no -> SetVisibilityForAllLocalRenderables (cur_vis);
+    }
   return 0;
 }
 
@@ -574,6 +564,17 @@ int main (int ac, char **av)
   omni_layer -> GetRootNode () -> AppendChild (g_windshield);
   Tamparams::Current ()->windshield = g_windshield;
 
+  if (PlatonicMaes *mae = tamp . FindMaesByName ("front"))
+    { InterpVect &rs = Tamparams::Current ()->room_scaler;
+      f64 rmf = Tamparams::Current ()->room_minify_factor;
+      rs . PointA () . Set (Vect (rmf, rmf, rmf));
+      rs . PointB () . Set (Vect::onesv);
+      rs . Finish ();
+      ScGrappler *scg = new ScGrappler (rs, ZoftVect (mae -> CornerBL ()));
+      scg -> SetName ("room-scaler");
+      g_wallpaper -> AppendGrappler (scg);
+    }
+
   Vect left_cntr
     = (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
        -  0.5 * maes -> Width () * maes -> Over ()
@@ -649,16 +650,29 @@ int main (int ac, char **av)
   afz->min_speed = 50.0;
   afz->max_speed = 250.0;
 
+  LinePileRenderable *lpr = new LinePileRenderable;
+
   PlatonicMaes *plams[2] = { left, maes };
   for (PlatonicMaes *emm  :  plams)
     { Vect v = 0.5 * emm->wid.val * emm->ovr.val;
-      Vect l = emm->loc.val - v;
+      Vect l = emm->loc.val - emm->upp.val * (emm->upp.val . Dot (emm->loc.val));
+      l += -v + Tamparams::Current ()->escaband_mid * emm->upp.val;
       Vect r = l + 2.0 * v;
-      v = 0.1 * emm->hei.val * emm->upp.val;
+      v = 0.5 * Tamparams::Current ()->escaband_hei * emm->upp.val;
       Vect b = l - v;
       Vect t = l + v;
       afz -> AppendSwath (new Swath ({l, r}, {b, t}, emm));
+
+      lpr -> AppendLine ({l - v, l + v});
+      lpr -> AppendLine ({l + v, r + v});
+      lpr -> AppendLine ({r + v, r - v});
+      lpr -> AppendLine ({r - v, l - v});
     }
+
+  Node *wframe_node = new Node (lpr);
+  lpr -> SetShouldDraw (false);
+  g_wallpaper -> AppendChild (wframe_node);
+  Tamparams::Current ()->construction_marks . push_back (wframe_node);
 
 //  afz -> PopulateFromScratch ();
   AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.freezo);

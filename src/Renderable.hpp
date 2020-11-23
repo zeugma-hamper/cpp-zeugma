@@ -44,7 +44,6 @@ class Renderable
   virtual void Draw (u16 vyu_id) = 0;
 
   bool ShouldDraw () const;
-
   void SetShouldDraw (bool _tf);
 
   sort_key GetSortKey () const;

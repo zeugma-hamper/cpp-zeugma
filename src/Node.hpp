@@ -101,6 +101,8 @@ class Node
 
   void ClearTransforms ();
 
+  void SetVisibilityForAllLocalRenderables (bool vis);
+
   Node *Parent ();
 
   // node takes ownership of child nodes

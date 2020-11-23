@@ -249,6 +249,12 @@ void Node::ClearTransforms ()
 
 
 
+void Node::SetVisibilityForAllLocalRenderables (bool vis)
+{ for (Renderable *re  :  m_renderables)
+    re -> SetShouldDraw (vis);
+}
+
+
 Node *Node::Parent ()
 { return m_parent; }
 
