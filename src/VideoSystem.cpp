@@ -86,18 +86,18 @@ v2i32 VideoTexture::GetDimensions () const
   return dimensions;
 }
 
-void VideoTexture::SetMatteDimensions (v2i32 _min, v2i32 _max)
+void VideoTexture::SetMatteDimensions (v2u32 _min, v2u32 _max)
 {
   matte_min = _min;
   matte_max = _max;
 }
 
-v2i32 VideoTexture::GetMatteMin () const
+v2u32 VideoTexture::GetMatteMin () const
 {
   return matte_min;
 }
 
-v2i32 VideoTexture::GetMatteMax () const
+v2u32 VideoTexture::GetMatteMax () const
 {
   return matte_max;
 }
@@ -205,7 +205,7 @@ ch_ptr<VideoTexture> VideoPipeline::OpenFile (std::string_view _path)
 
 bool VideoPipeline::AddMatte (f64 _loop_start_ts, f64 _loop_end_ts,
                               i32 _frame_count, fs::path const &_matte_dir,
-                              v2i32 _min, v2i32 _max)
+                              v2u32 _min, v2u32 _max)
 {
   auto *system = VideoSystem::GetSystem();
   assert (system);
@@ -579,7 +579,7 @@ ch_ptr<VideoTexture> VideoSystem::CreateVideoTexture (VideoFormat _format)
 
 MattePipeline VideoSystem::CreateMattePipeline (f64 _loop_start_ts, f64 _loop_end_ts,
                                                 i32 _frame_count, fs::path const &_matte_dir,
-                                                v2i32 _min, v2i32 _max)
+                                                v2u32 _min, v2u32 _max)
 {
   MattePipeline matte;
   matte.worker = make_ch<MatteLoaderWorker> (_loop_start_ts, _frame_count, _matte_dir);
@@ -610,7 +610,7 @@ VideoBrace VideoSystem::OpenVideoFile (std::string_view _path)
 VideoBrace VideoSystem::OpenMatte (std::string_view _uri,
                                    f64 _loop_start_ts, f64 _loop_end_ts,
                                    i32 _frame_count, fs::path const &_matte_dir,
-                                   v2i32 _min, v2i32 _max)
+                                   v2u32 _min, v2u32 _max)
 {
   ch_ptr<VideoPipeline> pipeline = make_ch<VideoPipeline> ();
 

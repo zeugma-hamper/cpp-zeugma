@@ -50,7 +50,13 @@ void mod_dec_index (T &val, T max)
   val = (val + max - 1) % max;
 }
 
-
+static void AddMatteToPipeline (VideoPipeline *pipe, ClipInfo const &ci)
+{
+  pipe->AddMatte(ci.start_time, ci.start_time + ci.duration,
+                 ci.frame_count, ci.directory,
+                 ci.geometry.dir_geometry.min,
+                 ci.geometry.dir_geometry.max);
+}
 
 i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
 {
@@ -110,12 +116,7 @@ i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
           pipe->ClearMattes();
           FilmInfo const &fi = s_films.GetNthFilm(s_film_index);
           ClipInfo const &ci = fi.GetNthClip(s_clip_index);
-          v2i32 min = v2i32 {i32 (ci.geometry.dir_geometry.min[0]),
-            i32 (ci.geometry.dir_geometry.min[1])};
-          v2i32 max = v2i32 {i32 (ci.geometry.dir_geometry.max[0]),
-            i32 (ci.geometry.dir_geometry.max[1])};
-          pipe->AddMatte(ci.start_time, ci.start_time + ci.duration,
-                         ci.frame_count, ci.directory, min, max);
+          AddMatteToPipeline(pipe.get (), ci);
           pipe->SetActiveMatte(0);
           pipe->GetDecoder()->Loop(ci.start_time, ci.start_time + ci.duration);
           s_renderable->EnableMatte();
@@ -143,14 +144,9 @@ i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
           // reaches the pipeline sink. will probably need something
           // tighter for audio sync.
           auto seg_done_cb = [pipe, ci] (boost::signals2::connection conn,
-                                         DecodePipeline *dec, SegmentDoneBehavior sdb)
+                                         DecodePipeline *, SegmentDoneBehavior)
           {
-            v2i32 min = v2i32 {i32 (ci.geometry.dir_geometry.min[0]),
-              i32 (ci.geometry.dir_geometry.min[1])};
-            v2i32 max = v2i32 {i32 (ci.geometry.dir_geometry.max[0]),
-              i32 (ci.geometry.dir_geometry.max[1])};
-            pipe->AddMatte(ci.start_time, ci.start_time + ci.duration,
-                           ci.frame_count, ci.directory, min, max);
+            AddMatteToPipeline(pipe.get (), ci);
             pipe->SetActiveMatte(0);
             pipe->GetDecoder()->Loop(ci.start_time, ci.start_time + ci.duration, 1.0f);
             s_renderable->EnableMatte();
@@ -224,12 +220,7 @@ i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
           for (szt i = 0; i < 3; ++i)
             {
               ClipInfo const &ci = film_info.GetNthClip(i);
-              v2i32 min = v2i32 {i32 (ci.geometry.dir_geometry.min[0]),
-                i32 (ci.geometry.dir_geometry.min[1])};
-              v2i32 max = v2i32 {i32 (ci.geometry.dir_geometry.max[0]),
-                i32 (ci.geometry.dir_geometry.max[1])};
-              pipe->AddMatte(ci.start_time, ci.start_time + ci.duration,
-                             ci.frame_count, ci.directory, min, max);
+              AddMatteToPipeline(pipe.get (), ci);
             }
           ClipInfo const &ci = film_info.GetNthClip(0);
           pipe->SetActiveMatte(0);
@@ -272,7 +263,7 @@ int main (int, char **)
   assert (s_films.LoadFilmGeometry("../configs/mattes.toml"));
 
   FilmInfo const &film_info = s_films.GetNthFilm(s_film_index);
-  assert (film_info.clips.size () > 0 && film_info.clips.size () > s_clip_index);
+  assert (film_info.clips.size () > 0 && i64(film_info.clips.size ()) > s_clip_index);
   [[maybe_unused]] ClipInfo const &clip_info = film_info.GetNthClip(s_clip_index);
 
   auto *video_system = VideoSystem::GetSystem();

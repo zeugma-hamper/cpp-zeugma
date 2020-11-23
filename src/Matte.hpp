@@ -42,9 +42,9 @@ namespace charm
 struct MatteGeometry
 {
   u32 index = u32(-1);
-  u32 dimensions[2] = {0, 0};
-  u32 min[2] = {u32(-1), u32 (-1)};
-  u32 max[2] = {0, 0};
+  v2u32 dimensions = {0, 0};
+  v2u32 min = {u32(-1), u32 (-1)};
+  v2u32 max = {0, 0};
 
   static const std::string s_index;
   static const std::string s_dimensions;

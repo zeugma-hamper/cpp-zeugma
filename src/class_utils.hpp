@@ -39,12 +39,6 @@ void ZeroStruct (T &_str)
   memset (&_str, 0, sizeof (T));
 }
 
-template<typename T, szt N>
-constexpr szt ArraySize (T const (&)[N])
-{
-  return N;
-}
-
 }
 
 #endif //BORING_NAME_MAKE_FUN_LATER

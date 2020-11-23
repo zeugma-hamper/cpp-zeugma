@@ -41,7 +41,7 @@ MattedVideoRenderable::MattedVideoRenderable (std::string_view _path,
   VideoBrace brace
     = system->OpenMatte (_path, _loop_start_ts, _loop_end_ts,
                          -1, _matte_pattern,
-                         v2i32{-1, -1}, v2i32{-1, -1});
+                         v2u32{0, 0}, v2u32{0, 0});
   m_video_texture = brace.video_texture;
   m_bgfx_state = system->GetMatteBGFXState() | BGFX_STATE_PT_TRISTRIP;
 }
@@ -52,15 +52,11 @@ MattedVideoRenderable::MattedVideoRenderable (FilmInfo const &_film, ClipInfo co
   VideoSystem *system = VideoSystem::GetSystem ();
   assert (system);
 
-  v2i32 min = {i32 (_clip.geometry.dir_geometry.min[0]),
-    i32 (_clip.geometry.dir_geometry.min[1])};
-  v2i32 max = {i32 (_clip.geometry.dir_geometry.max[0]),
-    i32 (_clip.geometry.dir_geometry.max[1])};
-
   VideoBrace brace
     = system->OpenMatte (_film.film_path.string(),
                          _clip.start_time, _clip.start_time + _clip.duration,
-                         _clip.frame_count, _clip.directory, min, max);
+                         _clip.frame_count, _clip.directory,
+                         _clip.geometry.dir_geometry.min, _clip.geometry.dir_geometry.max);
   m_video_texture = brace.video_texture;
   m_bgfx_state = system->GetMatteBGFXState() | BGFX_STATE_PT_TRISTRIP;
 }
@@ -202,8 +198,8 @@ void MattedVideoRenderable::Draw (u16 vyu_id)
   bgfx::setVertexCount(4);
 
   v2i32 const dim = m_video_texture->GetDimensions ();
-  v2i32 const matte_min = m_video_texture->GetMatteMin();
-  v2i32 const matte_max = m_video_texture->GetMatteMax();
+  v2u32 const matte_min = m_video_texture->GetMatteMin();
+  v2u32 const matte_max = m_video_texture->GetMatteMax();
 
   glm::vec4 const vid_dim {dim.x, dim.y, 1.0f, 1.0f};
   glm::vec4 const matte_dim {matte_min.x, matte_min.y, matte_max.x, matte_max.y};

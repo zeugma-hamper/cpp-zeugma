@@ -82,20 +82,20 @@ static int process_mattes (std::vector<FilmInfo> const &_films)
 static void CombineGeom (MatteGeometry &_ref, MatteGeometry const &_new)
 {
   // printf ("ref: (%u, %u) x (%u, %u)\n",
-  //         _ref.min[0], _ref.min[1], _ref.max[0], _ref.max[1]);
+  //         _ref.min.x, _ref.min.y, _ref.max.x, _ref.max.y);
   // printf ("new: (%u, %u) x (%u, %u)\n",
-  //         _new.min[0], _new.min[1], _new.max[0], _new.max[1]);
+  //         _new.min.x, _new.min.y, _new.max.x, _new.max.y);
 
-  _ref.min[0] = std::min (_ref.min[0], _new.min[0]);
-  _ref.min[1] = std::min (_ref.min[1], _new.min[1]);
+  _ref.min.x = std::min (_ref.min.x, _new.min.x);
+  _ref.min.y = std::min (_ref.min.y, _new.min.y);
 
-  _ref.max[0] = std::max (_ref.max[0], _new.max[0]);
-  _ref.max[1] = std::max (_ref.max[1], _new.max[1]);
+  _ref.max.x = std::max (_ref.max.x, _new.max.x);
+  _ref.max.y = std::max (_ref.max.y, _new.max.y);
 
-  _ref.dimensions[0] = _ref.max[0] - _ref.min[0];
-  _ref.dimensions[1] = _ref.max[1] - _ref.min[1];
+  _ref.dimensions.x = _ref.max.x - _ref.min.x;
+  _ref.dimensions.y = _ref.max.y - _ref.min.y;
 
-  // printf ("dim: (%u, %u)\n", _ref.dimensions[0], _ref.dimensions[1]);
+  // printf ("dim: (%u, %u)\n", _ref.dimensions.x, _ref.dimensions.y);
 }
 
 static MatteGeometry ConvertToGeom (u32 index, OIIO::ROI const &_roi)

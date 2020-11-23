@@ -58,9 +58,9 @@ class VideoTexture : public CharmBase<VideoTexture>
   void SetDimensions (v2i32 _dim);
   v2i32 GetDimensions () const;
 
-  void SetMatteDimensions (v2i32 _min, v2i32 _max);
-  v2i32 GetMatteMin () const;
-  v2i32 GetMatteMax () const;
+  void SetMatteDimensions (v2u32 _min, v2u32 _max);
+  v2u32 GetMatteMin () const;
+  v2u32 GetMatteMax () const;
 
   void SetNthTexture (size_t _index, bgfx::TextureHandle _handle);
   bgfx::TextureHandle GetNthTexture (size_t _index) const;
@@ -78,8 +78,8 @@ class VideoTexture : public CharmBase<VideoTexture>
 
   VideoFormat format;
   v2i32 dimensions = {-1, -1};
-  v2i32 matte_min = {-1, -1};
-  v2i32 matte_max = {-1, -1};
+  v2u32 matte_min = {0, 0};
+  v2u32 matte_max = {0, 0};
   bgfx::ProgramHandle program  = BGFX_INVALID_HANDLE;
   bgfx::UniformHandle uniforms[10] = {BGFX_INVALID_HANDLE,
                                       BGFX_INVALID_HANDLE,
@@ -108,8 +108,8 @@ struct MattePipeline
   f64 end_timestamp = -1.0;
   i32 frame_count = 0;
   i32 awaited = -1;
-  v2i32 roi_min {0, 0};
-  v2i32 roi_max {0, 0};
+  v2u32 roi_min {0, 0};
+  v2u32 roi_max {0, 0};
   MatteFrameUnique last_popped_frame;
   ch_ptr<MatteLoaderWorker> worker;
 };
@@ -123,7 +123,7 @@ class VideoPipeline : public CharmBase<VideoPipeline>
   ch_ptr<VideoTexture> OpenFile (std::string_view _path);
   bool AddMatte (f64 _loop_start_ts, f64 _loop_end_ts,
                  i32 _frame_count, fs::path const &_matte_dir,
-                 v2i32 _min, v2i32 _max);
+                 v2u32 _min, v2u32 _max);
 
   ch_ptr<DecodePipeline> const &GetDecoder ();
   ch_ptr<VideoTexture> GetVideoTexture ();
@@ -203,7 +203,7 @@ class VideoSystem
   ch_ptr<VideoTexture> CreateVideoTexture (VideoFormat _format);
   MattePipeline CreateMattePipeline (f64 _loop_start_ts, f64 _loop_end_ts,
                                      i32 _frame_count, fs::path const &_matte_dir,
-                                     v2i32 _min, v2i32 _max);
+                                     v2u32 _min, v2u32 _max);
 
 
 
@@ -213,7 +213,7 @@ class VideoSystem
   VideoBrace OpenMatte (std::string_view _uri,
                         f64 _loop_start_ts, f64 _loop_end_ts,
                         i32 _frame_count, fs::path const &_matte_dir,
-                        v2i32 _min, v2i32 _max);
+                        v2u32 _min, v2u32 _max);
 
   VideoBrace DuplicateVideo (ch_ptr<VideoPipeline> const &_pipeline);
   VideoBrace DuplicateMatte (ch_ptr<VideoPipeline> const &_pipeline,

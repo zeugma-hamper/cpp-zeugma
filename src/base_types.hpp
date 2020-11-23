@@ -195,6 +195,22 @@ typedef struct {
   };
 } v4u64;
 
+template<typename T, szt N>
+constexpr szt ArraySize (T const (&)[N])
+{
+  return N;
+}
+
+template<typename VOUT, typename VIN>
+VOUT vect_cast (VIN const &_v)
+{
+  VOUT vout;
+  static_assert (ArraySize(vout.a) == ArraySize(_v.a));
+  for (u32 i = 0; i < ArraySize (vout.a); ++i)
+    vout.a[i] = decltype(vout.x) (_v[i]);
+
+  return vout;
+}
 
 }
 
