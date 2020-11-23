@@ -76,7 +76,7 @@ void VideoRenderable::Draw (u16 vyu_id)
 
   glm::vec4 const over = glm::vec4 (as_glm (m_over), 0.0f);
   glm::vec4 const up = glm::vec4 (as_glm (m_up), 0.0f);
-  glm::vec4 const ac (1.0, 1.0, 1.0, 1.0); //= as_glm (m_adjc.val);
+  glm::vec4 const ac = as_glm (m_adjc);
   bgfx::setUniform (m_video_texture->GetOverUniform(), &over);
   bgfx::setUniform (m_video_texture->GetUpUniform(), &up);
   bgfx::setUniform (m_video_texture->GetAdjColorUniform(), glm::value_ptr (ac));
