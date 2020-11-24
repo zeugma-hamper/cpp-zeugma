@@ -94,15 +94,6 @@ ProgramResiduals CreateProgram (bx::FilePath const &_vert_path,
     return {prog, vs, fs};
 }
 
-std::vector<bgfx::UniformHandle> GetShaderUniforms (bgfx::ShaderHandle _sh)
-{
-  u16 uni_count = bgfx::getShaderUniforms(_sh);
-  std::vector<bgfx::UniformHandle> handles{uni_count};
-  bgfx::getShaderUniforms (_sh, handles.data (), uni_count);
-
-  return handles;
-}
-
 // bgfx::TextureHandle LoadTexture2D (bx::FilePath const &_path, u64 _bgfx_flags)
 // {
 //   // bx::FileReader reader;

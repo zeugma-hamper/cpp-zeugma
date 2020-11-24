@@ -6,6 +6,7 @@
 #include <Node.hpp>
 #include <PlatonicMaes.h>
 #include <Renderable.hpp>
+#include <TexturedRenderable.hpp>
 #include <VideoRenderable.hpp>
 #include <ZEYowlEvent.h>
 
@@ -15,6 +16,7 @@
 #include <class_utils.hpp>
 #include <bgfx_utils.hpp>
 
+#include <algorithm>
 #include <string_view>
 
 #include <stdio.h>
@@ -23,30 +25,217 @@
 using namespace charm;
 namespace s2 = boost::signals2;
 
-static ch_weak_ptr<DecodePipeline> s_pipeline;
+static ch_weak_ptr<VideoPipeline> s_pipeline;
+static Node *s_renderable_owner = nullptr;
+static MattedVideoRenderable *s_renderable = nullptr;
 static bool s_pipeline_is_playing = true;
+static FilmCatalog s_films;
+static i64 s_film_index = 4;
+static i64 s_clip_index = 1;
+static boost::signals2::connection s_seg_done;
+
+//increment val mod max
+template<typename T>
+void mod_inc_index (T &val, T max)
+{
+  static_assert (std::is_integral_v<T>);
+  val = (val + 1) % max;
+}
+
+//decrement val mod max
+template<typename T>
+void mod_dec_index (T &val, T max)
+{
+  static_assert (std::is_integral_v<T>);
+  val = (val + max - 1) % max;
+}
+
+static void AddMatteToPipeline (VideoPipeline *pipe, ClipInfo const &ci)
+{
+  pipe->AddMatte(ci.start_time, ci.start_time + ci.duration,
+                 ci.frame_count, ci.directory,
+                 ci.geometry.dir_geometry.min,
+                 ci.geometry.dir_geometry.max);
+}
 
 i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
 {
   fprintf (stderr, "handle key press\n");
-  if (auto pipe = s_pipeline.lock();
-      pipe && _event->Utterance() == "p")
-    {
-      GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipe->m_pipeline), GST_DEBUG_GRAPH_SHOW_ALL, "decode-pipeline-before");
+  ch_ptr<VideoPipeline> pipe = s_pipeline.ref ();
+  if (! pipe)
+    return 0;
 
+  ch_ptr<DecodePipeline> dec = pipe->GetDecoder();
+  if (! dec)
+    return 0;
+
+  std::string utt = _event->Utterance();
+  std::transform (utt.begin (), utt.end (), utt.begin (),
+                  [] (unsigned char c) { return std::tolower (c); });
+
+  if (utt == "q") //quit
+    {
+      s_pipeline.reset ();
+      GraphicsApplication::GetApplication()->StopRunning();
+    }
+  else if (utt == "w" || utt == "s") //previous/next video
+    {
+      if (utt == "w")
+        mod_dec_index(s_film_index, s_films.GetFilmCount ());
+      else
+        mod_inc_index(s_film_index, s_films.GetFilmCount ());
+
+      s_renderable_owner->RemoveRenderable(s_renderable);
+
+      FilmInfo const &film_info = s_films.GetNthFilm(s_film_index);
+
+      auto *video_system = VideoSystem::GetSystem();
+      VideoBrace const brace = video_system->OpenVideoFile (film_info.film_path.string());
+
+      MattedVideoRenderable *renderable
+        = new MattedVideoRenderable (brace.video_texture);
+      renderable->SetEnableMatte(false);
+      renderable->SetSizeReferent(SizeReferent::Video);
+      s_pipeline = brace.control_pipeline;
+      s_renderable_owner->AppendRenderable (renderable);
+      s_renderable = renderable;
+      s_pipeline_is_playing = true;
+    }
+  else if (utt == "a" || utt == "d") //previous/next clip
+    {
+      FilmInfo const &fi = s_films.GetNthFilm(s_film_index);
+      if (utt == "a")
+        mod_dec_index(s_clip_index, fi.GetClipCount ());
+      else
+        mod_inc_index(s_clip_index, fi.GetClipCount ());
+
+
+      auto pipe = s_pipeline.ref ();
+      if (pipe)
+        {
+          pipe->ClearMattes();
+          FilmInfo const &fi = s_films.GetNthFilm(s_film_index);
+          ClipInfo const &ci = fi.GetNthClip(s_clip_index);
+          AddMatteToPipeline(pipe.get (), ci);
+          pipe->SetActiveMatte(0);
+          pipe->GetDecoder()->Loop(ci.start_time, ci.start_time + ci.duration);
+          s_renderable->EnableMatte();
+          s_renderable->SetEnableMixColor(true);
+        }
+    }
+  else if (utt == "z" || utt == "c") //fast play to next clip
+    {
+      FilmInfo const &fi = s_films.GetNthFilm(s_film_index);
+      if (utt == "z")
+        mod_dec_index(s_clip_index, fi.GetClipCount ());
+      else
+        mod_inc_index(s_clip_index, fi.GetClipCount ());
+
+
+      auto pipe = s_pipeline.ref ();
+      if (pipe)
+        {
+          pipe->ClearMattes();
+          ClipInfo const &ci = s_films.GetNthFilm(s_film_index).GetNthClip(s_clip_index);
+          pipe->GetDecoder()->TrickModeSeek(ci.start_time, 120.0);
+          // so this works pretty well, but the fast playback is (i
+          // think) hiding a discontinuity. segment done message is
+          // sent quite a bit before the last frame of the segment
+          // reaches the pipeline sink. will probably need something
+          // tighter for audio sync.
+          auto seg_done_cb = [pipe, ci] (boost::signals2::connection conn,
+                                         DecodePipeline *, SegmentDoneBehavior)
+          {
+            AddMatteToPipeline(pipe.get (), ci);
+            pipe->SetActiveMatte(0);
+            pipe->GetDecoder()->Loop(ci.start_time, ci.start_time + ci.duration, 1.0f);
+            s_renderable->EnableMatte();
+            s_renderable->SetEnableMixColor(true);
+            conn.disconnect();
+          };
+          s_seg_done = pipe->GetDecoder()->AddSegmentDoneExCallback(std::move (seg_done_cb));
+        }
+    }
+  else if (utt == "e") //increase playspeed 5x
+    {
+      auto pipe = s_pipeline.ref ();
+      f32 const ps = pipe->GetDecoder()->PlaySpeed();
+      pipe->GetDecoder()->SetPlaySpeed(ps + 5.0f);
+    }
+  else if (utt == "f") //step forward 1 frame
+    {
+      auto pipe = s_pipeline.ref ();
+      pipe->GetDecoder()->Step(1);
+    }
+  else if (utt == "p") //toggle play/pause
+    {
       if (s_pipeline_is_playing)
         {
           fprintf (stderr, "set to paused\n");
-          pipe->Pause();
+          dec->Pause();
         }
       else
        {
           fprintf (stderr, "set to playing\n");
-          pipe->Play();
-        }
+          dec->Play();
+       }
 
       s_pipeline_is_playing = !s_pipeline_is_playing;
-      GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipe->m_pipeline), GST_DEBUG_GRAPH_SHOW_ALL, "decode-pipeline-after");
+    }
+  else if (utt == "b")
+    {
+      auto pipe = s_pipeline.ref ();
+      if (pipe)
+        {
+          f64 pos = pipe->GetDecoder()->CurrentTimestamp();
+          pipe->ClearMattes();
+          s_renderable->DisableMatte ();
+          s_renderable->SetEnableMixColor(false);
+          pipe->GetDecoder()->Seek(pos);
+        }
+    }
+  else if (utt == "i") // loop over first three clips of itmfl
+    {
+      s_film_index = 5;
+      s_clip_index = 0;
+      FilmInfo const &film_info = s_films.GetNthFilm(s_film_index);
+
+      s_renderable_owner->RemoveRenderable(s_renderable);
+
+      auto *video_system = VideoSystem::GetSystem();
+      VideoBrace const brace = video_system->OpenVideoFile (film_info.film_path.string());
+
+      MattedVideoRenderable *renderable
+        = new MattedVideoRenderable (brace.video_texture);
+      renderable->SetEnableMatte(true);
+      renderable->SetSizeReferent(SizeReferent::Video);
+      s_pipeline = brace.control_pipeline;
+      s_renderable_owner->AppendRenderable (renderable);
+      s_renderable = renderable;
+      s_pipeline_is_playing = true;
+
+      auto pipe = s_pipeline.ref ();
+      if (pipe)
+        {
+          for (szt i = 0; i < 3; ++i)
+            {
+              ClipInfo const &ci = film_info.GetNthClip(i);
+              AddMatteToPipeline(pipe.get (), ci);
+            }
+          ClipInfo const &ci = film_info.GetNthClip(0);
+          pipe->SetActiveMatte(0);
+          pipe->GetDecoder()->Loop(ci.start_time, ci.start_time + ci.duration, 1.0f);
+        }
+    }
+  else if (utt == "j")
+    {
+      auto pipe = s_pipeline.ref ();
+      if (pipe)
+        {
+          i64 am = pipe->active_matte;
+          mod_inc_index(am, pipe->MatteCount());
+          pipe->SetActiveMatte(am);
+        }
     }
 
   return 0;
@@ -65,31 +254,34 @@ int main (int, char **)
   nodal->Scale (0.75 * maes->Width());
   nodal->Translate (maes->Loc());
 
-  std::vector<FilmInfo> configs = ReadFilmInfo ("../configs/film-config.toml");
-  assert (configs.size () > 0);
+  assert (s_films.LoadFilmInfo("../configs/film-config.toml"));
 
-  FilmInfo &film_info = configs[4];
-  assert (film_info.clips.size () > 0);
-  VideoRenderable *renderable = new VideoRenderable (film_info);
-
-  // std::vector<FilmGeometry> geom = ReadFileGeometry("../configs/mattes.toml");
-  // assert (geom.size () > 0);
-  // MergeFilmInfoGeometry(configs, geom);
-
-  // FilmInfo &film_info = configs[4];
+  // FilmInfo &film_info = s_films[s_film_index];
   // assert (film_info.clips.size () > 0);
-  // [[maybe_unused]] ClipInfo &clip_info = film_info.clips[0];
+  // VideoRenderable *renderable = new VideoRenderable (film_info);
 
-  // MattedVideoRenderable *renderable
-  //   = new MattedVideoRenderable (film_info, clip_info);
+  assert (s_films.LoadFilmGeometry("../configs/mattes.toml"));
+
+  FilmInfo const &film_info = s_films.GetNthFilm(s_film_index);
+  assert (film_info.clips.size () > 0 && i64(film_info.clips.size ()) > s_clip_index);
+  [[maybe_unused]] ClipInfo const &clip_info = film_info.GetNthClip(s_clip_index);
+
+  auto *video_system = VideoSystem::GetSystem();
+  VideoBrace brace = video_system->OpenVideoFile (film_info.film_path.string());
+
+  MattedVideoRenderable *renderable
+    = new MattedVideoRenderable (brace.video_texture);
+  renderable->SetEnableMatte(false);
+  renderable->SetSizeReferent(SizeReferent::Video);
+  s_pipeline = brace.control_pipeline;
   // printf ("clip dims: [%u, %u] - [%u, %u]\n",
   //         clip_info.geometry.dir_geometry.min[0],
   //         clip_info.geometry.dir_geometry.min[1],
   //         clip_info.geometry.dir_geometry.max[0],
   //         clip_info.geometry.dir_geometry.max[1]);
-
-  s_pipeline = renderable->GetPipeline();
-  // s_pipeline.lock ()->Play ();
+  s_renderable = renderable;
+  s_renderable_owner = nodal;
+  brace = VideoBrace{};
 
   s2::connection key_conn = dead_zone.GetSprinkler().AppendHandler<ZEYowlAppearEvent>(&handle_key_press);
 

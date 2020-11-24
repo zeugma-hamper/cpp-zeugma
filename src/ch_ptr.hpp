@@ -29,12 +29,14 @@ class ReferenceCounter
 
   inline bool dec_ref ()
   {
-    return --m_strong_count == 0 && m_weak_count == 0;
+    --m_strong_count;
+    return m_strong_count == 0 && m_weak_count == 0;
   }
 
   inline bool dec_weak_ref ()
   {
-    return m_strong_count == 0 && --m_weak_count == 0;
+    --m_weak_count;
+    return m_strong_count == 0 && m_weak_count == 0;
   }
 
   inline bool expired () const noexcept
@@ -449,7 +451,7 @@ class ch_weak_ptr
     return m_pointer;
   }
 
-  ch_ptr<T> lock () const noexcept
+  ch_ptr<T> ref () const noexcept
   {
     if (! expired ())
       {
@@ -458,6 +460,11 @@ class ch_weak_ptr
       }
 
     return {};
+  }
+
+  ch_ptr<T> lock () const noexcept
+  {
+    return ref ();
   }
 
  private:

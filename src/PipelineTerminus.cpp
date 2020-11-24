@@ -22,7 +22,7 @@ f64 PipelineTerminus::CurrentTimestamp () const
 
 gint64 PipelineTerminus::CurrentTimestampNS () const
 {
-  return 0;
+  return -1;
 }
 
 std::string PipelineTerminus::GetAcceptedCapsString() const
@@ -32,7 +32,7 @@ std::string PipelineTerminus::GetAcceptedCapsString() const
     return {};
 
   gchar *caps_str = gst_caps_to_string (caps.get());
-  std::string const ret {caps_str};
+  std::string ret {caps_str};
   g_free (caps_str);
   return ret;
 }
@@ -46,6 +46,8 @@ BasicPipelineTerminus::BasicPipelineTerminus (std::string_view _accepted_caps)
 
 BasicPipelineTerminus::~BasicPipelineTerminus ()
 {
+  m_sink = nullptr;
+  m_pipeline = nullptr;
 }
 
 gst_ptr<GstCaps> BasicPipelineTerminus::GetAcceptedCaps () const
@@ -84,12 +86,6 @@ BasicPipelineTerminus::NewDecodedPad (DecodePipeline *,
 bool
 BasicPipelineTerminus::OnShutdown (DecodePipeline *)
 {
-  // {
-  //   std::unique_lock {m_sample_mutex};
-  //   if (m_sample)
-  //     m_sample.release();
-  // }
-
   return true;
 }
 

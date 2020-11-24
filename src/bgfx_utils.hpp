@@ -15,6 +15,8 @@
 
 namespace charm
 {
+
+// Shader/Program utility functions
 struct ProgramResiduals
 {
   bgfx::ProgramHandle program;
@@ -22,18 +24,13 @@ struct ProgramResiduals
   bgfx::ShaderHandle fragment;
 };
 
-bx::DefaultAllocator *GetBxDefaultAllocator ();
-
-const bgfx::Memory *ReadFileIntoBGFX (bx::FilePath const &_path);
-
 bgfx::ShaderHandle CreateShader (bx::FilePath const &_path);
 
 ProgramResiduals CreateProgram (bx::FilePath const &_vert_path,
                                 bx::FilePath const &_frag_path,
                                 bool _destroy_shaders);
 
-std::vector<bgfx::UniformHandle> GetShaderUniforms (bgfx::ShaderHandle _sh);
-
+// Texture loading utilities
 struct TextureParticulars
 {
   bgfx::TextureHandle handle = BGFX_INVALID_HANDLE;
@@ -45,12 +42,18 @@ struct TextureParticulars
 //Create a texture handle and decode image to texture, texture is mutable
 [[maybe_unused]]
 constexpr u64 const DefaultTextureFlags = BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE;
+
 TextureParticulars CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags);
 TextureParticulars CreateTexture2D (bx::FilePath const &_path, u64 _bgfx_flags, bool _create_mipmaps);
+
 //Updates texture from image file. Format, size, etc. must match.
 bgfx::TextureHandle UpdateWholeTexture2D (bgfx::TextureHandle _texture,
                                           bx::FilePath const &_path);
 
+//Memory utility functions
+bx::DefaultAllocator *GetBxDefaultAllocator ();
+
+const bgfx::Memory *ReadFileIntoBGFX (bx::FilePath const &_path);
 
 struct BImgFree
 {
@@ -63,8 +66,6 @@ struct BImgFree
 using bimg_ptr = std::unique_ptr<bimg::ImageContainer, BImgFree>;
 
 bimg_ptr LoadKTXImage (std::string_view _path, bx::Error *_error);
-
-
 
 // helper function to delete classes used with bgfx::makeRef
 template<typename T>

@@ -172,42 +172,42 @@ MattePathPattern (FilmInfo const _film, ClipInfo const &_clip)
 
 bool MatteGeometry::IsValid () const
 {
-  return min[0] < max[0] && min[1] < max[1];
+  return min.x < max.x && min.y < max.y;
 }
 
 v2f32 MatteGeometry::GetCenter () const
 {
-  return {(min[0] + max[0]) / 2.0f, (min[1] + max[1]) / 2.0f};
+  return {(min.x + max.x) / 2.0f, (min.y + max.y) / 2.0f};
 }
 
 void MatteGeometry::Print (const char *_prefix) const
 {
   printf ("%s[%u, %u]: %u - %u  x  %u - %u\n",
-          _prefix, dimensions[0], dimensions[1], min[0], max[0], min[1], max[1]);
+          _prefix, dimensions.x, dimensions.y, min.x, max.x, min.y, max.y);
 }
 
 bool MatteGeometry::operator== (MatteGeometry const &_mg) const
 {
   return index == _mg.index &&
-    dimensions[0] == _mg.dimensions[0]  &&
-    dimensions[1] == _mg.dimensions[1] &&
-    min[0] == _mg.min[0]  &&
-    max[0] == _mg.max[0]  &&
-    min[1] == _mg.min[1]  &&
-    max[1] == _mg.max[1];
+    dimensions.x == _mg.dimensions.x  &&
+    dimensions.y == _mg.dimensions.y &&
+    min.x == _mg.min.x  &&
+    max.x == _mg.max.x  &&
+    min.y == _mg.min.y  &&
+    max.y == _mg.max.y;
 }
 
 toml::table MatteGeometry::into_toml () const
 {
-  std::array<u32, 7> data{index, dimensions[0], dimensions[1],
-    min[0], min[1], max[0], max[1]};
+  std::array<u32, 7> data{index, dimensions.x, dimensions.y,
+    min.x, min.y, max.x, max.y};
 
   return toml::table {{"geom", data}};
 
   // return toml::table {{s_index, index},
-  //                     {s_dimensions, {dimensions[0], dimensions[1]}},
-  //                     {s_min, {min[0], min[1]}},
-  //                     {s_max, {max[0], max[1]}}};
+  //                     {s_dimensions, {dimensions.x, dimensions.y}},
+  //                     {s_min, {min.x, min.y}},
+  //                     {s_max, {max.x, max.y}}};
 
 }
 
@@ -215,26 +215,26 @@ void MatteGeometry::from_toml (toml::value const &_v)
 {
   auto data = toml::find<std::array<u32, 7>> (_v, "geom");
   index = data[0];
-  dimensions[0] = data[1];
-  dimensions[1] = data[2];
-  min[0] = data[3];
-  min[1] = data[4];
-  max[0] = data[5];
-  max[1] = data[6];
+  dimensions.x = data[1];
+  dimensions.y = data[2];
+  min.x = data[3];
+  min.y = data[4];
+  max.x = data[5];
+  max.y = data[6];
 
   // using coord = std::array<u32, 2>;
   // coord tmp;
   // tmp = toml::find<coord> (_v, s_dimensions);
-  // dimensions[0] = tmp[0];
-  // dimensions[1] = tmp[1];
+  // dimensions.x = tmp[0];
+  // dimensions.y = tmp[1];
 
   // tmp = toml::find<coord> (_v, s_min);
-  // min[0]= tmp[0];
-  // min[1] = tmp[1];
+  // min.x= tmp[0];
+  // min.y = tmp[1];
 
   // tmp = toml::find<coord> (_v, s_max);
-  // max[0] = tmp[0];
-  // max[1] = tmp[1];
+  // max.x = tmp[0];
+  // max.y = tmp[1];
 
   // index = toml::find<u32> (_v, s_index);
 }
@@ -299,8 +299,8 @@ toml::table MatteDirGeometry::into_toml () const
   frames.reserve (frame_geometry.size ());
   for (MatteGeometry const &mg : frame_geometry)
     {
-      frames.push_back ({mg.index, mg.dimensions[0], mg.dimensions[1],
-          mg.min[0], mg.min[1], mg.max[0], mg.max[1]});
+      frames.push_back ({mg.index, mg.dimensions.x, mg.dimensions.y,
+          mg.min.x, mg.min.y, mg.max.x, mg.max.y});
     }
 
   return toml::table {{s_path, clip_path},
@@ -323,12 +323,12 @@ void MatteDirGeometry::from_toml (toml::value const &_v)
           frame_geometry.emplace_back();
           MatteGeometry &mg = frame_geometry.back ();
           mg.index = matte_val[0];
-          mg.dimensions[0] = matte_val[1];
-          mg.dimensions[1] = matte_val[2];
-          mg.min[0] = matte_val[3];
-          mg.min[1] = matte_val[4];
-          mg.max[0] = matte_val[5];
-          mg.max[1] = matte_val[6];
+          mg.dimensions.x = matte_val[1];
+          mg.dimensions.y = matte_val[2];
+          mg.min.x = matte_val[3];
+          mg.min.y = matte_val[4];
+          mg.max.x = matte_val[5];
+          mg.max.y = matte_val[6];
         }
     }
 }
@@ -371,6 +371,126 @@ void FilmGeometry::from_toml (toml::value const & _v)
   directory_geometries = toml::find<std::vector<MatteDirGeometry>> (_v, s_directory_geometries);
 
   Sort ();
+}
+
+i64 FilmInfo::GetClipCount () const
+{
+  return i64 (clips.size ());
+}
+
+ClipInfo const &FilmInfo::GetNthClip (i64 _nth) const
+{
+  assert (_nth >= 0);
+  return clips[_nth];
+}
+
+std::vector<ClipInfo> const &FilmInfo::GetClips () const
+{
+  return clips;
+}
+
+std::vector<ClipInfo const *> FilmInfo::GetClipsAfter (ClipInfo const *_clip, f64 _within) const
+{
+  return GetClipsAfter (_clip->start_time + _clip->duration, _within);
+}
+
+std::vector<ClipInfo const *> FilmInfo::GetClipsAfter (f64 _ts, f64 _within) const
+{
+  std::vector<ClipInfo const *> ret;
+
+  auto in_range = [] (ClipInfo const &ci, f64 ts)
+  { return (ci.start_time <= ts && ts < ci.start_time + ci.duration); };
+
+  auto close_enough = [] (ClipInfo const &base, ClipInfo const &ci, f64 within)
+  { return (ci.start_time - base.start_time) <= within + 0.00005;  };
+
+  auto end = clips.end ();
+  for (auto cur = clips.begin(); cur != end; ++cur)
+    if (in_range(*cur, _ts))
+      {
+        ClipInfo const &base = *cur;
+        ret.push_back (&base);
+        ++cur;
+        for (; cur != end; ++cur)
+          {
+            if (close_enough (base, *cur, _within))
+              ret.push_back(&*cur);
+            else
+              return ret;
+          }
+
+      }
+
+  return ret;
+}
+
+
+FilmCatalog::FilmCatalog ()
+  : m_loaded_films {false},
+    m_loaded_geometry {false}
+{
+}
+
+bool FilmCatalog::LoadFilmInfo (std::filesystem::path const &_path)
+{
+  assert (! m_loaded_films);
+
+  m_films = ReadFilmInfo(_path);
+  if (m_films.size ())
+    {
+      m_loaded_films = true;
+      return true;
+    }
+
+  return false;
+}
+
+bool FilmCatalog::LoadFilmGeometry (std::filesystem::path const &_path)
+{
+  assert (m_loaded_films);
+  assert (! m_loaded_geometry);
+
+  std::vector<FilmGeometry> geom = ReadFileGeometry(_path);
+  if (geom.size () == 0)
+    return false;
+
+  MergeFilmInfoGeometry(m_films, geom);
+  m_loaded_geometry = true;
+  return true;
+}
+
+i64 FilmCatalog::GetFilmCount () const
+{
+  return i64 (m_films.size ());
+}
+
+FilmInfo const &FilmCatalog::GetNthFilm (i64 _nth) const
+{
+  assert (_nth >= 0);
+  return m_films[_nth];
+}
+
+std::vector<FilmInfo> const &FilmCatalog::GetFilms () const
+{
+  return m_films;
+}
+
+FilmInfo const *FilmCatalog::FindFilmByName (std::string_view _name) const
+{
+  for (auto const &fm : m_films)
+    if (fm.name == _name)
+      return &fm;
+
+  return nullptr;
+}
+
+FilmInfo const *FilmCatalog::FindFilmByAbbreviation (std::string_view _abbrev) const
+{
+  for (auto const &fm : m_films)
+    if (fm.abbreviation == _abbrev)
+      return &fm;
+
+  return nullptr;
 }
 
 std::vector<FilmGeometry>

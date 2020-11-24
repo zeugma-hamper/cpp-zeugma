@@ -102,3 +102,4 @@ bld
 bld-asan
 bld-clang
 bld-release
+bld-msgs

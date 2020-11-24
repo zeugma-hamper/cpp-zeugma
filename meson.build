@@ -22,11 +22,17 @@ lo_dep = dependency ('liblo')
 #### libGLU: sure, it's deprecated; but then: aren't we all?
 glu_dep = cpp.find_library ('libGLU')
 
+bgfx_build_args = []
+if (get_option('bgfx-msgs').enabled ())
+  bgfx_build_args = bgfx_build_args + ['-DBX_CONFIG_DEBUG=1', '-DBGFX_CONFIG_DEBUG=1']
+endif
+
 ##### bx
 bx_include_dirs = ['bx/include', 'bx/3rdparty']
 bx_sources = ['bx/src/amalgamated.cpp']
 
 bx_lib = static_library ('bx', bx_sources,
+                         cpp_args : bgfx_build_args,
                          include_directories : bx_include_dirs,
                          dependencies : [dl_dep, threads_dep])
 
@@ -128,6 +134,7 @@ bimg_third_party_sources = ['bimg/3rdparty/astc/astc_averages_and_directions.cpp
                             'bimg/3rdparty/pvrtc/PvrTcPacket.cpp']
 
 bimg_lib = static_library ('bimg', bimg_third_party_sources + bimg_sources,
+                           cpp_args : bgfx_build_args,
                            include_directories : bimg_include_dirs,
                            dependencies : [bx_dep])
 
@@ -148,9 +155,9 @@ bgfx_include_dirs = ['bgfx/include',
 bgfx_sources = ['bgfx/src/amalgamated.cpp']
 
 #definition for GL is gl version to use, definition for vulkan is on/off switch
+bgfx_lib_cpp_args = bgfx_build_args + ['-DBGFX_CONFIG_RENDERER_OPENGL=46', '-DBGFX_CONFIG_RENDERER_VULKAN=1']
 bgfx_lib = static_library ('bgfx', bgfx_sources,
-                           cpp_args : ['-DBGFX_CONFIG_RENDERER_OPENGL=46',
-                                       '-DBGFX_CONFIG_RENDERER_VULKAN=1'],
+                           cpp_args : bgfx_lib_cpp_args,
                            include_directories : bgfx_include_dirs,
                            dependencies : [bx_dep, bimg_dep, x11_dep, opengl_dep, vulkan_dep])
 
@@ -237,6 +244,7 @@ charm_definition_deps = [bx_dep, bimg_dep, bgfx_dep, glfw_dep,
 charm_lib = static_library ('charm', lib_sources,
                             include_directories : [charm_inc, toml_inc],
                             dependencies : charm_definition_deps,
+                            cpp_args : bgfx_build_args,
                             install : true)
 
 charm_dep = declare_dependency (include_directories : [charm_inc, toml_inc],
@@ -317,9 +325,9 @@ chud_zone_exec = executable ('chud-zone',
                              sources : ['src/chud-zone.cpp'],
                              dependencies : [charm_dep])
 
-cz_the_sequel_exec = executable ('cz_the_sequel',
-                             sources : ['src/cz_the_sequel.cpp'],
-                             dependencies : [charm_dep])
+# cz_the_sequel_exec = executable ('cz_the_sequel',
+#                              sources : ['src/cz_the_sequel.cpp'],
+#                              dependencies : [charm_dep])
 
 tri_demo_exec = executable ('tri_demo',
                             sources : ['src/tri_demo.cpp',
@@ -327,11 +335,11 @@ tri_demo_exec = executable ('tri_demo',
                                        'src/TriBand.cpp'],
                             dependencies : [charm_dep, glu_dep])
 
-tri_cleanup_exec = executable ('tri_cleanup',
-                            sources : ['src/tri_cleanup.cpp',
-                                       'src/Collage.cpp',
-                                       'src/TriBand.cpp'],
-                            dependencies : [charm_dep])
+# tri_cleanup_exec = executable ('tri_cleanup',
+#                             sources : ['src/tri_cleanup.cpp',
+#                                        'src/Collage.cpp',
+#                                        'src/TriBand.cpp'],
+#                             dependencies : [charm_dep])
 
 tample_exec = executable ('tample',
                            sources : ['src/AtomicFreezone.cpp',

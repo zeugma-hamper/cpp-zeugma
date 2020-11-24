@@ -22,7 +22,7 @@ class VideoRenderable final : public Renderable
 {
  public:
 
-  VideoRenderable (std::string_view _uri);
+  VideoRenderable (std::string_view _path);
   VideoRenderable (FilmInfo const &_film);
   ~VideoRenderable ()  override;
 
@@ -33,6 +33,7 @@ class VideoRenderable final : public Renderable
 
  private:
   ch_ptr<VideoTexture> m_video_texture;
+  u64 m_bgfx_state;
 };
 
 

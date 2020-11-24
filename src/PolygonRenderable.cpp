@@ -79,7 +79,7 @@ static void PRBeginCB (GLenum mode, void *bonus)
   ephem_pr->gl_mode = mode;
 }
 
-static void PRVertexCB (void *pvas, void *bonus)
+static void PRVertexCB (void *pvas, void */*bonus*/)
 { v3f64 *vrt = (v3f64 *)pvas;
   glm::vec3 vv (as_glm (*vrt));
   if (trifan_prgrs < 0  &&  strippy_prog < 0)
@@ -111,7 +111,7 @@ static void PRVertexCB (void *pvas, void *bonus)
     }
 }
 
-static void PREndCB (void *bonus)
+static void PREndCB (void */*bonus*/)
 { if (trifan_prgrs >= 0)
     trifan_prgrs = -1;
   else if (strippy_prog >= 0)
@@ -119,7 +119,7 @@ static void PREndCB (void *bonus)
   ephem_pr = NULL;
 }
 
-static void PRErrorCB (GLenum err, void *bonus)
+static void PRErrorCB (GLenum err, void */*bonus*/)
 { fprintf (stderr, "Holy gol-durn cripes! error in PRErrorCB: <%d>\n", err);
   fprintf (stderr, "... which is this: [%s]\n", gluErrorString (err));
 }

@@ -105,7 +105,7 @@ class ZoftThing
               }
           }
 
-        i64 Inhale (i64 ratch, f64 thyme)  override
+        i64 Inhale (i64 /*ratch*/, f64 /*thyme*/)  override
           { return 0; }
       };
 
@@ -125,7 +125,7 @@ class ZoftThing
            :  ZoftThing<TT>::template ZGuts<TT> (), latchval (lv)
           { }
 
-        i64 Inhale (i64 ratch, f64 thyme)  override
+        i64 Inhale (i64 /*ratch*/, f64 /*thyme*/)  override
           { this -> PuppeteerHosts (latchval);
             return 0;
           }

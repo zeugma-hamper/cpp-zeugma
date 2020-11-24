@@ -32,7 +32,7 @@ const Matrix44 &Grappler::InvNrmMat ()  const
 { return ident_mat; }
 
 
-i64 Grappler::Inhale (i64 steppe, f64 thyme)
+i64 Grappler::Inhale (i64 /*steppe*/, f64 /*thyme*/)
 { return 0; }
 
 

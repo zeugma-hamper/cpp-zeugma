@@ -93,13 +93,12 @@ CollageMatte::CollageMatte (FilmInfo const &_film, ClipInfo const &_clip,
   : Renderable (),
     m_stencil_val(_stencil_val)
 {
-  v2i32 min = {i32 (_clip.geometry.dir_geometry.min[0]),i32 (_clip.geometry.dir_geometry.min[1])};
-  v2i32 max = {i32 (_clip.geometry.dir_geometry.max[0]),i32 (_clip.geometry.dir_geometry.max[1])};
-
   VideoBrace brace = VideoSystem::GetSystem ()
     ->OpenMatte (std::string ("file://") + _film.film_path.string(),
                  _clip.start_time, _clip.start_time + _clip.duration,
-                 _clip.frame_count, _clip.directory, min, max);
+                 _clip.frame_count, _clip.directory,
+                 _clip.geometry.dir_geometry.min,
+                 _clip.geometry.dir_geometry.max);
   m_video_texture = brace.video_texture;
 }
 

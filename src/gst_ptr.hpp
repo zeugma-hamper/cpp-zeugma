@@ -6,6 +6,16 @@
 
 namespace charm {
 
+//for use with unique_ptr and glib allocated memory
+template<typename T>
+struct default_gfree
+{
+  void operator () (T *_t) const
+  {
+    g_free (_t);
+  }
+};
+
 template<typename T>
 struct gst_ref_functions;
 

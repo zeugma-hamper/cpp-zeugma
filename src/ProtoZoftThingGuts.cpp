@@ -38,6 +38,7 @@ i64 VelvetLung::Inhale (i64 ratch, f64 thyme)
 
 bool ProtoZoftThingGuts::EnrollForMassBreathing ()
 { // once and for all:
+  [[maybe_unused]]
   static bool pztg_got_this_party_started
 #ifndef ZOFT_DO_NOT_ENGAGE_AUTOMATIC_BREATHER
     = [](){ ProtoZoftThingGuts::InstallMassBreather ();  return true; } ();

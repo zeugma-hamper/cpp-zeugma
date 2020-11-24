@@ -3,6 +3,8 @@
 #include <DecodePipeline.hpp>
 #include <MatteLoaderPool.hpp>
 
+#include <vector_utils.hpp>
+
 #include <gst/app/gstappsink.h>
 
 #include <algorithm>
@@ -16,10 +18,14 @@ TampVideoTerminus::TampVideoTerminus ()
   : BasicPipelineTerminus("video/x-raw,format=I420"),
     m_sample_mutex {},
     m_sample_status {SampleStatus::NoSample},
+    m_frame_pts {-1},
     m_frame_number {-1},
     m_has_eos {false}
 { }
 
+TampVideoTerminus::~TampVideoTerminus ()
+{
+}
 
 static void video_term_handle_eos (GstAppSink *, gpointer);
 static GstFlowReturn video_term_handle_new_preroll (GstAppSink *_sink, gpointer _pipeline);
@@ -85,7 +91,12 @@ remove_sink:
 
 bool TampVideoTerminus::OnShutdown (DecodePipeline *_dec)
 {
-  FetchClearSample ();
+  {
+    std::unique_lock lock {m_sample_mutex};
+    m_buffer_signal.disconnect_all_slots();
+    FetchClearSampleInternal();
+  }
+
   return BasicPipelineTerminus::OnShutdown(_dec);
 }
 
@@ -98,6 +109,18 @@ void TampVideoTerminus::FlushNotify ()
   m_sample.reset ();
 }
 
+gint64 TampVideoTerminus::CurrentTimestampNS () const
+{
+  std::unique_lock {m_sample_mutex};
+  return m_frame_pts;
+}
+
+i64 TampVideoTerminus::CurrentFrameNumber () const
+{
+  std::unique_lock {m_sample_mutex};
+  return m_frame_number;
+}
+
 SampleStatus TampVideoTerminus::HasSample ()
 {
   std::unique_lock lock (m_sample_mutex);
@@ -107,15 +130,13 @@ SampleStatus TampVideoTerminus::HasSample ()
 gst_ptr<GstSample> TampVideoTerminus::FetchSample ()
 {
   std::unique_lock lock (m_sample_mutex);
-  return m_sample;
+  return FetchSampleInternal();
 }
 
 gst_ptr<GstSample> TampVideoTerminus::FetchClearSample ()
 {
   std::unique_lock lock (m_sample_mutex);
-  gst_ptr<GstSample> ptr = std::exchange (m_sample, {});
-  m_sample_status = SampleStatus::NoSample;
-  return ptr;
+  return FetchClearSampleInternal();
 }
 
 void TampVideoTerminus::NotifyOfEOS ()
@@ -132,8 +153,7 @@ void TampVideoTerminus::NotifyOfSample (SampleStatus _status, gst_ptr<GstSample>
 
   CacheCaps(gst_sample_get_caps (m_sample.get ()));
   UpdateFrameNumber();
-  RemoveWorkerCruft();
-  UpdateWorkers();
+  ExerciseBufferCallback();
 }
 
 void TampVideoTerminus::NotifyOfSample (SampleStatus _status, gst_ptr<GstSample> &&_sample)
@@ -144,28 +164,19 @@ void TampVideoTerminus::NotifyOfSample (SampleStatus _status, gst_ptr<GstSample>
 
   CacheCaps(gst_sample_get_caps (m_sample.get ()));
   UpdateFrameNumber();
-  RemoveWorkerCruft();
-  UpdateWorkers();
+  ExerciseBufferCallback();
 }
 
-void TampVideoTerminus::AddMatteWorker (ch_ptr<MatteLoaderWorker> const &_worker)
+SignalConnection TampVideoTerminus::AddBufferCallback (BufferCallback &&_cb)
 {
-  if (! _worker)
-    return;
-
   std::unique_lock lock {m_sample_mutex};
-  m_matte_workers.push_back (ch_weak_ptr {_worker});
+  return m_buffer_signal.connect(std::move (_cb));
 }
 
-void TampVideoTerminus::RemoveMatteLoaderWorker (ch_ptr<MatteLoaderWorker> const &_worker)
+SignalConnection TampVideoTerminus::AddBufferExCallback (BufferExCallback &&_cb)
 {
-  if (! _worker)
-    return;
-
   std::unique_lock lock {m_sample_mutex};
-  auto const ret
-    = std::remove (m_matte_workers.begin (), m_matte_workers.end (), _worker);
-  m_matte_workers.erase (ret, m_matte_workers.end ());
+  return m_buffer_signal.connect_extended(std::move (_cb));
 }
 
 void TampVideoTerminus::CacheCaps (GstCaps *_caps)
@@ -183,32 +194,32 @@ void TampVideoTerminus::UpdateFrameNumber ()
     return;
 
   GstBuffer *buffer = gst_sample_get_buffer (m_sample.get ());
-  gint64 pts = GST_BUFFER_PTS(buffer);
+  if (! GST_BUFFER_PTS_IS_VALID(buffer))
+    return;
+
+  m_frame_pts = GST_BUFFER_PTS(buffer);
   assert (m_video_info.fps_d != 0);
-  m_frame_number = (i64) gst_util_uint64_scale_round(1, pts * GST_VIDEO_INFO_FPS_N(&m_video_info),
-                                                     GST_SECOND * GST_VIDEO_INFO_FPS_D(&m_video_info));
+  m_frame_number
+    = (i64) gst_util_uint64_scale_round(1, m_frame_pts * GST_VIDEO_INFO_FPS_N(&m_video_info),
+                                        GST_SECOND * GST_VIDEO_INFO_FPS_D(&m_video_info));
 }
 
-void TampVideoTerminus::UpdateWorkers ()
+void TampVideoTerminus::ExerciseBufferCallback ()
 {
-  for (ch_weak_ptr<MatteLoaderWorker> &wworker : m_matte_workers)
-    {
-      if (auto sworker = wworker.lock (); sworker)
-        {
-          sworker->PushJob (u32 (m_frame_number),
-                            m_video_info.fps_n, m_video_info.fps_d);
-          sworker->PushJob (u32 (m_frame_number+1),
-                            m_video_info.fps_n, m_video_info.fps_d);
-        }
-    }
+  GstBuffer *buffer = gst_sample_get_buffer(m_sample.get ());
+  m_buffer_signal (buffer, &m_video_info, m_frame_pts, m_frame_number);
 }
 
-void TampVideoTerminus::RemoveWorkerCruft ()
+gst_ptr<GstSample> TampVideoTerminus::FetchSampleInternal ()
 {
-  auto iter = std::remove_if (m_matte_workers.begin (), m_matte_workers.end (),
-                              [] (ch_weak_ptr<MatteLoaderWorker> const &ww)
-                              { return ww.expired(); });
-  m_matte_workers.erase (iter, m_matte_workers.end ());
+  return m_sample;
+}
+
+gst_ptr<GstSample> TampVideoTerminus::FetchClearSampleInternal ()
+{
+  gst_ptr<GstSample> ptr = std::exchange (m_sample, {});
+  m_sample_status = SampleStatus::NoSample;
+  return ptr;
 }
 
 static void video_term_handle_eos (GstAppSink *, gpointer _terminus)

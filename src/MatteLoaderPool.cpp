@@ -114,8 +114,6 @@ void MatteLoaderWorker::DoWork ()
   if (frame_id < 0)
     return;
 
-  // fprintf (stderr, "mlw: do work %ld\n", frame_id);
-
   bgfx::TextureFormat::Enum const formats[5]{
     bgfx::TextureFormat::Unknown,
     bgfx::TextureFormat::R8,
@@ -223,7 +221,7 @@ MatteLoaderPool::MatteLoaderPool ()
 
 MatteLoaderPool::~MatteLoaderPool ()
 {
-  assert (! m_currently_loading.load ());
+  ShutDown ();
 }
 
 void MatteLoaderPool::ShutDown()

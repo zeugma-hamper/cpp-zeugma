@@ -2,6 +2,8 @@
 #ifndef BORING_NAME_MAKE_FUN_LATER
 #define BORING_NAME_MAKE_FUN_LATER
 
+#include <base_types.hpp>
+
 #include <string.h>
 
 #define CHARM_DELETE_MOVE(KLASS) \

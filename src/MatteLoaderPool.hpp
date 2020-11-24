@@ -16,12 +16,6 @@
 namespace charm
 {
 
-// struct MatteFrameBimg
-// {
-//   u32 offset = 0;
-//   bimg_ptr data;
-// };
-
 template<typename T>
 struct default_free
 {
@@ -36,11 +30,16 @@ using u8_ptr = std::unique_ptr<u8, default_free<u8>>;
 struct MatteFrameUnique
 {
   u32 offset = u32 (-1);
-  bgfx::TextureFormat::Enum format;
+  bgfx::TextureFormat::Enum format = bgfx::TextureFormat::Unknown;
   u32 width = 0;
   u32 height = 0;
   u32 data_size = 0; //what will i do for images greater than 4GB?
   u8_ptr data;
+
+  bool IsValid () const
+  {
+    return (bool)data;
+  }
 };
 
 struct MatteFrameBimg
@@ -85,7 +84,6 @@ class MatteLoaderWorker : public CharmBase<MatteLoaderWorker, MTReferenceCounter
 
   std::mutex m_result_mutex;
   boost::circular_buffer<MatteFrameUnique> m_result_queue;
-  //boost::circular_buffer<MatteFrameBimg> m_result_queue;
 
   MatteLoaderPool *m_loader_pool;
 };
