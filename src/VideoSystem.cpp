@@ -179,6 +179,10 @@ VideoPipeline::VideoPipeline ()
 VideoPipeline::~VideoPipeline ()
 {
   buffer_connection.disconnect();
+  {
+    std::unique_lock lock {m_matte_lock};
+    mattes.clear();
+  }
 }
 
 ch_ptr<VideoTexture> VideoPipeline::OpenFile (std::string_view _path)
