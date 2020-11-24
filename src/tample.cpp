@@ -184,6 +184,7 @@ class Tampo final : public GraphicsApplication
   ch_ptr <Orksur> orksu;
   ch_ptr<Sensorium> sensy;
   ch_ptr<GraumanPalace> gegyp;
+  ch_ptr<GraumanPalace> gchin;
   Node *texxyno;
 };
 
@@ -551,9 +552,9 @@ int main (int ac, char **av)
   PlatonicMaes *tabl = tamp . FindMaesByName ("table");
   assert (tabl);
 
-  front_layer -> AppendRenderTargetMaes (maes);
-  left_layer -> AppendRenderTargetMaes (left);
-  table_layer -> AppendRenderTargetMaes (tabl);
+  // front_layer -> AppendRenderTargetMaes (maes);
+  // left_layer -> AppendRenderTargetMaes (left);
+  // table_layer -> AppendRenderTargetMaes (tabl);
 
   f64 const total_height = 2.0 * maes -> Height();
   f64 const total_width = maes -> Width ();
@@ -628,6 +629,17 @@ int main (int ac, char **av)
   AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
   AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
   AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
+
+  GraumanPalace *grau_chin = new GraumanPalace;
+  grau_chin -> SetOverUp (left -> Over (), left -> Up ());
+  grau_chin -> ImportExhibitionRoster (film_infos);
+  grau_chin -> Translate (left -> Loc ());
+  drand48 ();
+  grau_chin -> ReleasePushback ();
+  grau_chin -> JumpToRandomFlick ();
+  g_left_wall -> AppendChild (grau_chin);
+
+  tamp.gchin = ch_ptr <GraumanPalace> (grau_chin);
 
 
 /*

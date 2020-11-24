@@ -88,10 +88,14 @@ void GraumanPalace::JumpToFlick (i64 which_flick)
     return;
 
   if (SilverScreen *ss = NthSilverScreen (now_showing))
-    ss -> Pause ();
+    { ss -> Pause ();
+      ss -> FadeDown ();
+    }
 
   if (SilverScreen *ss = NthSilverScreen (which_flick))
-    ss -> Play ();
+    { ss -> Play ();
+      ss -> FadeUp ();
+    }
 
   now_showing = which_flick;
   ltrl_slide . ProceedTo (-now_showing * flick_spacing * Over ());

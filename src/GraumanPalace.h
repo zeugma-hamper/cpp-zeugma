@@ -110,6 +110,8 @@ class GraumanPalace  :  public Zeubject, public Node,
     { JumpToFlick (now_showing + 1); }
   void JumpToPrevFlick ()
     { JumpToFlick (now_showing - 1); }
+  void JumpToRandomFlick ()
+    { JumpToFlick (i64( (f64(screens . size ()) - 0.0001) * drand48 ())); }
 
   void TogglePlayPause ();
 
