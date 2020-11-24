@@ -18,7 +18,9 @@
 #include <VideoRenderable.hpp>
 #include <MattedVideoRenderable.hpp>
 #include <TexturedRenderable.hpp>
+#include <LinePileRenderable.h>
 #include <PolygonRenderable.h>
+#include <GridRenderable.h>
 
 //base Ze
 #include <Zeubject.h>
@@ -35,13 +37,19 @@
 #include <LoopZoft.h>
 #include "SinuZoft.h"
 #include "SumZoft.h"
+#include "TrGrappler.h"
+#include "ScGrappler.h"
 
 //events
 #include <GLFWWaterWorks.hpp>
+#include <ZEBulletinEvent.h>
 #include <ZESpatialEvent.h>
 #include <ZEYowlEvent.h>
 #include <RawEventParsing.h>
 #include <GeomFumble.h>
+
+//UI
+#include "Alignifer.h"
 
 //etc.
 #include <BlockTimer.hpp>
@@ -64,35 +72,42 @@
 #include "Orksur.h"
 #include "Ticato.h"
 #include "AtomicFreezone.h"
+#include "GraumanPalace.h"
+#include "tamparams.h"
 
 
 using namespace charm;
 
-// oy. also: oy.
-class Cursoresque;
-// how about some more oy?
-std::vector <Cursoresque *> cursoresques;
+
 // don't forget: oy.
 bool extra_poo = [] () { srand48 (32123);  return true; } ();
 
 
-class Cursoresque  :  public Zeubject
+class Cursoresque  :  public Alignifer
 { public:
-  Node *crs_nod;
-  Renderable *crs_rnd;
-  ZoftVect crs_pos;
-  Cursoresque (f64 sz)  :  Zeubject (),
-                           crs_nod (new Node),
-                           crs_rnd (new RectangleRenderable)
-    { crs_nod -> AppendRenderable (crs_rnd);
-      f64 ltime = 0.55 - 0.1 * drand48 ();
-      crs_nod -> Rotate (ZoftVect (Vect::zaxis),
-                         LoopFloat (0.0, 2.0 * M_PI / ltime, ltime));
-      crs_nod -> Scale (sz);
-      crs_pos . MakeBecomeLikable ();
-      crs_nod -> Translate (crs_pos);
+  PolygonRenderable *re1,  *re2;
+  Cursoresque (f64 sz, i64 nv = 6)  :  Alignifer (),
+                                       re1 (new PolygonRenderable),
+                                       re2 (new PolygonRenderable)
+    { AppendRenderable (re1);
+      AppendRenderable (re2);
+      re1 -> SetFillColor (ZeColor (1.0, 0.5));
+      re2 -> SetFillColor (ZeColor (1.0, 0.5));
+      for (i64 w = 0  ;  w < 2  ;  ++w)
+        for (i64 q = 0  ;  q < nv  ;  ++q)
+          { f64 theeeta = 2.0 * M_PI / (f64)nv * (f64)q  +  w * M_PI;
+            Vect radial = (0.5 * (w + 1.0))
+              *  (cos (theeeta) * Vect::xaxis  +  sin (theeeta) * Vect::yaxis);
+            SinuVect arm (0.065 * radial, 0.8 + 0.11 * drand48 (),
+                          0.24 * (1.0 + 3.0 * (q%2)) * radial);
+            (w > 0 ? re1 : re2) -> AppendVertex (arm);
+          }
+      ScaleZoft () = Vect (sz);
     }
 };
+
+
+std::vector <Cursoresque *> cursoresques;
 
 
 class Sensorium  :  public Zeubject, public ZESpatialPhagy, public ZEYowlPhagy
@@ -155,23 +170,20 @@ class Tampo final : public GraphicsApplication
 
   bool DoWhatThouWilt (i64 ratch, f64 thyme)  override;
 
-  PlatonicMaes *ClosestIntersectedMaes (const Vect &frm, const Vect &aim,
-                                        Vect *hit_point = NULL);
   Frontier *IntersectedFrontier (const Vect &frm, const Vect &aim,
                                  Vect *hit_point = NULL);
   void FlatulateCursor (ZESpatialMoveEvent *e);
 
   void AccrueElevatorOffset (const Vect &off);
 
- protected:
-  ch_ptr<Sensorium> sensy;
-
  public:
-//  ch_ptr <Orksur> ork;
   ZoftVect elev_transl;
   f64 elev_trans_mult;
   VideoRenderable *steenbeck;
-  AtomicFreezone *freezo;
+  ch_ptr <AtomicFreezone> freezo;
+  ch_ptr <Orksur> orksu;
+  ch_ptr<Sensorium> sensy;
+  ch_ptr<GraumanPalace> gegyp;
   Node *texxyno;
 };
 
@@ -197,23 +209,24 @@ i64 Sensorium::ZESpatialMove (ZESpatialMoveEvent *e)
       return 0;
     }
 
-  Tampo *instance = (Tampo *)GraphicsApplication::GetApplication();
+  Tampo *tam = (Tampo *)GraphicsApplication::GetApplication();
 
-  if (instance)
-    instance -> FlatulateCursor (e);
+  if (tam)
+    tam -> FlatulateCursor (e);
 
   recentest_pos[e -> Provenance ()] = e -> Loc ();
   if (elevating)
     { Vect newpos = AveragePos ();
       Vect offset = newpos - elev_prevpos;
       offset = offset . Dot (Vect::yaxis) * Vect::yaxis;
-      if (instance)
-        instance -> AccrueElevatorOffset (offset);
+      if (tam)
+        tam -> AccrueElevatorOffset (offset);
       elev_prevpos = newpos;
     }
   else
-    { auto it = rupaul_map . find (e -> Provenance ());
-/*      if (it != rupaul_map . end ())
+    {
+/*    auto it = rupaul_map . find (e -> Provenance ());
+      if (it != rupaul_map . end ())
         { QuadroPod &qu = it->second;
           Vect hit;
           Tampo *app = (Tampo *)GraphicsApplication::GetApplication();
@@ -237,7 +250,7 @@ i64 Sensorium::ZESpatialMove (ZESpatialMoveEvent *e)
         } */
     }
 
-  if (PlatonicMaes *emm = instance -> FindMaesByName ("table"))
+  if (PlatonicMaes *emm = tam -> FindMaesByName ("table"))
     { Vect p = e -> Loc ();
       p -= emm -> Loc ();
       f64 wid = emm -> Width (), hei = emm -> Height ();
@@ -333,29 +346,18 @@ i64 Sensorium::ZESpatialSoften (ZESpatialSoftenEvent *e)
 
 
 i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
-{ if (! solo_tamp->steenbeck  ||  ! e)
-    return -1;
-  const ch_ptr <DecodePipeline> deep
-    = solo_tamp->steenbeck -> GetPipeline ();
-
-  if (! deep)
-    return 0;
-
-  static bool now_playing = true;
-  auto seek_ts = [] () { static i32 i = 0; return ++i * 60.0; };
-
-  fprintf (stderr, "timestamp is %.3f\n", deep -> CurrentTimestamp ());
-
-  if (e -> Utterance ()  ==  " ")
-    { if (now_playing)
-        deep -> Pause ();
-      else
-        deep -> Play ();
-      now_playing = ! now_playing;
+{ if (e -> Utterance ()  ==  "0")
+    { InterpVect &rs = Tamparams::Current ()->room_scaler;
+      rs . Reverse ();
+      rs . Commence ();
     }
-  else if (e -> Utterance ()  ==  "s")
-    deep -> Seek (seek_ts ());
-
+  else if (e -> Utterance ()  ==  "1")
+    { static bool cur_vis = false;
+      cur_vis = ! cur_vis;
+      for (Node *no  :  Tamparams::Current ()->construction_marks)
+        if (no)
+          no -> SetVisibilityForAllLocalRenderables (cur_vis);
+    }
   return 0;
 }
 
@@ -371,12 +373,10 @@ i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
 
 
 Tampo::Tampo ()  :  GraphicsApplication (),
-                    sensy {new Sensorium},
-//                    ork (NULL),
+                    sensy (new Sensorium),
                     elev_trans_mult (77.0),
                     steenbeck (NULL),
-                    texxyno (NULL),
-                    freezo (NULL)
+                    texxyno (NULL)
 { AppendSpatialPhage (&m_event_sprinkler, sensy);
   AppendYowlPhage (&m_event_sprinkler, sensy);
   elev_transl . MakeBecomeLikable ();
@@ -398,7 +398,7 @@ bool Tampo::DoWhatThouWilt (i64 ratch, f64 thyme)
       farr = ratch;
     }
 
-  if (texxyno  &&  timey.val > 1.5)
+  if (texxyno  &&  timey.val > 8.5)
     { if (Node *par = texxyno -> Parent ())
         { par -> ExciseChild (texxyno);
           delete texxyno;
@@ -409,32 +409,6 @@ bool Tampo::DoWhatThouWilt (i64 ratch, f64 thyme)
   if (freezo)//  &&  timey.val > 3.0)
     freezo -> Inhale (ratch, thyme);
   return true;
-}
-
-PlatonicMaes *Tampo::ClosestIntersectedMaes (const Vect &frm, const Vect &aim,
-                                             Vect *hit_point)
-{ PlatonicMaes *close_m = NULL;
-  Vect close_p, hit;
-  f64 close_d;
-
-  i32 cnt = NumMaeses ();
-  for (i32 q = 0  ;  q < cnt  ;  ++q)
-    { PlatonicMaes *emm = NthMaes (q);
-      if (G::RayRectIntersection (frm, aim,
-                                  emm -> Loc (), emm -> Over (),
-                                  emm -> Up (), emm -> Width (),
-                                  emm -> Height (), &hit))
-        { f64 d = hit . DistFrom (frm);
-          if (! close_m  ||  d < close_d)
-            { close_m = emm;
-              close_p = hit;
-              close_d = d;
-            }
-        }
-    }
-  if (hit_point)
-    *hit_point = close_p;
-  return close_m;
 }
 
 Frontier *Tampo::IntersectedFrontier (const Vect &frm, const Vect &aim,
@@ -474,9 +448,8 @@ void Tampo::FlatulateCursor (ZESpatialMoveEvent *e)
   Vect hit;
   if (PlatonicMaes *emm = ClosestIntersectedMaes (e -> Loc (), e -> Aim (),
                                                   &hit))
-    { crs->crs_pos = hit;
-      crs->crs_rnd -> SetOver (emm -> Over ());
-      crs->crs_rnd -> SetUp (emm -> Up ());
+    { crs -> LocZoft () . Set (hit);
+      crs ->AlignToMaes (emm);
     }
 }
 
@@ -527,10 +500,10 @@ int main (int ac, char **av)
   if (! tamp . StartUp ())
     return -1;
 
-  Layer *front_layer = tamp . GetSceneLayer();
-  Layer *left_layer = new Layer ();
-  tamp . AppendSceneLayer (left_layer);
-  Layer *omni_layer = new Layer ();
+  Layer *omni_layer = tamp . GetSceneLayer();
+  Layer *walls_layer = new Layer ();
+  tamp . AppendSceneLayer (walls_layer);
+  Layer *table_layer = new Layer ();
   tamp . AppendSceneLayer (omni_layer);
 
   i32 const leaf_count = tamp . NumRenderLeaves();
@@ -539,10 +512,12 @@ int main (int ac, char **av)
       if (! leaf->maes)
         continue;
 
-      if (leaf->maes -> Name () == "front")
-        leaf->layers . push_back (front_layer);
-      else if (leaf->maes -> Name () == "left")
-        leaf->layers . push_back (left_layer);
+      if (leaf->maes -> Name ()  ==  "front")
+        leaf->layers . push_back (walls_layer);
+      if (leaf->maes -> Name ()  ==  "left")
+        leaf->layers . push_back (walls_layer);
+      if (leaf->maes -> Name ()  ==  "table")
+        leaf->layers . push_back (table_layer);
 
       //ee_layer goes on all
       leaf->layers . push_back (omni_layer);
@@ -554,7 +529,7 @@ int main (int ac, char **av)
 
   { BlockTimer bt ("loading & merging geom");
     BlockTimer slurpt ("slurping geom file");
-    std::vector<FilmGeometry> geoms
+    std::vector <FilmGeometry> geoms
       = ReadFileGeometry("../configs/mattes.toml");
     slurpt . StopTimer ();
     assert (geoms . size ()  >  0);
@@ -572,38 +547,57 @@ int main (int ac, char **av)
   f64 const total_width = maes -> Width ();
   f64 const band_height = total_height / 3.0;
 
-  Node *kawntent = new Node;
-  kawntent -> Translate (tamp . elev_transl);
-  omni_layer -> GetRootNode () -> AppendChild (kawntent);
+  Node *g_wallpaper = new Node;
+  g_wallpaper -> Translate (tamp . elev_transl);
+  walls_layer -> GetRootNode () -> AppendChild (g_wallpaper);
+  Tamparams::Current ()->wallpaper = g_wallpaper;
 
-  Node *windshield = new Node;
-  omni_layer -> GetRootNode () -> AppendChild (windshield);
+  Node *g_tablecloth = new Node;
+  table_layer -> GetRootNode () -> AppendChild (g_tablecloth);
+  Tamparams::Current ()->tablecloth = g_tablecloth;
+
+  Node *g_conveyor = new Node;
+  omni_layer -> GetRootNode () -> AppendChild (g_conveyor);
+  Tamparams::Current ()->conveyor = g_conveyor;
+
+  Node *g_windshield = new Node;
+  omni_layer -> GetRootNode () -> AppendChild (g_windshield);
+  Tamparams::Current ()->windshield = g_windshield;
+
+  if (PlatonicMaes *mae = tamp . FindMaesByName ("front"))
+    { InterpVect &rs = Tamparams::Current ()->room_scaler;
+      f64 rmf = Tamparams::Current ()->room_minify_factor;
+      rs . PointA () . Set (Vect (rmf, rmf, rmf));
+      rs . PointB () . Set (Vect::onesv);
+      rs . Finish ();
+      ScGrappler *scg = new ScGrappler (rs, ZoftVect (mae -> CornerBL ()));
+      scg -> SetName ("room-scaler");
+      g_wallpaper -> AppendGrappler (scg);
+    }
 
   Vect left_cntr
     = (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
        -  0.5 * maes -> Width () * maes -> Over ()
        +  maes -> Loc () . Dot (maes -> Up ()) * maes -> Up ());
-  // elements_band = new ElementsBand (total_width, band_height, film_infos,
-  //                                   *left, left_cntr);
-  // elements_band->Translate (tamp . elev_transl);
-
-  // ee_layer -> GetRootNode () -> AppendChild (elements_band);
 
   for (int q = 0  ;  q < 3  ;  ++q)
     { Cursoresque *c = new Cursoresque (0.015 * maes -> Height ());
-      omni_layer -> GetRootNode () -> AppendChild (c->crs_nod);
+      g_windshield -> AppendChild (c);
 
       cursoresques . push_back (c);
-      c->crs_pos = maes -> Loc ();
+      c -> LocZoft () = maes -> Loc ();
     }
-/*
-  tamp.steenbeck = new VideoRenderable (film_infos[4]);
-  Node *drive_in = new Node (tamp.steenbeck);
-  drive_in -> Scale (0.7 * total_width);
-  drive_in -> Translate (maes -> Loc ()
-                         - 0.9 * maes -> Height () * maes -> Up ());
-  kawntent -> AppendChild (drive_in);
-*/
+
+  GraumanPalace *grau_egyp = new GraumanPalace;
+  grau_egyp -> ImportExhibitionRoster (film_infos);
+  grau_egyp -> Translate (maes -> Loc ());
+  g_wallpaper -> AppendChild (grau_egyp);
+
+  tamp.gegyp = ch_ptr <GraumanPalace> (grau_egyp);
+  AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
+  AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
+  AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
+
 
 /*
   Node *splat = new Node;
@@ -623,56 +617,78 @@ int main (int ac, char **av)
                                        ZeColor (1.0, 1.0, 0.0, 0.3)));
   splat -> AppendRenderable (polysplat);
   polysplat -> SetShouldEdge (true);
-//  windshield -> AppendChild (splat);
-
-  ch_ptr <Orksur> orkp (new Orksur (*tabl));
-  windshield -> AppendChild (orkp . get ());
-  AppendSpatialPhage (&(tamp . GetSprinkler ()), orkp);
-  AppendYowlPhage (&(tamp . GetSprinkler ()), orkp);
+//  g_windshield -> AppendChild (splat);
 */
+  Orksur *orkp = new Orksur (*tabl);
+  tamp.orksu = ch_ptr <Orksur> (orkp);
+  g_tablecloth -> AppendChild (orkp);
+  AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.orksu);
+  AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.orksu);
+  AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.orksu);
+
   for (i64 q = 0  ;  q < tamp . NumWaterWorkses ()  ;  ++q)
     if (GLFWWaterWorks *ww
         = dynamic_cast <GLFWWaterWorks *> (tamp . NthWaterWorks (q)))
       ww -> SetPromoteMouseToSpatialOrthoStyle (true);
-/*
-  for (int q = 0  ;  q < 25  ;  ++q)
-    { Ticato *tic = new Ticato (film_infos);
-      tic->re -> SetOver (maes -> Over ());
-      tic->re -> SetUp (maes -> Up ());
-      tic->sca . Set (Vect (200.0));
-      tic->loc . Set (maes -> Loc ()
-                      + (drand48 () - 0.5) * 6000.0 * maes -> Over ()
-                      + (drand48 () - 0.5) * 6000.0 * maes -> Up ());
-      windshield -> AppendChild (tic->no);
-    }
-*/
-  TextureParticulars tipi = CreateTexture2D ("/tmp/blap.png", DefaultTextureFlags);
+
+  TextureParticulars tipi
+    = CreateTexture2D ("/tmp/SIGN.jpg", DefaultTextureFlags);
   TexturedRenderable *texre = new TexturedRenderable (tipi);
+  texre -> AdjColorZoft ()
+    . BecomeLike (SinuColor (ZeColor (0.0, 0.5), 1.0, ZeColor (1.0, 0.5)));
   Node *texno = (tamp.texxyno = new Node (texre));
   texno -> Scale (1300.0);
   texno -> Translate (maes -> Loc ());
-  windshield -> AppendChild (texno);
+  g_wallpaper -> AppendChild (texno);
 
-  AtomicFreezone *afz = (tamp.freezo = new AtomicFreezone);
+  AtomicFreezone *afz = new AtomicFreezone;
+  tamp.freezo = ch_ptr <AtomicFreezone> (afz);
   afz->cineganz = &film_infos;
-  afz->field_amok = kawntent;
+  afz->field_amok = g_wallpaper;
   afz->atom_count_goal = 45.0;
   afz->inter_arrival_t = 5.0;
   afz->min_speed = 50.0;
   afz->max_speed = 250.0;
 
+  LinePileRenderable *lpr = new LinePileRenderable;
+
   PlatonicMaes *plams[2] = { left, maes };
   for (PlatonicMaes *emm  :  plams)
     { Vect v = 0.5 * emm->wid.val * emm->ovr.val;
-      Vect l = emm->loc.val - v;
+      Vect l = emm->loc.val - emm->upp.val * (emm->upp.val . Dot (emm->loc.val));
+      l += -v + Tamparams::Current ()->escaband_mid * emm->upp.val;
       Vect r = l + 2.0 * v;
-      v = 0.1 * emm->hei.val * emm->upp.val;
+      v = 0.5 * Tamparams::Current ()->escaband_hei * emm->upp.val;
       Vect b = l - v;
       Vect t = l + v;
       afz -> AppendSwath (new Swath ({l, r}, {b, t}, emm));
+
+      lpr -> AppendLine ({l - v, l + v});
+      lpr -> AppendLine ({l + v, r + v});
+      lpr -> AppendLine ({r + v, r - v});
+      lpr -> AppendLine ({r - v, l - v});
     }
 
-  afz -> PopulateFromScratch ();
+  Node *wframe_node = new Node (lpr);
+  lpr -> SetShouldDraw (false);
+  g_wallpaper -> AppendChild (wframe_node);
+  Tamparams::Current ()->construction_marks . push_back (wframe_node);
+
+//  afz -> PopulateFromScratch ();
+  AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.freezo);
+  AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.freezo);
+
+GridRenderable *griddy = new GridRenderable;
+Node *gridno = new Node (griddy);
+griddy -> SetCenter (tabl -> Loc ());
+griddy -> SetOver (tabl -> Over ());
+griddy -> SetUp (tabl -> Up ());
+griddy -> SetWidth (0.5 * tabl -> Width ());
+griddy -> SetHeight (0.5 * tabl -> Height ());
+griddy -> SetWarp (0.1 * tabl -> Over ());
+griddy -> SetWeft (0.1 * tabl -> Up ());
+griddy -> SetGridColor (ZeColor (1.0, 0.0, 1.0, 0.5));
+g_tablecloth -> AppendChild (gridno);
 
   tamp . Run ();
 

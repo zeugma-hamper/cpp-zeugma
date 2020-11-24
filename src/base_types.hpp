@@ -212,6 +212,14 @@ VOUT vect_cast (VIN const &_v)
   return vout;
 }
 
+//
+////
+//
+
+
+struct InitFreeLiving { };
+extern InitFreeLiving INITLESS;
+
 }
 
 

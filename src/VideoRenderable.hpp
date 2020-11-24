@@ -1,3 +1,4 @@
+
 #ifndef VIDEO_RENDERABLE
 #define VIDEO_RENDERABLE
 
@@ -9,11 +10,13 @@
 #include <bgfx_utils.hpp>
 #include <ch_ptr.hpp>
 
-namespace charm
-{
+
+namespace charm  {
+
 
 struct VideoTexture;
 struct FilmInfo;
+
 
 class VideoRenderable final : public Renderable
 {
@@ -33,6 +36,8 @@ class VideoRenderable final : public Renderable
   u64 m_bgfx_state;
 };
 
+
 }
+
 
 #endif //VIDEO_RENDERABLE

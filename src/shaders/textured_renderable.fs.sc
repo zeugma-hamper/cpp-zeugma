@@ -2,6 +2,8 @@ $input v_uv
 
 #include <bgfx_shader.sh>
 
+uniform vec4 u_adjc;
+
 SAMPLER2D (u_texture, 0);
 
 layout(location = 0) out vec4 out_color;
@@ -12,5 +14,5 @@ void main()
   if (tx_color.a < 0.01)
     discard;
 
-  out_color = tx_color;
+  out_color = u_adjc * tx_color;
 }

@@ -1,7 +1,10 @@
+
 $input v_uv
 
 #include <bgfx_shader.sh>
 #include <yuv.sh>
+
+uniform vec4 u_adj_color;
 
 SAMPLER2D (u_video_texture0, 0);
 SAMPLER2D (u_video_texture1, 1);
@@ -27,10 +30,10 @@ void main()
                    texture2D (u_video_texture1, v_uv).r,
                    texture2D (u_video_texture2, v_uv).r);
 
-  vec4 oc = vec4 (convert_bt601_scaled (yuv), alpha);
+  vec4 oc = u_adj_color * vec4 (convert_bt601_scaled (yuv), alpha);
   if (ENABLE_MIX > 0.0 && alpha * alpha < 0.25)
     {
-      oc = vec4 (yuv.r, yuv.r, yuv.r, 1.0) * u_mix_color;
+      oc = u_adj_color * u_mix_color * vec4 (yuv.r, yuv.r, yuv.r, 1.0);
     }
 
   out_color = oc;

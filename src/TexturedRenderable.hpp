@@ -30,6 +30,7 @@ class TexturedRenderable final : public Renderable
   bgfx::UniformHandle m_uni_up;
   bgfx::UniformHandle m_uni_wh;
   bgfx::UniformHandle m_uni_texture;
+  bgfx::UniformHandle m_uni_adj_iro;
   TextureParticulars m_particulars;
 
 };

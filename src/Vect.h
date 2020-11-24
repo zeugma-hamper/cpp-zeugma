@@ -16,6 +16,7 @@ namespace charm
 class Vect  :  public v3f64
 { public:
   Vect ()  { x = y = z = 0.0; }
+  explicit Vect (InitFreeLiving)  { }
   Vect (f64 eks, f64 wye, f64 zee)
     { x = eks;  y = wye;  z = zee; }
   Vect (f64 mono)
@@ -111,11 +112,11 @@ class Vect  :  public v3f64
 
   f64 AngleWith (const Vect &v)  const
     { return acos (Norm () . Dot (v . Norm ())); }
-  inline f64 DegAngleWith (const Vect &v)  const
+  f64 DegAngleWith (const Vect &v)  const
     { return 180.0 / M_PI * AngleWith (v); }
 
   Vect &RotateSelfPreNormed (const Vect &axis, f64 rad_ang);
-  inline Vect &RotateSelf (Vect axis, f64 rad_ang)
+  Vect &RotateSelf (Vect axis, f64 rad_ang)
     { axis . NormSelf ();
       return RotateSelfPreNormed (axis, rad_ang);
     }

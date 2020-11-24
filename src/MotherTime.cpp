@@ -14,7 +14,7 @@ namespace charm  {
 static f64 OOAB = (1.0 / 1000000000.0);
 
 
-inline u64 NANOSECS_OF_NOW ()
+u64 NANOSECS_OF_NOW ()
 { auto nowish = chrono::steady_clock::now () . time_since_epoch ();
   auto nanos = chrono::duration_cast <chrono::nanoseconds> (nowish);
   return nanos . count ();

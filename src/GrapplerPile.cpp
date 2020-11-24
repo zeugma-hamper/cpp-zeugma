@@ -31,15 +31,24 @@ Grappler *GrapplerPile::NthGrappler (i64 ind)  const
   return graps[ind];
 }
 
-i64 GrapplerPile::FindGrappler (Grappler *g)  const
+i64 GrapplerPile::IndexForGrappler (Grappler *g)  const
 { if (g)
-    { int q = 0;
+    { i64 q = 0;
       for (auto qi = graps . begin ()  ;
            qi != graps . end ()  ;
            ++q, ++qi)
         if (*qi == g)
           return q;
     }
+  return -1;
+}
+
+i64 GrapplerPile::IndexForGrappler (const std::string &nm)  const
+{ i64 q = 0;
+  for (auto it = graps . begin ()  ;  it != graps . end ()  ;  ++it, ++q)
+    if (Grappler *gr = *it)
+      if (gr -> Name () == nm)
+        return q;
   return -1;
 }
 
@@ -78,8 +87,7 @@ GrapplerPile &GrapplerPile::RemoveGrappler (Grappler *g)
   auto const end_it = graps.end ();
   for (auto qi = graps . begin ()  ;  qi != end_it  ;  ++qi)
     if (*qi == g)
-      {
-        delete g;
+      { delete g;
         graps . erase (qi);
         break;
       }
@@ -88,16 +96,14 @@ GrapplerPile &GrapplerPile::RemoveGrappler (Grappler *g)
 
 GrapplerPile &GrapplerPile::RemoveNthGrappler (i64 ind)
 { if (ind >= 0  ||  ind < i64 (graps . size ()))
-    {
-      delete graps[ind];
+    { delete graps[ind];
       graps . erase (graps . begin () + ind);
     }
   return *this;
 }
 
 GrapplerPile &GrapplerPile::RemoveAllGrapplers ()
-{
-  for (Grappler *g : graps)
+{ for (Grappler *g : graps)
     delete g;
 
   graps . clear ();
@@ -110,6 +116,7 @@ GrapplerPile &GrapplerPile::RemoveAllGrapplers ()
 i64 GrapplerPile::Inhale (i64 steppe, f64 thyme)
 { if (GrapplerCount ()  <  1)
     return 0;
+
   auto qi = graps . begin ();
   Grappler *g = *qi;
   g -> Inhale (steppe, thyme);
@@ -129,4 +136,4 @@ i64 GrapplerPile::Inhale (i64 steppe, f64 thyme)
 }
 
 
-}  // you sure you want that third hemlock margarita, namespace charm?
+}  // you sure you want that third hemlock margarita, namespace charm? yes? okay.

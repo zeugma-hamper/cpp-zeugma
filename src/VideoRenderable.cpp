@@ -15,8 +15,8 @@
 
 
 
-namespace charm
-{
+namespace charm  {
+
 
 VideoRenderable::VideoRenderable (std::string_view _path)
   : Renderable (),
@@ -36,13 +36,15 @@ VideoRenderable::VideoRenderable (FilmInfo const &_fm)
   VideoSystem *system = VideoSystem::GetSystem();
 
   VideoBrace brace = system->OpenVideoFile (_fm.film_path.string ());
+
   m_video_texture = brace.video_texture;
   m_bgfx_state = system->GetVideoBGFXState() | BGFX_STATE_PT_TRISTRIP;
 }
 
+
 VideoRenderable::~VideoRenderable ()
-{
-}
+{ }
+
 
 ch_ptr<VideoTexture> const &VideoRenderable::GetVideoTexture () const
 {
@@ -92,11 +94,14 @@ void VideoRenderable::Draw (u16 vyu_id)
 
   glm::vec4 const over = glm::vec4 (as_glm (m_over), 0.0f);
   glm::vec4 const up = glm::vec4 (as_glm (m_up), 0.0f);
-  bgfx::setUniform(m_video_texture->GetOverUniform(), &over);
-  bgfx::setUniform(m_video_texture->GetUpUniform(), &up);
+  glm::vec4 const ac = as_glm (m_adjc);
+  bgfx::setUniform (m_video_texture->GetOverUniform(), &over);
+  bgfx::setUniform (m_video_texture->GetUpUniform(), &up);
+  bgfx::setUniform (m_video_texture->GetAdjColorUniform(), glm::value_ptr (ac));
 
   bgfx::submit(vyu_id, m_video_texture->GetProgram());
 
 }
+
 
 }

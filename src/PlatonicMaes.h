@@ -93,6 +93,18 @@ class PlatonicMaes  :  public SpaceThing
   void SetIdealPixelHeight (i64 iph)
     { ideal_pixhei = iph; }
 
+  Vect CornerBL ()  const
+    { return loc.val - 0.5 * (wid.val * ovr.val + hei.val * upp.val); }
+
+  Vect CornerTL ()  const
+    { return loc.val - 0.5 * (wid.val * ovr.val - hei.val * upp.val); }
+
+  Vect CornerTR ()  const
+    { return loc.val + 0.5 * (wid.val * ovr.val + hei.val * upp.val); }
+
+  Vect CornerBR ()  const
+    { return loc.val + 0.5 * (wid.val * ovr.val - hei.val * upp.val); }
+
 
   i64 Inhale (i64 ratch, f64 thyme);
 };

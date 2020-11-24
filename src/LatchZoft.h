@@ -15,7 +15,7 @@ class LatchZoft  :  public ZoftThing<T>
 
   using GutsTyp = typename ZoftThing<T>::template LatchGuts<T>;
 
-  inline GutsTyp *GutsIfOrigType ()
+  GutsTyp *GutsIfOrigType ()
     { return dynamic_cast <GutsTyp *> (this -> Guts ()); }
 
   static GutsTyp *NewGuts ()

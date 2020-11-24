@@ -58,6 +58,8 @@ class GraphicsApplication  :  public Application
   PlatonicMaes *NthMaes (i32 ind) const;
   PlatonicMaes *FindMaesByName (std::string_view _name) const;
 
+  PlatonicMaes *ClosestIntersectedMaes (const Vect &frm, const Vect &aim,
+                                        Vect *hit_point = NULL);
   i32 NumRenderLeaves ()  const;
   CMVTrefoil *NthRenderLeaf (i32 ind) const;
   CMVTrefoil *FindRenderLeafByName (std::string_view _name) const;

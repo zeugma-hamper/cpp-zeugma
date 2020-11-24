@@ -50,7 +50,8 @@ class SinuZoft  :  public ZoftThing <T>
             cent . Inhale (ratch, thyme);
             phas . Inhale (ratch, thyme);
             TT v = cent.val
-              +  ampl.val * sin (fmod (freq * thyme + phas, 2.0 * M_PI));
+              +  ampl.val * sin (fmod (2.0 * M_PI * freq * thyme + phas,
+                                       2.0 * M_PI));
             this -> PuppeteerHosts (v);
             return 0;
           }
@@ -59,7 +60,7 @@ class SinuZoft  :  public ZoftThing <T>
 
   using GutsTyp = ZGuts <T>;
 
-  inline GutsTyp *GutsIfOrigType ()
+  GutsTyp *GutsIfOrigType ()
     { return dynamic_cast <GutsTyp *> (this -> Guts ()); }
 
   static ZGuts <T> *NewGuts ()

@@ -27,7 +27,7 @@ VideoTexture::VideoTexture (VideoFormat _format, bgfx::ProgramHandle _program,
   for (size_t i = 0; i < ArraySize (textures); ++i)
     textures[i] = BGFX_INVALID_HANDLE;
 
-  assert (_uni_count <= 10);
+  assert (_uni_count <= 11);
 
   for (size_t i = 0; i < _uni_count; ++i)
     uniforms[i] = _unis[i];
@@ -159,6 +159,11 @@ bgfx::UniformHandle const &VideoTexture::GetUpUniform () const
 bgfx::UniformHandle const &VideoTexture::GetMixColorUniform () const
 {
   return uniforms[9];
+}
+
+bgfx::UniformHandle const &VideoTexture::GetAdjColorUniform () const
+{
+  return uniforms[10];
 }
 
 bgfx::ProgramHandle const &VideoTexture::GetProgram () const
@@ -325,16 +330,17 @@ VideoSystem::VideoSystem ()
 
   m_pipelines.reserve (24);
 
-  m_vgr.uniforms[0] = bgfx::createUniform("u_video_texture0", bgfx::UniformType::Sampler);
-  m_vgr.uniforms[1] = bgfx::createUniform("u_video_texture1", bgfx::UniformType::Sampler);
-  m_vgr.uniforms[2] = bgfx::createUniform("u_video_texture2", bgfx::UniformType::Sampler);
-  m_vgr.uniforms[3] = bgfx::createUniform("u_video_matte",    bgfx::UniformType::Sampler);
-  m_vgr.uniforms[4] = bgfx::createUniform("u_dimensions",     bgfx::UniformType::Vec4);
-  m_vgr.uniforms[5] = bgfx::createUniform("u_matte_dimensions", bgfx::UniformType::Vec4);
-  m_vgr.uniforms[6] = bgfx::createUniform("u_over", bgfx::UniformType::Vec4);
-  m_vgr.uniforms[7] = bgfx::createUniform("u_up",   bgfx::UniformType::Vec4);
-  m_vgr.uniforms[8] = bgfx::createUniform("u_flags",   bgfx::UniformType::Vec4);
-  m_vgr.uniforms[9] = bgfx::createUniform("u_mix_color",   bgfx::UniformType::Vec4);
+  m_vgr.uniforms[0]  = bgfx::createUniform("u_video_texture0", bgfx::UniformType::Sampler);
+  m_vgr.uniforms[1]  = bgfx::createUniform("u_video_texture1", bgfx::UniformType::Sampler);
+  m_vgr.uniforms[2]  = bgfx::createUniform("u_video_texture2", bgfx::UniformType::Sampler);
+  m_vgr.uniforms[3]  = bgfx::createUniform("u_video_matte",    bgfx::UniformType::Sampler);
+  m_vgr.uniforms[4]  = bgfx::createUniform("u_dimensions",     bgfx::UniformType::Vec4);
+  m_vgr.uniforms[5]  = bgfx::createUniform("u_matte_dimensions", bgfx::UniformType::Vec4);
+  m_vgr.uniforms[6]  = bgfx::createUniform("u_over", bgfx::UniformType::Vec4);
+  m_vgr.uniforms[7]  = bgfx::createUniform("u_up",   bgfx::UniformType::Vec4);
+  m_vgr.uniforms[8]  = bgfx::createUniform("u_flags",   bgfx::UniformType::Vec4);
+  m_vgr.uniforms[9]  = bgfx::createUniform("u_mix_color",   bgfx::UniformType::Vec4);
+  m_vgr.uniforms[10] = bgfx::createUniform("u_adj_color",   bgfx::UniformType::Vec4);
 
   ProgramResiduals ps = CreateProgram ("video_vs.bin", "video_fs.bin", true);
   m_vgr.basic_program = ps.program;

@@ -96,7 +96,7 @@ class ZoftThing
               delete this;
           }
 
-        inline void PuppeteerHosts (const TT &v)
+        void PuppeteerHosts (const TT &v)
           { if (num_hosts == 1)
               hostesque.zt->val = v;
             else if (num_hosts > 1)
@@ -224,7 +224,7 @@ class ZoftThing
   // to) the identical definitions in derived classes...
   using GutsTyp = ZGuts <T>;
 
-  inline GutsTyp *GutsIfOrigType ()
+  GutsTyp *GutsIfOrigType ()
     { return dynamic_cast <GutsTyp *> (this -> Guts ()); }
 
   void InstallGuts (ZGuts <T> *g)
@@ -240,7 +240,7 @@ class ZoftThing
       // just_changed = true;  nomo_change = false;  // assuming guts does this
     }
 
-  inline i64 Inhale (i64 ratch, f64 thyme)
+  i64 Inhale (i64 ratch, f64 thyme)
     { if (nomo_change)
         { if (just_changed)
             just_changed = false;

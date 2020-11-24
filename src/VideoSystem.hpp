@@ -72,6 +72,7 @@ class VideoTexture : public CharmBase<VideoTexture>
   bgfx::UniformHandle const &GetOverUniform () const;
   bgfx::UniformHandle const &GetUpUniform () const;
   bgfx::UniformHandle const &GetMixColorUniform () const;
+  bgfx::UniformHandle const &GetAdjColorUniform () const;
   bgfx::ProgramHandle const &GetProgram () const;
 
  protected:
@@ -81,7 +82,9 @@ class VideoTexture : public CharmBase<VideoTexture>
   v2u32 matte_min = {0, 0};
   v2u32 matte_max = {0, 0};
   bgfx::ProgramHandle program  = BGFX_INVALID_HANDLE;
-  bgfx::UniformHandle uniforms[10] = {BGFX_INVALID_HANDLE,
+  bgfx::UniformHandle uniforms[11] = {BGFX_INVALID_HANDLE,
+                                      BGFX_INVALID_HANDLE,
+                                      BGFX_INVALID_HANDLE,
                                       BGFX_INVALID_HANDLE,
                                       BGFX_INVALID_HANDLE,
                                       BGFX_INVALID_HANDLE,
@@ -172,7 +175,7 @@ class VideoSystem
                                                   BGFX_STATE_BLEND_INV_SRC_ALPHA);
     bgfx::ProgramHandle matte_program = BGFX_INVALID_HANDLE;
 
-    bgfx::UniformHandle uniforms[10] = {BGFX_INVALID_HANDLE, //video texture 0
+    bgfx::UniformHandle uniforms[11] = {BGFX_INVALID_HANDLE, //video texture 0
                                         BGFX_INVALID_HANDLE, //video texture 1
                                         BGFX_INVALID_HANDLE, //video texture 2
                                         BGFX_INVALID_HANDLE, //video matte
@@ -181,7 +184,8 @@ class VideoSystem
                                         BGFX_INVALID_HANDLE, //over
                                         BGFX_INVALID_HANDLE, //up
                                         BGFX_INVALID_HANDLE, //flags
-                                        BGFX_INVALID_HANDLE};//mix color
+                                        BGFX_INVALID_HANDLE, //mix color
+                                        BGFX_INVALID_HANDLE};//adj color
 
     bgfx::TextureHandle black_texture;
     bgfx::TextureHandle white_texture;

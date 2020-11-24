@@ -1,3 +1,4 @@
+
 #include <MattedVideoRenderable.hpp>
 
 #include <BlockTimer.hpp>
@@ -8,8 +9,9 @@
 
 #include <algorithm>
 
-namespace charm
-{
+
+namespace charm  {
+
 
 namespace fs = std::filesystem;
 
@@ -42,6 +44,7 @@ MattedVideoRenderable::MattedVideoRenderable (std::string_view _path,
     = system->OpenMatte (_path, _loop_start_ts, _loop_end_ts,
                          -1, _matte_pattern,
                          v2u32{0, 0}, v2u32{0, 0});
+
   m_video_texture = brace.video_texture;
   m_bgfx_state = system->GetMatteBGFXState() | BGFX_STATE_PT_TRISTRIP;
 }
@@ -57,13 +60,15 @@ MattedVideoRenderable::MattedVideoRenderable (FilmInfo const &_film, ClipInfo co
                          _clip.start_time, _clip.start_time + _clip.duration,
                          _clip.frame_count, _clip.directory,
                          _clip.geometry.dir_geometry.min, _clip.geometry.dir_geometry.max);
+
   m_video_texture = brace.video_texture;
   m_bgfx_state = system->GetMatteBGFXState() | BGFX_STATE_PT_TRISTRIP;
 }
 
+
 MattedVideoRenderable::~MattedVideoRenderable ()
-{
-}
+{ }
+
 
 ch_ptr<VideoTexture> const &MattedVideoRenderable::GetVideoTexture () const
 {
@@ -204,8 +209,10 @@ void MattedVideoRenderable::Draw (u16 vyu_id)
   glm::vec4 const vid_dim {dim.x, dim.y, 1.0f, 1.0f};
   glm::vec4 const matte_dim {matte_min.x, matte_min.y, matte_max.x, matte_max.y};
 
-  bgfx::setUniform(m_video_texture->GetDimensionUniform(), glm::value_ptr (vid_dim));
-  bgfx::setUniform(m_video_texture->GetMatteDimUniform(),  glm::value_ptr (matte_dim));
+  bgfx::setUniform (m_video_texture->GetDimensionUniform(),
+                    glm::value_ptr (vid_dim));
+  bgfx::setUniform (m_video_texture->GetMatteDimUniform(),
+                    glm::value_ptr (matte_dim));
 
   glm::vec4 const flags {f32 (m_size_referent),
                          GetEnableMixColor() ? 1.0f : 0.0f, 0.0f, 0.0f};
@@ -214,10 +221,14 @@ void MattedVideoRenderable::Draw (u16 vyu_id)
 
   glm::vec4 const over = glm::vec4 (as_glm (m_over), 0.0f);
   glm::vec4 const up = glm::vec4 (as_glm (m_up), 0.0f);
-  bgfx::setUniform(m_video_texture->GetOverUniform(), &over);
-  bgfx::setUniform(m_video_texture->GetUpUniform(), &up);
+  glm::vec4 const ac = as_glm (m_adjc.val);
+
+  bgfx::setUniform (m_video_texture->GetOverUniform(), &over);
+  bgfx::setUniform (m_video_texture->GetUpUniform(), &up);
+  bgfx::setUniform (m_video_texture->GetAdjColorUniform(), glm::value_ptr (ac));
 
   bgfx::submit(vyu_id, m_video_texture->GetProgram());
 }
+
 
 }

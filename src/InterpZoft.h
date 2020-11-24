@@ -4,6 +4,7 @@
 
 
 #include "ZoftThing.h"
+#include "LatchZoft.h"
 #include "interp-funcs.h"
 
 
@@ -116,7 +117,7 @@ class InterpZoft  :  public ZoftThing <T>
 
   using GutsTyp = ZGuts <T>;
 
-  inline GutsTyp *GutsIfOrigType ()
+  GutsTyp *GutsIfOrigType ()
     { return dynamic_cast <GutsTyp *> (this -> Guts ()); }
 
   static ZGuts <T> *NewGuts ()
@@ -172,11 +173,13 @@ class InterpZoft  :  public ZoftThing <T>
       return false;
     }
 
-  bool ProceedTo (const ZoftThing <T> &next_b)
+  bool ProceedTo (const ZoftThing <T> &next_bz)
     { if (GutsTyp *g = GutsIfOrigType ())
-        { g -> ProceedTo (next_b);  return true; }
+        { g -> ProceedTo (next_bz);  return true; }
       return false;
     }
+  bool ProceedTo (const Vect &next_b)
+    { ZoftVect nbz (next_b);  return ProceedTo (nbz); }
 
   ZoftThing <T> &PointA ()
     { if (GutsTyp *g = GutsIfOrigType ())
