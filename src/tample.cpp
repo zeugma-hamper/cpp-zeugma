@@ -347,14 +347,14 @@ i64 Sensorium::ZESpatialSoften (ZESpatialSoftenEvent *e)
 
 i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
 { if (e -> Utterance ()  ==  "0")
-    { InterpVect &rs = Tamparams::Current ()->room_scaler;
+    { InterpVect &rs = Tamglobals::Only ()->room_scaler;
       rs . Reverse ();
       rs . Commence ();
     }
   else if (e -> Utterance ()  ==  "1")
     { static bool cur_vis = false;
       cur_vis = ! cur_vis;
-      for (Node *no  :  Tamparams::Current ()->construction_marks)
+      for (Node *no  :  Tamglobals::Only ()->construction_marks)
         if (no)
           no -> SetVisibilityForAllLocalRenderables (cur_vis);
     }
@@ -550,22 +550,22 @@ int main (int ac, char **av)
   Node *g_wallpaper = new Node;
   g_wallpaper -> Translate (tamp . elev_transl);
   walls_layer -> GetRootNode () -> AppendChild (g_wallpaper);
-  Tamparams::Current ()->wallpaper = g_wallpaper;
+  Tamglobals::Only ()->wallpaper = g_wallpaper;
 
   Node *g_tablecloth = new Node;
   table_layer -> GetRootNode () -> AppendChild (g_tablecloth);
-  Tamparams::Current ()->tablecloth = g_tablecloth;
+  Tamglobals::Only ()->tablecloth = g_tablecloth;
 
   Node *g_conveyor = new Node;
   omni_layer -> GetRootNode () -> AppendChild (g_conveyor);
-  Tamparams::Current ()->conveyor = g_conveyor;
+  Tamglobals::Only ()->conveyor = g_conveyor;
 
   Node *g_windshield = new Node;
   omni_layer -> GetRootNode () -> AppendChild (g_windshield);
-  Tamparams::Current ()->windshield = g_windshield;
+  Tamglobals::Only ()->windshield = g_windshield;
 
   if (PlatonicMaes *mae = tamp . FindMaesByName ("front"))
-    { InterpVect &rs = Tamparams::Current ()->room_scaler;
+    { InterpVect &rs = Tamglobals::Only ()->room_scaler;
       f64 rmf = Tamparams::Current ()->room_minify_factor;
       rs . PointA () . Set (Vect (rmf, rmf, rmf));
       rs . PointB () . Set (Vect::onesv);
@@ -672,7 +672,7 @@ int main (int ac, char **av)
   Node *wframe_node = new Node (lpr);
   lpr -> SetShouldDraw (false);
   g_wallpaper -> AppendChild (wframe_node);
-  Tamparams::Current ()->construction_marks . push_back (wframe_node);
+  Tamglobals::Only ()->construction_marks . push_back (wframe_node);
 
 //  afz -> PopulateFromScratch ();
   AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.freezo);

@@ -30,21 +30,28 @@ struct Tamparams
 
   f64 pb_snapback_interp_time = 0.4;
   f64 lateral_slide_interp_time = 0.3;
-  f64 pb_snapback_fade_time = 0.4;
+  f64 pb_snapback_fade_time = 0.5;
 
-  Node *wallpaper = NULL;
+  f64 room_minify_factor = 0.478128;  // that's 4372mm / 9144mm, folks...
+
+  static Tamparams ur_params;
+  static std::vector <Tamparams *> tampa_stack;
+  static Tamparams *Current ();
+};
+
+
+struct Tamglobals
+{ Node *wallpaper = NULL;
   Node *tablecloth = NULL;
   Node *conveyor = NULL;
   Node *windshield = NULL;
 
   std::vector <Node *> construction_marks;
 
-  f64 room_minify_factor = 0.478128;  // that's 4372mm / 9144mm, folks...
   InterpVect room_scaler;
 
-  static Tamparams ur_params;
-  static std::vector <Tamparams *> tampa_stack;
-  static Tamparams *Current ();
+  static Tamglobals ur_globals;
+  static Tamglobals *Only ();
 };
 
 

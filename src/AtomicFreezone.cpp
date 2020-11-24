@@ -221,7 +221,7 @@ i64 AtomicFreezone::ZESpatialHarden (ZESpatialHardenEvent *e)
       auto it = hoverees . find (prv);
       if (it  !=  hoverees . end ())
         hoverees . erase (it);
-      if (Node *conv = Tamparams::Current ()->conveyor)
+      if (Node *conv = Tamglobals::Only ()->conveyor)
         { tic->from_node = tic -> Parent ();
           conv -> AppendChild (tic);
         }
