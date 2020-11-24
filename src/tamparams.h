@@ -41,7 +41,9 @@ struct Tamparams
 
 
 struct Tamglobals
-{ Node *wallpaper = NULL;
+{ Node *front_wall = NULL;
+  Node *left_wall = NULL;
+  Node *wallpaper = NULL;
   Node *tablecloth = NULL;
   Node *conveyor = NULL;
   Node *windshield = NULL;

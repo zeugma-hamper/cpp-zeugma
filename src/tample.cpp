@@ -501,6 +501,10 @@ int main (int ac, char **av)
     return -1;
 
   Layer *omni_layer = tamp . GetSceneLayer();
+  Layer *front_layer = new Layer ();
+  tamp . AppendSceneLayer (front_layer);
+  Layer *left_layer = new Layer ();
+  tamp . AppendSceneLayer (left_layer);
   Layer *walls_layer = new Layer ();
   tamp . AppendSceneLayer (walls_layer);
   Layer *table_layer = new Layer ();
@@ -513,9 +517,13 @@ int main (int ac, char **av)
         continue;
 
       if (leaf->maes -> Name ()  ==  "front")
-        leaf->layers . push_back (walls_layer);
+        { leaf->layers . push_back (walls_layer);
+          leaf->layers . push_back (front_layer);
+        }
       if (leaf->maes -> Name ()  ==  "left")
-        leaf->layers . push_back (walls_layer);
+        { leaf->layers . push_back (walls_layer);
+          leaf->layers . push_back (left_layer);
+        }
       if (leaf->maes -> Name ()  ==  "table")
         leaf->layers . push_back (table_layer);
 
@@ -543,9 +551,23 @@ int main (int ac, char **av)
   PlatonicMaes *tabl = tamp . FindMaesByName ("table");
   assert (tabl);
 
+  front_layer -> AppendRenderTargetMaes (maes);
+  left_layer -> AppendRenderTargetMaes (left);
+  table_layer -> AppendRenderTargetMaes (tabl);
+
   f64 const total_height = 2.0 * maes -> Height();
   f64 const total_width = maes -> Width ();
   f64 const band_height = total_height / 3.0;
+
+  Node *g_front_wall = new Node;
+  g_front_wall -> Translate (tamp . elev_transl);
+  front_layer -> GetRootNode () -> AppendChild (g_front_wall);
+  Tamglobals::Only ()->front_wall = g_front_wall;
+
+  Node *g_left_wall = new Node;
+  g_left_wall -> Translate (tamp . elev_transl);
+  left_layer -> GetRootNode () -> AppendChild (g_left_wall);
+  Tamglobals::Only ()->left_wall = g_left_wall;
 
   Node *g_wallpaper = new Node;
   g_wallpaper -> Translate (tamp . elev_transl);
@@ -570,9 +592,18 @@ int main (int ac, char **av)
       rs . PointA () . Set (Vect (rmf, rmf, rmf));
       rs . PointB () . Set (Vect::onesv);
       rs . Finish ();
+
       ScGrappler *scg = new ScGrappler (rs, ZoftVect (mae -> CornerBL ()));
       scg -> SetName ("room-scaler");
       g_wallpaper -> AppendGrappler (scg);
+
+      scg = new ScGrappler (rs, ZoftVect (mae -> CornerBL ()));
+      scg -> SetName ("room-scaler");
+      g_front_wall -> AppendGrappler (scg);
+
+      scg = new ScGrappler (rs, ZoftVect (mae -> CornerBL ()));
+      scg -> SetName ("room-scaler");
+      g_left_wall -> AppendGrappler (scg);
     }
 
   Vect left_cntr
@@ -591,7 +622,7 @@ int main (int ac, char **av)
   GraumanPalace *grau_egyp = new GraumanPalace;
   grau_egyp -> ImportExhibitionRoster (film_infos);
   grau_egyp -> Translate (maes -> Loc ());
-  g_wallpaper -> AppendChild (grau_egyp);
+  g_front_wall -> AppendChild (grau_egyp);
 
   tamp.gegyp = ch_ptr <GraumanPalace> (grau_egyp);
   AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
