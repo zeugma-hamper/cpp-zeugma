@@ -479,7 +479,7 @@ void DecodePipeline::HandleStateChangedMessage (GstMessage *message)
 
 void DecodePipeline::HandleSegmentDone (GstMessage *)
 {
-  fprintf (stderr, "got segment done!\n");
+  // fprintf (stderr, "got segment done!\n");
   //looping got cancelled, clear segment
   if (m_loop_status.loop_start < 0 ||
       m_loop_status.loop_end < 0)

@@ -63,16 +63,14 @@ void VideoTexture::BindGraphics (u64 _additional_state, bool _use_matte)
     }
 
   // if matte is valid
-  if (bgfx::isValid(textures[3]))
+  if (bgfx::isValid(textures[3]) && _use_matte)
     {
-      //fprintf (stderr, "binding matte\n");
-      if (_use_matte)
-        bgfx::setTexture (3, uniforms[3], textures[3]);
-      else
-        {
-          bgfx::TextureHandle const bl = VideoSystem::GetSystem()->GetBlackTexture();
-          bgfx::setTexture (3, uniforms[3], bl);
-        }
+      bgfx::setTexture (3, uniforms[3], textures[3]);
+    }
+  else
+    {
+      bgfx::TextureHandle const bl = VideoSystem::GetSystem()->GetBlackTexture();
+      bgfx::setTexture (3, uniforms[3], bl);
     }
 }
 
