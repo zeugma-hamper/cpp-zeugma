@@ -17,6 +17,8 @@
 #include <Matte.hpp>
 #include <VideoRenderable.hpp>
 
+#include "tamparams.h"
+
 #include <Frontier.hpp>
 
 #include <vector>
@@ -30,6 +32,8 @@ class SilverScreen  :  public Node
   const FilmInfo &finf;
   VideoRenderable *vren;
   RectRenderableFrontier *frtr;
+  InterpColor scr_fader;
+//  ZoftColor scr_fader;
 
   const std::string &Name ()
     { return finf.name; }
@@ -38,7 +42,19 @@ class SilverScreen  :  public Node
                 const FilmInfo &fi)  :  Node (), vren (vr), finf (fi)
     { frtr = new RectRenderableFrontier (vr, Vect::zerov, 1.0, 1.0);
       SetFrontier (frtr);
+      scr_fader . SetInterpTime (Tamparams::Current ()->pb_snapback_fade_time);
+      scr_fader . PointA () . Set (ZeColor (1.0, 1.0, 1.0, 0.0));
+      scr_fader . PointB () . Set (ZeColor (1.0));
+      scr_fader . Finish ();
+      scr_fader . MakeBecomeLikable ();
+      vren -> AdjColorZoft () . BecomeLike (scr_fader);
     }
+
+  void FadeUp ();
+  void FadeDown ();
+
+  void Pause ();
+  void Play ();
 };
 
 

@@ -28,6 +28,10 @@ struct Tamparams
 
   f64 table_scale_factor = 0.5;
 
+  f64 pb_snapback_interp_time = 0.4;
+  f64 lateral_slide_interp_time = 0.3;
+  f64 pb_snapback_fade_time = 0.4;
+
   Node *wallpaper = NULL;
   Node *tablecloth = NULL;
   Node *conveyor = NULL;

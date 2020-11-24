@@ -63,9 +63,12 @@ void VideoRenderable::Draw (u16 vyu_id)
   if (! m_video_texture || ! bgfx::isValid(m_video_texture->GetNthTexture (0)))
     return;
 
-  bgfx::setTransform(&m_node->GetAbsoluteTransformation().model);
+  bgfx::setTransform (&m_node->GetAbsoluteTransformation().model);
 
-  m_video_texture->BindGraphics (BGFX_STATE_PT_TRISTRIP);
+  m_video_texture -> BindGraphics
+    (BGFX_STATE_PT_TRISTRIP  |
+     BGFX_STATE_BLEND_FUNC (BGFX_STATE_BLEND_SRC_ALPHA,
+                            BGFX_STATE_BLEND_INV_SRC_ALPHA));
 
   bgfx::setVertexCount(4);
 

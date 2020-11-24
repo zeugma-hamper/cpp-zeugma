@@ -6,9 +6,44 @@
 #include <vector_interop.hpp>
 
 
+//
+/// SilverScreen, just for a bit
+//
+
+void SilverScreen::FadeUp ()
+{ scr_fader . PointA () . Set (ZeColor (1.0, 0.0));
+  scr_fader . PointB () . Set (ZeColor (1.0, 1.0));
+  scr_fader . Commence ();
+}
+
+void SilverScreen::FadeDown ()
+{ scr_fader . PointA () . Set (ZeColor (1.0, 1.0));
+  scr_fader . PointB () . Set (ZeColor (1.0, 0.0));
+  scr_fader . Commence ();
+}
+
+void SilverScreen::Pause ()
+{ if (! vren)  return;
+  ch_ptr <DecodePipeline> deep = vren -> GetPipeline ();
+  if (deep)
+    deep -> Pause ();
+}
+
+void SilverScreen::Play ()
+{ if (! vren)  return;
+  ch_ptr <DecodePipeline> deep = vren -> GetPipeline ();
+  if (deep)
+    deep -> Play ();
+}
+
+
+//
+///  GraumanPalace items of every stripe follow
+//
+
 GraumanPalace::GraumanPalace ()  :  Zeubject (), Node (),
                                     backing_maes (NULL),
-                                    flick_wid (4000.0), flick_spacing (4320.0),
+                                    flick_wid (3600.0), flick_spacing (3840.0),
                                     ovr (Vect::xaxis), upp (Vect::yaxis),
                                     nrm (Vect::zaxis), slider (new Node),
                                     now_showing (0),
@@ -16,8 +51,8 @@ GraumanPalace::GraumanPalace ()  :  Zeubject (), Node (),
                                     pb_max_push (-50000.0), pb_max_pull (5000.0)
 { AppendChild (slider);
 
-  push_depth . SetInterpTime (0.4);
-  ltrl_slide . SetInterpTime (0.3);
+  push_depth . SetInterpTime (Tamparams::Current ()->pb_snapback_interp_time);
+  ltrl_slide . SetInterpTime (Tamparams::Current ()->lateral_slide_interp_time);
 
   Grappler *g = slider -> Translate (ltrl_slide);
   g -> SetName ("slide-trans");
@@ -48,6 +83,15 @@ void GraumanPalace::JumpToFlick (i64 which_flick)
     which_flick = 0;
   else if (which_flick  >=  screens . size ())
     which_flick = screens . size () - 1;
+
+  if (which_flick  ==  now_showing)
+    return;
+
+  if (SilverScreen *ss = NthSilverScreen (now_showing))
+    ss -> Pause ();
+
+  if (SilverScreen *ss = NthSilverScreen (which_flick))
+    ss -> Play ();
 
   now_showing = which_flick;
   ltrl_slide . ProceedTo (-now_showing * flick_spacing * Over ());
@@ -96,7 +140,10 @@ vire->SetAdjColor(ZeColor(1.0,1.0,0.1,1.0));
 
 
 void GraumanPalace::EngagePushback ()
-{ // fade up all flicks
+{ SilverScreen *curss = CurSilverScreen ();
+  for (SilverScreen *ss  :  screens)
+    if (ss  !=  curss)
+      ss -> FadeUp ();
 }
 
 void GraumanPalace::ReleasePushback ()
@@ -105,6 +152,13 @@ void GraumanPalace::ReleasePushback ()
   JumpToFlick (closest_flick);
   push_depth . ProceedTo (Vect::zerov);
   push_depth .  Commence ();
+
+  SilverScreen *curss = CurSilverScreen ();
+  for (SilverScreen *ss  :  screens)
+    if (ss  !=  curss)
+      { ss -> FadeDown ();
+        ss -> Pause ();
+      }
 }
 
 
@@ -192,13 +246,12 @@ i64 GraumanPalace::ZEYowlAppear (ZEYowlAppearEvent *e)
   else if (utt == "p")
     JumpToPrevFlick ();
   else if (utt == "z")
-    { push_depth . ProceedTo (-5.0 * flick_wid * Norm ());
+    { push_depth . ProceedTo (-15.0 * flick_wid * Norm ());
       push_depth .  Commence ();
+      EngagePushback ();
     }
   else if (utt == "x")
-    { push_depth . ProceedTo (Vect::zerov);
-      push_depth .  Commence ();
-    }
+    { ReleasePushback (); }
   else if (utt == " ")
     { TogglePlayPause (); }
   return 0;
