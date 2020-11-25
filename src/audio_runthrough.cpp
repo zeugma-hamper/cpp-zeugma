@@ -45,5 +45,7 @@ int main (int ac, char **av)
       sleep (1);
     }
 
+  messenger.SendGetSuggestions();
+
   return 0;
 }
