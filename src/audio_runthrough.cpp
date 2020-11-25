@@ -24,10 +24,12 @@ int main (int ac, char **av)
   fprintf (stderr, "address is %s:%s\n", host.c_str (), port.c_str ());
   AudioMessenger messenger (host, port);
 
-  // fprintf (stderr, "play boop\n");
-  // messenger.SendPlayBoop();
+  fprintf (stderr, "play boop\n");
+  messenger.SendPlayBoop();
   sleep (1);
 
+  // ordering of messages here seems to be a problem. perhaps this is
+  // an argument for switching to TCP?
   fprintf (stderr, "muted play boop\n");
   messenger.SendMute();
   sleep (1);
