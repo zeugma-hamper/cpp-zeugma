@@ -345,6 +345,7 @@ tample_exec = executable ('tample',
                            sources : ['src/AtomicFreezone.cpp',
                                       'src/GraumanPalace.cpp',
                                       'src/Orksur.cpp',
+                                      'src/SilverScreen.cpp',
                                       'src/Ticato.cpp',
                                       'src/tamparams.cpp',
                                       'src/tample.cpp'
