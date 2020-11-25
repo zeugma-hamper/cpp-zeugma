@@ -199,7 +199,12 @@ void MattedVideoRenderable::Draw (u16 vyu_id)
 
   bgfx::setTransform(&m_node->GetAbsoluteTransformation().model);
 
-  m_video_texture->BindGraphics (m_bgfx_state, GetEnableMatte());
+  m_video_texture->BindGraphics
+    (m_bgfx_state  |
+     BGFX_STATE_BLEND_FUNC (BGFX_STATE_BLEND_SRC_ALPHA,
+                            BGFX_STATE_BLEND_INV_SRC_ALPHA),
+     GetEnableMatte ());
+
   bgfx::setVertexCount(4);
 
   v2i32 const dim = m_video_texture->GetDimensions ();

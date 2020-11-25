@@ -67,7 +67,8 @@ SilverScreen *GraumanPalace::NthSilverScreen (i64 ind)
   return screens[ind];
 }
 
-VideoRenderable *GraumanPalace::NthFlick (i64 ind)
+//VideoRenderable *GraumanPalace::NthFlick (i64 ind)
+MattedVideoRenderable *GraumanPalace::NthFlick (i64 ind)
 { if (SilverScreen *s = NthSilverScreen (ind))
     return s -> vren;
   return NULL;
@@ -104,7 +105,8 @@ void GraumanPalace::JumpToFlick (i64 which_flick)
 
 
 void GraumanPalace::TogglePlayPause ()
-{ VideoRenderable *vire = CurFlick ();
+{ //VideoRenderable *vire = CurFlick ();
+  MattedVideoRenderable *vire = CurFlick ();
   if (! vire)
     return;
 
@@ -121,12 +123,18 @@ void GraumanPalace::TogglePlayPause ()
 
 
 void GraumanPalace::ImportExhibitionRoster (const std::vector <FilmInfo> &fimmz)
-{ u32 cnt = fimmz . size ();
+{ VideoSystem *vsys = VideoSystem::GetSystem ();
+
+  u32 cnt = fimmz . size ();
   for (u32 q = 0  ;  q < cnt  ;  ++q)
     { const FilmInfo &finf = fimmz[q];
       fprintf (stderr, "oh yes: about to load <%s>\n", finf.name . c_str ());
 
-      VideoRenderable *vire = new VideoRenderable (finf);
+      //VideoRenderable *vire = new VideoRenderable (finf);
+      const VideoBrace br = vsys -> OpenVideoFile (finf.film_path.string ());
+      MattedVideoRenderable *vire = new MattedVideoRenderable (br.video_texture);
+      vire -> SetEnableMatte (false);
+      vire -> SetSizeReferent (SizeReferent::Video);
       if (! vire)
         continue;  // is this even possible? doubt it; but just in case...
       vire -> SetOver (Over ());

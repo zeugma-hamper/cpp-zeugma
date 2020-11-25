@@ -16,6 +16,7 @@
 #include <Node.hpp>
 #include <Matte.hpp>
 #include <VideoRenderable.hpp>
+#include <MattedVideoRenderable.hpp>
 
 #include "tamparams.h"
 
@@ -30,7 +31,8 @@ using namespace charm;
 class SilverScreen  :  public Node
 { public:
   const FilmInfo &finf;
-  VideoRenderable *vren;
+//  VideoRenderable *vren;
+  MattedVideoRenderable *vren;
   RectRenderableFrontier *frtr;
   InterpColor scr_fader;
 //  ZoftColor scr_fader;
@@ -38,7 +40,8 @@ class SilverScreen  :  public Node
   const std::string &Name ()
     { return finf.name; }
 
-  SilverScreen (VideoRenderable *vr,
+//  SilverScreen (VideoRenderable *vr,
+  SilverScreen (MattedVideoRenderable *vr,
                 const FilmInfo &fi)  :  Node (), vren (vr), finf (fi)
     { frtr = new RectRenderableFrontier (vr, Vect::zerov, 1.0, 1.0);
       SetFrontier (frtr);
@@ -98,11 +101,13 @@ class GraumanPalace  :  public Zeubject, public Node,
     { return NumSilverScreens (); }
 
   SilverScreen *NthSilverScreen (i64 ind);
-  VideoRenderable *NthFlick (i64 ind);
+  //VideoRenderable *NthFlick (i64 ind);
+  MattedVideoRenderable *NthFlick (i64 ind);
 
   SilverScreen *CurSilverScreen ()
     { return NthSilverScreen (now_showing); }
-  VideoRenderable *CurFlick ()
+  //VideoRenderable *CurFlick ()
+  MattedVideoRenderable *CurFlick ()
     { return NthFlick (now_showing); }
 
   void JumpToFlick (i64 which_flick);
