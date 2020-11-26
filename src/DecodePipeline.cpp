@@ -497,7 +497,7 @@ void DecodePipeline::HandleSegmentDone (GstMessage *)
 
       SeekFull (1.0,
                 GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_ACCURATE | GST_SEEK_FLAG_FLUSH),
-                GST_SEEK_TYPE_SET, current_ts,
+                GST_SEEK_TYPE_SET, seg_ts,
                 GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
       Pause ();
 

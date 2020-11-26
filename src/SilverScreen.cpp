@@ -95,6 +95,7 @@ bool SilverScreen::ScootToNextClip ()
 bool SilverScreen::ScootToPrevClip ()
 { f64 ts = CurTimestamp ();
   const ClipInfo *cl = finf . FirstClipEndingBefore (ts);
-  return cl  ?  ScootToTime (cl->end_time)  :  false;
+  return cl  ?  ScootToTime (cl->end_time - (1.0/24.0))  :  false;
+  //return cl  ?  ScootToTime (cl->start_time)  :  false;
 }
 
