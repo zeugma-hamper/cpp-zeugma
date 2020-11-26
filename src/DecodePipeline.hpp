@@ -99,6 +99,9 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   f64 CurrentTimestamp () const;
   gint64 CurrentTimestampNS () const;
 
+  v2i32 CurrentVideoFrameRate () const;
+  v2i32 CurrentAudioFrameRate () const;
+
   f64 Duration () const;
   gint64 DurationNanoseconds () const;
 

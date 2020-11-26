@@ -37,6 +37,8 @@ class PipelineTerminus
   f64 CurrentTimestamp () const;
   virtual gint64 CurrentTimestampNS () const;
 
+  virtual v2i32 CurrentFrameRate () const;
+
   virtual void FlushNotify () {};
 
   virtual bool HasSink () const = 0;

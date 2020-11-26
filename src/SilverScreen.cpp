@@ -53,6 +53,7 @@ bool SilverScreen::StepBy (i32 num_frames)
 
   deep -> Pause ();
   deep -> Step (num_frames);
+  return true;
 }
 
 

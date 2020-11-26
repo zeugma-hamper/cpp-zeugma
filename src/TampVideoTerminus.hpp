@@ -29,7 +29,7 @@ class TampVideoTerminus : public BasicPipelineTerminus
 
   i64 CurrentFrameNumber () const;
 
-  v2i32 CurrentFrameRate () const;
+  v2i32 CurrentFrameRate () const override;
 
   SampleStatus HasSample ();
   gst_ptr<GstSample> FetchSample ();

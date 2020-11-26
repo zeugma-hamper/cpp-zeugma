@@ -25,6 +25,11 @@ gint64 PipelineTerminus::CurrentTimestampNS () const
   return -1;
 }
 
+v2i32 PipelineTerminus::CurrentFrameRate () const
+{
+  return {0,1};
+}
+
 std::string PipelineTerminus::GetAcceptedCapsString() const
 {
   gst_ptr<GstCaps> caps = GetAcceptedCaps ();
