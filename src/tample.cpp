@@ -545,19 +545,19 @@ int main (int ac, char **av)
     MergeFilmInfoGeometry (film_infos, geoms);
   }
 
-  PlatonicMaes *maes = tamp . FindMaesByName ("front");
-  assert (maes);
+  PlatonicMaes *frnt = tamp . FindMaesByName ("front");
+  assert (frnt);
   PlatonicMaes *left = tamp . FindMaesByName ("left");
   assert (left);
   PlatonicMaes *tabl = tamp . FindMaesByName ("table");
   assert (tabl);
 
-  // front_layer -> AppendRenderTargetMaes (maes);
+  // front_layer -> AppendRenderTargetMaes (frnt);
   // left_layer -> AppendRenderTargetMaes (left);
   // table_layer -> AppendRenderTargetMaes (tabl);
 
-  f64 const total_height = 2.0 * maes -> Height();
-  f64 const total_width = maes -> Width ();
+  f64 const total_height = 2.0 * frnt -> Height();
+  f64 const total_width = frnt -> Width ();
   f64 const band_height = total_height / 3.0;
 
   Node *g_front_wall = new Node;
@@ -607,22 +607,22 @@ int main (int ac, char **av)
       g_left_wall -> AppendGrappler (scg);
     }
 
-  Vect left_cntr
-    = (-0.5 * (maes -> Width () - left -> Width ()) * left -> Over ()
-       -  0.5 * maes -> Width () * maes -> Over ()
-       +  maes -> Loc () . Dot (maes -> Up ()) * maes -> Up ());
+  Vect auth_left_cntr
+    = (-0.5 * (frnt -> Width () - left -> Width ()) * left -> Over ()
+       -  0.5 * frnt -> Width () * frnt -> Over ()
+       +  frnt -> Loc () . Dot (frnt -> Up ()) * frnt -> Up ());
 
   for (int q = 0  ;  q < 3  ;  ++q)
-    { Cursoresque *c = new Cursoresque (0.015 * maes -> Height ());
+    { Cursoresque *c = new Cursoresque (0.015 * frnt -> Height ());
       g_windshield -> AppendChild (c);
 
       cursoresques . push_back (c);
-      c -> LocZoft () = maes -> Loc ();
+      c -> LocZoft () = frnt -> Loc ();
     }
 
   GraumanPalace *grau_egyp = new GraumanPalace;
   grau_egyp -> ImportExhibitionRoster (film_infos);
-  grau_egyp -> Translate (maes -> Loc ());
+  grau_egyp -> Translate (frnt -> Loc ());
   g_front_wall -> AppendChild (grau_egyp);
 
   tamp.gegyp = ch_ptr <GraumanPalace> (grau_egyp);
@@ -633,7 +633,7 @@ int main (int ac, char **av)
   GraumanPalace *grau_chin = new GraumanPalace;
   grau_chin -> SetOverUp (left -> Over (), left -> Up ());
   grau_chin -> ImportExhibitionRoster (film_infos);
-  grau_chin -> Translate (left -> Loc ());
+  grau_chin -> Translate (auth_left_cntr);
   drand48 ();
   grau_chin -> ReleasePushback ();
   grau_chin -> JumpToRandomFlick ();
@@ -646,9 +646,9 @@ int main (int ac, char **av)
   Node *splat = new Node;
   PolygonRenderable *polysplat = new PolygonRenderable;
   i64 nv = 14;
-  SinuVect centz (1000.0 * maes -> Over (), 0.3, maes -> Loc ());
+  SinuVect centz (1000.0 * frnt -> Over (), 0.3, frnt -> Loc ());
   for (i64 q = 0  ;  q < nv  ;  ++q)
-    { f64 r = 0.3 * maes -> Height ();
+    { f64 r = 0.3 * frnt -> Height ();
       f64 theeeta = 2.0 * M_PI / (f64)nv * (f64)q;
       Vect radv = cos (theeeta) * Vect::xaxis  +  sin (theeeta) * Vect::yaxis;
       SinuVect arm (0.3 * r * radv, 1.0 + 0.3 * drand48 (),
@@ -681,7 +681,7 @@ int main (int ac, char **av)
     . BecomeLike (SinuColor (ZeColor (0.0, 0.5), 1.0, ZeColor (1.0, 0.5)));
   Node *texno = (tamp.texxyno = new Node (texre));
   texno -> Scale (1300.0);
-  texno -> Translate (maes -> Loc ());
+  texno -> Translate (frnt -> Loc ());
   g_wallpaper -> AppendChild (texno);
 
   AtomicFreezone *afz = new AtomicFreezone;
@@ -695,7 +695,7 @@ int main (int ac, char **av)
 
   LinePileRenderable *lpr = new LinePileRenderable;
 
-  PlatonicMaes *plams[2] = { left, maes };
+  PlatonicMaes *plams[2] = { left, frnt };
   for (PlatonicMaes *emm  :  plams)
     { Vect v = 0.5 * emm->wid.val * emm->ovr.val;
       Vect l = emm->loc.val - emm->upp.val * (emm->upp.val . Dot (emm->loc.val));
