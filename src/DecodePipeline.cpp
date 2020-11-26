@@ -488,7 +488,7 @@ void DecodePipeline::HandleSegmentDone (GstMessage *)
           return;
         }
 
-      fprintf (stderr, "current ts is %f\n", current_ts / f64 (1e9));
+      gint64 const seg_ts = m_play_speed > 0.0 ? m_segment_end : m_segment_start;
 
       SeekFull (1.0,
                 GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE),
