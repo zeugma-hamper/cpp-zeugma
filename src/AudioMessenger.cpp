@@ -38,33 +38,44 @@ void AudioMessenger::Connect (std::string_view _host, std::string_view _port)
   SendUnmute();
 }
 
-void AudioMessenger::SendMute ()
+void AudioMessenger::SendMessage (std::string_view _path)
 {
   assert (m_audio_address);
 
-  m_audio_address->send ("/ta/mute");
+  m_audio_address->send (_path.data ());
+}
+
+void AudioMessenger::SendMessage (std::string_view _path, std::string_view _json_msg)
+{
+  assert (m_audio_address);
+
+  m_audio_address->send (_path.data (), "s", _json_msg.data ());
+}
+
+void AudioMessenger::SendMute ()
+{
+  SendMessage ("/ta/mute");
 }
 
 void AudioMessenger::SendUnmute ()
 {
-  assert (m_audio_address);
-
-  m_audio_address->send ("/ta/unmute");
+  SendMessage ("/ta/unmute");
 }
 
 
 void AudioMessenger::SendPlayBoop ()
 {
-  m_audio_address->send ("/ta/play_boop");
+  SendMessage("/ta/play_boop");
 }
 
 // 0-5 are valid boops
 void AudioMessenger::SendPlayBoop (i32 _index)
 {
-  assert (m_audio_address);
   assert (_index >= 0 && _index < 6);
 
-  m_audio_address->send ("/ta/play_boop", lo::Message ("i", _index));
+  nl::json j;
+  j["boopID"] = _index;
+  SendMessage("/ta/play_boop", j.dump ());
 }
 
 
@@ -72,8 +83,9 @@ void AudioMessenger::SendPlaySound (std::string_view _file)
 {
   assert (m_audio_address);
 
-  m_audio_address->send ("/ta/play_sound",
-                         lo::Message ("s", _file.data ()));
+  nl::json j;
+  j["name"] = _file;
+  SendMessage ("/ta/play_sound", j.dump ());
 }
 
 void AudioMessenger::SendGetSuggestions ()
@@ -82,8 +94,7 @@ void AudioMessenger::SendGetSuggestions ()
 
   nlohmann::json j;
   j["foo"] = "bar";
-  m_audio_address->send ("/ta/get_suggestions",
-                         lo::Message ("s", j.dump ().c_str ()));
+  SendMessage("/tap/get_suggestions",j.dump ());
 }
 
 //TASReceiver
@@ -116,8 +127,12 @@ void TASReceiver::Connect (std::string_view _port)
   m_audio_server = new lo::Server (_port.data (),
                                    [this] (i32 _num, const char *_msg, const char *_where)
                                    { this->LoErrorHandler(_num, _msg, _where); });
-  m_audio_server->add_method ("/taclient/suggestions",
-                              
+
+  auto handle_sugg = [this] (const char *path, lo::Message const &_msg)
+  { this->HandleSuggestions(path, _msg); };
+
+  m_audio_server->add_method ("/taclient/suggestions", "s", std::move (handle_sugg));
+
 }
 
 void TASReceiver::Disconnect ()
@@ -150,31 +165,79 @@ i32 TASReceiver::LoErrorHandler (i32 _num, const char *_msg, const char *_where)
 
 void TASReceiver::HandleSuggestions (const char *_path, lo::Message const &_msg)
 {
-  nl::json j = json::parse ((const char *)_msg.argv()[0]);
-  
+  nl::json j;
+  try {
+    j = nl::json::parse ((const char *)_msg.argv()[0]);
+  } catch (std::exception &e) {
+    fprintf (stderr, "error parsing %s\n", e.what());
+    return;
+  }
+
+  TASSuggestionEvent evt {_path, std::move (j)};
+
+  m_sprinkler->Spray(&evt);
 }
 
-ZETASMessageEvent::ZETASMessageEvent (std::string_view _path, nl::json &_message)
+TASMessageEvent::TASMessageEvent (std::string_view _path, nl::json const &_message)
   : ZeEvent (),
     m_path {_path},
     m_message {_message}
 {
 }
 
-i64 ZETASMessageEvent::GetResponseID () const
+TASMessageEvent::TASMessageEvent (std::string_view _path, nl::json &&_message)
+  : ZeEvent (),
+    m_path {_path},
+    m_message {std::move (_message)}
 {
+}
+
+i64 TASMessageEvent::GetMessageID (bool _spit_error) const
+{
+  auto it = m_message.find ("messageID");
+  if (it != m_message.end () && it.value ().is_number())
+    return it.value ().get<i64> ();
+
+  if (_spit_error)
+    fprintf (stderr, "TAS didn't get expected message id for %s\n", m_path.c_str ());
+
   return -1;
 }
 
-std::string const &ZETASMessageEvent::GetPath () const
+std::string const &TASMessageEvent::GetPath () const
 {
   return m_path;
 }
 
-nl::json const &ZETASMessageEvent::GetMessage () const
+nl::json const &TASMessageEvent::GetMessage () const
 {
   return m_message;
 }
 
+TASSuggestionEvent::TASSuggestionEvent (std::string_view _path, nl::json const &_message)
+  : TASMessageEvent (_path, _message)
+{
+}
+
+TASSuggestionEvent::TASSuggestionEvent (std::string_view _path, nl::json &&_message)
+  : TASMessageEvent (_path, std::move (_message))
+{
+}
+
+i64 TASSuggestionEvent::GetSuggestionCount () const
+{
+  return i64 (m_message.size ());
+}
+
+std::vector<std::string> TASSuggestionEvent::GetSuggestionNames () const
+{
+  std::vector<std::string> ret;
+  ret.reserve (GetSuggestionCount());
+
+  for (auto &elem : m_message.items ())
+    ret.push_back(elem.key());
+
+  return ret;
+}
 
 }

@@ -33,6 +33,9 @@ class AudioMessenger
 
   void Connect (std::string_view _host, std::string_view _port);
 
+  void SendMessage (std::string_view _path);
+  void SendMessage (std::string_view _path, std::string_view _json_msg);
+
   void SendMute ();
   void SendUnmute ();
 
@@ -74,14 +77,15 @@ class TASReceiver : public ZePublicWaterWorks
   MultiSprinkler *m_sprinkler;
 };
 
-class ZETASMessageEvent : public ZeEvent
+class TASMessageEvent : public ZeEvent
 {
  public:
- ZE_EVT_TUMESCE (ZETASMessage, Ze);
+ ZE_EVT_TUMESCE (TASMessage, Ze);
 
-  ZETASMessageEvent (std::string_view _path, nl::json &_message);
+  TASMessageEvent (std::string_view _path, nl::json const &_message);
+  TASMessageEvent (std::string_view _path, nl::json &&_message);
 
-  i64 GetResponseID () const;
+  i64 GetMessageID (bool _spit_error = false) const;
 
   std::string const &GetPath () const;
 
@@ -91,6 +95,18 @@ class ZETASMessageEvent : public ZeEvent
  protected:
   std::string m_path;
   nlohmann::json m_message;
+};
+
+class TASSuggestionEvent : public TASMessageEvent
+{
+ public:
+  ZE_EVT_TUMESCE (TASSuggestion, TASMessage);
+
+  TASSuggestionEvent (std::string_view _path, nl::json const &_message);
+  TASSuggestionEvent (std::string_view _path, nl::json &&_message);
+
+  i64 GetSuggestionCount () const;
+  std::vector<std::string> GetSuggestionNames () const;
 };
 
 }
