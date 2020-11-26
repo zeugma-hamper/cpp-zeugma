@@ -247,6 +247,9 @@ void DecodePipeline::TrickModeSeek (f64 _ts, f64 _rate)
     SeekFull(rate, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, current_ts, GST_SEEK_TYPE_SET, ts);
   else if (ts < current_ts)
     SeekFull(-rate, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, ts, GST_SEEK_TYPE_SET, current_ts);
+
+  if (m_pending_state != GST_STATE_PLAYING)
+    Play ();
 }
 
 DecodePipeline::MediaStatus DecodePipeline::GetStatus () const
@@ -485,13 +488,15 @@ void DecodePipeline::HandleSegmentDone (GstMessage *)
           return;
         }
 
+      fprintf (stderr, "current ts is %f\n", current_ts / f64 (1e9));
+
       SeekFull (1.0,
                 GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE),
                 GST_SEEK_TYPE_SET, 0,
                 GST_SEEK_TYPE_END, 0);
 
       SeekFull (1.0,
-                GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_ACCURATE),
+                GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_ACCURATE | GST_SEEK_FLAG_FLUSH),
                 GST_SEEK_TYPE_SET, current_ts,
                 GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
       Pause ();
