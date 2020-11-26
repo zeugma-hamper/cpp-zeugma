@@ -509,7 +509,7 @@ int main (int ac, char **av)
   Layer *walls_layer = new Layer ();
   tamp . AppendSceneLayer (walls_layer);
   Layer *table_layer = new Layer ();
-  tamp . AppendSceneLayer (omni_layer);
+  tamp . AppendSceneLayer (table_layer);
 
   i32 const leaf_count = tamp . NumRenderLeaves();
   for (i32 i = 0; i < leaf_count; ++i)
@@ -518,12 +518,12 @@ int main (int ac, char **av)
         continue;
 
       if (leaf->maes -> Name ()  ==  "front")
-        { leaf->layers . push_back (walls_layer);
-          leaf->layers . push_back (front_layer);
+        { leaf->layers . push_back (front_layer);
+          leaf->layers . push_back (walls_layer);
         }
       if (leaf->maes -> Name ()  ==  "left")
-        { leaf->layers . push_back (walls_layer);
-          leaf->layers . push_back (left_layer);
+        { leaf->layers . push_back (left_layer);
+          leaf->layers . push_back (walls_layer);
         }
       if (leaf->maes -> Name ()  ==  "table")
         leaf->layers . push_back (table_layer);
