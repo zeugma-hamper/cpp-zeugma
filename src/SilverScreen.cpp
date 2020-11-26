@@ -57,6 +57,15 @@ bool SilverScreen::StepBy (i32 num_frames)
 }
 
 
+f64 SilverScreen::Duration ()
+{ if (! vren)  return -1.0;
+  ch_ptr <DecodePipeline> deep = vren -> GetPipeline ();
+  if (deep)
+    return deep -> Duration ();
+  return -1.0;
+}
+
+
 f64 SilverScreen::CurTimestamp ()
 { if (! vren)  return -1.0;
   ch_ptr <DecodePipeline> deep = vren -> GetPipeline ();
@@ -100,3 +109,15 @@ bool SilverScreen::ScootToPrevClip ()
   //return cl  ?  ScootToTime (cl->start_time)  :  false;
 }
 
+
+void SilverScreen::AttachTimeline (Timeline *tl)
+{ if (! (timmy = tl))
+    return;
+
+  timmy -> SetRepDuration (Duration ());
+  timmy -> SetPlayTime (CurTimestamp ());
+}
+
+
+void SilverScreen::DetachTimeline (Timeline *tl)
+{ timmy = NULL; }

@@ -19,6 +19,8 @@
 
 #include "tamparams.h"
 
+#include "Timeline.h"
+
 #include <Frontier.hpp>
 
 #include <vector>
@@ -34,6 +36,7 @@ class SilverScreen  :  public Node
   ch_ptr <VideoPipeline> vpip;
   RectRenderableFrontier *frtr;
   InterpColor scr_fader;
+  Timeline *timmy;
 
   const std::string &Name ()
     { return finf.name; }
@@ -41,7 +44,9 @@ class SilverScreen  :  public Node
 //  SilverScreen (VideoRenderable *vr,
   SilverScreen (MattedVideoRenderable *vr,
                 ch_ptr <VideoPipeline> vp,
-                const FilmInfo &fi)  :  Node (), finf (fi), vren (vr), vpip (vp)
+                const FilmInfo &fi)  :  Node (),
+                                        finf (fi), vren (vr), vpip (vp),
+                                        timmy (NULL)
     { frtr = new RectRenderableFrontier (vr, Vect::zerov, 1.0, 1.0);
       SetFrontier (frtr);
       scr_fader . SetInterpTime (Tamparams::Current ()->pb_snapback_fade_time);
@@ -61,12 +66,15 @@ class SilverScreen  :  public Node
 
   bool StepBy (i32 num_frames);
 
-
+  f64 Duration ();
   f64 CurTimestamp ();
 
   bool ScootToTime (f64 tstamp);
   bool ScootToNextClip ();
   bool ScootToPrevClip ();
+
+  void AttachTimeline (Timeline *tl);
+  void DetachTimeline (Timeline *tl);
 };
 
 

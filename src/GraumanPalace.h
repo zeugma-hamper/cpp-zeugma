@@ -19,6 +19,7 @@
 #include <MattedVideoRenderable.hpp>
 
 #include "SilverScreen.h"
+#include "Timeline.h"
 
 #include "tamparams.h"
 
@@ -49,6 +50,8 @@ class GraumanPalace  :  public Zeubject, public Node,
   i64 pb_estab_flick;
   f64 pb_depth_scale, pb_slide_scale;
   f64 pb_max_push, pb_max_pull;
+
+  Timeline *sole_tline;
 
   GraumanPalace ();
 

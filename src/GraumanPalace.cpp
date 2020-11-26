@@ -13,7 +13,8 @@ GraumanPalace::GraumanPalace ()  :  Zeubject (), Node (),
                                     nrm (Vect::zaxis), slider (new Node),
                                     now_showing (0),
                                     pb_depth_scale (30.0), pb_slide_scale (20.0),
-                                    pb_max_push (-50000.0), pb_max_pull (5000.0)
+                                    pb_max_push (-50000.0), pb_max_pull (5000.0),
+                                    sole_tline (NULL)
 { AppendChild (slider);
 
   push_depth . SetInterpTime (Tamparams::Current ()->pb_snapback_interp_time);
@@ -23,6 +24,10 @@ GraumanPalace::GraumanPalace ()  :  Zeubject (), Node (),
   g -> SetName ("slide-trans");
   g = slider -> Translate  (push_depth);
   g -> SetName ("push-trans");
+
+  sole_tline = new Timeline;
+  AppendChild (sole_tline);
+  sole_tline -> SetWidthAndThickth (1.1 * flick_wid, 25.0);
 }
 
 
@@ -56,11 +61,13 @@ void GraumanPalace::JumpToFlick (i64 which_flick)
   if (SilverScreen *ss = NthSilverScreen (now_showing))
     { ss -> Pause ();
       ss -> FadeDown ();
+      ss -> DetachTimeline (sole_tline);
     }
 
   if (SilverScreen *ss = NthSilverScreen (which_flick))
     { ss -> Play ();
       ss -> FadeUp ();
+      ss -> AttachTimeline (sole_tline);
     }
 
   now_showing = which_flick;

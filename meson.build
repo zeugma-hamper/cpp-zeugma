@@ -348,6 +348,7 @@ tample_exec = executable ('tample',
                                       'src/Orksur.cpp',
                                       'src/SilverScreen.cpp',
                                       'src/Ticato.cpp',
+                                      'src/Timeline.cpp',
                                       'src/tamparams.cpp',
                                       'src/tample.cpp'
                                      ],
