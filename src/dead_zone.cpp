@@ -167,6 +167,11 @@ i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
       auto pipe = s_pipeline.ref ();
       pipe->GetDecoder()->Step(1);
     }
+  else if (utt == "r") //step backward 1 frame
+    {
+      auto pipe = s_pipeline.ref ();
+      pipe->GetDecoder()->Step(-1);
+    }
   else if (utt == "p") //toggle play/pause
     {
       if (s_pipeline_is_playing)

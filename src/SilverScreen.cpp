@@ -74,15 +74,15 @@ bool SilverScreen::ScootToTime (f64 tstamp)
   if (tstamp < 0.0  ||  tstamp > deep -> Duration ())
     return false;
 
-  deep -> TrickModeSeek (tstamp, 100.0);
-  deep -> Play ();
+  // auto seg_done_cb = [deep, tstamp] (boost::signals2::connection conn,
+  //                                    DecodePipeline *, SegmentDoneBehavior)
+  //   { deep -> Seek (tstamp);
+  //     conn . disconnect ();
+  //   };
+  // deep -> AddSegmentDoneExCallback (std::move (seg_done_cb));
 
-  auto seg_done_cb = [deep, tstamp] (boost::signals2::connection conn,
-                                     DecodePipeline *, SegmentDoneBehavior)
-    { deep -> Seek (tstamp);
-      conn.disconnect();
-    };
-  deep -> AddSegmentDoneExCallback (std::move (seg_done_cb));
+  deep -> TrickModeSeek (tstamp, 100.0);
+
   return true;
 }
 
