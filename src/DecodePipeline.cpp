@@ -244,15 +244,9 @@ void DecodePipeline::TrickModeSeek (f64 _ts, f64 _rate)
                                        GST_SEEK_FLAG_SEGMENT);
 
   if (current_ts < ts)
-    {
-      SeekFull(rate, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, current_ts, GST_SEEK_TYPE_SET, ts);
-      m_play_speed = rate;
-    }
+    SeekFull(rate, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, current_ts, GST_SEEK_TYPE_SET, ts);
   else if (ts < current_ts)
-    {
-      SeekFull(-rate, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, ts, GST_SEEK_TYPE_SET, current_ts);
-      m_play_speed = -rate;
-    }
+    SeekFull(-rate, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, ts, GST_SEEK_TYPE_SET, current_ts);
 }
 
 DecodePipeline::MediaStatus DecodePipeline::GetStatus () const
