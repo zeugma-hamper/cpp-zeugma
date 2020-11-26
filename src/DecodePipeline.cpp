@@ -219,9 +219,9 @@ void DecodePipeline::SetPlaySpeed (f32 _speed, bool _trick_play)
                              GST_SEEK_FLAG_TRICKMODE_NO_AUDIO);
 
   if (_speed > 0)
-    SeekFull(_speed, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, ts, GST_SEEK_TYPE_END, 0);
+    SeekFull(_speed, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, ts, GST_SEEK_TYPE_NONE, 0);
   else
-    SeekFull(_speed, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, ts, GST_SEEK_TYPE_SET, 0);
+    SeekFull(_speed, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, ts, GST_SEEK_TYPE_NONE, 0);
 }
 
 void DecodePipeline::TrickModeSeek (f64 _ts, f64 _rate)
