@@ -1,12 +1,14 @@
+
 #include <Matte.hpp>
 #include <toml.hpp>
 
 #include <regex>
 
-namespace charm
-{
+
+namespace charm  {
 
 namespace fs = std::filesystem;
+
 
 std::vector<FilmInfo>
 ReadFilmInfo (std::filesystem::path const &_path)
@@ -145,6 +147,7 @@ ReadFilmInfo (std::filesystem::path const &_path)
           cd.name = captures[3].str ();
           cd.start_time  = std::stod (captures[1].str ());
           cd.duration    = std::stod (captures[2].str ());
+          cd.end_time    = cd.start_time + cd.duration;
           cd.frame_count = std::distance (fs::directory_iterator {cd.directory},
                                           fs::directory_iterator {});
         }
@@ -389,12 +392,14 @@ std::vector<ClipInfo> const &FilmInfo::GetClips () const
   return clips;
 }
 
-std::vector<ClipInfo const *> FilmInfo::GetClipsAfter (ClipInfo const *_clip, f64 _within) const
+std::vector<ClipInfo const *> FilmInfo::GetClipsAfter (ClipInfo const *_clip,
+                                                       f64 _within) const
 {
   return GetClipsAfter (_clip->start_time + _clip->duration, _within);
 }
 
-std::vector<ClipInfo const *> FilmInfo::GetClipsAfter (f64 _ts, f64 _within) const
+std::vector<ClipInfo const *> FilmInfo::GetClipsAfter (f64 _ts,
+                                                       f64 _within) const
 {
   std::vector<ClipInfo const *> ret;
 
@@ -422,6 +427,59 @@ std::vector<ClipInfo const *> FilmInfo::GetClipsAfter (f64 _ts, f64 _within) con
       }
 
   return ret;
+}
+
+
+ClipList FilmInfo::ClipsSurrounding (f64 tstamp)  const
+{ std::vector <const ClipInfo *> exudate;
+  for (auto ci  :  clips)
+    if (ci.start_time <= tstamp  &&  tstamp <= ci.end_time)
+      exudate . push_back (&ci);
+  return exudate;
+}
+
+
+ClipList FilmInfo::ClipsByStartTime ()  const
+{ std::vector <const ClipInfo *> sorty;
+  for (auto &ci  :  clips)
+    sorty . push_back (&ci);
+  auto discrim = [] (const ClipInfo *ca, const ClipInfo *cb)
+    { return (ca->start_time < cb->start_time
+              &&  ca->end_time < cb->end_time);
+    };
+  std::sort (sorty . begin (), sorty . end (), discrim);
+  return sorty;
+}
+
+ClipList FilmInfo::ClipsByEndTime ()  const
+{ std::vector <const ClipInfo *> sorty;
+  for (auto &ci  :  clips)
+    sorty . push_back (&ci);
+  auto discrim = [] (const ClipInfo *ca, const ClipInfo *cb)
+    { return (ca->end_time > cb->end_time
+              &&  ca->start_time > cb->start_time);
+    };
+  std::sort (sorty . begin (), sorty . end (), discrim);
+  return sorty;
+}
+
+
+const ClipInfo *FilmInfo::FirstClipBeginningAfter (f64 tstamp)  const
+{ std::vector <const ClipInfo *> clerps = ClipsByStartTime ();
+  auto omega = clerps . end ();
+  for (auto it = clerps . begin ()  ;  it != omega  ;  ++it)
+    if ((*it)->start_time  >  tstamp)
+      return *it;
+  return NULL;
+}
+
+const ClipInfo *FilmInfo::FirstClipEndingBefore (f64 tstamp)  const
+{ std::vector <const ClipInfo *> clerps = ClipsByEndTime ();
+  auto omega = clerps . end ();
+  for (auto it = clerps . begin ()  ;  it != omega  ;  ++it)
+    if ((*it)->end_time  <  tstamp)
+      return *it;
+  return NULL;
 }
 
 
@@ -537,4 +595,5 @@ void MergeFilmInfoGeometry (std::vector<FilmInfo> &_info,
     }
 }
 
-}
+
+}  // namespace charm terminated with extreme prejudice

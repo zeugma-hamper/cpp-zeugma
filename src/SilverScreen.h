@@ -15,7 +15,6 @@
 
 #include <Node.hpp>
 #include <Matte.hpp>
-#include <VideoRenderable.hpp>
 #include <MattedVideoRenderable.hpp>
 
 #include "tamparams.h"
@@ -31,18 +30,18 @@ using namespace charm;
 class SilverScreen  :  public Node
 { public:
   const FilmInfo &finf;
-//  VideoRenderable *vren;
   MattedVideoRenderable *vren;
+  ch_ptr <VideoPipeline> vpip;
   RectRenderableFrontier *frtr;
   InterpColor scr_fader;
-//  ZoftColor scr_fader;
 
   const std::string &Name ()
     { return finf.name; }
 
 //  SilverScreen (VideoRenderable *vr,
   SilverScreen (MattedVideoRenderable *vr,
-                const FilmInfo &fi)  :  Node (), vren (vr), finf (fi)
+                ch_ptr <VideoPipeline> vp,
+                const FilmInfo &fi)  :  Node (), finf (fi), vren (vr), vpip (vp)
     { frtr = new RectRenderableFrontier (vr, Vect::zerov, 1.0, 1.0);
       SetFrontier (frtr);
       scr_fader . SetInterpTime (Tamparams::Current ()->pb_snapback_fade_time);
@@ -58,6 +57,16 @@ class SilverScreen  :  public Node
 
   void Pause ();
   void Play ();
+  void TogglePlayPause ();
+
+  bool StepBy (i32 num_frames);
+
+
+  f64 CurTimestamp ();
+
+  bool ScootToTime (f64 tstamp);
+  bool ScootToNextClip ();
+  bool ScootToPrevClip ();
 };
 
 

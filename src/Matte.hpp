@@ -119,8 +119,12 @@ struct ClipInfo
 
   f64 start_time = -1.0;
   f64 duration = -1.0f;
+  f64 end_time = -1.0;
   u32 frame_count = 0u;
 };
+
+
+using ClipList = std::vector <const ClipInfo *>;
 
 struct FilmInfo
 {
@@ -128,8 +132,14 @@ struct FilmInfo
   ClipInfo const &GetNthClip (i64 _nth) const;
   std::vector<ClipInfo> const &GetClips () const;
 
-  std::vector<ClipInfo const *> GetClipsAfter (ClipInfo const *_clip, f64 _within = 0.0) const;
-  std::vector<ClipInfo const *> GetClipsAfter (f64 _ts, f64 _within = 0.0) const;
+  ClipList GetClipsAfter (ClipInfo const *_clip, f64 _within = 0.0) const;
+  ClipList GetClipsAfter (f64 _ts, f64 _within = 0.0) const;
+
+  ClipList ClipsSurrounding (f64 tstamp)  const;
+  ClipList ClipsByStartTime ()  const;
+  ClipList ClipsByEndTime ()  const;
+  const ClipInfo *FirstClipBeginningAfter (f64 tstamp)  const;
+  const ClipInfo *FirstClipEndingBefore (f64 tstamp)  const;
 
   std::filesystem::path film_path;
   std::filesystem::path clip_path;

@@ -105,7 +105,7 @@ void GraumanPalace::ImportExhibitionRoster (const std::vector <FilmInfo> &fimmz)
       vire -> SetOver (Over ());
       vire -> SetUp (Up ());
 vire->SetAdjColor(ZeColor(1.0,1.0,0.1,1.0));
-      SilverScreen *sisc = new SilverScreen (vire, finf);
+      SilverScreen *sisc = new SilverScreen (vire, br.control_pipeline, finf);
       screens . push_back (sisc);
       sisc -> AppendRenderable (vire);
 
@@ -230,6 +230,24 @@ i64 GraumanPalace::ZEYowlAppear (ZEYowlAppearEvent *e)
   else if (utt == "x")
     { ReleasePushback (); }
   else if (utt == " ")
-    { TogglePlayPause (); }
+    { if (SilverScreen *ss = CurSilverScreen ())
+        ss -> TogglePlayPause ();
+    }
+  else if (utt == "d")
+    { if (SilverScreen *ss = CurSilverScreen ())
+        ss -> ScootToNextClip ();
+    }
+  else if (utt == "a")
+    { if (SilverScreen *ss = CurSilverScreen ())
+        ss -> ScootToPrevClip ();
+    }
+  else if (utt == "f")
+    { if (SilverScreen *ss = CurSilverScreen ())
+        ss -> StepBy (1);
+    }
+  else if (utt == "b")
+    { if (SilverScreen *ss = CurSilverScreen ())
+        ss -> StepBy (-1);
+    }
   return 0;
 }
