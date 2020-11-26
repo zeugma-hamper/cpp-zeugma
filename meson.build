@@ -178,6 +178,7 @@ gst_video_dep = dependency ('gstreamer-video-1.0')
 ##### CHARM #####
 lib_sources = ['src/application.cpp',
                'src/Alignifer.cpp',
+               'src/AudioMessenger.cpp',
                'src/Bolex.cpp',
                'src/CoGrappler.cpp',
                'src/CMVTrefoil.cpp',
@@ -355,3 +356,7 @@ tample_exec = executable ('tample',
 scan_mattes_exec = executable ('scan_mattes',
                                sources : ['src/scan_mattes.cpp'],
                                dependencies : [charm_dep])
+
+audio_runthrough_exec = executable ('audio_runthrough',
+                                    sources : ['src/audio_runthrough.cpp'],
+                                    dependencies : [charm_dep])
