@@ -6,6 +6,7 @@
 #include <lo/lo_cpp.h>
 
 #include <assert.h>
+#include <iostream>
 
 namespace charm
 {
@@ -94,7 +95,7 @@ void AudioMessenger::SendGetSuggestions ()
 
   nlohmann::json j;
   j["foo"] = "bar";
-  SendMessage("/tap/get_suggestions",j.dump ());
+  SendMessage("/ta/get_suggestions", j.dump ());
 }
 
 //TASReceiver
@@ -131,7 +132,7 @@ void TASReceiver::Connect (std::string_view _port)
   auto handle_sugg = [this] (const char *path, lo::Message const &_msg)
   { this->HandleSuggestions(path, _msg); };
 
-  m_audio_server->add_method ("/taclient/suggestions", "s", std::move (handle_sugg));
+  m_audio_server->add_method ("/ta_client/suggestions", "s", std::move (handle_sugg));
 
 }
 
@@ -226,7 +227,10 @@ TASSuggestionEvent::TASSuggestionEvent (std::string_view _path, nl::json &&_mess
 
 i64 TASSuggestionEvent::GetSuggestionCount () const
 {
-  return i64 (m_message.size ());
+  if (auto it = m_message.find ("suggestions"); it != m_message.end ())
+    return i64 (it->size ());
+
+  return 0;
 }
 
 std::vector<std::string> TASSuggestionEvent::GetSuggestionNames () const
@@ -234,8 +238,13 @@ std::vector<std::string> TASSuggestionEvent::GetSuggestionNames () const
   std::vector<std::string> ret;
   ret.reserve (GetSuggestionCount());
 
-  for (auto &elem : m_message.items ())
-    ret.push_back(elem.key());
+  try {
+    for (auto &[key, value] : m_message.items ())
+      ret.push_back(value["name"].get<std::string>());
+  } catch (std::exception &e) {
+    fprintf (stderr, "couldn't parse suggestion message: %s\n", e.what ());
+    return {};
+  }
 
   return ret;
 }

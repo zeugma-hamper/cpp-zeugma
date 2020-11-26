@@ -40,7 +40,7 @@ class AudioMessenger
   void SendUnmute ();
 
   void SendPlayBoop ();
-  // 0-5 are valid boops
+  // 0-4 are valid boops
   void SendPlayBoop (i32 _index);
 
   void SendPlaySound (std::string_view _file);
