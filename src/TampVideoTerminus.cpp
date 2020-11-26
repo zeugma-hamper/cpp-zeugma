@@ -121,6 +121,15 @@ i64 TampVideoTerminus::CurrentFrameNumber () const
   return m_frame_number;
 }
 
+v2i32 TampVideoTerminus::CurrentFrameRate () const
+{
+  std::unique_lock {m_sample_mutex};
+  if (! m_caps)
+    return {0, 1};
+
+  return {m_video_info.fps_n, m_video_info.fps_d};
+}
+
 SampleStatus TampVideoTerminus::HasSample ()
 {
   std::unique_lock lock (m_sample_mutex);

@@ -231,6 +231,7 @@ void DecodePipeline::TrickModeSeek (f64 _ts, f64 _rate)
     return;
 
   gint64 const ts = _ts * 1e9;
+  fprintf (stderr, "trick mode seek to %f or %ld\n", _ts, ts);
 
   gint64 current_ts = 0;
   if (! gst_element_query_position(m_pipeline, GST_FORMAT_TIME, &current_ts))
@@ -242,6 +243,9 @@ void DecodePipeline::TrickModeSeek (f64 _ts, f64 _rate)
   GstSeekFlags flags = (GstSeekFlags) (GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE |
                                        GST_SEEK_FLAG_TRICKMODE | GST_SEEK_FLAG_TRICKMODE_NO_AUDIO |
                                        GST_SEEK_FLAG_SEGMENT);
+  // GstSeekFlags flags = (GstSeekFlags) (GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE |
+  //                                      GST_SEEK_FLAG_TRICKMODE |
+  //                                      GST_SEEK_FLAG_SEGMENT);
 
   if (current_ts < ts)
     SeekFull(rate, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, current_ts, GST_SEEK_TYPE_SET, ts);
@@ -317,6 +321,23 @@ gint64 DecodePipeline::CurrentTimestampNS () const
 
   return 0;
 }
+
+v2i32 DecodePipeline::CurrentVideoFrameRate () const
+{
+  if (m_video_terminus)
+    return m_video_terminus->CurrentFrameRate ();
+
+  return {0, 1};
+}
+
+v2i32 DecodePipeline::CurrentAudioFrameRate () const
+{
+  if (m_audio_terminus)
+    return m_audio_terminus->CurrentFrameRate ();
+
+  return {0, 1};
+}
+
 
 f64 DecodePipeline::Duration () const
 {
