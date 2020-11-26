@@ -173,8 +173,16 @@ i64 GraumanPalace::ZESpatialHarden (ZESpatialHardenEvent *e)
       pb_estab_flick = now_showing;
       EngagePushback ();
     }
-  else if (eym . Dot (ovr)  >  0.8)  // to the right!
+  else if (eym . Dot (upp)  <  -0.8)  // to the down!
     { TogglePlayPause (); }
+  else if (eym . Dot (ovr)  >  0.8)  // to the right!
+    { if (SilverScreen *ss = CurSilverScreen ())
+        ss -> ScootToNextClip ();
+    }
+  else if (eym . Dot (ovr)  <  -0.8)  // to the left!
+    { if (SilverScreen *ss = CurSilverScreen ())
+        ss -> ScootToPrevClip ();
+    }
   else if (SilverScreen *s = CurSilverScreen ())
     { Vect hit;
       if (s->vren
