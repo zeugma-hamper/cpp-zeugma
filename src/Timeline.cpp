@@ -45,8 +45,8 @@ texre->SetAdjColor(ZeColor(1.0,0.0,0.0));
   cgr -> SetName ("orientation");
   AppendGrappler (cgr);
 
-  loc . MakeBecomeLikable ();
-  TrGrappler *trg = new TrGrappler (loc);
+  shift . SetInterpTime (0.3);
+  TrGrappler *trg = new TrGrappler (shift);
   AppendGrappler (trg);
 }
 
@@ -134,7 +134,7 @@ bool Timeline::TimeFromSpatialPointing (ZESpatialEvent *e, f64 &out_time)
       f64 ov = hitp . Dot (ovr);
       f64 up = hitp . Dot (upp);
       if (ov < 0.65 * width  &&  ov > -0.65 * width
-          &&  up < 4.0 * thickth  &&  up > -4.0 * thickth)
+          &&  up < 20.0 * thickth  &&  up > -20.0 * thickth)
         { f64 t = ov / width  +  0.5;
           if (t < 0.0)       t = 0.0;
           else if (t > 1.0)  t = 1.0;

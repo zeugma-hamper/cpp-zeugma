@@ -83,6 +83,13 @@ ch_ptr<DecodePipeline> MattedVideoRenderable::GetPipeline () const
   return {};
 }
 
+v2i32 MattedVideoRenderable::GetVideoDimensions ()  const
+{
+  if (m_video_texture)
+    return m_video_texture -> GetDimensions ();
+  return { -1, -1 };
+}
+
 MattedVideoRenderable *MattedVideoRenderable::DuplicateVideoOnly () const
 {
   auto *system = VideoSystem::GetSystem();

@@ -68,7 +68,11 @@ void GraumanPalace::JumpToFlick (i64 which_flick)
     { ss -> Play ();
       ss -> FadeUp ();
 //      ss -> AttachTimeline (sole_tline);
-      sole_tline -> EstablishCineReceiver (ss);
+      if (sole_tline)
+        { sole_tline -> EstablishCineReceiver (ss);
+          sole_tline->shift . Set ((-0.5 * ss -> AspectRatio () * flick_wid
+                                    - 6.0 * sole_tline->thickth) * upp);
+        }
     }
 
   now_showing = which_flick;

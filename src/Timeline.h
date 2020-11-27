@@ -29,7 +29,7 @@ class Timeline  :  public Zeubject, public Node,
 { public:
 
   Vect ovr, upp;
-  InterpVect loc;
+  InterpVect shift;
   f64 width, thickth;
   f64 rep_duration;
   f64 play_time;

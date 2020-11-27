@@ -57,6 +57,8 @@ class SilverScreen  :  public Node
       vren -> AdjColorZoft () . BecomeLike (scr_fader);
     }
 
+  f64 AspectRatio ();
+
   void FadeUp ();
   void FadeDown ();
 

@@ -181,6 +181,12 @@ class InterpZoft  :  public ZoftThing <T>
   bool ProceedTo (const Vect &next_b)
     { ZoftVect nbz (next_b);  return ProceedTo (nbz); }
 
+  bool Set (const Vect &p)
+    { return ProceedTo (p)  &&  Commence (); }
+
+  bool SetHard (const Vect &p)
+    { return ProceedTo (p)  &&  Finish (); }
+
   ZoftThing <T> &PointA ()
     { if (GutsTyp *g = GutsIfOrigType ())
         return g -> PointA ();

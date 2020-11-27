@@ -6,6 +6,15 @@
 #include <vector_interop.hpp>
 
 
+f64 SilverScreen::AspectRatio ()
+{ if (! vren)
+    return -1.0;
+
+  v2i32 dimmy = vren -> GetVideoDimensions ();
+  return (f64)dimmy.y / (f64)dimmy.x;
+}
+
+
 void SilverScreen::FadeUp ()
 { scr_fader . PointA () . Set (ZeColor (1.0, 0.0));
   scr_fader . PointB () . Set (ZeColor (1.0, 1.0));

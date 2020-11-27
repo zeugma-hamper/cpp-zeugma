@@ -37,6 +37,8 @@ class MattedVideoRenderable final : public Renderable
   ch_ptr<VideoTexture> const &GetVideoTexture () const;
   ch_ptr<DecodePipeline> GetPipeline () const;
 
+  v2i32 GetVideoDimensions ()  const;
+
   MattedVideoRenderable *DuplicateVideoOnly () const;
   MattedVideoRenderable *DuplicateWithActiveMatte () const;
   MattedVideoRenderable *DuplicateWithMatte (i64 _matted_index) const;
