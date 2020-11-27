@@ -622,6 +622,7 @@ int main (int ac, char **av)
 
   GraumanPalace *grau_egyp = new GraumanPalace;
   grau_egyp -> ImportExhibitionRoster (film_infos);
+  grau_egyp -> JumpToFlick (0);
   grau_egyp -> Translate (frnt -> Loc ());
   g_front_wall -> AppendChild (grau_egyp);
 

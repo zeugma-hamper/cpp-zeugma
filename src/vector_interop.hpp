@@ -1,5 +1,7 @@
+
 #ifndef CROSS_BUT_NOT_THE_USEFUL_ONE
 #define CROSS_BUT_NOT_THE_USEFUL_ONE
+
 
 #include <base_types.hpp>
 #include <charm_glm.hpp>
@@ -8,8 +10,9 @@
 
 #include "ZeColor.h"
 
-namespace charm
-{
+
+namespace charm  {
+
 
 inline glm::vec3 as_glm (v3f32 const &_v)
 {

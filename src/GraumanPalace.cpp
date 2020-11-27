@@ -11,7 +11,7 @@ GraumanPalace::GraumanPalace ()  :  Zeubject (), Node (),
                                     flick_wid (3600.0), flick_spacing (3840.0),
                                     ovr (Vect::xaxis), upp (Vect::yaxis),
                                     nrm (Vect::zaxis), slider (new Node),
-                                    now_showing (0),
+                                    now_showing (-1),
                                     pb_depth_scale (30.0), pb_slide_scale (20.0),
                                     pb_max_push (-50000.0), pb_max_pull (5000.0),
                                     sole_tline (NULL)
@@ -61,13 +61,14 @@ void GraumanPalace::JumpToFlick (i64 which_flick)
   if (SilverScreen *ss = NthSilverScreen (now_showing))
     { ss -> Pause ();
       ss -> FadeDown ();
-      ss -> DetachTimeline (sole_tline);
+//      ss -> DetachTimeline (sole_tline);
     }
 
   if (SilverScreen *ss = NthSilverScreen (which_flick))
     { ss -> Play ();
       ss -> FadeUp ();
-      ss -> AttachTimeline (sole_tline);
+//      ss -> AttachTimeline (sole_tline);
+      sole_tline -> EstablishCineReceiver (ss);
     }
 
   now_showing = which_flick;
@@ -120,6 +121,8 @@ vire->SetAdjColor(ZeColor(1.0,1.0,0.1,1.0));
       sisc -> Scale (flick_wid);
       sisc -> Translate ((f64)q * flick_spacing * Over ());
     }
+  if (cnt  >  0)
+    JumpToFlick (0);
 }
 
 
@@ -164,6 +167,8 @@ i64 GraumanPalace::ZESpatialMove (ZESpatialMoveEvent *e)
       push_depth . ProceedTo (puba * nrm);
       ltrl_slide . ProceedTo (latr * ovr);
     }
+  else
+    { return sole_tline -> ZESpatialMove (e); }
   return 0;
 }
 
@@ -190,30 +195,32 @@ i64 GraumanPalace::ZESpatialHarden (ZESpatialHardenEvent *e)
     { if (SilverScreen *ss = CurSilverScreen ())
         ss -> ScootToPrevClip ();
     }
-  else if (SilverScreen *s = CurSilverScreen ())
-    { Vect hit;
-      if (s->vren
-          &&  s->frtr -> CheckHit (G::Ray (e -> Loc (), e -> Aim ()), &hit))
-         {fprintf (stderr, "hit CINEMA! namely <%s>! and at ",
-                   s->finf.name . c_str ());
-           hit . SpewToStderr ();  fprintf (stderr, "\n");
-           Vect rig = 0.5 * s->vren -> Over ();
-           Vect lef = -rig;
-           Matrix44 m = from_glm (s -> GetAbsoluteTransformation ().model);
-           m . TransformVectInPlace (lef);
-           m . TransformVectInPlace (rig);
-           f64 ww = rig . DistFrom (lef);
-           f64 t = (hit - lef) . Dot ((rig - lef) . Norm ());
-           if (ww  !=  0.0)
-             t /= ww;
-           fprintf (stderr, "HEY! HEY YOU! YEAH, YOU! WELL GUESS WHAT: TEE "
-                    " = %.2lf\n", t);
-           ch_ptr<DecodePipeline> depi = s->vren -> GetPipeline ();
-           f64 dur = depi -> Duration ();
-           if (t < 0.0)  t = 0.0;  else if (t > 1.0) t = 1.0;
-           depi -> Seek (t * dur);
-         }
-    }
+  else
+    { return sole_tline -> ZESpatialHarden (e); }
+  // else if (SilverScreen *s = CurSilverScreen ())
+  //   { Vect hit;
+  //     if (s->vren
+  //         &&  s->frtr -> CheckHit (G::Ray (e -> Loc (), e -> Aim ()), &hit))
+  //        {fprintf (stderr, "hit CINEMA! namely <%s>! and at ",
+  //                  s->finf.name . c_str ());
+  //          hit . SpewToStderr ();  fprintf (stderr, "\n");
+  //          Vect rig = 0.5 * s->vren -> Over ();
+  //          Vect lef = -rig;
+  //          Matrix44 m = from_glm (s -> GetAbsoluteTransformation ().model);
+  //          m . TransformVectInPlace (lef);
+  //          m . TransformVectInPlace (rig);
+  //          f64 ww = rig . DistFrom (lef);
+  //          f64 t = (hit - lef) . Dot ((rig - lef) . Norm ());
+  //          if (ww  !=  0.0)
+  //            t /= ww;
+  //          fprintf (stderr, "HEY! HEY YOU! YEAH, YOU! WELL GUESS WHAT: TEE "
+  //                   " = %.2lf\n", t);
+  //          ch_ptr <DecodePipeline> depi = s->vren -> GetPipeline ();
+  //          f64 dur = depi -> Duration ();
+  //          if (t < 0.0)  t = 0.0;  else if (t > 1.0) t = 1.0;
+  //          depi -> Seek (t * dur);
+  //        }
+  //   }
   return 0;
 }
 

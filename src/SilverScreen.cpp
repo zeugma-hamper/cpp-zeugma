@@ -75,6 +75,17 @@ f64 SilverScreen::CurTimestamp ()
 }
 
 
+bool SilverScreen::JumpToTime (f64 tstamp)
+{ if (! vren)
+    return false;
+  ch_ptr <DecodePipeline> deep = vren -> GetPipeline ();
+  if (! deep)
+    return false;
+  deep -> Seek (tstamp);
+  return true;
+}
+
+
 bool SilverScreen::ScootToTime (f64 tstamp)
 { if (! vren  ||  ! vpip)
     return false;

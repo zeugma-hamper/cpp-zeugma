@@ -63,9 +63,13 @@ class GraumanPalace  :  public Zeubject, public Node,
     { return nrm; }
 
   void SetOverUp (const Vect &o, const Vect &u)
-    { ovr = o . Norm ();  upp = u . Norm ();  nrm = ovr . Cross (upp); }
+    { ovr = o . Norm ();  upp = u . Norm ();  nrm = ovr . Cross (upp);
+      sole_tline -> SetOverAndUp (ovr, upp);
+    }
   void SetOverNorm (const Vect &o, const Vect &n)
-    { ovr = o . Norm ();  nrm = n . Norm ();  ovr = upp . Cross (nrm); }
+    { ovr = o . Norm ();  nrm = n . Norm ();  ovr = upp . Cross (nrm);
+      sole_tline -> SetOverAndUp (ovr, upp);
+    }
 
   i64 NumSilverScreens ()  const
     { return screens . size (); }

@@ -31,6 +31,22 @@ class CoGrappler  :  public Grappler
     { }
 
 
+  void SetViaNormalizedBasisVectors (const Vect &e0, const Vect &e1,
+                                     const Vect &e2);
+
+  void SetViaOverAndUp (Vect o, Vect u)
+    { o . NormSelf ();  u . NormSelf (); Vect n = o . Cross (u);
+      SetViaNormalizedBasisVectors (o, u, n);
+    }
+  void SetViaOverAndNorm (Vect o, Vect n)
+    { o . NormSelf ();  n . NormSelf (); Vect u = n . Cross (o);
+      SetViaNormalizedBasisVectors (o, u, n);
+    }
+  void SetViaNormAndUp (Vect n, Vect u)
+    { n . NormSelf ();  u . NormSelf (); Vect o = u . Cross (n);
+      SetViaNormalizedBasisVectors (o, u, n);
+    }
+
   Matrix44 &PointMatrix ()
     { return pm; }
   Matrix44 &InversePointMatrix ()

@@ -69,6 +69,8 @@ class SilverScreen  :  public Node
   f64 Duration ();
   f64 CurTimestamp ();
 
+  bool JumpToTime (f64 tstamp);
+
   bool ScootToTime (f64 tstamp);
   bool ScootToNextClip ();
   bool ScootToPrevClip ();
