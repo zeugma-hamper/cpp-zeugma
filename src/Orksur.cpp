@@ -265,3 +265,17 @@ i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
     }
   return 0;
 }
+
+
+i64 Orksur::TASSuggestion (TASSuggestionEvent *e)
+{ if (! e)
+    return -1;
+
+// if mom were looking, of course, we'd be chekcing the echo_id...
+  std::vector <std::string> suggs = e -> GetSuggestionNames ();
+fprintf (stderr, "WEEEEELLLLLP. Just got %d audio suggestions:\n",suggs.size());
+for (auto &ess  :  suggs)
+fprintf(stderr,"\"%s\", ", ess.c_str ());
+fprintf(stderr,"\n");
+  return 0;
+}

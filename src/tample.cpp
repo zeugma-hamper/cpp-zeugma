@@ -507,6 +507,9 @@ int main (int ac, char **av)
   AudioMessenger *a_mess = new AudioMessenger ("192.168.0.33", "57121");
   Tamglobals::Only ()->sono_hermes = a_mess;
 
+  TASReceiver *audio_rejoinder_catcher = new TASReceiver ("57122");
+  tamp . AppendWaterWorks (audio_rejoinder_catcher);
+
   Layer *omni_layer = tamp . GetSceneLayer();
   Layer *front_layer = new Layer ();
   tamp . AppendSceneLayer (front_layer);
@@ -675,6 +678,7 @@ int main (int ac, char **av)
   AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.orksu);
   AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.orksu);
   AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.orksu);
+  tamp . GetSprinkler () . AppendPhage <TASSuggestionEvent> (tamp.orksu);
 
   for (i64 q = 0  ;  q < tamp . NumWaterWorkses ()  ;  ++q)
     if (GLFWWaterWorks *ww

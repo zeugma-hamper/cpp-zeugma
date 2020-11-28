@@ -136,7 +136,7 @@ void TASReceiver::Connect (std::string_view _port)
   auto handle_sugg = [this] (const char *path, lo::Message const &_msg)
   { this->HandleSuggestions(path, _msg); };
 
-  m_audio_server->add_method ("/ta_client/suggestions", "s", std::move (handle_sugg));
+  m_audio_server->add_method ("/taclient/suggestions", "s", std::move (handle_sugg));
 
 }
 

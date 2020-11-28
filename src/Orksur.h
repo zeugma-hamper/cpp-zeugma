@@ -15,6 +15,8 @@
 
 #include "Ticato.h"
 
+#include "AudioMessenger.hpp"
+
 #include <map>
 #include <unordered_map>
 
@@ -36,7 +38,8 @@ struct Splort  :  Node
 
 class Orksur  :  public PlatonicMaes, public Node,
                  public ZESpatialPhagy, public ZEYowlPhagy,
-                 public ZEBulletinPhagy
+                 public ZEBulletinPhagy,
+                 public TASSuggestionEvent::TASSuggestionPhage
 { public:
 
   struct Fondlish { Ticato *tic;  Vect gropoff; };
@@ -72,6 +75,8 @@ class Orksur  :  public PlatonicMaes, public Node,
   i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
 
   i64 ZEBulletin (ZEBulletinEvent *e)  override;
+
+  i64 TASSuggestion (TASSuggestionEvent *e)  override;
 };
 
 
