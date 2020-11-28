@@ -22,6 +22,7 @@ using namespace charm;
 
 class Ticato  :  public Alignifer
 { public:
+  const ClipInfo *atom_info;
   Renderable *re;
   RectRenderableFrontier *fr;
   ZoftVect vel;
@@ -36,6 +37,14 @@ class Ticato  :  public Alignifer
 
   ~Ticato ()  override
     { }
+
+
+  const std::string &AtomName ()  const
+    { static std::string empty_s;
+      if (atom_info)
+        return atom_info->geometry.niq_atomname;
+      return empty_s;
+    }
 
   PlatonicMaes *CurMaes ()  const
     { return cur_maes; }

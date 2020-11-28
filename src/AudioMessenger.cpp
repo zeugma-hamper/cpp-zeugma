@@ -89,12 +89,16 @@ void AudioMessenger::SendPlaySound (std::string_view _file)
   SendMessage ("/ta/play_sound", j.dump ());
 }
 
-void AudioMessenger::SendGetSuggestions ()
+void AudioMessenger::SendGetSuggestions (std::vector <std::string> &extant_atoms,
+                                         const std::string &new_atom,
+                                         u64 echo_id)
 {
   assert (m_audio_address);
 
   nlohmann::json j;
-  j["foo"] = "bar";
+  j["extant_atoms"] = extant_atoms;
+  j["new_atom"] = new_atom;
+  j["echo_id"] = echo_id;
   SendMessage("/ta/get_suggestions", j.dump ());
 }
 

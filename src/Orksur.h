@@ -15,6 +15,7 @@
 
 #include "Ticato.h"
 
+#include <map>
 #include <unordered_map>
 
 
@@ -48,10 +49,13 @@ class Orksur  :  public PlatonicMaes, public Node,
   std::unordered_map <std::string, Fondlish> hoverees;
   std::unordered_map <std::string, Fondlish> graspees;
   f64 sentient_dist, contact_dist;
+  std::map <u64, Ticato *> awaiting_audio_sooth;
 
   Orksur (const PlatonicMaes &ma);
 
 //  Splort *NewSplort (f64 rad, i64 num_verts = 6)  const;
+
+  std::vector <std::string> CollageAtomsNameList ();
 
   Ticato *ClosestAtom (const Vect &p);
 

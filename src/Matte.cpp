@@ -248,6 +248,7 @@ const std::string MatteGeometry::s_min = "min";
 const std::string MatteGeometry::s_max = "max";
 
 const std::string MatteDirGeometry::s_path = "path";
+const std::string MatteDirGeometry::s_niq_atomname = "niq_atomname";
 const std::string MatteDirGeometry::s_dir_geometry = "directory_geometry";
 const std::string MatteDirGeometry::s_frame_geometry = "frame_geometry";
 
@@ -314,6 +315,7 @@ toml::table MatteDirGeometry::into_toml () const
 void MatteDirGeometry::from_toml (toml::value const &_v)
 {
   clip_path = toml::find<std::string> (_v, s_path);
+  niq_atomname = toml::find<std::string> (_v, s_niq_atomname);
   dir_geometry = toml::find<MatteGeometry> (_v, s_dir_geometry);
   if (s_load_per_frame_geometry)
     {

@@ -4,7 +4,13 @@
 #include "SinuZoft.h"
 #include "SumZoft.h"
 
+#include "ZeUUID.h"
+
+#include "vector_utils.hpp"
+
 #include "tamparams.h"
+
+#include <vector>
 
 
 Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
@@ -33,6 +39,15 @@ Splort *Orksur::NewSplort (f64 rad, i64 num_verts)  const
   return spl;
 }
 */
+
+
+std::vector <std::string> Orksur::CollageAtomsNameList ()
+{ std::vector <std::string> nlist;
+  for (Ticato *tic  :  players)
+    if (tic)
+      nlist . push_back (tic -> AtomName ());
+  return nlist;
+}
 
 
 Ticato *Orksur::ClosestAtom (const Vect &p)
@@ -73,14 +88,19 @@ bool Orksur::AppendAtomToCollage (Ticato *tic)
       assert (2 == 3);
     }
 
+  std::vector <std::string> extant_atoms = CollageAtomsNameList ();
+
   collage -> AppendChild (tic);  // excises from former parent, see?
   players . push_back (tic);
   tic->accom_sca
     . Set (Vect (Tamparams::Current ()->table_scale_factor));
 
-  AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes;
-  if (sherm)
-    sherm -> SendPlayBoop (5);
+  if (AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes)
+    { sherm -> SendPlayBoop (5);
+      u64 echo_id = ZeMonotonicID ();
+      awaiting_audio_sooth[echo_id] = tic;
+      sherm -> SendGetSuggestions (extant_atoms, tic -> AtomName (), echo_id);
+    }
 
   return true;
 }
@@ -89,6 +109,8 @@ bool Orksur::AppendAtomToCollage (Ticato *tic)
 bool Orksur::RemoveAtomFromCollage (Ticato *tic)
 { if (! tic)
     return false;
+  FindErase (players, tic);
+  tic -> Parent () -> RemoveChild (tic);
   return true;
 }
 

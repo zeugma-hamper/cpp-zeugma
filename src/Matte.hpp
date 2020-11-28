@@ -66,10 +66,12 @@ struct MatteGeometry
 struct MatteDirGeometry
 {
   std::string clip_path;
+  std::string niq_atomname;
   MatteGeometry dir_geometry;
   std::vector<MatteGeometry> frame_geometry;
 
   static const std::string s_path;
+  static const std::string s_niq_atomname;
   static const std::string s_dir_geometry;
   static const std::string s_frame_geometry;
 

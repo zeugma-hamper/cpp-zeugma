@@ -1,5 +1,7 @@
+
 #ifndef TIN_CANS_AND_STRING
 #define TIN_CANS_AND_STRING
+
 
 #include <ZeEvent.h>
 #include <ZePublicWaterWorks.hpp>
@@ -10,6 +12,7 @@
 
 #include <string_view>
 
+
 namespace lo
 {
   class Server;
@@ -17,10 +20,11 @@ namespace lo
   class Message;
 }
 
-namespace charm
-{
+
+namespace charm  {
 
 namespace nl = nlohmann;
+
 
 class AudioMessenger
 {
@@ -45,12 +49,14 @@ class AudioMessenger
 
   void SendPlaySound (std::string_view _file);
 
-  void SendGetSuggestions ();
+  void SendGetSuggestions (std::vector <std::string> &extant_atoms,
+                           const std::string &new_atom, u64 echo_id);
 
  protected:
   lo::Address *m_audio_address;
   i64 m_message_id;
 };
+
 
 class TASReceiver : public ZePublicWaterWorks
 {
@@ -77,6 +83,7 @@ class TASReceiver : public ZePublicWaterWorks
   MultiSprinkler *m_sprinkler;
 };
 
+
 class TASMessageEvent : public ZeEvent
 {
  public:
@@ -97,6 +104,7 @@ class TASMessageEvent : public ZeEvent
   nlohmann::json m_message;
 };
 
+
 class TASSuggestionEvent : public TASMessageEvent
 {
  public:
@@ -109,6 +117,8 @@ class TASSuggestionEvent : public TASMessageEvent
   std::vector<std::string> GetSuggestionNames () const;
 };
 
+
 }
+
 
 #endif

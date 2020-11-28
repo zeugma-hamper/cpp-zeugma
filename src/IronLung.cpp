@@ -14,7 +14,7 @@ bool IronLung::AppendBreathee (Zeubject *z)
   if (std::find (breathees . begin (), erminus, z)  !=  breathees . end ())
     return false;
   breathees . push_back (z);
-fprintf(stderr,"ADDING BREATHEE --- now at %ld\n",breathees.size());
+//fprintf(stderr,"ADDING BREATHEE --- now at %ld\n",breathees.size());
   return true;
 }
 
@@ -27,7 +27,7 @@ bool IronLung::RemoveBreathee (Zeubject *z)
   if (it ==  erminus)
     return false;
   breathees . erase (it);
-fprintf(stderr,"and then DITCHING BREATHEE; thus at %ld\n",breathees.size());
+//fprintf(stderr,"and then DITCHING BREATHEE; thus at %ld\n",breathees.size());
   return true;
 }
 
