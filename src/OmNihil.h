@@ -9,7 +9,7 @@
 namespace charm  {
 
 
-class OmNihil  :  public CharmBase<OmNihil>
+class OmNihil  :  public CharmBase <OmNihil>
 { public:
   virtual ~OmNihil ()
     { }

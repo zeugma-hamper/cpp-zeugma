@@ -62,6 +62,36 @@ void Orksur::DistinguishHoverees ()
 }
 
 
+bool Orksur::AppendAtomToCollage (Ticato *tic)
+{ if (! tic)
+    return false;
+
+  collage -> AppendChild (tic);
+  auto it = std::find (players . begin (), players . end (), tic);
+  if (it  !=  players . end ())
+    { // again, something plentifully wrong; why's it already here?
+      assert (2 == 3);
+    }
+
+  collage -> AppendChild (tic);  // excises from former parent, see?
+  players . push_back (tic);
+  tic->accom_sca
+    . Set (Vect (Tamparams::Current ()->table_scale_factor));
+
+  AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes;
+  if (sherm)
+    sherm -> SendPlayBoop (5);
+
+  return true;
+}
+
+
+bool Orksur::RemoveAtomFromCollage (Ticato *tic)
+{ if (! tic)
+    return false;
+  return true;
+}
+
 
 i64 Orksur::ZESpatialMove (ZESpatialMoveEvent *e)
 { if (! e)
@@ -209,17 +239,7 @@ i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
   else if (e -> Says ("atom-deposit"))
     { if (tic = dynamic_cast <Ticato *> (e -> ObjByTag ("inbound-atom")))
         if (e -> ObjByTag ("onto-maes")  ==  underlying_maes)
-          { collage -> AppendChild (tic);
-            auto it = std::find (players . begin (), players . end (), tic);
-            if (it  !=  players . end ())
-              { // again, something plentifully wrong; why's it already here?
-                assert (2 == 3);
-              }
-            collage -> AppendChild (tic);  // excises from former parent, see?
-            players . push_back (tic);
-            tic->accom_sca
-              . Set (Vect (Tamparams::Current ()->table_scale_factor));
-          }
+          { AppendAtomToCollage (tic); }
     }
   return 0;
 }

@@ -7,6 +7,7 @@
 
 #include "Node.hpp"
 #include "InterpZoft.h"
+#include "AudioMessenger.hpp"
 
 #include <vector>
 
@@ -40,6 +41,7 @@ struct Tamparams
 };
 
 
+
 struct Tamglobals
 { Node *front_wall = NULL;
   Node *left_wall = NULL;
@@ -51,6 +53,8 @@ struct Tamglobals
   std::vector <Node *> construction_marks;
 
   InterpVect room_scaler;
+
+  AudioMessenger *sono_hermes = NULL;
 
   static Tamglobals ur_globals;
   static Tamglobals *Only ();

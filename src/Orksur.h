@@ -62,6 +62,9 @@ class Orksur  :  public PlatonicMaes, public Node,
 
   void DistinguishHoverees ();
 
+  bool AppendAtomToCollage (Ticato *tic);
+  bool RemoveAtomFromCollage (Ticato *tic);
+
   i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
 
   i64 ZEBulletin (ZEBulletinEvent *e)  override;

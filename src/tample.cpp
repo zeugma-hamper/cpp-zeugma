@@ -48,6 +48,9 @@
 #include <RawEventParsing.h>
 #include <GeomFumble.h>
 
+// audio
+#include "AudioMessenger.hpp"
+
 //UI
 #include "Alignifer.h"
 
@@ -501,6 +504,9 @@ int main (int ac, char **av)
   if (! tamp . StartUp ())
     return -1;
 
+  AudioMessenger *a_mess = new AudioMessenger ("192.168.0.33", "57121");
+  Tamglobals::Only ()->sono_hermes = a_mess;
+
   Layer *omni_layer = tamp . GetSceneLayer();
   Layer *front_layer = new Layer ();
   tamp . AppendSceneLayer (front_layer);
@@ -735,6 +741,8 @@ griddy -> SetGridColor (ZeColor (1.0, 0.0, 1.0, 0.5));
 g_tablecloth -> AppendChild (gridno);
 
   tamp . Run ();
+
+  delete a_mess;
 
   return 0;
 }
