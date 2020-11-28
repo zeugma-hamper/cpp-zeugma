@@ -41,8 +41,8 @@ Splort *Orksur::NewSplort (f64 rad, i64 num_verts)  const
 */
 
 
-std::vector <std::string> Orksur::CollageAtomsNameList ()
-{ std::vector <std::string> nlist;
+stringy_list Orksur::CollageAtomsNameList ()
+{ stringy_list nlist;
   for (Ticato *tic  :  players)
     if (tic)
       nlist . push_back (tic -> AtomName ());
@@ -88,7 +88,7 @@ bool Orksur::AppendAtomToCollage (Ticato *tic)
       assert (2 == 3);
     }
 
-  std::vector <std::string> extant_atoms = CollageAtomsNameList ();
+  stringy_list extant_atoms = CollageAtomsNameList ();
 
   collage -> AppendChild (tic);  // excises from former parent, see?
   players . push_back (tic);
@@ -97,9 +97,9 @@ bool Orksur::AppendAtomToCollage (Ticato *tic)
 
   if (AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes)
     { sherm -> SendPlayBoop (5);
-      u64 echo_id = ZeMonotonicID ();
-      awaiting_audio_sooth[echo_id] = tic;
-      sherm -> SendGetSuggestions (extant_atoms, tic -> AtomName (), echo_id);
+      i64 disc_id = ZeMonotonicID ();
+      awaiting_audio_sooth[disc_id] = tic;
+      sherm -> SendGetSuggestions (extant_atoms, tic -> AtomName (), disc_id);
     }
 
   return true;
@@ -271,11 +271,21 @@ i64 Orksur::TASSuggestion (TASSuggestionEvent *e)
 { if (! e)
     return -1;
 
-// if mom were looking, of course, we'd be chekcing the echo_id...
-  std::vector <std::string> suggs = e -> GetSuggestionNames ();
+  i64 disc_id = e -> GetMessageID ();
+  auto awaiter = awaiting_audio_sooth . find (disc_id);
+  if (awaiter  ==  awaiting_audio_sooth . end ())
+    return 0;
+  Ticato *tic = awaiter->second;
+  awaiting_audio_sooth . erase (awaiter);
+
+  stringy_list suggs = e -> GetSuggestionNames ();
 fprintf (stderr, "WEEEEELLLLLP. Just got %d audio suggestions:\n",suggs.size());
 for (auto &ess  :  suggs)
 fprintf(stderr,"\"%s\", ", ess.c_str ());
 fprintf(stderr,"\n");
+  if (! tic)
+    return -1;
+  tic->sono_options = suggs;
+// and presumably quite a bit more action...
   return 0;
 }

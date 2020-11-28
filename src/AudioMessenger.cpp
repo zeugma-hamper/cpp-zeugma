@@ -89,16 +89,17 @@ void AudioMessenger::SendPlaySound (std::string_view _file)
   SendMessage ("/ta/play_sound", j.dump ());
 }
 
-void AudioMessenger::SendGetSuggestions (std::vector <std::string> &extant_atoms,
+void AudioMessenger::SendGetSuggestions (stringy_list &extant_atoms,
                                          const std::string &new_atom,
-                                         u64 echo_id)
+                                         u64 disc_id)
 {
   assert (m_audio_address);
 
   nlohmann::json j;
   j["extant_atoms"] = extant_atoms;
   j["new_atom"] = new_atom;
-  j["echo_id"] = echo_id;
+//  j["message_id"] = echo_id;
+  j["discussion_id"] = disc_id;
   SendMessage("/ta/get_suggestions", j.dump ());
 }
 
@@ -199,13 +200,25 @@ TASMessageEvent::TASMessageEvent (std::string_view _path, nl::json &&_message)
 
 i64 TASMessageEvent::GetMessageID (bool _spit_error) const
 {
-  auto it = m_message.find ("messageID");
+  auto it = m_message.find ("message_id");
   if (it != m_message.end () && it.value ().is_number())
     return it.value ().get<i64> ();
 
   if (_spit_error)
-    fprintf (stderr, "TAS didn't get expected message id for %s\n", m_path.c_str ());
+    fprintf (stderr, "TAS didn't get expected message id for %s\n",
+             m_path.c_str ());
 
+  return -1;
+}
+
+i64 TASMessageEvent::GetDiscussionID (bool _spit_error) const
+{ auto it = m_message.find ("discussion_id");
+  if (it != m_message . end ()  &&  it.value () . is_number ())
+    return it.value () . get <i64> ();
+
+  if (_spit_error)
+    fprintf (stderr, "TAS didn't get a discussion id for %s\n",
+             m_path . c_str ());
   return -1;
 }
 
@@ -242,13 +255,15 @@ std::vector<std::string> TASSuggestionEvent::GetSuggestionNames () const
   std::vector<std::string> ret;
   ret.reserve (GetSuggestionCount());
 
-  try {
-    for (auto &[key, value] : m_message.items ())
-      ret.push_back(value["name"].get<std::string>());
-  } catch (std::exception &e) {
-    fprintf (stderr, "couldn't parse suggestion message: %s\n", e.what ());
-    return {};
-  }
+  try
+    { auto fladge = m_message . find ("suggestions");
+      for (auto &entry : *fladge)
+        ret . push_back (entry["name"] . get <std::string> ());
+    }
+  catch (std::exception &e)
+    { fprintf (stderr, "couldn't parse suggestion message: %s\n", e.what ());
+      return {};
+    }
 
   return ret;
 }

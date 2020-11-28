@@ -7,12 +7,15 @@
 
 #include "Node.hpp"
 #include "InterpZoft.h"
-#include "AudioMessenger.hpp"
 
+#include <string>
 #include <vector>
 
 
 using namespace charm;
+
+
+using stringy_list = std::vector <std::string>;
 
 
 struct Tamparams
@@ -40,6 +43,9 @@ struct Tamparams
   static Tamparams *Current ();
 };
 
+
+namespace charm
+{ class AudioMessenger; }
 
 
 struct Tamglobals

@@ -14,6 +14,8 @@
 
 #include "PlatonicMaes.h"
 
+#include "tamparams.h"
+
 #include <string>
 
 
@@ -28,6 +30,7 @@ class Ticato  :  public Alignifer
   ZoftVect vel;
   ZoftVect accom_sca;
   PlatonicMaes *cur_maes;
+  stringy_list sono_options;
   std::string hvrr;
   std::string ynkr;
   Node *from_node;

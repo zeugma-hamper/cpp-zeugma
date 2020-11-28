@@ -21,9 +21,9 @@ ZeUUID::ZeUUID ()
 /// not uuid hereinafter
 //
 
-static u64 _ze_monotonic_id = 6;
+static i64 _ze_monotonic_id = 6;
 
-u64 ZeMonotonicID ()
+i64 ZeMonotonicID ()
 { return ++_ze_monotonic_id; }
 
 

@@ -29,7 +29,7 @@ struct ZeUUID
 /// separately, a simple incrementing identifier
 //
 
-u64 ZeMonotonicID ();
+i64 ZeMonotonicID ();
 
 
 }

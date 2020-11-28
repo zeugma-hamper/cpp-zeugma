@@ -58,7 +58,7 @@ class Orksur  :  public PlatonicMaes, public Node,
 
 //  Splort *NewSplort (f64 rad, i64 num_verts = 6)  const;
 
-  std::vector <std::string> CollageAtomsNameList ();
+  stringy_list CollageAtomsNameList ();
 
   Ticato *ClosestAtom (const Vect &p);
 

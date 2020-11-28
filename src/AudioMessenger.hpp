@@ -6,6 +6,8 @@
 #include <ZeEvent.h>
 #include <ZePublicWaterWorks.hpp>
 
+#include "tamparams.h"
+
 #include <class_utils.hpp>
 
 #include <nlohmann/json.hpp>
@@ -49,8 +51,8 @@ class AudioMessenger
 
   void SendPlaySound (std::string_view _file);
 
-  void SendGetSuggestions (std::vector <std::string> &extant_atoms,
-                           const std::string &new_atom, u64 echo_id);
+  void SendGetSuggestions (stringy_list &extant_atoms,
+                           const std::string &new_atom, u64 disc_id);
 
  protected:
   lo::Address *m_audio_address;
@@ -93,6 +95,7 @@ class TASMessageEvent : public ZeEvent
   TASMessageEvent (std::string_view _path, nl::json &&_message);
 
   i64 GetMessageID (bool _spit_error = false) const;
+  i64 GetDiscussionID (bool _spit_error = false)  const;
 
   std::string const &GetPath () const;
 
