@@ -468,9 +468,17 @@ namespace po = boost::program_options;
 
 
 int main (int ac, char **av)
-{ po::options_description desc ("available options");
+{ // well, here we go.
+  std::string aud_host ("sepsis.local");
+  std::string aud_port ("57121");
+
+ po::options_description desc ("available options");
   desc . add_options ()
     ("help", "hm. what do you think?")
+    ("audserver-host", po::value <std::string> (&aud_host),
+     "host, via ip or name, where audio server dwells")
+    ("audserver-port", po::value <std::string> (&aud_port),
+     "port on which audio server listens (default: 57121)")
 /*    ("prison-break", "escaped elements only mode")
     ("clip-collages", "disallow collage elements outside rect-bounds")
     ("background-gray", po::value<f64>(&global_param_background_gray),
@@ -484,8 +492,8 @@ int main (int ac, char **av)
     ;
 
   po::variables_map arg_map;
-  po::store (po::parse_command_line(ac, av, desc), arg_map);
-  po::notify(arg_map);
+  po::store (po::parse_command_line (ac, av, desc), arg_map);
+  po::notify (arg_map);
 
 
   if (arg_map . count ("help"))
@@ -504,7 +512,7 @@ int main (int ac, char **av)
   if (! tamp . StartUp ())
     return -1;
 
-  AudioMessenger *a_mess = new AudioMessenger ("192.168.0.33", "57121");
+  AudioMessenger *a_mess = new AudioMessenger (aud_host, aud_port);
   Tamglobals::Only ()->sono_hermes = a_mess;
 
   TASReceiver *audio_rejoinder_catcher = new TASReceiver ("57122");
