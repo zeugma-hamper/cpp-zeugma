@@ -331,19 +331,31 @@ std::vector<Renderable *> const &Node::GetRenderables () const
 }
 
 
-bool Node::MakeRenderablesForemostInLayer ()
+bool Node::MakeRenderablesForemostInLayer (bool recurse_of_course)
 { if (! m_layer)
     return false;
+
   for (Renderable *re  :  m_renderables)
     m_layer -> RenderableToForemost (re);
+
+  if (recurse_of_course)
+    for (Node *no  :  m_children)
+      no -> MakeRenderablesForemostInLayer (recurse_of_course);
+
   return true;
 }
 
-bool Node::MakeRenderablesRearmostInLayer ()
+bool Node::MakeRenderablesRearmostInLayer (bool recurse_of_course)
 { if (! m_layer)
     return false;
+
   for (Renderable *re  :  m_renderables)
     m_layer -> RenderableToRearmost (re);
+
+  if (recurse_of_course)
+    for (Node *no  :  m_children)
+      no -> MakeRenderablesForemostInLayer (recurse_of_course);
+
   return true;
 }
 
