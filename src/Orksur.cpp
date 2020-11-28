@@ -271,7 +271,7 @@ i64 Orksur::TASSuggestion (TASSuggestionEvent *e)
 { if (! e)
     return -1;
 
-  i64 disc_id = e -> GetMessageID ();
+  i64 disc_id = e -> GetDiscussionID ();
   auto awaiter = awaiting_audio_sooth . find (disc_id);
   if (awaiter  ==  awaiting_audio_sooth . end ())
     return 0;
