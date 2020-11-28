@@ -330,6 +330,24 @@ std::vector<Renderable *> const &Node::GetRenderables () const
   return m_renderables;
 }
 
+
+bool Node::MakeRenderablesForemostInLayer ()
+{ if (! m_layer)
+    return false;
+  for (Renderable *re  :  m_renderables)
+    m_layer -> RenderableToForemost (re);
+  return true;
+}
+
+bool Node::MakeRenderablesRearmostInLayer ()
+{ if (! m_layer)
+    return false;
+  for (Renderable *re  :  m_renderables)
+    m_layer -> RenderableToRearmost (re);
+  return true;
+}
+
+
 void Node::SetLayer (Layer *_layer)
 {
   if (m_layer)

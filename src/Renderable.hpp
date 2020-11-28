@@ -46,6 +46,9 @@ class Renderable
   bool ShouldDraw () const;
   void SetShouldDraw (bool _tf);
 
+  // bool MakeForemostInLayer ();
+  // bool MakeRearmostInLayer ();
+
   sort_key GetSortKey () const;
 
   graph_id GetGraphId () const;

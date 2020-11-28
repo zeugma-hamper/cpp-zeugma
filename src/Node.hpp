@@ -120,6 +120,9 @@ class Node
   std::vector<Renderable *> &GetRenderables ();
   std::vector<Renderable *> const &GetRenderables () const;
 
+  bool MakeRenderablesForemostInLayer ();
+  bool MakeRenderablesRearmostInLayer ();
+
   void   SetLayer (Layer *_layer);
   Layer *GetLayer () const;
 

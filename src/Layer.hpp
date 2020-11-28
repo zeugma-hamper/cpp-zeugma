@@ -37,6 +37,9 @@ class Layer
   std::vector<Renderable *> &GetRenderables ();
   std::vector<Frontier *> &GetFrontiers ();
 
+  bool RenderableToForemost (Renderable *re);
+  bool RenderableToRearmost (Renderable *re);
+
   void SortFrontiers ();
 
  protected:
