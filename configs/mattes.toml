@@ -959,6 +959,7 @@ frame_geometry = [
 ],
 ]
 path = "000073.791_000004.416_0000000000_violin"
+niq_atomname = "boaa=violin"
 [boaa.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -2134,6 +2135,7 @@ frame_geometry = [
 ],
 ]
 path = "000291.625_000005.375_0000000000_cake"
+niq_atomname = "boaa=cake"
 [boaa.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -3957,6 +3959,7 @@ frame_geometry = [
 ],
 ]
 path = "000405.666_000008.375_0000000000_isaac"
+niq_atomname = "boaa=newton_money"
 [boaa.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -5699,6 +5702,7 @@ frame_geometry = [
 ],
 ]
 path = "000538.125_000008.000_0000000000_columns"
+niq_atomname = "boaa=columns"
 [boaa.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -6739,6 +6743,7 @@ frame_geometry = [
 ],
 ]
 path = "001251.083_000004.750_0000000000_vomit"
+niq_atomname = "boaa=vomit"
 [boaa.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -16932,6 +16937,7 @@ frame_geometry = [
 ],
 ]
 path = "002014.833_000047.125_0000000000_lothario"
+niq_atomname = "boaa=lothario"
 [boaa.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -17900,6 +17906,7 @@ frame_geometry = [
 ],
 ]
 path = "002124.833_000004.416_0000000000_typewriter"
+niq_atomname = "boaa=typewriter"
 [boaa.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -19318,6 +19325,7 @@ frame_geometry = [
 ],
 ]
 path = "003435.208_000006.500_0000000000_boy"
+niq_atomname = "boaa=boy_with_orange"
 [boaa.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -22329,6 +22337,7 @@ frame_geometry = [
 ],
 ]
 path = "003755.125_000013.875_0000000000_bathhouse"
+niq_atomname = "boaa=bathhouse"
 [boaa.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -22865,6 +22874,7 @@ frame_geometry = [
 ],
 ]
 path = "004096.375_000002.416_0000000000_posseidon"
+niq_atomname = "boaa=poseidon"
 [boaa.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -23311,6 +23321,7 @@ frame_geometry = [
 ],
 ]
 path = "004259.875_000002.000_0000000000_statueheadb"
+niq_atomname = "boaa=statue_head_b"
 [boaa.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -23766,6 +23777,7 @@ frame_geometry = [
 ],
 ]
 path = "004259.875_000002.041_0000000000_statueheada"
+niq_atomname = "boaa=statue_head_a"
 [boaa.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -24869,6 +24881,7 @@ frame_geometry = [
 ],
 ]
 path = "005652.666_000005.041_0000000000_statuebust"
+niq_atomname = "boaa=statue_bust"
 [boaa.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -25396,6 +25409,7 @@ frame_geometry = [
 ],
 ]
 path = "006924.333_000002.375_0000000000_gyroscope"
+niq_atomname = "boaa=gyroscope"
 [boaa.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -26169,6 +26183,7 @@ frame_geometry = [
 ],
 ]
 path = "000785.208_000003.500_0000000000_spazz"
+niq_atomname = "btk=spazz"
 [btk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -28910,6 +28925,7 @@ frame_geometry = [
 ],
 ]
 path = "001050.333_000012.625_0000000000_rocks"
+niq_atomname = "btk=rocks"
 [btk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -32011,6 +32027,7 @@ frame_geometry = [
 ],
 ]
 path = "001050.333_000014.292_0000000000_building"
+niq_atomname = "btk=bunker"
 [btk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -35112,6 +35129,7 @@ frame_geometry = [
 ],
 ]
 path = "001050.333_000014.292_0000000000_grass"
+niq_atomname = "btk=grass"
 [btk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -36755,6 +36773,7 @@ frame_geometry = [
 ],
 ]
 path = "001057.083_000007.542_0000000000_shrubs"
+niq_atomname = "btk=shrubs"
 [btk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -37201,6 +37220,7 @@ frame_geometry = [
 ],
 ]
 path = "001062.625_000002.000_0000000000_body"
+niq_atomname = "btk="
 [btk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -38511,6 +38531,7 @@ frame_geometry = [
 ],
 ]
 path = "001097.333_000006.000_0000000000_burning_man"
+niq_atomname = "btk="
 [btk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -39335,6 +39356,7 @@ frame_geometry = [
 ],
 ]
 path = "001609.083_000003.750_0000000000_eyeball"
+niq_atomname = "btk="
 [btk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -41563,6 +41585,7 @@ frame_geometry = [
 ],
 ]
 path = "001932.208_000010.250_0000000000_escalator"
+niq_atomname = "btk="
 [btk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -42540,6 +42563,7 @@ frame_geometry = [
 ],
 ]
 path = "001978.625_000004.458_0000000000_man"
+niq_atomname = "btk="
 [btk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -44030,6 +44054,7 @@ frame_geometry = [
 ],
 ]
 path = "001983.166_000006.833_0000000000_woman"
+niq_atomname = "btk="
 [btk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -46546,6 +46571,7 @@ frame_geometry = [
 ],
 ]
 path = "001983.166_000011.583_0000000000_manturning"
+niq_atomname = "btk="
 [btk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -47568,6 +47594,7 @@ frame_geometry = [
 ],
 ]
 path = "001990.083_000004.666_0000000000_stairs"
+niq_atomname = "btk="
 [btk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -48638,6 +48665,7 @@ frame_geometry = [
 ],
 ]
 path = "002039.625_000004.875_0000000000_bowl"
+niq_atomname = "c="
 [c.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -49705,6 +49733,7 @@ frame_geometry = [
 ],
 ]
 path = "002039.625_000004.875_0000000000_clint"
+niq_atomname = "c=clint"
 [c.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -50772,6 +50801,7 @@ frame_geometry = [
 ],
 ]
 path = "002039.625_000004.875_0000000000_mug"
+niq_atomname = "c=mug"
 [c.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -51839,6 +51869,7 @@ frame_geometry = [
 ],
 ]
 path = "002039.625_000004.875_0000000000_salt"
+niq_atomname = "c=salt_shaker"
 [c.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -52906,6 +52937,7 @@ frame_geometry = [
 ],
 ]
 path = "002039.625_000004.875_0000000000_sugar"
+niq_atomname = "c=sugar"
 [c.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -53424,6 +53456,7 @@ frame_geometry = [
 ],
 ]
 path = "002100.250_000002.333_0000000000_couple"
+niq_atomname = "c=diner_couple"
 [c.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -53942,6 +53975,7 @@ frame_geometry = [
 ],
 ]
 path = "002100.250_000002.333_0000000000_woman"
+niq_atomname = "c=diner_woman"
 [c.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -54919,6 +54953,7 @@ frame_geometry = [
 ],
 ]
 path = "002122.833_000004.458_0000000000_tractor"
+niq_atomname = "c=dozer"
 [c.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -55896,6 +55931,7 @@ frame_geometry = [
 ],
 ]
 path = "002123.083_000004.458_0000000000_dinosaur03"
+niq_atomname = "c=carnosaur_03"
 [c.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -57656,6 +57692,7 @@ frame_geometry = [
 ],
 ]
 path = "002848.041_000008.083_0000000000_magnifying"
+niq_atomname = "c=magnifying_glass"
 [c.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -58426,6 +58463,7 @@ frame_geometry = [
 ],
 ]
 path = "003951.375_000003.500_0000000000_lasers"
+niq_atomname = "c=laser_fence"
 [c.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -60222,6 +60260,7 @@ frame_geometry = [
 ],
 ]
 path = "004192.208_000008.250_0000000000_dinosaur"
+niq_atomname = "c=carnosaur_01"
 [c.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -60956,6 +60995,7 @@ frame_geometry = [
 ],
 ]
 path = "004424.708_000003.333_0000000000_dinosaur02"
+niq_atomname = "c=carnosaur_02"
 [c.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -61969,6 +62009,7 @@ frame_geometry = [
 ],
 ]
 path = "004732.208_000004.625_0000000000_flamethrower"
+niq_atomname = "c=flamethrower"
 [c.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -63480,6 +63521,7 @@ frame_geometry = [
 ],
 ]
 path = "001177.875_000006.916_0000000000_ashtray"
+niq_atomname = "cs=ashtray"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -64988,6 +65030,7 @@ frame_geometry = [
 ],
 ]
 path = "001177.875_000006.916_0000000000_glasses"
+niq_atomname = "cs=glasses"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -66496,6 +66539,7 @@ frame_geometry = [
 ],
 ]
 path = "001177.875_000006.916_0000000000_microphone"
+niq_atomname = "cs=microphone_01"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -68004,6 +68048,7 @@ frame_geometry = [
 ],
 ]
 path = "001177.875_000006.916_0000000000_microphone02"
+niq_atomname = "cs=microphone_02"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -69512,6 +69557,7 @@ frame_geometry = [
 ],
 ]
 path = "001177.875_000006.916_0000000000_phone"
+niq_atomname = "cs=phone"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -71020,6 +71066,7 @@ frame_geometry = [
 ],
 ]
 path = "001177.875_000006.916_0000000000_tape"
+niq_atomname = "cs=tape_roll"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -72726,6 +72773,7 @@ frame_geometry = [
 ],
 ]
 path = "001247.916_000007.833_0000000000_smoker"
+niq_atomname = "cs=smoke_rings"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -75134,6 +75182,7 @@ frame_geometry = [
 ],
 ]
 path = "001660.041_000011.083_0000000000_rubik"
+niq_atomname = "cs=rubik_cube"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -75715,6 +75764,7 @@ frame_geometry = [
 ],
 ]
 path = "001949.458_000002.625_0000000000_creamer"
+niq_atomname = "cs=creamer"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -77664,6 +77714,7 @@ frame_geometry = [
 ],
 ]
 path = "001949.458_000008.958_0000000000_coffee"
+niq_atomname = "cs=coffee"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -78551,6 +78602,7 @@ frame_geometry = [
 ],
 ]
 path = "002871.166_000004.041_0000000000_magician"
+niq_atomname = "cs=card_magician"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -81166,6 +81218,7 @@ frame_geometry = [
 ],
 ]
 path = "002932.166_000012.041_0000000000_cube"
+niq_atomname = "cs=giant_cube"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -83025,6 +83078,7 @@ frame_geometry = [
 ],
 ]
 path = "002962.208_000008.541_0000000000_car"
+niq_atomname = "cs=car"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -84884,6 +84938,7 @@ frame_geometry = [
 ],
 ]
 path = "002962.208_000008.541_0000000000_lamppost"
+niq_atomname = "cs=lamppost"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -86743,6 +86798,7 @@ frame_geometry = [
 ],
 ]
 path = "002962.208_000008.541_0000000000_stoplight"
+niq_atomname = "cs=stoplight"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -88602,6 +88658,7 @@ frame_geometry = [
 ],
 ]
 path = "002962.208_000008.541_0000000000_theater"
+niq_atomname = "cs=theater_marquee"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -90461,6 +90518,7 @@ frame_geometry = [
 ],
 ]
 path = "002962.208_000008.541_0000000000_trafficlight"
+niq_atomname = "cs=traffic_light"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -91762,6 +91820,7 @@ frame_geometry = [
 ],
 ]
 path = "003011.875_000005.958_0000000000_clock"
+niq_atomname = "cs=ibm_clock"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -102342,6 +102401,7 @@ frame_geometry = [
 ],
 ]
 path = "003123.000_000048.916_0000000000_readingfrench"
+niq_atomname = "cs=reading_french"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -103508,6 +103568,7 @@ frame_geometry = [
 ],
 ]
 path = "003854.333_000005.333_0000000000_beast"
+niq_atomname = "cs=beast_stroke"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -104674,6 +104735,7 @@ frame_geometry = [
 ],
 ]
 path = "003854.333_000005.333_0000000000_hand"
+niq_atomname = "cs=stroking_hand"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -107100,6 +107162,7 @@ frame_geometry = [
 ],
 ]
 path = "004286.375_000011.166_0000000000_barbie"
+niq_atomname = "cs=barbie"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -107978,6 +108041,7 @@ frame_geometry = [
 ],
 ]
 path = "004775.250_000004.000_0000000000_singer01"
+niq_atomname = "cs=singer_01"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -108856,6 +108920,7 @@ frame_geometry = [
 ],
 ]
 path = "004775.250_000004.000_0000000000_singer02"
+niq_atomname = "cs=singer_02"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -109734,6 +109799,7 @@ frame_geometry = [
 ],
 ]
 path = "004775.250_000004.000_0000000000_singer03"
+niq_atomname = "cs=singer_03"
 [cs.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -110732,6 +110798,7 @@ frame_geometry = [
 ],
 ]
 path = "000264.625_000004.541_0000000000_doctornurse"
+niq_atomname = "f=doctor_nurse_window"
 [f.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -111025,6 +111092,7 @@ frame_geometry = [
 ],
 ]
 path = "000407.041_000001.291_0000000000_keyhole"
+niq_atomname = "f=keyhole"
 [f.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -112245,6 +112313,7 @@ frame_geometry = [
 ],
 ]
 path = "000614.166_000005.583_0000000000_longshothorse"
+niq_atomname = "f=distant_horse"
 [f.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -113195,6 +113264,7 @@ frame_geometry = [
 ],
 ]
 path = "000653.291_000004.333_0000000000_waterpour"
+niq_atomname = "f=water_pour"
 [f.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -116107,6 +116177,7 @@ frame_geometry = [
 ],
 ]
 path = "001147.416_000013.416_0000000000_leper"
+niq_atomname = "f=leper"
 [f.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -117039,6 +117110,7 @@ frame_geometry = [
 ],
 ]
 path = "001175.125_000004.250_0000000000_indiandoor"
+niq_atomname = "f=golden_door"
 [f.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -117971,6 +118043,7 @@ frame_geometry = [
 ],
 ]
 path = "001175.125_000004.250_0000000000_indianguard"
+niq_atomname = "f=indian_guard"
 [f.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -118966,6 +119039,7 @@ frame_geometry = [
 ],
 ]
 path = "002123.916_000004.541_0000000000_teeth"
+niq_atomname = "f=false_teeth_glass"
 [f.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -119817,6 +119891,7 @@ frame_geometry = [
 ],
 ]
 path = "003250.500_000003.875_0000000000_redcart"
+niq_atomname = "f=red_cart"
 [f.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -122534,6 +122609,7 @@ frame_geometry = [
 ],
 ]
 path = "000423.042_000012.500_0000000000_bannister"
+niq_atomname = "itmfl=bannister"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -125248,6 +125324,7 @@ frame_geometry = [
 ],
 ]
 path = "000423.042_000012.500_0000000000_globe"
+niq_atomname = "itmfl=globe"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -127962,6 +128039,7 @@ frame_geometry = [
 ],
 ]
 path = "000423.042_000012.500_0000000000_window"
+niq_atomname = "itmfl=boss_window"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -130082,6 +130160,7 @@ frame_geometry = [
 ],
 ]
 path = "000557.875_000009.750_0000000000_newspaper"
+niq_atomname = "itmfl=maggie_newspaper"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -132445,6 +132524,7 @@ frame_geometry = [
 ],
 ]
 path = "000851.542_000010.875_0000000000_maggie"
+niq_atomname = "itmfl=maggie_thermos"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -134808,6 +134888,7 @@ frame_geometry = [
 ],
 ]
 path = "000851.542_000010.875_0000000000_thermos"
+niq_atomname = "itmfl=thermos"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -137009,6 +137090,7 @@ frame_geometry = [
 ],
 ]
 path = "001350.708_000010.125_0000000000_bossman"
+niq_atomname = "itmfl=boss_man"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -139210,6 +139292,7 @@ frame_geometry = [
 ],
 ]
 path = "001350.708_000010.125_0000000000_maggieback"
+niq_atomname = "itmfl=maggie_back"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -141411,6 +141494,7 @@ frame_geometry = [
 ],
 ]
 path = "001350.708_000010.125_0000000000_pictures"
+niq_atomname = "itmfl=picture_frames"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -142766,6 +142850,7 @@ frame_geometry = [
 ],
 ]
 path = "001564.583_000006.208_0000000000_grandma"
+niq_atomname = "itmfl=granny_scold"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -143617,6 +143702,7 @@ frame_geometry = [
 ],
 ]
 path = "001717.625_000003.875_0000000000_cupstir"
+niq_atomname = "itmfl=cup_stir"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -145242,6 +145328,7 @@ frame_geometry = [
 ],
 ]
 path = "001949.625_000007.458_0000000000_tux"
+niq_atomname = "itmfl=tony_turn"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -146327,6 +146414,7 @@ frame_geometry = [
 ],
 ]
 path = "002027.792_000004.958_0000000000_hand_fork"
+niq_atomname = "itmfl=hand_fork"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -146908,6 +146996,7 @@ frame_geometry = [
 ],
 ]
 path = "002028.042_000002.625_0000000000_plate"
+niq_atomname = "itmfl=plate"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -148407,6 +148496,7 @@ frame_geometry = [
 ],
 ]
 path = "002056.375_000006.875_0000000000_food"
+niq_atomname = "itmfl=food"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -149132,6 +149222,7 @@ frame_geometry = [
 ],
 ]
 path = "005455.042_000003.292_0000000000_angkor01"
+niq_atomname = "itmfl=angkor_01"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -149857,6 +149948,7 @@ frame_geometry = [
 ],
 ]
 path = "005455.042_000003.292_0000000000_angkor02"
+niq_atomname = "itmfl=angkor_02"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -150582,6 +150674,7 @@ frame_geometry = [
 ],
 ]
 path = "005455.042_000003.292_0000000000_angkor03"
+niq_atomname = "itmfl=angkor_03"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -151307,6 +151400,7 @@ frame_geometry = [
 ],
 ]
 path = "005455.042_000003.292_0000000000_angkor04"
+niq_atomname = "itmfl=angkor_04"
 [itmfl.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -151783,6 +151877,7 @@ frame_geometry = [
 ],
 ]
 path = "000143.166_000002.125_0000000000_precog01"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -152256,6 +152351,7 @@ frame_geometry = [
 ],
 ]
 path = "000143.166_000002.125_0000000000_precog02"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -152729,6 +152825,7 @@ frame_geometry = [
 ],
 ]
 path = "000143.166_000002.125_0000000000_precog03"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -153202,6 +153299,7 @@ frame_geometry = [
 ],
 ]
 path = "000143.166_000002.125_0000000000_precogtank"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -153927,6 +154025,7 @@ frame_geometry = [
 ],
 ]
 path = "000599.416_000003.291_0000000000_ship01"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -154922,6 +155021,7 @@ frame_geometry = [
 ],
 ]
 path = "000616.666_000004.541_0000000000_merrygoround"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -156718,6 +156818,7 @@ frame_geometry = [
 ],
 ]
 path = "002504.916_000008.250_0000000000_ship02"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -158406,6 +158507,7 @@ frame_geometry = [
 ],
 ]
 path = "002505.416_000007.750_0000000000_ship03"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -158906,6 +159008,7 @@ frame_geometry = [
 ],
 ]
 path = "002645.333_000002.250_0000000000_contortionist"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -159568,6 +159671,7 @@ frame_geometry = [
 ],
 ]
 path = "003248.541_000003.000_0000000000_car01"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -160626,6 +160730,7 @@ frame_geometry = [
 ],
 ]
 path = "003261.666_000004.833_0000000000_car02"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -161513,6 +161618,7 @@ frame_geometry = [
 ],
 ]
 path = "003377.208_000004.041_0000000000_spoon"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -162445,6 +162551,7 @@ frame_geometry = [
 ],
 ]
 path = "003377.208_000004.250_0000000000_strainer"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -164034,6 +164141,7 @@ frame_geometry = [
 ],
 ]
 path = "003377.208_000007.291_0000000000_hand"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -165650,6 +165758,7 @@ frame_geometry = [
 ],
 ]
 path = "003377.208_000007.416_0000000000_handsandcup"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -166420,6 +166529,7 @@ frame_geometry = [
 ],
 ]
 path = "003381.125_000003.500_0000000000_cup"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -167262,6 +167372,7 @@ frame_geometry = [
 ],
 ]
 path = "004805.583_000003.833_0000000000_bubble"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -168104,6 +168215,7 @@ frame_geometry = [
 ],
 ]
 path = "005838.291_000003.833_0000000000_cop"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -168946,6 +169058,7 @@ frame_geometry = [
 ],
 ]
 path = "005838.291_000003.833_0000000000_umbrella01"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -169788,6 +169901,7 @@ frame_geometry = [
 ],
 ]
 path = "005838.291_000003.833_0000000000_umbrella02"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -170630,6 +170744,7 @@ frame_geometry = [
 ],
 ]
 path = "005838.291_000003.833_0000000000_umbrellagroup01"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -171544,6 +171659,7 @@ frame_geometry = [
 ],
 ]
 path = "006919.958_000004.166_0000000000_baseballmitt"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -172458,6 +172574,7 @@ frame_geometry = [
 ],
 ]
 path = "006919.958_000004.166_0000000000_bearhead"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -173372,6 +173489,7 @@ frame_geometry = [
 ],
 ]
 path = "006919.958_000004.166_0000000000_dog"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -174646,6 +174764,7 @@ frame_geometry = [
 ],
 ]
 path = "007145.041_000005.833_0000000000_ship04"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -175596,6 +175715,7 @@ frame_geometry = [
 ],
 ]
 path = "007146.541_000004.333_0000000000_ship05"
+niq_atomname = "mr="
 [mr.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -176027,6 +176147,7 @@ frame_geometry = [
 ],
 ]
 path = "000289.083_000001.916_0000000000_milkdrop"
+niq_atomname = "ms="
 [ms.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -177184,6 +177305,7 @@ frame_geometry = [
 ],
 ]
 path = "000351.000_000005.291_0000000000_ufo"
+niq_atomname = "ms="
 [ms.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -180771,6 +180893,7 @@ frame_geometry = [
 ],
 ]
 path = "000554.250_000016.541_0000000000_joystick"
+niq_atomname = "ms="
 [ms.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -181136,6 +181259,7 @@ frame_geometry = [
 ],
 ]
 path = "000617.375_000001.625_0000000000_vu"
+niq_atomname = "ms="
 [ms.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -181870,6 +181994,7 @@ frame_geometry = [
 ],
 ]
 path = "000793.416_000003.333_0000000000_cereal"
+niq_atomname = "ms="
 [ms.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -182253,6 +182378,7 @@ frame_geometry = [
 ],
 ]
 path = "000807.291_000001.708_0000000000_cereal02"
+niq_atomname = "ms="
 [ms.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -182636,6 +182762,7 @@ frame_geometry = [
 ],
 ]
 path = "000807.291_000001.708_0000000000_phalliccookiejar"
+niq_atomname = "ms="
 [ms.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -184855,6 +184982,7 @@ frame_geometry = [
 ],
 ]
 path = "000866.958_000010.208_0000000000_mouth"
+niq_atomname = "ms="
 [ms.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -187074,6 +187202,7 @@ frame_geometry = [
 ],
 ]
 path = "000866.958_000010.208_0000000000_mouthandstache"
+niq_atomname = "ms="
 [ms.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -189293,6 +189422,7 @@ frame_geometry = [
 ],
 ]
 path = "000866.958_000010.208_0000000000_stache"
+niq_atomname = "ms="
 [ms.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -189676,6 +189806,7 @@ frame_geometry = [
 ],
 ]
 path = "001238.833_000001.708_0000000000_biker"
+niq_atomname = "ms="
 [ms.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -190203,6 +190334,7 @@ frame_geometry = [
 ],
 ]
 path = "001333.083_000002.375_0000000000_teddy"
+niq_atomname = "ms="
 [ms.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -191009,6 +191141,7 @@ frame_geometry = [
 ],
 ]
 path = "002066.916_000003.666_0000000000_alienhand"
+niq_atomname = "ms="
 [ms.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -192103,6 +192236,7 @@ frame_geometry = [
 ],
 ]
 path = "002139.083_000005.000_0000000000_swingguy"
+niq_atomname = "ms="
 [ms.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -193197,6 +193331,7 @@ frame_geometry = [
 ],
 ]
 path = "002139.083_000005.000_0000000000_swings"
+niq_atomname = "ms="
 [ms.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -196580,6 +196715,7 @@ frame_geometry = [
 ],
 ]
 path = "000336.083_000015.583_0000000000_girltracing"
+niq_atomname = "nk="
 [nk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -197269,6 +197405,7 @@ frame_geometry = [
 ],
 ]
 path = "000387.875_000003.125_0000000000_jumpingrope"
+niq_atomname = "nk="
 [nk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -198246,6 +198383,7 @@ frame_geometry = [
 ],
 ]
 path = "000463.375_000004.458_0000000000_talkingmale"
+niq_atomname = "nk="
 [nk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -198701,6 +198839,7 @@ frame_geometry = [
 ],
 ]
 path = "000882.375_000002.041_0000000000_rentsign"
+niq_atomname = "nk="
 [nk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -201433,6 +201572,7 @@ frame_geometry = [
 ],
 ]
 path = "001028.500_000012.583_0000000000_helmet"
+niq_atomname = "nk="
 [nk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -202518,6 +202658,7 @@ frame_geometry = [
 ],
 ]
 path = "001628.041_000004.958_0000000000_firstmate"
+niq_atomname = "nk="
 [nk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -203171,6 +203312,7 @@ frame_geometry = [
 ],
 ]
 path = "002030.583_000002.958_0000000000_reeltoreel"
+niq_atomname = "nk="
 [nk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -203455,6 +203597,7 @@ frame_geometry = [
 ],
 ]
 path = "003987.541_000001.250_0000000000_phone"
+niq_atomname = "nk="
 [nk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -204108,6 +204251,7 @@ frame_geometry = [
 ],
 ]
 path = "005364.958_000002.958_0000000000_babycarriage"
+niq_atomname = "nk="
 [nk.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -206429,6 +206573,7 @@ frame_geometry = [
 ],
 ]
 path = "000255.250_000010.667_0000000000_hate_hand"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -218116,6 +218261,7 @@ frame_geometry = [
 ],
 ]
 path = "001117.625_000054.042_0000000000_mitchum"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -224268,6 +224414,7 @@ frame_geometry = [
 ],
 ]
 path = "002329.958_000028.417_0000000000_bed"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -230420,6 +230567,7 @@ frame_geometry = [
 ],
 ]
 path = "002329.958_000028.417_0000000000_chair"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -236572,6 +236720,7 @@ frame_geometry = [
 ],
 ]
 path = "002329.958_000028.417_0000000000_door"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -242724,6 +242873,7 @@ frame_geometry = [
 ],
 ]
 path = "002329.958_000028.417_0000000000_lamp"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -248876,6 +249026,7 @@ frame_geometry = [
 ],
 ]
 path = "002329.958_000028.417_0000000000_mitchum"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -255028,6 +255179,7 @@ frame_geometry = [
 ],
 ]
 path = "002329.958_000028.417_0000000000_shelley"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -261180,6 +261332,7 @@ frame_geometry = [
 ],
 ]
 path = "002329.958_000028.417_0000000000_wall"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -263291,6 +263444,7 @@ frame_geometry = [
 ],
 ]
 path = "003382.292_000009.708_0000000000_boat02"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -266221,6 +266375,7 @@ frame_geometry = [
 ],
 ]
 path = "003422.458_000013.500_0000000000_boat"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -269151,6 +269306,7 @@ frame_geometry = [
 ],
 ]
 path = "003422.458_000013.500_0000000000_boy"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -272081,6 +272237,7 @@ frame_geometry = [
 ],
 ]
 path = "003422.458_000013.500_0000000000_oar"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -275011,6 +275168,7 @@ frame_geometry = [
 ],
 ]
 path = "003422.458_000013.500_0000000000_pearl"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -278409,6 +278567,7 @@ frame_geometry = [
 ],
 ]
 path = "003450.458_000015.667_0000000000_boat"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -281807,6 +281966,7 @@ frame_geometry = [
 ],
 ]
 path = "003450.458_000015.667_0000000000_frog"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -285205,6 +285365,7 @@ frame_geometry = [
 ],
 ]
 path = "003450.458_000015.667_0000000000_rock"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -286641,6 +286802,7 @@ frame_geometry = [
 ],
 ]
 path = "003585.542_000006.583_0000000000_turtle"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -288959,6 +289121,7 @@ frame_geometry = [
 ],
 ]
 path = "003606.208_000010.667_0000000000_bunny01"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -291277,6 +291440,7 @@ frame_geometry = [
 ],
 ]
 path = "003606.208_000010.667_0000000000_bunny02"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -299733,6 +299897,7 @@ frame_geometry = [
 ],
 ]
 path = "003663.875_000039.083_0000000000_boat"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -308189,6 +308354,7 @@ frame_geometry = [
 ],
 ]
 path = "003663.875_000039.083_0000000000_house1"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -316645,6 +316811,7 @@ frame_geometry = [
 ],
 ]
 path = "003663.875_000039.083_0000000000_house2"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -325101,6 +325268,7 @@ frame_geometry = [
 ],
 ]
 path = "003663.875_000039.083_0000000000_land"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -333557,6 +333725,7 @@ frame_geometry = [
 ],
 ]
 path = "003663.875_000039.083_0000000000_water"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -341410,6 +341579,7 @@ frame_geometry = [
 ],
 ]
 path = "003666.667_000036.292_0000000000_pearl"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -349227,6 +349397,7 @@ frame_geometry = [
 ],
 ]
 path = "003666.833_000036.125_0000000000_john"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -350393,6 +350564,7 @@ frame_geometry = [
 ],
 ]
 path = "004677.083_000005.333_0000000000_love_hand"
+niq_atomname = "noth="
 [noth.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -353074,6 +353246,7 @@ frame_geometry = [
 ],
 ]
 path = "000231.958_000012.333_0000000000_tombstone01"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -355752,6 +355925,7 @@ frame_geometry = [
 ],
 ]
 path = "000231.958_000012.333_0000000000_tombstone02"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -358430,6 +358604,7 @@ frame_geometry = [
 ],
 ]
 path = "000231.958_000012.333_0000000000_tombstone03"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -361108,6 +361283,7 @@ frame_geometry = [
 ],
 ]
 path = "000231.958_000012.333_0000000000_tombstone04"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -363786,6 +363962,7 @@ frame_geometry = [
 ],
 ]
 path = "000231.958_000012.333_0000000000_tombstone05"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -366464,6 +366641,7 @@ frame_geometry = [
 ],
 ]
 path = "000231.958_000012.333_0000000000_tombstone06"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -367315,6 +367493,7 @@ frame_geometry = [
 ],
 ]
 path = "000317.125_000003.875_0000000000_tombstone07"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -368166,6 +368345,7 @@ frame_geometry = [
 ],
 ]
 path = "000317.125_000003.875_0000000000_tombstone08"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -369017,6 +369197,7 @@ frame_geometry = [
 ],
 ]
 path = "000317.125_000003.875_0000000000_tombstone09"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -369868,6 +370049,7 @@ frame_geometry = [
 ],
 ]
 path = "000317.125_000003.875_0000000000_tombstone10"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -370719,6 +370901,7 @@ frame_geometry = [
 ],
 ]
 path = "000317.125_000003.875_0000000000_tombstone11"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -371570,6 +371753,7 @@ frame_geometry = [
 ],
 ]
 path = "000317.125_000003.875_0000000000_tombstone12"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -371971,6 +372155,7 @@ frame_geometry = [
 ],
 ]
 path = "000428.333_000001.791_0000000000_zombie06"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -374487,6 +374672,7 @@ frame_geometry = [
 ],
 ]
 path = "000484.500_000011.583_0000000000_zombie01"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -376256,6 +376442,7 @@ frame_geometry = [
 ],
 ]
 path = "000767.666_000008.125_0000000000_zombie05"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -377782,6 +377969,7 @@ frame_geometry = [
 ],
 ]
 path = "001113.666_000007.000_0000000000_bathrobezombie"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -378921,6 +379109,7 @@ frame_geometry = [
 ],
 ]
 path = "001115.458_000005.208_0000000000_zombie03"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -380060,6 +380249,7 @@ frame_geometry = [
 ],
 ]
 path = "001115.458_000005.208_0000000000_zombie04"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -381028,6 +381218,7 @@ frame_geometry = [
 ],
 ]
 path = "002067.250_000004.416_0000000000_torchman"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -382293,6 +382484,7 @@ frame_geometry = [
 ],
 ]
 path = "002067.250_000005.791_0000000000_burningchair"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -387788,6 +387980,7 @@ frame_geometry = [
 ],
 ]
 path = "003345.000_000025.375_0000000000_chair01"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -393283,6 +393476,7 @@ frame_geometry = [
 ],
 ]
 path = "003345.000_000025.375_0000000000_chair02"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -398778,6 +398972,7 @@ frame_geometry = [
 ],
 ]
 path = "003345.000_000025.375_0000000000_tv"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -400088,6 +400283,7 @@ frame_geometry = [
 ],
 ]
 path = "004241.833_000006.000_0000000000_herojump"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -400660,6 +400856,7 @@ frame_geometry = [
 ],
 ]
 path = "004253.333_000002.583_0000000000_gaspump"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -401286,6 +401483,7 @@ frame_geometry = [
 ],
 ]
 path = "005144.750_000002.833_0000000000_zombie02"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -402353,6 +402551,7 @@ frame_geometry = [
 ],
 ]
 path = "005147.625_000004.875_0000000000_woman"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -402961,6 +403160,7 @@ frame_geometry = [
 ],
 ]
 path = "005607.125_000002.750_0000000000_shooter"
+niq_atomname = "notld="
 [notld.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -405039,6 +405239,7 @@ frame_geometry = [
 ],
 ]
 path = "000006.417_000009.542_0000000000_oldman"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -411776,6 +411977,7 @@ frame_geometry = [
 ],
 ]
 path = "000629.708_000031.125_0000000000_guy01"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -418513,6 +418715,7 @@ frame_geometry = [
 ],
 ]
 path = "000629.708_000031.125_0000000000_guy02"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -425250,6 +425453,7 @@ frame_geometry = [
 ],
 ]
 path = "000629.708_000031.125_0000000000_train"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -431987,6 +432191,7 @@ frame_geometry = [
 ],
 ]
 path = "000629.708_000031.125_0000000000_woody"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -434314,6 +434519,7 @@ frame_geometry = [
 ],
 ]
 path = "000660.833_000010.708_0000000000_train"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -439143,6 +439349,7 @@ frame_geometry = [
 ],
 ]
 path = "000660.833_000022.292_0000000000_jack"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -443972,6 +444179,7 @@ frame_geometry = [
 ],
 ]
 path = "000660.833_000022.292_0000000000_woody"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -448756,6 +448964,7 @@ frame_geometry = [
 ],
 ]
 path = "000661.042_000022.083_0000000000_blondie"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -452145,6 +452354,7 @@ frame_geometry = [
 ],
 ]
 path = "000667.500_000015.625_0000000000_bronson"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -454445,6 +454655,7 @@ frame_geometry = [
 ],
 ]
 path = "000683.125_000010.583_0000000000_bronson"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -456178,6 +456389,7 @@ frame_geometry = [
 ],
 ]
 path = "003976.750_000007.958_0000000000_box"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -457911,6 +458123,7 @@ frame_geometry = [
 ],
 ]
 path = "003976.750_000007.958_0000000000_clock"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -459644,6 +459857,7 @@ frame_geometry = [
 ],
 ]
 path = "003976.750_000007.958_0000000000_cup"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -461377,6 +461591,7 @@ frame_geometry = [
 ],
 ]
 path = "003976.750_000007.958_0000000000_curtain"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -463110,6 +463325,7 @@ frame_geometry = [
 ],
 ]
 path = "003976.750_000007.958_0000000000_curtain2"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -464843,6 +465059,7 @@ frame_geometry = [
 ],
 ]
 path = "003976.750_000007.958_0000000000_figurine"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -466576,6 +466793,7 @@ frame_geometry = [
 ],
 ]
 path = "003976.750_000007.958_0000000000_figurine2"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -468309,6 +468527,7 @@ frame_geometry = [
 ],
 ]
 path = "003976.750_000007.958_0000000000_lamp"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -470042,6 +470261,7 @@ frame_geometry = [
 ],
 ]
 path = "003976.750_000007.958_0000000000_man"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -471775,6 +471995,7 @@ frame_geometry = [
 ],
 ]
 path = "003976.750_000007.958_0000000000_quills"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -473508,6 +473729,7 @@ frame_geometry = [
 ],
 ]
 path = "003976.750_000007.958_0000000000_train"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -475241,6 +475463,7 @@ frame_geometry = [
 ],
 ]
 path = "003976.750_000007.958_0000000000_wall"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -476974,6 +477197,7 @@ frame_geometry = [
 ],
 ]
 path = "003976.750_000007.958_0000000000_wall2"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -477150,6 +477374,7 @@ frame_geometry = [
 ],
 ]
 path = "007742.667_000000.750_0000000000_rifle"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -478802,6 +479027,7 @@ frame_geometry = [
 ],
 ]
 path = "007742.667_000007.583_0000000000_cowboy"
+niq_atomname = "ouatitw="
 [ouatitw.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -479656,6 +479882,7 @@ frame_geometry = [
 ],
 ]
 path = "000602.750_000003.875_0000000000_leewalka"
+niq_atomname = "pb="
 [pb.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -480498,6 +480725,7 @@ frame_geometry = [
 ],
 ]
 path = "000610.500_000003.833_0000000000_leewalkb"
+niq_atomname = "pb="
 [pb.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -481385,6 +481613,7 @@ frame_geometry = [
 ],
 ]
 path = "000618.125_000004.041_0000000000_leewalkc"
+niq_atomname = "pb="
 [pb.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -481813,6 +482042,7 @@ frame_geometry = [
 ],
 ]
 path = "000671.750_000001.916_0000000000_leeshoot"
+niq_atomname = "pb="
 [pb.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -488748,6 +488978,7 @@ frame_geometry = [
 ],
 ]
 path = "000841.375_000032.041_0000000000_angiewalk"
+niq_atomname = "pb="
 [pb.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -489356,6 +489587,7 @@ frame_geometry = [
 ],
 ]
 path = "001543.250_000002.750_0000000000_carbacka"
+niq_atomname = "pb="
 [pb.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -489820,6 +490052,7 @@ frame_geometry = [
 ],
 ]
 path = "001550.500_000002.083_0000000000_carbackb"
+niq_atomname = "pb="
 [pb.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -493335,6 +493568,7 @@ frame_geometry = [
 ],
 ]
 path = "001626.791_000016.208_0000000000_crane"
+niq_atomname = "pb="
 [pb.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -496931,6 +497165,7 @@ frame_geometry = [
 ],
 ]
 path = "002512.458_000016.583_0000000000_telescope"
+niq_atomname = "pb="
 [pb.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -500779,6 +501014,7 @@ frame_geometry = [
 ],
 ]
 path = "002709.375_000017.750_0000000000_angie"
+niq_atomname = "pb="
 [pb.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -502314,6 +502550,7 @@ frame_geometry = [
 ],
 ]
 path = "002877.416_000007.041_0000000000_light"
+niq_atomname = "pb="
 [pb.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -506927,6 +507164,7 @@ frame_geometry = [
 ],
 ]
 path = "003338.833_000021.291_0000000000_payphone"
+niq_atomname = "pb="
 [pb.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -509470,6 +509708,7 @@ frame_geometry = [
 ],
 ]
 path = "003906.208_000011.708_0000000000_hands"
+niq_atomname = "pb="
 [pb.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -509997,6 +510236,7 @@ frame_geometry = [
 ],
 ]
 path = "004270.125_000002.375_0000000000_blender"
+niq_atomname = "pb="
 [pb.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -510524,6 +510764,7 @@ frame_geometry = [
 ],
 ]
 path = "004270.125_000002.375_0000000000_mixer"
+niq_atomname = "pb="
 [pb.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -512041,6 +512282,7 @@ frame_geometry = [
 ],
 ]
 path = "004275.833_000006.958_0000000000_mixerlarge"
+niq_atomname = "pb="
 [pb.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -514011,6 +514253,7 @@ frame_geometry = [
 ],
 ]
 path = "000140.750_000009.042_0000000000_nuns"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -516140,6 +516383,7 @@ frame_geometry = [
 ],
 ]
 path = "000140.750_000009.792_0000000000_couple"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -518269,6 +518513,7 @@ frame_geometry = [
 ],
 ]
 path = "000140.750_000009.792_0000000000_floor"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -520398,6 +520643,7 @@ frame_geometry = [
 ],
 ]
 path = "000140.750_000009.792_0000000000_wall"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -522158,6 +522404,7 @@ frame_geometry = [
 ],
 ]
 path = "000377.250_000008.083_0000000000_running_guy"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -538741,6 +538988,7 @@ frame_geometry = [
 ],
 ]
 path = "000848.667_000076.708_0000000000_floor"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -555324,6 +555572,7 @@ frame_geometry = [
 ],
 ]
 path = "000848.667_000076.708_0000000000_hulot"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -571907,6 +572156,7 @@ frame_geometry = [
 ],
 ]
 path = "000848.667_000076.708_0000000000_leftwall"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -588490,6 +588740,7 @@ frame_geometry = [
 ],
 ]
 path = "000848.667_000076.708_0000000000_oldman"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -605073,6 +605324,7 @@ frame_geometry = [
 ],
 ]
 path = "000848.667_000076.708_0000000000_rightwall"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -617426,6 +617678,7 @@ frame_geometry = [
 ],
 ]
 path = "000868.208_000057.125_0000000000_walker"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -621940,6 +622193,7 @@ frame_geometry = [
 ],
 ]
 path = "001771.667_000020.833_0000000000_flowers_01"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -626454,6 +626708,7 @@ frame_geometry = [
 ],
 ]
 path = "001771.667_000020.833_0000000000_flowers_02"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -630968,6 +631223,7 @@ frame_geometry = [
 ],
 ]
 path = "001771.667_000020.833_0000000000_flowervender01"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -635482,6 +635738,7 @@ frame_geometry = [
 ],
 ]
 path = "001771.667_000020.833_0000000000_photographer01"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -636999,6 +637256,7 @@ frame_geometry = [
 ],
 ]
 path = "001784.375_000006.958_0000000000_man"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -639587,6 +639845,7 @@ frame_geometry = [
 ],
 ]
 path = "001792.500_000011.917_0000000000_vendor"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -648259,6 +648518,7 @@ frame_geometry = [
 ],
 ]
 path = "001792.500_000040.083_0000000000_flowerlady"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -656931,6 +657191,7 @@ frame_geometry = [
 ],
 ]
 path = "001792.500_000040.083_0000000000_photographer02"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -665603,6 +665864,7 @@ frame_geometry = [
 ],
 ]
 path = "001792.500_000040.083_0000000000_vendor"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -667705,6 +667967,7 @@ frame_geometry = [
 ],
 ]
 path = "001804.958_000009.667_0000000000_hatlady"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -670932,6 +671195,7 @@ frame_geometry = [
 ],
 ]
 path = "001810.125_000014.875_0000000000_teenager01"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -673511,6 +673775,7 @@ frame_geometry = [
 ],
 ]
 path = "001810.917_000011.875_0000000000_teenager02"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -675082,6 +675347,7 @@ frame_geometry = [
 ],
 ]
 path = "001825.375_000007.208_0000000000_japaneseman"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -678030,6 +678296,7 @@ frame_geometry = [
 ],
 ]
 path = "001837.167_000013.583_0000000000_fatman"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -682580,6 +682847,7 @@ frame_geometry = [
 ],
 ]
 path = "003053.041_000021.000_0000000000_window01"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -687130,6 +687398,7 @@ frame_geometry = [
 ],
 ]
 path = "003053.041_000021.000_0000000000_window02"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -691680,6 +691949,7 @@ frame_geometry = [
 ],
 ]
 path = "003053.041_000021.000_0000000000_window03"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -696230,6 +696500,7 @@ frame_geometry = [
 ],
 ]
 path = "003053.041_000021.000_0000000000_window04"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -698647,6 +698918,7 @@ frame_geometry = [
 ],
 ]
 path = "005772.916_000011.125_0000000000_drunk"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -701064,6 +701336,7 @@ frame_geometry = [
 ],
 ]
 path = "005772.916_000011.125_0000000000_neon"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -702050,6 +702323,7 @@ frame_geometry = [
 ],
 ]
 path = "005788.208_000004.500_0000000000_dancer"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -706150,6 +706424,7 @@ frame_geometry = [
 ],
 ]
 path = "005886.833_000018.916_0000000000_lamp01"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -710250,6 +710525,7 @@ frame_geometry = [
 ],
 ]
 path = "005886.833_000018.916_0000000000_lamp02"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -714350,6 +714626,7 @@ frame_geometry = [
 ],
 ]
 path = "005886.833_000018.916_0000000000_woodstuff"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -718450,6 +718727,7 @@ frame_geometry = [
 ],
 ]
 path = "005886.833_000018.916_0000000000_woodstuff02"
+niq_atomname = "pt="
 [pt.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -718953,6 +719231,7 @@ frame_geometry = [
 ],
 ]
 path = "001446.250_000002.250_0000000000_car02"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -720749,6 +721028,7 @@ frame_geometry = [
 ],
 ]
 path = "001446.250_000008.250_0000000000_car01"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -722545,6 +722825,7 @@ frame_geometry = [
 ],
 ]
 path = "001446.250_000008.250_0000000000_copcar"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -726141,6 +726422,7 @@ frame_geometry = [
 ],
 ]
 path = "001550.875_000016.583_0000000000_car"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -729737,6 +730019,7 @@ frame_geometry = [
 ],
 ]
 path = "001550.875_000016.583_0000000000_road"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -730714,6 +730997,7 @@ frame_geometry = [
 ],
 ]
 path = "001563.000_000004.458_0000000000_sportscar"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -734535,6 +734819,7 @@ frame_geometry = [
 ],
 ]
 path = "001694.167_000017.625_0000000000_car"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -738356,6 +738641,7 @@ frame_geometry = [
 ],
 ]
 path = "001694.167_000017.625_0000000000_road"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -740161,6 +740447,7 @@ frame_geometry = [
 ],
 ]
 path = "001797.708_000008.292_0000000000_truck01"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -741966,6 +742253,7 @@ frame_geometry = [
 ],
 ]
 path = "001797.708_000008.292_0000000000_truck02"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -744068,6 +744356,7 @@ frame_geometry = [
 ],
 ]
 path = "002434.875_000009.667_0000000000_policecar"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -744640,6 +744929,7 @@ frame_geometry = [
 ],
 ]
 path = "002511.875_000002.583_0000000000_white_car"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -745905,6 +746195,7 @@ frame_geometry = [
 ],
 ]
 path = "002514.333_000005.792_0000000000_cop_car"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -747971,6 +748262,7 @@ frame_geometry = [
 ],
 ]
 path = "003405.083_000009.500_0000000000_oldman"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -748678,6 +748970,7 @@ frame_geometry = [
 ],
 ]
 path = "003814.791_000003.208_0000000000_hippyguitar"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -749925,6 +750218,7 @@ frame_geometry = [
 ],
 ]
 path = "004214.875_000005.708_0000000000_pushcar"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -750758,6 +751052,7 @@ frame_geometry = [
 ],
 ]
 path = "004558.000_000003.791_0000000000_carfront"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -752293,6 +752588,7 @@ frame_geometry = [
 ],
 ]
 path = "005200.041_000007.041_0000000000_policewoman"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -752595,6 +752891,7 @@ frame_geometry = [
 ],
 ]
 path = "005248.083_000001.333_0000000000_blinklight"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
@@ -753212,6 +753509,7 @@ frame_geometry = [
 ],
 ]
 path = "005686.333_000002.791_0000000000_stopsign"
+niq_atomname = "vp="
 [vp.directory_geometries.directory_geometry]
 geom = [
 4294967295,
