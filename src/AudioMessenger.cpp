@@ -85,7 +85,7 @@ void AudioMessenger::SendPlaySound (std::string_view _file)
   assert (m_audio_address);
 
   nl::json j;
-  j["name"] = _file;
+  j["filename"] = _file;
   SendMessage ("/ta/play_sound", j.dump ());
 }
 

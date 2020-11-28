@@ -99,7 +99,8 @@ bool Orksur::AppendAtomToCollage (Ticato *tic)
     { sherm -> SendPlayBoop (5);
       i64 disc_id = ZeMonotonicID ();
       awaiting_audio_sooth[disc_id] = tic;
-      sherm -> SendGetSuggestions (extant_atoms, tic -> AtomName (), disc_id);
+      sherm -> SendGetSuggestions (extant_atoms, //tic -> AtomName (),
+                                   "c=123", disc_id);
     }
 
   return true;
@@ -287,5 +288,11 @@ fprintf(stderr,"\n");
     return -1;
   tic->sono_options = suggs;
 // and presumably quite a bit more action...
+  if (AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes)
+    if (suggs . size ()  >  0)
+      { i32 ind = drand48 () * suggs . size ();
+        fprintf(stderr,"about to request %d = [%s]...\n",ind,suggs[ind].c_str());
+        sherm -> SendPlaySound (suggs . at (ind));
+      }
   return 0;
 }
