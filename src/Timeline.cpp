@@ -24,7 +24,7 @@ Timeline::Timeline ()  :  Zeubject (), Node (),
 
 // enmaken the play nub
   TextureParticulars tepa
-    = CreateTexture2D ("../play-nub.png", DefaultTextureFlags);
+    = CreateTexture2D ("../ui-visuals/play-nub.png", DefaultTextureFlags);
   TexturedRenderable *texre = new TexturedRenderable (tepa);
 texre->SetAdjColor(ZeColor(1.0,0.0,0.0));
   play_nub -> AppendRenderable (texre);
