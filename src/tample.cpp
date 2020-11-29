@@ -707,10 +707,12 @@ int main (int ac, char **av)
   tamp.freezo = ch_ptr <AtomicFreezone> (afz);
   afz->cineganz = &film_infos;
   afz->field_amok = g_wallpaper;
-  afz->atom_count_goal = 45.0;
-  afz->inter_arrival_t = 5.0;
-  afz->min_speed = 50.0;
-  afz->max_speed = 250.0;
+  stringy_list spethial = { "c=carnosaur_01", "noth=bunny_right",
+                            "pt=drunk", "pb=flashing_light", "mr=ship_01" };
+  for (const std::string &s  :  spethial)
+    if (! afz -> AppendPrivilegedAtom (s))
+      fprintf (stderr, "phailed privileging atom [%s]...\n", s . c_str ());
+  afz -> SetPrivlegedAtomProbability (0.5);
 
   LinePileRenderable *lpr = new LinePileRenderable;
 

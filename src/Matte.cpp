@@ -505,6 +505,16 @@ bool FilmCatalog::LoadFilmInfo (std::filesystem::path const &_path)
   return false;
 }
 
+
+const ClipInfo
+ *FilmInfo::ClipFromUniqueAtomName (const std::string &uq_nm)  const
+{ for (const ClipInfo &clin  :  clips)
+    if (uq_nm  ==  clin . UniqueAtomName ())
+      return &clin;
+  return NULL;
+}
+
+
 bool FilmCatalog::LoadFilmGeometry (std::filesystem::path const &_path)
 {
   assert (m_loaded_films);

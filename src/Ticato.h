@@ -38,6 +38,8 @@ class Ticato  :  public Alignifer
   Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm = -1,
           i64 which_clip = -1);
 
+  Ticato (const FilmInfo &finf, const ClipInfo &clinf);
+
   ~Ticato ()  override
     { }
 

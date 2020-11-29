@@ -11,6 +11,14 @@
 #include <GraphicsApplication.hpp>
 
 
+AtomicFreezone::AtomicFreezone ()  :  Zeubject (), cineganz (NULL),
+                                      field_amok (NULL), atom_count_goal (45),
+                                      inter_arrival_t (5.0),
+                                      min_speed (75.0), max_speed (250.0),
+                                      privileged_atom_probability (0.0)
+{ }
+
+
 void AtomicFreezone::AppendSwath (Swath *sw)
 { if (! sw)
     return;
@@ -27,6 +35,25 @@ Swath *AtomicFreezone::SwathFor (PlatonicMaes *ma)
     if (sw  &&  ma == sw->supporting_maes)
       return sw;
   return NULL;
+}
+
+
+AtomInfoPair AtomicFreezone::ClipFromUniqueAtomName (const std::string &uq_nm)
+{ if (cineganz)
+    for (const FilmInfo &fimm  :  *cineganz)
+      if (const ClipInfo *clinp = fimm . ClipFromUniqueAtomName (uq_nm))
+        return { &fimm, clinp };
+  return { NULL, NULL };
+}
+
+
+bool AtomicFreezone::AppendPrivilegedAtom (const std::string &canon_name)
+{ AtomInfoPair aip = ClipFromUniqueAtomName (canon_name);
+  if (aip.first  !=  NULL)
+    { privileged_atoms . push_back (aip);
+      return true;
+    }
+  return false;
 }
 
 
@@ -58,7 +85,15 @@ void AtomicFreezone::DetachAndDisposeOfAtom (Ticato *icat)
 
 Ticato *AtomicFreezone::InstanitateAtom (const Vect &loc, PlatonicMaes *mae,
                                          i32 direc)
-{ Ticato *tic = new Ticato (*cineganz);
+{ Ticato *tic;
+  if (drand48 ()  >=  privileged_atom_probability)
+    tic = new Ticato (*cineganz);
+  else
+    { i64 ind = (i64)(drand48 () * (f64)privileged_atoms . size ());
+      AtomInfoPair aip = privileged_atoms[ind];
+      tic = new Ticato (*aip.first, *aip.second);
+    }
+
   tic->cur_maes = mae;
   tic -> AlignToMaes ();
   tic->sca . SetHard (400.0 + drand48 () * 300.0);

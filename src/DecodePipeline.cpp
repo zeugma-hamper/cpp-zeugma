@@ -322,7 +322,7 @@ gint64 DecodePipeline::CurrentTimestampNS () const
   return 0;
 }
 
-v2i32 DecodePipeline::CurrentVideoFrameRate () const
+v2i32 DecodePipeline::CurrentVideoFrameRateAsRatio () const
 {
   if (m_video_terminus)
     return m_video_terminus->CurrentFrameRate ();
@@ -330,7 +330,8 @@ v2i32 DecodePipeline::CurrentVideoFrameRate () const
   return {0, 1};
 }
 
-v2i32 DecodePipeline::CurrentAudioFrameRate () const
+
+v2i32 DecodePipeline::CurrentAudioFrameRateAsRatio () const
 {
   if (m_audio_terminus)
     return m_audio_terminus->CurrentFrameRate ();

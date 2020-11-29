@@ -44,6 +44,31 @@ fprintf(stderr,"INSTANTIATING [%s]...\n",clinf.geometry.niq_atomname.c_str());
 }
 
 
+Ticato::Ticato (const FilmInfo &finf, const ClipInfo &clinf)
+  :  Alignifer (),
+     atom_info (&clinf), re (NULL), fr (NULL), accom_sca (1.0), cur_maes (NULL),
+     from_node (NULL)
+{ // no ambiguity about it...
+ fprintf(stderr,"INSTANTIATING [%s]...\n",clinf.geometry.niq_atomname.c_str());
+  re = new MattedVideoRenderable (finf, clinf);
+  fr = new RectRenderableFrontier (re, Vect::zerov, 1.0, 1.0);
+  AppendRenderable (re);
+  SetFrontier (fr);
+  atom_info = &clinf;
+
+  accom_sca . MakeBecomeLikable ();
+  if (GrapplerPile *gp = UnsecuredGrapplerPile ())
+    { i64 ind = gp -> IndexForGrappler (gp -> FindGrappler ("loc"));
+      ScGrappler *scg = new ScGrappler (accom_sca);
+      scg -> SetName ("accom-scale");
+      if (ind  >=  0)
+        gp -> InsertGrappler (scg, ind);
+      else
+        gp -> AppendGrappler (scg);
+    }
+}
+
+
 bool Ticato::BeHoveredBy (const std::string &prov)
 { if (! hvrr . empty ())
     return false;

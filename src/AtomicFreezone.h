@@ -29,6 +29,9 @@ struct Swath
 };
 
 
+using AtomInfoPair = std::pair <const FilmInfo *, const ClipInfo *>;
+
+
 class AtomicFreezone  :  public Zeubject,
                          public ZESpatialPhagy,
                          public ZEYowlPhagy
@@ -40,6 +43,8 @@ class AtomicFreezone  :  public Zeubject,
   f64 inter_arrival_t;
   f64 max_speed, min_speed;
   f64 prev_time;
+  std::vector <AtomInfoPair> privileged_atoms;
+  f64 privileged_atom_probability;
 
   std::map <std::string, Ticato *> hoverees;
   std::map <std::string, Ticato *> yankees;
@@ -48,8 +53,21 @@ class AtomicFreezone  :  public Zeubject,
   f64 meander_len;
   G::Plane over_lid, undr_lid;
 
+  AtomicFreezone ();
+
   void AppendSwath (Swath *sw);
   Swath *SwathFor (PlatonicMaes *ma);
+
+  AtomInfoPair ClipFromUniqueAtomName (const std::string &uq_nm);
+
+  bool AppendPrivilegedAtom (const std::string &canon_name);
+  void ClearPrivilegedAtoms ()
+    { privileged_atoms . clear (); }
+
+  f64 PrivilegedAtomProbability ()  const
+    { return privileged_atom_probability; }
+  void SetPrivlegedAtomProbability (f64 prob)
+    { privileged_atom_probability = prob; }
 
   Ticato *FirstHitAtom (const G::Ray &ra, Vect *hitp);
 

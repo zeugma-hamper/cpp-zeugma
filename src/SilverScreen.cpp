@@ -111,7 +111,11 @@ bool SilverScreen::ScootToTime (f64 tstamp)
   //   };
   // deep -> AddSegmentDoneExCallback (std::move (seg_done_cb));
 
-  deep -> TrickModeSeek (tstamp, 100.0);
+  f64 curt = CurTimestamp ();
+  f64 tdist = fabs (tstamp - curt);
+//  f64 frate = deep -> CurrentVideoFrameRate ();
+  f64 scootrate = tdist < 1.5  ?  tdist  :  tdist / 1.5;
+  deep -> TrickModeSeek (tstamp, scootrate);
 
   return true;
 }

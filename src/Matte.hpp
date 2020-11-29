@@ -75,6 +75,9 @@ struct MatteDirGeometry
   static const std::string s_dir_geometry;
   static const std::string s_frame_geometry;
 
+  const std::string &UniqueAtomName ()  const
+    { return niq_atomname; }
+
   v2f32 GetCenter () const;
 
   v2f32 GetCenter (szt _frame) const;
@@ -123,6 +126,9 @@ struct ClipInfo
   f64 duration = -1.0f;
   f64 end_time = -1.0;
   u32 frame_count = 0u;
+
+  const std::string &UniqueAtomName ()  const
+    { return geometry . UniqueAtomName (); }
 };
 
 
@@ -142,6 +148,8 @@ struct FilmInfo
   ClipList ClipsByEndTime ()  const;
   const ClipInfo *FirstClipBeginningAfter (f64 tstamp)  const;
   const ClipInfo *FirstClipEndingBefore (f64 tstamp)  const;
+
+  const ClipInfo *ClipFromUniqueAtomName (const std::string &uq_nm)  const;
 
   std::filesystem::path film_path;
   std::filesystem::path clip_path;

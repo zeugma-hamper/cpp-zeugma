@@ -69,10 +69,10 @@ void AudioMessenger::SendPlayBoop ()
   SendMessage("/ta/play_boop");
 }
 
-// 0-5 are valid boops
+// 1-5 are valid boops; 6 chooses a random boop in the 1-5 range
 void AudioMessenger::SendPlayBoop (i32 _index)
 {
-  assert (_index >= 0 && _index < 6);
+  assert (_index >= 1 && _index <= 6);
 
   nl::json j;
   j["boopID"] = _index;
