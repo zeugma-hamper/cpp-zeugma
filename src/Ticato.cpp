@@ -3,8 +3,6 @@
 
 #include "ScGrappler.h"
 
-#include "MattedVideoRenderable.hpp"
-
 
 i64 ze_rand (i64 h, i64 l = 0)
 { return -l + i64(floorf64(h - l) * drand48 ()); }
@@ -12,8 +10,8 @@ i64 ze_rand (i64 h, i64 l = 0)
 
 Ticato::Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm, i64 which_clip)
   :  Alignifer (),
-     atom_info (NULL), re (NULL), fr (NULL), accom_sca (1.0), cur_maes (NULL),
-     from_node (NULL)
+     atom_info (NULL), re (NULL), fr (NULL), accom_sca (1.0), atom_dur (-1.0),
+     cur_maes (NULL), playing_sono (-1), playing_prfm_id (-1), from_node (NULL)
 { if (which_fimm  <  0)
     which_fimm = ze_rand (fimmz . size ());
 
@@ -41,13 +39,20 @@ fprintf(stderr,"INSTANTIATING [%s]...\n",clinf.geometry.niq_atomname.c_str());
       else
         gp -> AppendGrappler (scg);
     }
+
+  ch_ptr <DecodePipeline> depi = re -> GetPipeline ();
+  if (depi)
+    atom_dur = depi -> Duration ();
+
+  if (IronLung *irlu = IronLung::GlobalByName ("omni-lung"))
+    irlu -> AppendBreathee (this);
 }
 
 
 Ticato::Ticato (const FilmInfo &finf, const ClipInfo &clinf)
   :  Alignifer (),
-     atom_info (&clinf), re (NULL), fr (NULL), accom_sca (1.0), cur_maes (NULL),
-     from_node (NULL)
+     atom_info (&clinf), re (NULL), fr (NULL), accom_sca (1.0), atom_dur (-1.0),
+     cur_maes (NULL), playing_sono (-1), playing_prfm_id (-1), from_node (NULL)
 { // no ambiguity about it...
  fprintf(stderr,"INSTANTIATING [%s]...\n",clinf.geometry.niq_atomname.c_str());
   re = new MattedVideoRenderable (finf, clinf);
@@ -66,6 +71,19 @@ Ticato::Ticato (const FilmInfo &finf, const ClipInfo &clinf)
       else
         gp -> AppendGrappler (scg);
     }
+
+  ch_ptr <DecodePipeline> depi = re -> GetPipeline ();
+  if (depi)
+    atom_dur = depi -> Duration ();
+
+  if (IronLung *irlu = IronLung::GlobalByName ("omni-lung"))
+    irlu -> AppendBreathee (this);
+}
+
+
+Ticato::~Ticato ()
+{ if (IronLung *irlu = IronLung::GlobalByName ("omni-lung"))
+    irlu -> RemoveBreathee (this);
 }
 
 
@@ -101,4 +119,10 @@ bool Ticato::BeNotYankedBy (const std::string &prov)
   bool ret = (ynkr == prov);
   ynkr . clear ();
   return ret;
+}
+
+
+i64 Ticato::Inhale (i64 ratch, f64 thyme)
+{
+  return 0;
 }

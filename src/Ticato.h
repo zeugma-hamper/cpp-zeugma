@@ -8,11 +8,14 @@
 #include "Frontier.hpp"
 
 #include "Matte.hpp"
+#include "MattedVideoRenderable.hpp"
 
 #include "Alignifer.h"
 #include "MotherTime.h"
 
 #include "PlatonicMaes.h"
+
+#include "LoopZoft.h"
 
 #include "tamparams.h"
 
@@ -25,24 +28,26 @@ using namespace charm;
 class Ticato  :  public Alignifer
 { public:
   const ClipInfo *atom_info;
-  Renderable *re;
+  MattedVideoRenderable *re;
   RectRenderableFrontier *fr;
   ZoftVect vel;
   ZoftVect accom_sca;
+  f64 atom_dur;
   PlatonicMaes *cur_maes;
   stringy_list sono_options;
+  i32 playing_sono;
+  i64 playing_prfm_id;
   std::string hvrr;
   std::string ynkr;
   Node *from_node;
+  LoopFloat shabby_loop_minder;
 
   Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm = -1,
           i64 which_clip = -1);
 
   Ticato (const FilmInfo &finf, const ClipInfo &clinf);
 
-  ~Ticato ()  override
-    { }
-
+  ~Ticato ()  override;
 
   const std::string &AtomName ()  const
     { static std::string empty_s;
@@ -77,6 +82,8 @@ class Ticato  :  public Alignifer
     { return ynkr; }
   bool BeYankedBy (const std::string &prov);
   bool BeNotYankedBy (const std::string &prov);
+
+  i64 Inhale (i64 ratch, f64 thyme);
 };
 
 

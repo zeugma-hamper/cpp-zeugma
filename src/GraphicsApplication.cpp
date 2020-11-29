@@ -265,6 +265,10 @@ bool GraphicsApplication::RunOneCycle ()
     ProtoZoftThingGuts::MassBreather ()
       -> Inhale (m_global_ratchet, global_frame_thyme);
 
+  for (IronLung *irlu  :  IronLung::GlobalLungs ())
+    if (irlu)
+      irlu -> Inhale (m_global_ratchet, global_frame_thyme);
+
   VideoSystem *vs = VideoSystem::GetSystem();
   assert (vs);
   vs->PollMessages();

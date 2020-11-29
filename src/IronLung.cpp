@@ -40,4 +40,46 @@ i64 IronLung::Inhale (i64 ratch, f64 thyme)
 }
 
 
+//
+/// IronLung's luscious static instances and methods
+//
+
+std::vector <IronLung *> IronLung::global_iron_lungs;
+
+bool IronLung::AppendGlobal (IronLung *irlu)
+{ if (irlu  &&
+      std::find (global_iron_lungs . begin (), global_iron_lungs . end (), irlu)
+        ==  global_iron_lungs . end ())
+    { global_iron_lungs . push_back (irlu);
+      return true;
+    }
+  return false;
+}
+
+
+bool IronLung::RemoveGlobal (IronLung *irlu)
+{ auto it = std::find (global_iron_lungs . begin (),
+                       global_iron_lungs . end (),
+                       irlu);
+  if (it  !=  global_iron_lungs . end ())
+    { global_iron_lungs . erase (it);
+      return true;
+    }
+  return false;
+}
+
+
+IronLung *IronLung::GlobalByName (const std::string &nm)
+{ for (IronLung *irlu  :  global_iron_lungs)
+    if (irlu  &&  nm == irlu -> Name ())
+      return irlu;
+  return NULL;
+}
+
+
+static bool whiff_of_poo
+  = [] () { IronLung *ol = new IronLung;  ol -> SetName ("omni-lung");
+            IronLung::AppendGlobal (ol);  return true; } ();
+
+
 }  // the discount reaper comes for us all, little namespace charm...
