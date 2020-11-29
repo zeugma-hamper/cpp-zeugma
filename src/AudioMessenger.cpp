@@ -96,7 +96,7 @@ void AudioMessenger::SendStopSound (i64 perf_id)
 
   nl::json j;
   j["performance_id"] = perf_id;
-  SendMessage ("/ta/stop_sound", j.dump ());
+  SendMessage ("/ta/stop_performance", j.dump ());
 }
 
 void AudioMessenger::SendGetSuggestions (stringy_list &extant_atoms,
