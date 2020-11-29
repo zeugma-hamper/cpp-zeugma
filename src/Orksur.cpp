@@ -234,6 +234,32 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
 }
 
 
+i64 Orksur::ZEYowlAppear (ZEYowlAppearEvent *e)
+{ if (! e)
+    return -1;
+  const std::string &utt = e -> Utterance ();
+  const char *ustr = utt . c_str ();
+  if (*ustr  ==  '\0')
+    return 0;
+
+  char uch = *ustr;
+  if (uch >= '0'  &&  uch <= '9')
+    { i64 ind = uch - '0';
+      if (ind  <  players . size ())
+        sel_atom = players[ind];
+    }
+  else if (uch  ==  'Z')
+    { if (sel_atom)
+        sel_atom -> SonoSilence ();
+    }
+  else if (uch >= 'A'  &&  uch <= 'J')
+    { i64 ind = uch - 'A';
+      if (sel_atom)
+        sel_atom -> EnunciateNthSonoOption (ind);
+    }
+  return 0;
+}
+
 i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
 { if (! e)
     return -1;
@@ -287,11 +313,11 @@ fprintf(stderr,"\n");
     return -1;
   tic->sono_options = suggs;
 // and presumably quite a bit more action...
-  if (AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes)
-    if (suggs . size ()  >  0)
-      { i32 ind = drand48 () * suggs . size ();
-        fprintf(stderr,"about to request %d = [%s]...\n",ind,suggs[ind].c_str());
-        sherm -> SendPlaySound (suggs . at (ind));
-      }
+  // if (AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes)
+  //   if (suggs . size ()  >  0)
+  //     { i32 ind = drand48 () * suggs . size ();
+  //       fprintf(stderr,"about to request %d = [%s]...\n",ind,suggs[ind].c_str());
+  //       sherm -> SendPlaySound (suggs . at (ind));
+  //     }
   return 0;
 }

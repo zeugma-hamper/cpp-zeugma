@@ -83,6 +83,10 @@ class Ticato  :  public Alignifer
   bool BeYankedBy (const std::string &prov);
   bool BeNotYankedBy (const std::string &prov);
 
+  bool SonoPlay ();
+  bool SonoSilence ();
+  bool EnunciateNthSonoOption (i64 ind);
+
   i64 Inhale (i64 ratch, f64 thyme);
 };
 

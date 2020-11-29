@@ -350,12 +350,12 @@ i64 Sensorium::ZESpatialSoften (ZESpatialSoftenEvent *e)
 
 
 i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
-{ if (e -> Utterance ()  ==  "0")
+{ if (e -> Utterance ()  ==  "q")
     { InterpVect &rs = Tamglobals::Only ()->room_scaler;
       rs . Reverse ();
       rs . Commence ();
     }
-  else if (e -> Utterance ()  ==  "1")
+  else if (e -> Utterance ()  ==  "w")
     { static bool cur_vis = false;
       cur_vis = ! cur_vis;
       for (Node *no  :  Tamglobals::Only ()->construction_marks)

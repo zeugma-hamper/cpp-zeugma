@@ -3,6 +3,10 @@
 
 #include "ScGrappler.h"
 
+#include "AudioMessenger.hpp"
+
+#include "ZeUUID.h"
+
 
 i64 ze_rand (i64 h, i64 l = 0)
 { return -l + i64(floorf64(h - l) * drand48 ()); }
@@ -40,10 +44,7 @@ fprintf(stderr,"INSTANTIATING [%s]...\n",clinf.geometry.niq_atomname.c_str());
         gp -> AppendGrappler (scg);
     }
 
-  ch_ptr <DecodePipeline> depi = re -> GetPipeline ();
-  if (depi)
-    atom_dur = depi -> Duration ();
-
+  atom_dur = clinf.duration;
   if (IronLung *irlu = IronLung::GlobalByName ("omni-lung"))
     irlu -> AppendBreathee (this);
 }
@@ -72,10 +73,7 @@ Ticato::Ticato (const FilmInfo &finf, const ClipInfo &clinf)
         gp -> AppendGrappler (scg);
     }
 
-  ch_ptr <DecodePipeline> depi = re -> GetPipeline ();
-  if (depi)
-    atom_dur = depi -> Duration ();
-
+  atom_dur = clinf.duration;
   if (IronLung *irlu = IronLung::GlobalByName ("omni-lung"))
     irlu -> AppendBreathee (this);
 }
@@ -122,7 +120,51 @@ bool Ticato::BeNotYankedBy (const std::string &prov)
 }
 
 
+bool Ticato::SonoPlay ()
+{ if (playing_sono >= 0  &&  playing_sono < sono_options . size ())
+    if (AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes)
+      { playing_prfm_id = ZeMonotonicID ();
+        sherm -> SendPlaySound (sono_options[playing_sono], playing_prfm_id);
+        shabby_loop_minder . Restart ();
+        return true;
+      }
+  return false;
+}
+
+bool Ticato::SonoSilence ()
+{ if (playing_prfm_id  <  0)
+    return true;
+  if (AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes)
+    { sherm -> SendStopSound (playing_prfm_id);
+      playing_prfm_id = -1;
+      playing_sono = -1;
+      return true;
+    }
+  return false;
+}
+
+
+bool Ticato::EnunciateNthSonoOption (i64 ind)
+{ if (ind  ==  playing_sono)
+    return true;
+  if (ind  <  0)
+    return SonoSilence ();
+  if (ind  >=  sono_options . size ())
+    return false;
+  if (AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes)
+    { if (playing_prfm_id  >=  0)
+        sherm -> SendStopSound (playing_prfm_id);
+      playing_sono = ind;
+      SonoPlay ();
+      return true;
+    }
+  return false;
+}
+
+
 i64 Ticato::Inhale (i64 ratch, f64 thyme)
-{
+{ if (playing_sono >= 0  &&  atom_dur > 0)
+    if (shabby_loop_minder.val  >  atom_dur)
+      SonoPlay ();
   return 0;
 }

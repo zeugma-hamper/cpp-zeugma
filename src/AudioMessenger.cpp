@@ -80,13 +80,23 @@ void AudioMessenger::SendPlayBoop (i32 _index)
 }
 
 
-void AudioMessenger::SendPlaySound (std::string_view _file)
+void AudioMessenger::SendPlaySound (std::string_view _file, i64 perf_id)
 {
   assert (m_audio_address);
 
   nl::json j;
   j["filename"] = _file;
+  j["performance_id"] = perf_id;
   SendMessage ("/ta/play_sound", j.dump ());
+}
+
+void AudioMessenger::SendStopSound (i64 perf_id)
+{
+  assert (m_audio_address);
+
+  nl::json j;
+  j["performance_id"] = perf_id;
+  SendMessage ("/ta/stop_sound", j.dump ());
 }
 
 void AudioMessenger::SendGetSuggestions (stringy_list &extant_atoms,

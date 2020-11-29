@@ -53,6 +53,7 @@ class Orksur  :  public PlatonicMaes, public Node,
   std::unordered_map <std::string, Fondlish> graspees;
   f64 sentient_dist, contact_dist;
   std::map <u64, Ticato *> awaiting_audio_sooth;
+  Ticato *sel_atom;
 
   Orksur (const PlatonicMaes &ma);
 
@@ -73,6 +74,8 @@ class Orksur  :  public PlatonicMaes, public Node,
   bool RemoveAtomFromCollage (Ticato *tic);
 
   i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
+
+  i64 ZEYowlAppear (ZEYowlAppearEvent *e)  override;
 
   i64 ZEBulletin (ZEBulletinEvent *e)  override;
 

@@ -49,7 +49,8 @@ class AudioMessenger
   // 0-4 are valid boops
   void SendPlayBoop (i32 _index);
 
-  void SendPlaySound (std::string_view _file);
+  void SendPlaySound (std::string_view _file, i64 perf_id = -1);
+  void SendStopSound (i64 perf_id);
 
   void SendGetSuggestions (stringy_list &extant_atoms,
                            const std::string &new_atom, u64 disc_id);
