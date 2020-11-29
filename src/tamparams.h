@@ -57,6 +57,7 @@ struct Tamglobals
   Node *windshield = NULL;
 
   std::vector <Node *> construction_marks;
+  InterpColor construction_marks_color;
 
   InterpVect room_scaler;
 

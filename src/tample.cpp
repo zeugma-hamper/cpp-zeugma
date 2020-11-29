@@ -358,9 +358,11 @@ i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
   else if (e -> Utterance ()  ==  "w")
     { static bool cur_vis = false;
       cur_vis = ! cur_vis;
-      for (Node *no  :  Tamglobals::Only ()->construction_marks)
-        if (no)
-          no -> SetVisibilityForAllLocalRenderables (cur_vis);
+      // for (Node *no  :  Tamglobals::Only ()->construction_marks)
+      //   if (no)
+      //     no -> SetVisibilityForAllLocalRenderables (cur_vis);
+      Tamglobals::Only ()->construction_marks_color . Reverse ();
+      Tamglobals::Only ()->construction_marks_color . Commence ();
     }
   return 0;
 }
@@ -715,6 +717,14 @@ int main (int ac, char **av)
   afz -> SetPrivlegedAtomProbability (0.5);
 
   LinePileRenderable *lpr = new LinePileRenderable;
+  InterpColor constru_col ((SinuColor (ZeColor (0.2, 0.2), 0.25,
+                                       ZeColor (0.8, 0.8))),
+                           ZoftColor (ZeColor (0.0, 0.0)),
+                           0.4);
+  constru_col . SetInterpFunc (InterpFuncs::LINEAR);
+  lpr -> SetLinesColor (constru_col);
+  constru_col . Commence ();
+  Tamglobals::Only ()->construction_marks_color . BecomeLike (constru_col);
 
   PlatonicMaes *plams[2] = { left, frnt };
   for (PlatonicMaes *emm  :  plams)
@@ -734,7 +744,7 @@ int main (int ac, char **av)
     }
 
   Node *wframe_node = new Node (lpr);
-  lpr -> SetShouldDraw (false);
+
   g_wallpaper -> AppendChild (wframe_node);
   Tamglobals::Only ()->construction_marks . push_back (wframe_node);
 

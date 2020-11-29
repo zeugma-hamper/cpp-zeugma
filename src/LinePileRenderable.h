@@ -50,6 +50,8 @@ class LinePileRenderable  :  public Renderable
     { return lines_iro.val; }
   void SetLinesColor (const ZeColor &c)
     { lines_iro . Set (c); }
+  void SetLinesColor (const ZoftColor &zc)
+    { lines_iro . BecomeLike (zc); }
   ZoftColor &LinesColorZoft ()
     { return lines_iro; }
 
