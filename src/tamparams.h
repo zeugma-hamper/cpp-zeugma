@@ -21,11 +21,13 @@ using stringy_list = std::vector <std::string>;
 struct Tamparams
 { bool allow_anisotropic_pixelviews = false;
 
-  f64 workband_mid = 2000.0;
+//  f64 workband_mid = 2000.0;
+  f64 workband_mid = 1700.0;
   f64 workband_hei = 2000.0;
 
   f64 escaband_mid = 4875.0;
-  f64 escaband_hei = 3750.0;
+//  f64 escaband_hei = 3750.0;
+  f64 escaband_hei = 4350.0;
 
   f64 collband_mid = 7950.0;
   f64 collband_hei = 2400.0;

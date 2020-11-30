@@ -159,7 +159,7 @@ i64 Orksur::ZESpatialMove (ZESpatialMoveEvent *e)
 assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
   Ticato *ca = ClosestAtom (proj);
 
-  if (! ca  ||  tt  >  sentient_dist)
+  if (! ca  ||  tt  >  sentient_dist)  // but wait... what if grasping?
     { if (heff  !=  hoverees . end ())
         { hoverees . erase (heff);
           // and whatever else's polite on un-hover

@@ -639,10 +639,14 @@ int main (int ac, char **av)
       c -> LocZoft () = frnt -> Loc ();
     }
 
+  Vect cine_cnt = frnt -> Loc ();
+  cine_cnt -= cine_cnt . Dot (frnt -> Up ()) * frnt -> Up ();
+  cine_cnt += Tamparams::Current ()->workband_mid * frnt -> Up ();
+
   GraumanPalace *grau_egyp = new GraumanPalace;
   grau_egyp -> ImportExhibitionRoster (film_infos);
   grau_egyp -> JumpToFlick (0);
-  grau_egyp -> Translate (frnt -> Loc ());
+  grau_egyp -> Translate (cine_cnt);
   g_front_wall -> AppendChild (grau_egyp);
 
   tamp.gegyp = ch_ptr <GraumanPalace> (grau_egyp);
@@ -650,10 +654,14 @@ int main (int ac, char **av)
   AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
   AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
 
+  cine_cnt = auth_left_cntr;
+  cine_cnt -= cine_cnt . Dot (left -> Up ()) * left -> Up ();
+  cine_cnt += Tamparams::Current ()->workband_mid * left -> Up ();
+
   GraumanPalace *grau_chin = new GraumanPalace;
   grau_chin -> SetOverUp (left -> Over (), left -> Up ());
   grau_chin -> ImportExhibitionRoster (film_infos);
-  grau_chin -> Translate (auth_left_cntr);
+  grau_chin -> Translate (cine_cnt);
   drand48 ();
   grau_chin -> ReleasePushback ();
   grau_chin -> JumpToRandomFlick ();
