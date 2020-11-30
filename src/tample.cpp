@@ -89,9 +89,11 @@ bool extra_poo = [] () { srand48 (32123);  return true; } ();
 class Cursoresque  :  public Alignifer
 { public:
   PolygonRenderable *re1,  *re2;
+  PlatonicMaes *cur_maes;
   Cursoresque (f64 sz, i64 nv = 6)  :  Alignifer (),
                                        re1 (new PolygonRenderable),
-                                       re2 (new PolygonRenderable)
+                                       re2 (new PolygonRenderable),
+                                       cur_maes (NULL)
     { AppendRenderable (re1);
       AppendRenderable (re2);
       re1 -> SetFillColor (ZeColor (1.0, 0.5));
@@ -107,6 +109,10 @@ class Cursoresque  :  public Alignifer
           }
       ScaleZoft () = Vect (sz);
     }
+  void Invisify ()
+    { re1 -> SetShouldDraw (false);  re2 -> SetShouldDraw (false); }
+  void Visibloy ()
+    { re1 -> SetShouldDraw (true);  re2 -> SetShouldDraw (true); }
 };
 
 
@@ -213,10 +219,8 @@ i64 Sensorium::ZESpatialMove (ZESpatialMoveEvent *e)
       return 0;
     }
 
-  Tampo *tam = (Tampo *)GraphicsApplication::GetApplication();
-
-  if (tam)
-    tam -> FlatulateCursor (e);
+  Tampo *tam = (Tampo *)GraphicsApplication::GetApplication ();
+  tam -> FlatulateCursor (e);
 
   recentest_pos[e -> Provenance ()] = e -> Loc ();
   if (elevating)
@@ -228,31 +232,7 @@ i64 Sensorium::ZESpatialMove (ZESpatialMoveEvent *e)
       elev_prevpos = newpos;
     }
   else
-    {
-/*    auto it = rupaul_map . find (e -> Provenance ());
-      if (it != rupaul_map . end ())
-        { QuadroPod &qu = it->second;
-          Vect hit;
-          Tampo *app = (Tampo *)GraphicsApplication::GetApplication();
-          if (PlatonicMaes *maes
-              = app-> ClosestIntersectedMaes (e -> Loc (), e -> Aim (), &hit))
-            { if (qu.ma  !=  maes)
-                { qu.ma = maes;
-                  for (Renderable *rendy  :  qu.no -> GetRenderables ())
-                    { rendy -> SetOver (maes -> Over ());
-                      rendy -> SetUp (maes -> Up ());
-                    }
-                }
-              if (CineAtom *ca = dynamic_cast <CineAtom *> (qu.no))
-                { if (qu.re)
-                    { hit -= (qu.off.x * qu.re -> Over ()
-                              +  qu.off.y * qu.re -> Up ());
-                      ca->loc = hit;
-                    }
-                }
-            }
-        } */
-    }
+    { }
 
   if (PlatonicMaes *emm = tam -> FindMaesByName ("table"))
     { Vect p = e -> Loc ();
@@ -455,7 +435,14 @@ void Tampo::FlatulateCursor (ZESpatialMoveEvent *e)
   if (PlatonicMaes *emm = ClosestIntersectedMaes (e -> Loc (), e -> Aim (),
                                                   &hit))
     { crs -> LocZoft () . Set (hit);
-      crs ->AlignToMaes (emm);
+      if (emm  !=  crs->cur_maes)
+        { crs -> AlignToMaes (emm);
+          if (emm -> Name ()  ==  "table")
+            crs -> Invisify ();
+          else if (crs->cur_maes  &&  crs->cur_maes -> Name ()  ==  "table")
+            crs -> Visibloy ();
+          crs->cur_maes = emm;
+        }
     }
 }
 

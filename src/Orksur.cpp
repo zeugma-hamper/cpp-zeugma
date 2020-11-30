@@ -189,16 +189,18 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
         { if (heff->second.tic  ==  ca)  // expected case; same was hovered
             { hoverees . erase (heff);
               graspees[prv] = { ca, (ca -> Loc () - proj) };
+              ca -> MakeRenderablesForemostInLayer ();
             }
           else  // weird, but possible
             { Fondlish *fon = NULL;
               for (auto &gr  :  graspees)
                 if (gr.second.tic  ==  ca)
                   { fon = &gr.second;  break; }
-              if (! fon)  // nobody else is grasping ca
+              if (! fon)  // nobody else is grasping ca (which != the hoveree)
                 { // bid frond frarewell to whoever's in the heff, and then...
                   hoverees . erase (heff);
                   graspees[prv] = { ca, (ca -> Loc () - proj) };
+                  ca -> MakeRenderablesForemostInLayer ();
                 }
               else  // somebody else is grasping ca
                 { // if (heff->second.tic  !=  ca)  // can't be the case
