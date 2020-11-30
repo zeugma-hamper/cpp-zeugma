@@ -331,6 +331,15 @@ std::vector<Renderable *> const &Node::GetRenderables () const
 }
 
 
+i64 Node::NumRenderables ()  const
+{ return m_renderables . size (); }
+
+Renderable *Node::NthRenderable (i64 ind)
+{ if (ind < 0  ||  ind >= m_renderables . size ())
+    return NULL;
+  return m_renderables . at (ind);
+}
+
 bool Node::MakeRenderablesForemostInLayer (bool recurse_of_course)
 { if (! m_layer)
     return false;

@@ -18,7 +18,10 @@ class Alignifer  :  public Zeubject, public Node
   ZoftVect loc;
   ZoftVect sca;
 
+  void WellAndTrulyConstruct ();
+
   Alignifer ();
+  explicit Alignifer (Renderable *ren);
 
   Vect Loc ()  const
     { return loc.val; }

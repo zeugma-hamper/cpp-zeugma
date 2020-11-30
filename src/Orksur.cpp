@@ -302,7 +302,9 @@ i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
   else if (e -> Says ("atom-deposit"))
     { if (tic = dynamic_cast <Ticato *> (e -> ObjByTag ("inbound-atom")))
         if (e -> ObjByTag ("onto-maes")  ==  underlying_maes)
-          { AppendAtomToCollage (tic); }
+          { AppendAtomToCollage (tic);
+            tic -> BBoxSetColor (Tamglobals::Only ()->tabatom_bbox_color);
+          }
     }
   return 0;
 }

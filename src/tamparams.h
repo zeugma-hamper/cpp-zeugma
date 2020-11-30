@@ -61,6 +61,9 @@ struct Tamglobals
   std::vector <Node *> construction_marks;
   InterpColor construction_marks_color;
 
+  InterpColor escatom_bbox_color;
+  InterpColor tabatom_bbox_color;
+
   InterpVect room_scaler;
 
   AudioMessenger *sono_hermes = NULL;

@@ -9,7 +9,7 @@
 using namespace charm;
 
 
-Alignifer::Alignifer ()  :  Zeubject (), Node (), sca (Vect::onesv)
+void Alignifer::WellAndTrulyConstruct ()
 { loc . MakeBecomeLikable ();
   sca . MakeBecomeLikable ();
 
@@ -25,6 +25,15 @@ Alignifer::Alignifer ()  :  Zeubject (), Node (), sca (Vect::onesv)
   scg -> SetName ("loc");
   AppendGrappler (trg);
 }
+
+
+Alignifer::Alignifer ()  :  Zeubject (), Node (), sca (Vect::onesv)
+{ WellAndTrulyConstruct (); }
+
+
+Alignifer::Alignifer (Renderable *ren)  :  Zeubject (), Node (ren),
+                                           sca (Vect::onesv)
+{ WellAndTrulyConstruct (); }
 
 
 void Alignifer::AlignOverUp (const Vect &ov, const Vect &up)

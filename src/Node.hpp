@@ -120,6 +120,9 @@ class Node
   std::vector<Renderable *> &GetRenderables ();
   std::vector<Renderable *> const &GetRenderables () const;
 
+  i64 NumRenderables ()  const;
+  Renderable *NthRenderable (i64 ind);
+
   bool MakeRenderablesForemostInLayer (bool recurse_of_course = true);
   bool MakeRenderablesRearmostInLayer (bool recurse_of_course = true);
 

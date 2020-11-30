@@ -30,6 +30,7 @@ class Ticato  :  public Alignifer
   const ClipInfo *atom_info;
   MattedVideoRenderable *re;
   RectRenderableFrontier *fr;
+  Alignifer *bbox_subno;
   ZoftVect vel;
   ZoftVect accom_sca;
   f64 atom_dur;
@@ -42,12 +43,16 @@ class Ticato  :  public Alignifer
   Node *from_node;
   LoopFloat shabby_loop_minder;
 
+  void WellAndTrulyConstruct (const FilmInfo &finf, const ClipInfo &clinf);
+
+  Ticato ();
+  Ticato (const FilmInfo &finf, const ClipInfo &clinf);
   Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm = -1,
           i64 which_clip = -1);
 
-  Ticato (const FilmInfo &finf, const ClipInfo &clinf);
-
   ~Ticato ()  override;
+
+  void ProvisionVisibleBounds ();
 
   const std::string &AtomName ()  const
     { static std::string empty_s;
@@ -69,8 +74,12 @@ class Ticato  :  public Alignifer
     }
 
   void SetAndAlignToMaes (PlatonicMaes *ma)
-    { if (ma)
-        { cur_maes = ma;  AlignToMaes (); }
+    { if (! ma)
+        return;
+       cur_maes = ma;
+       AlignToMaes ();
+       if (bbox_subno)
+         bbox_subno -> AlignToMaes (ma);
     }
 
   const std::string CurHoverer ()  const
@@ -82,6 +91,9 @@ class Ticato  :  public Alignifer
     { return ynkr; }
   bool BeYankedBy (const std::string &prov);
   bool BeNotYankedBy (const std::string &prov);
+
+  void BBoxSetColor (const ZeColor &iro);
+  void BBoxSetColor (const ZoftColor &zc);
 
   bool SonoPlay ();
   bool SonoSilence ();

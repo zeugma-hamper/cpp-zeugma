@@ -705,7 +705,14 @@ int main (int ac, char **av)
   Node *texno = (tamp.texxyno = new Node (texre));
   texno -> Scale (1300.0);
   texno -> Translate (frnt -> Loc ());
-  g_wallpaper -> AppendChild (texno);
+//  g_wallpaper -> AppendChild (texno);
+
+  InterpColor atmbb_wall_col (ZeColor (0.0, 0.0), ZeColor (0.5, 0.5), 0.4);
+  InterpColor atmbb_tabl_col (ZeColor (0.0, 0.0), ZeColor (0.5, 0.5), 0.4);
+  atmbb_wall_col . Commence ();
+  atmbb_tabl_col . Commence ();
+  Tamglobals::Only ()->escatom_bbox_color . BecomeLike (atmbb_wall_col);
+  Tamglobals::Only ()->tabatom_bbox_color . BecomeLike (atmbb_tabl_col);
 
   AtomicFreezone *afz = new AtomicFreezone;
   tamp.freezo = ch_ptr <AtomicFreezone> (afz);
