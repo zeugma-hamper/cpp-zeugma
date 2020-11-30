@@ -191,6 +191,9 @@ void TASReceiver::HandleSuggestions (const char *_path, lo::Message const &_msg)
 
   TASSuggestionEvent evt {_path, std::move (j)};
 
+fprintf(stderr,"####\n####\n####\nthis, inbound: [[%s]]\n####\n",
+evt.GetMessage().dump().c_str());
+
   m_sprinkler->Spray(&evt);
 }
 
@@ -209,9 +212,9 @@ TASMessageEvent::TASMessageEvent (std::string_view _path, nl::json &&_message)
 }
 
 i64 TASMessageEvent::GetMessageID (bool _spit_error) const
-{
-  auto it = m_message.find ("message_id");
-  if (it != m_message.end () && it.value ().is_number())
+{ auto unwrapped = m_message . at (0);
+  auto it = unwrapped.find ("message_id");
+  if (it != unwrapped.end () && it.value ().is_number())
     return it.value ().get<i64> ();
 
   if (_spit_error)
@@ -222,8 +225,21 @@ i64 TASMessageEvent::GetMessageID (bool _spit_error) const
 }
 
 i64 TASMessageEvent::GetDiscussionID (bool _spit_error) const
-{ auto it = m_message.find ("discussion_id");
-  if (it != m_message . end ()  &&  it.value () . is_number ())
+{
+
+fprintf(stderr,"$$$$\n$$$$\n$$$$\nthis, inbound: -- %s --\n$$$$\n$$$$\n$$$$\n",
+m_message.dump().c_str());
+
+auto unwrapped = m_message . at (0);  // assuming we're wrapped in an array here
+
+fprintf(stderr,"****\n****\n****\nTHEN STRIPPED ONE LEVEL: -- %s --\n****\n****\n****\n",
+unwrapped.dump().c_str());
+
+ // auto it = m_message.find ("discussion_id");
+ //  if (it != m_message . end ()  &&  it.value () . is_number ())
+ //    return it.value () . get <i64> ();
+ auto it = unwrapped.find ("discussion_id");
+  if (it != unwrapped . end ()  &&  it.value () . is_number ())
     return it.value () . get <i64> ();
 
   if (_spit_error)
@@ -253,8 +269,8 @@ TASSuggestionEvent::TASSuggestionEvent (std::string_view _path, nl::json &&_mess
 }
 
 i64 TASSuggestionEvent::GetSuggestionCount () const
-{
-  if (auto it = m_message.find ("suggestions"); it != m_message.end ())
+{ auto unwrapped = m_message . at (0);
+  if (auto it = unwrapped.find ("suggestions"); it != unwrapped.end ())
     return i64 (it->size ());
 
   return 0;
@@ -266,9 +282,17 @@ std::vector<std::string> TASSuggestionEvent::GetSuggestionNames () const
   ret.reserve (GetSuggestionCount());
 
   try
-    { auto fladge = m_message . find ("suggestions");
-      for (auto &entry : *fladge)
-        ret . push_back (entry["name"] . get <std::string> ());
+    { auto unwrapped = m_message . at (0);
+      auto fladge = unwrapped . find ("suggestions");
+      if (fladge  !=  unwrapped . end ())
+        { for (auto &entry  :  *fladge)
+            ret . push_back (entry["name"] . get <std::string> ());
+        }
+      else
+        { fprintf (stderr, "more brutal json-v.-liblo-v.-iterator crap here "
+                   "in TASSuggestionEvent::GetSuggestionNames() ...\n");
+          return {};
+        }
     }
   catch (std::exception &e)
     { fprintf (stderr, "couldn't parse suggestion message: %s\n", e.what ());
@@ -277,5 +301,6 @@ std::vector<std::string> TASSuggestionEvent::GetSuggestionNames () const
 
   return ret;
 }
+
 
 }

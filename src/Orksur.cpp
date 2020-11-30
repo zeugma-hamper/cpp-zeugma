@@ -81,7 +81,6 @@ bool Orksur::AppendAtomToCollage (Ticato *tic)
 { if (! tic)
     return false;
 
-  collage -> AppendChild (tic);
   auto it = std::find (players . begin (), players . end (), tic);
   if (it  !=  players . end ())
     { // again, something plentifully wrong; why's it already here?
