@@ -128,9 +128,10 @@ i64 Orksur::ZESpatialMove (ZESpatialMoveEvent *e)
 
   Vect n = Norm ();
   const Vect &p = e -> Loc ();
-  f64 tt = fabs (n . Dot (p - loc));
+  f64 tt = n . Dot (p - loc);
   Vect proj = p  -  tt * n;
   s->loc . Set (proj);
+  tt = fabs (tt);
 
   Vect bloff = proj - CornerBL ();
   Vect troff = CornerTR () - proj;
@@ -175,9 +176,13 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
     { if (geff  !=  graspees . end ())
         { if (geff->second.tic  ==  ca)
             { ca -> LocZoft () . Set (proj + geff->second.gropoff);
+              // 'ca' is the same as 'geff.second.tic', as below
             }
           else // i.e. a different atom is 'closer', but...
-            { // ... too bad! we're modally grasping an atom already
+            { // ... too bad! we're modally grasping an atom already;
+              // thus still manipulate the grasped atom
+              geff->second.tic
+                -> LocZoft () . Set (proj + geff->second.gropoff);
             }
         }
       else if (heff  !=  hoverees . end ())
