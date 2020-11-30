@@ -53,7 +53,8 @@ class AudioMessenger
   void SendStopSound (i64 perf_id);
 
   void SendGetSuggestions (stringy_list &extant_atoms,
-                           const std::string &new_atom, u64 disc_id);
+                           const std::string &new_atom,
+                           f64 duration, u64 disc_id);
 
  protected:
   lo::Address *m_audio_address;

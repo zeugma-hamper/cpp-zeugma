@@ -108,14 +108,14 @@ void AudioMessenger::SendStopSound (i64 perf_id)
 
 void AudioMessenger::SendGetSuggestions (stringy_list &extant_atoms,
                                          const std::string &new_atom,
-                                         u64 disc_id)
+                                         f64 duration, u64 disc_id)
 {
   assert (m_audio_address);
 
   nlohmann::json j;
   j["extant_atoms"] = extant_atoms;
   j["new_atom"] = new_atom;
-//  j["message_id"] = echo_id;
+  j["duration"] = duration;
   j["discussion_id"] = disc_id;
   SendMessage("/ta/get_suggestions", j.dump ());
 }

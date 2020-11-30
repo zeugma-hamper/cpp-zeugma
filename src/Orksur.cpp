@@ -98,7 +98,10 @@ bool Orksur::AppendAtomToCollage (Ticato *tic)
     { sherm -> SendPlayBoop (5);
       i64 disc_id = ZeMonotonicID ();
       awaiting_audio_sooth[disc_id] = tic;
-      sherm -> SendGetSuggestions (extant_atoms, tic -> AtomName (), disc_id);
+      sherm -> SendGetSuggestions
+        (extant_atoms, tic -> AtomName (),
+         (tic->atom_info ? tic->atom_info->duration : 0.0),
+         disc_id);
     }
 
   return true;

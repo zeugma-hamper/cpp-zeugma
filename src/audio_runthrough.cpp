@@ -46,7 +46,7 @@ int main (int ac, char **av)
     }
 
   std::vector <std::string> so_much_nihil;
-  messenger.SendGetSuggestions (so_much_nihil, std::string (), 12);
+  messenger.SendGetSuggestions (so_much_nihil, std::string (), 6.66, 12);
 
   return 0;
 }
