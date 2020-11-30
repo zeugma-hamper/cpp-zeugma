@@ -453,6 +453,9 @@ void Tampo::AccrueElevatorOffset (const Vect &off)
 }
 
 
+extern bool json_is_not_insanely_wrapped;
+
+
 namespace po = boost::program_options;
 
 
@@ -468,6 +471,7 @@ int main (int ac, char **av)
      "host, via ip or name, where audio server dwells")
     ("audserver-port", po::value <std::string> (&aud_port),
      "port on which audio server listens (default: 57121)")
+    ("sane-json", "json slurped from liblo isn't wrapped in an array")
 /*    ("prison-break", "escaped elements only mode")
     ("clip-collages", "disallow collage elements outside rect-bounds")
     ("background-gray", po::value<f64>(&global_param_background_gray),
@@ -489,6 +493,9 @@ int main (int ac, char **av)
     { std::cout << desc << "\n";
       return 0;
     }
+
+  if (arg_map . count ("sane-json"))
+    json_is_not_insanely_wrapped = true;
 /*
   if (arg_map.count ("prison-break"))
     global_params_prison_break_mode = true;

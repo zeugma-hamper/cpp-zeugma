@@ -1,3 +1,4 @@
+
 #include <AudioMessenger.hpp>
 #include <MultiSprinkler.hpp>
 
@@ -8,8 +9,14 @@
 #include <assert.h>
 #include <iostream>
 
-namespace charm
-{
+#include "tamparams.h"
+
+
+bool json_is_not_insanely_wrapped = false;
+
+
+namespace charm  {
+
 
 AudioMessenger::AudioMessenger ()
   : m_audio_address {nullptr},
@@ -212,7 +219,9 @@ TASMessageEvent::TASMessageEvent (std::string_view _path, nl::json &&_message)
 }
 
 i64 TASMessageEvent::GetMessageID (bool _spit_error) const
-{ auto unwrapped = m_message . at (0);
+{ auto unwrapped = m_message;
+  if (! json_is_not_insanely_wrapped)
+    unwrapped = m_message . at (0);
   auto it = unwrapped.find ("message_id");
   if (it != unwrapped.end () && it.value ().is_number())
     return it.value ().get<i64> ();
@@ -230,7 +239,9 @@ i64 TASMessageEvent::GetDiscussionID (bool _spit_error) const
 fprintf(stderr,"$$$$\n$$$$\n$$$$\nthis, inbound: -- %s --\n$$$$\n$$$$\n$$$$\n",
 m_message.dump().c_str());
 
-auto unwrapped = m_message . at (0);  // assuming we're wrapped in an array here
+  auto unwrapped = m_message;
+  if (! json_is_not_insanely_wrapped)
+    unwrapped = m_message . at (0);
 
 fprintf(stderr,"****\n****\n****\nTHEN STRIPPED ONE LEVEL: -- %s --\n****\n****\n****\n",
 unwrapped.dump().c_str());
@@ -269,7 +280,9 @@ TASSuggestionEvent::TASSuggestionEvent (std::string_view _path, nl::json &&_mess
 }
 
 i64 TASSuggestionEvent::GetSuggestionCount () const
-{ auto unwrapped = m_message . at (0);
+{ auto unwrapped = m_message;
+  if (! json_is_not_insanely_wrapped)
+    unwrapped = m_message . at (0);
   if (auto it = unwrapped.find ("suggestions"); it != unwrapped.end ())
     return i64 (it->size ());
 
@@ -282,7 +295,9 @@ std::vector<std::string> TASSuggestionEvent::GetSuggestionNames () const
   ret.reserve (GetSuggestionCount());
 
   try
-    { auto unwrapped = m_message . at (0);
+    { auto unwrapped = m_message;
+      if (! json_is_not_insanely_wrapped)
+        unwrapped = m_message . at (0);
       auto fladge = unwrapped . find ("suggestions");
       if (fladge  !=  unwrapped . end ())
         { for (auto &entry  :  *fladge)
