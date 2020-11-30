@@ -186,18 +186,24 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
             }
         }
       else if (heff  !=  hoverees . end ())
-        { Fondlish *fon = NULL;
-          for (auto &fo  :  graspees)
-            if (fo.second.tic  ==  ca)
-              { fon = &fo.second;  break; }
-          if (! fon)  // nobody else is grasping ca
-            { // bid frond frarewell to whoever's in the heff, and then...
-              hoverees . erase (heff);
+        { if (heff->second.tic  ==  ca)  // expected case; same was hovered
+            { hoverees . erase (heff);
               graspees[prv] = { ca, (ca -> Loc () - proj) };
             }
-          else  // somebody else is grasping ca
-            { if (heff->second.tic  !=  ca)
-                heff->second.tic = ca;  // we're just going to keep hovering
+          else  // weird, but possible
+            { Fondlish *fon = NULL;
+              for (auto &gr  :  graspees)
+                if (gr.second.tic  ==  ca)
+                  { fon = &gr.second;  break; }
+              if (! fon)  // nobody else is grasping ca
+                { // bid frond frarewell to whoever's in the heff, and then...
+                  hoverees . erase (heff);
+                  graspees[prv] = { ca, (ca -> Loc () - proj) };
+                }
+              else  // somebody else is grasping ca
+                { // if (heff->second.tic  !=  ca)  // can't be the case
+                  heff->second.tic = ca;  // so we'll just keep hovering
+                }
             }
         }
       else
