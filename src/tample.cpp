@@ -545,19 +545,6 @@ int main (int ac, char **av)
       leaf->layers . push_back (omni_layer);
     }
 
-  std::vector <FilmInfo> film_infos
-    = ReadFilmInfo ("../configs/film-config.toml");
-  assert (film_infos.size () > 0);
-
-  { BlockTimer bt ("loading & merging geom");
-    BlockTimer slurpt ("slurping geom file");
-    std::vector <FilmGeometry> geoms
-      = ReadFileGeometry("../configs/mattes.toml");
-    slurpt . StopTimer ();
-    assert (geoms . size ()  >  0);
-    MergeFilmInfoGeometry (film_infos, geoms);
-  }
-
   PlatonicMaes *frnt = tamp . FindMaesByName ("front");
   assert (frnt);
   PlatonicMaes *left = tamp . FindMaesByName ("left");
@@ -633,6 +620,33 @@ int main (int ac, char **av)
       c -> LocZoft () = frnt -> Loc ();
     }
 
+  Orksur *orkp = new Orksur (*tabl);
+  tamp.orksu = ch_ptr <Orksur> (orkp);
+  g_tablecloth -> AppendChild (orkp);
+  AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.orksu);
+  AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.orksu);
+  AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.orksu);
+  tamp . GetSprinkler () . AppendPhage <TASSuggestionEvent> (tamp.orksu);
+
+  for (i64 q = 0  ;  q < tamp . NumWaterWorkses ()  ;  ++q)
+    if (GLFWWaterWorks *ww
+        = dynamic_cast <GLFWWaterWorks *> (tamp . NthWaterWorks (q)))
+      ww -> SetPromoteMouseToSpatialOrthoStyle (true);
+
+
+  std::vector <FilmInfo> film_infos
+    = ReadFilmInfo ("../configs/film-config.toml");
+  assert (film_infos.size () > 0);
+
+  { BlockTimer bt ("loading & merging geom");
+    BlockTimer slurpt ("slurping geom file");
+    std::vector <FilmGeometry> geoms
+      = ReadFileGeometry("../configs/mattes.toml");
+    slurpt . StopTimer ();
+    assert (geoms . size ()  >  0);
+    MergeFilmInfoGeometry (film_infos, geoms);
+  }
+
   Vect cine_cnt = frnt -> Loc ();
   cine_cnt -= cine_cnt . Dot (frnt -> Up ()) * frnt -> Up ();
   cine_cnt += Tamparams::Current ()->workband_mid * frnt -> Up ();
@@ -684,19 +698,6 @@ int main (int ac, char **av)
   polysplat -> SetShouldEdge (true);
 //  g_windshield -> AppendChild (splat);
 */
-  Orksur *orkp = new Orksur (*tabl);
-  tamp.orksu = ch_ptr <Orksur> (orkp);
-  g_tablecloth -> AppendChild (orkp);
-  AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.orksu);
-  AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.orksu);
-  AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.orksu);
-  tamp . GetSprinkler () . AppendPhage <TASSuggestionEvent> (tamp.orksu);
-
-  for (i64 q = 0  ;  q < tamp . NumWaterWorkses ()  ;  ++q)
-    if (GLFWWaterWorks *ww
-        = dynamic_cast <GLFWWaterWorks *> (tamp . NthWaterWorks (q)))
-      ww -> SetPromoteMouseToSpatialOrthoStyle (true);
-
   TextureParticulars tipi
     = CreateTexture2D ("/tmp/SIGN.jpg", DefaultTextureFlags);
   TexturedRenderable *texre = new TexturedRenderable (tipi);

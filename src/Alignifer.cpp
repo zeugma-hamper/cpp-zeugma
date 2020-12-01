@@ -22,7 +22,7 @@ void Alignifer::WellAndTrulyConstruct ()
   AppendGrappler (scg);
 
   TrGrappler *trg = new TrGrappler (loc);
-  scg -> SetName ("loc");
+  trg -> SetName ("loc");
   AppendGrappler (trg);
 }
 

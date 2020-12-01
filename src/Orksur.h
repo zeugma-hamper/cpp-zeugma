@@ -14,7 +14,7 @@
 #include "ZEYowlEvent.h"
 
 #include "Ticato.h"
-
+#include "SonoChoosist.h"
 #include "AudioMessenger.hpp"
 
 #include <map>
@@ -46,6 +46,7 @@ class Orksur  :  public PlatonicMaes, public Node,
 
   const PlatonicMaes *underlying_maes;
   Node *collage;
+  SonoChoosist *soncho;
   std::vector <Ticato *> players;
   std::vector <Ticato *> inchoates;
   std::unordered_map <std::string, Splort *> splorts;

@@ -16,9 +16,16 @@
 Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
                                             underlying_maes (&ma),
                                             collage (new Node),
+                                            soncho (new SonoChoosist (&ma)),
                                             sentient_dist (200.0),
                                             contact_dist (25.0)
-{ AppendChild (collage); }
+{ AppendChild (collage);
+  AppendChild (soncho);
+  soncho -> SetNumChoizls (5);
+  soncho->loc . Set (Loc ()  +  0.5 * (soncho->hei + 2.0 * soncho->brd_thc
+                                       - ma . Height ()) * ma . Up ());
+  soncho -> Furl ();
+}
 
 
 /*
@@ -56,7 +63,7 @@ Ticato *Orksur::ClosestAtom (const Vect &p)
 
   for (Ticato *tic  :  players)
     if (tic)
-      if ((d = tic -> Loc () . DistFrom (p))  <  cd)
+      if ((d = tic -> CurLoc () . DistFrom (p))  <  cd)
         { ct = tic;  cd = d; }
   return ct;
 }
@@ -191,7 +198,7 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
       else if (heff  !=  hoverees . end ())
         { if (heff->second.tic  ==  ca)  // expected case; same was hovered
             { hoverees . erase (heff);
-              graspees[prv] = { ca, (ca -> Loc () - proj) };
+              graspees[prv] = { ca, (ca -> CurLoc () - proj) };
               ca -> MakeRenderablesForemostInLayer ();
             }
           else  // weird, but possible
@@ -202,7 +209,7 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
               if (! fon)  // nobody else is grasping ca (which != the hoveree)
                 { // bid frond frarewell to whoever's in the heff, and then...
                   hoverees . erase (heff);
-                  graspees[prv] = { ca, (ca -> Loc () - proj) };
+                  graspees[prv] = { ca, (ca -> CurLoc () - proj) };
                   ca -> MakeRenderablesForemostInLayer ();
                 }
               else  // somebody else is grasping ca
@@ -218,7 +225,7 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
               { fon = &fo.second;  break; }
           if (! fon)
             { // acquiring ca as graspee without history or hovering
-              graspees[prv] = { ca, (ca -> Loc () - proj) };
+              graspees[prv] = { ca, (ca -> CurLoc () - proj) };
             }
           else  // ca already seeing some other wand...
             { // and so... we hover? uh... sure.
@@ -272,6 +279,10 @@ i64 Orksur::ZEYowlAppear (ZEYowlAppearEvent *e)
       if (sel_atom)
         sel_atom -> EnunciateNthSonoOption (ind);
     }
+  else if (utt  ==  "[")
+    { if (soncho)  soncho -> Furl (); }
+  else if (utt  ==  "]")
+    { if (soncho)  soncho -> Unfurl (); }
   return 0;
 }
 

@@ -23,9 +23,9 @@ class Alignifer  :  public Zeubject, public Node
   Alignifer ();
   explicit Alignifer (Renderable *ren);
 
-  Vect Loc ()  const
+  Vect CurLoc ()  const
     { return loc.val; }
-  Vect Scale ()  const
+  Vect CurScale ()  const
     { return sca.val; }
 
   ZoftVect &LocZoft ()
@@ -34,7 +34,7 @@ class Alignifer  :  public Zeubject, public Node
     { return sca; }
 
   void AlignOverUp (const Vect &ov, const Vect &up);
-  void AlignToMaes (PlatonicMaes *maes)
+  void AlignToMaes (const PlatonicMaes *maes)
     { if (maes)  AlignOverUp (maes -> Over (), maes -> Up ()); }
 };
 

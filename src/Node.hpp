@@ -62,20 +62,20 @@ class Node
   Grappler *FindGrappler (const std::string &nm);
 
   Grappler *Translate (const Vect &tr);
-  inline Grappler *Translate (f64 dx, f64 dy, f64 dz)
+  Grappler *Translate (f64 dx, f64 dy, f64 dz)
     { return Translate (Vect (dx, dy, dz)); }
 
   Grappler *Scale (const Vect &sc);
-  inline Grappler *Scale (f64 sx, f64 sy, f64 sz)
+  Grappler *Scale (f64 sx, f64 sy, f64 sz)
     { return Scale (Vect (sx, sy, sz)); }
-  inline Grappler *Scale (f64 s)
+  Grappler *Scale (f64 s)
     { return Scale (s, s, s); }
 
   Grappler *Rotate (const Vect &ax, f64 an);
-  inline Grappler *RotateD (const Vect &ax, f64 an)
+  Grappler *RotateD (const Vect &ax, f64 an)
     { return Rotate (ax, M_PI / 180.0 * an); }
   Grappler *RotateWithCenter (const Vect &ax, f64 an, const Vect &ce);
-  inline Grappler *RotateWithCenterD (const Vect &ax, f64 an, const Vect &ce)
+  Grappler *RotateWithCenterD (const Vect &ax, f64 an, const Vect &ce)
     { return RotateWithCenter (ax, M_PI / 180.0 * an, ce); }
 
   Grappler *Translate (ZoftVect &tzo);
