@@ -186,7 +186,7 @@ class Tampo final : public GraphicsApplication
   void AccrueElevatorOffset (const Vect &off);
 
  public:
-  ZoftVect elev_transl;
+  InterpVect elev_transl;
   f64 elev_trans_mult;
   VideoRenderable *steenbeck;
   ch_ptr <AtomicFreezone> freezo;
@@ -223,6 +223,8 @@ i64 Sensorium::ZESpatialMove (ZESpatialMoveEvent *e)
   tam -> FlatulateCursor (e);
 
   recentest_pos[e -> Provenance ()] = e -> Loc ();
+
+/*   // not permitting the ui-driven elevator thing for now
   if (elevating)
     { Vect newpos = AveragePos ();
       Vect offset = newpos - elev_prevpos;
@@ -233,7 +235,7 @@ i64 Sensorium::ZESpatialMove (ZESpatialMoveEvent *e)
     }
   else
     { }
-
+*/
   if (PlatonicMaes *emm = tam -> FindMaesByName ("table"))
     { Vect p = e -> Loc ();
       p -= emm -> Loc ();
@@ -312,13 +314,14 @@ i64 Sensorium::ZESpatialSoften (ZESpatialSoftenEvent *e)
         }
       return 0;
     }
-
+/*  // no ui-driven elevation for the nonce...
   auto it = elev_partic . find (e -> Provenance ());
   if (it  !=  elev_partic . end ())
     { elev_partic . erase (it);
       if (elevating)
         {  elevating = false; }
     }
+*/
 /*  else
     { auto it = rupaul_map . find (e -> Provenance ());
       if (it != rupaul_map . end ())
@@ -330,12 +333,31 @@ i64 Sensorium::ZESpatialSoften (ZESpatialSoftenEvent *e)
 
 
 i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
-{ if (e -> Utterance ()  ==  "q")
+{ const std::string &utt = e -> Utterance ();
+  if (utt == "q")
     { InterpVect &rs = Tamglobals::Only ()->room_scaler;
       rs . Reverse ();
       rs . Commence ();
+      bool &oto = Tamglobals::Only ()->room_is_scaled_oto;
+      if (oto)
+        solo_tamp->elev_transl . Set (Vect::zerov);
+      else
+        solo_tamp->elev_transl
+          . Set (Vect (0.0, Tamglobals::Only ()->cur_elev_stop, 0.0));
+      oto = ! oto;
     }
-  else if (e -> Utterance ()  ==  "w")
+  else if (utt == "w"  |  utt == "e"  |  utt == "r")
+    { bool &oto = Tamglobals::Only ()->room_is_scaled_oto;
+      f64 nes = (utt == "w"  ?  Tamparams::Current ()->workband_elevstop
+                 :  (utt == "e"  ?  Tamparams::Current ()->escband_elevstop
+                     :  Tamparams::Current ()->collabband_elevstop));
+      if (nes  !=  Tamglobals::Only ()->cur_elev_stop)
+        { Tamglobals::Only ()->cur_elev_stop = -nes;
+          if (oto)
+            solo_tamp->elev_transl . Set (Vect (0.0, -nes, 0.0));
+        }
+    }
+  else if (utt  ==  "t")
     { static bool cur_vis = false;
       cur_vis = ! cur_vis;
       // for (Node *no  :  Tamglobals::Only ()->construction_marks)
@@ -365,7 +387,8 @@ Tampo::Tampo ()  :  GraphicsApplication (),
                     texxyno (NULL)
 { AppendSpatialPhage (&m_event_sprinkler, sensy);
   AppendYowlPhage (&m_event_sprinkler, sensy);
-  elev_transl . MakeBecomeLikable ();
+  elev_transl . SetInterpFunc (InterpFuncs::CUBIC_AB);
+
 }
 
 
@@ -589,6 +612,7 @@ int main (int ac, char **av)
 
   if (PlatonicMaes *mae = tamp . FindMaesByName ("front"))
     { InterpVect &rs = Tamglobals::Only ()->room_scaler;
+      rs . SetInterpFunc (InterpFuncs::CUBIC_AB);
       f64 rmf = Tamparams::Current ()->room_minify_factor;
       rs . PointA () . Set (Vect (rmf, rmf, rmf));
       rs . PointB () . Set (Vect::onesv);

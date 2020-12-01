@@ -24,13 +24,16 @@ struct Tamparams
 //  f64 workband_mid = 2000.0;
   f64 workband_mid = 1700.0;
   f64 workband_hei = 2000.0;
+  f64 workband_elevstop = 0.0;
 
   f64 escaband_mid = 4875.0;
 //  f64 escaband_hei = 3750.0;
   f64 escaband_hei = 4350.0;
+  f64 escband_elevstop = 4875;
 
   f64 collband_mid = 7950.0;
   f64 collband_hei = 2400.0;
+  f64 collabband_elevstop = 7950.0;
 
   f64 table_scale_factor = 0.5;
 
@@ -65,6 +68,8 @@ struct Tamglobals
   InterpColor tabatom_bbox_color;
 
   InterpVect room_scaler;
+  bool room_is_scaled_oto = true;
+  f64 cur_elev_stop = 0.0;
 
   AudioMessenger *sono_hermes = NULL;
 
