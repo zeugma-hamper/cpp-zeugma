@@ -201,15 +201,6 @@ class Tampo final : public GraphicsApplication
 static Tampo *solo_tamp = NULL;
 
 
-struct QuadroPod
-{ Node *no;
-  PlatonicMaes *ma;
-  Renderable *re;
-  Vect off;
-};
-
-std::unordered_map <std::string, QuadroPod> rupaul_map;
-
 
 i64 Sensorium::ZESpatialMove (ZESpatialMoveEvent *e)
 { if (calibrating  &&  trig_partic . size () == 0)
@@ -277,21 +268,6 @@ i64 Sensorium::ZESpatialHarden (ZESpatialHardenEvent *e)
             }
         }
     }
-/*  else if (Frontier *f = instance -> IntersectedFrontier
-           (e -> Loc (), e -> Aim (), &hit))
-    { Vect offs;
-      Renderable *r = NULL;
-      if (CineAtom *ca = dynamic_cast <CineAtom *> (f -> ItsNode ()))
-        if (RectRenderableFrontier *rrf
-            = dynamic_cast <RectRenderableFrontier *> (f))
-          if (r = rrf -> GetRenderable ())
-            { Vect del = hit - ca->loc;
-              offs
-                . Set (del . Dot (r -> Over ()), del . Dot (r -> Up ()), 0.0);
-            }
-      rupaul_map[e -> Provenance ()] = { f -> ItsNode (), NULL, r, offs };
-    }
-*/
   return 0;
 }
 
@@ -320,12 +296,6 @@ i64 Sensorium::ZESpatialSoften (ZESpatialSoftenEvent *e)
     { elev_partic . erase (it);
       if (elevating)
         {  elevating = false; }
-    }
-*/
-/*  else
-    { auto it = rupaul_map . find (e -> Provenance ());
-      if (it != rupaul_map . end ())
-        rupaul_map . erase (it);
     }
 */
   return 0;
