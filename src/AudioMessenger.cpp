@@ -190,7 +190,7 @@ void TASReceiver::HandleSuggestions (const char *_path, lo::Message const &_msg)
 {
   nl::json j;
   try {
-    j = nl::json::parse ((const char *)_msg.argv()[0]);
+    j = nl::json::parse ((const char *)&(_msg.argv()[0]->s));
   } catch (std::exception &e) {
     fprintf (stderr, "error parsing %s\n", e.what());
     return;
@@ -198,8 +198,8 @@ void TASReceiver::HandleSuggestions (const char *_path, lo::Message const &_msg)
 
   TASSuggestionEvent evt {_path, std::move (j)};
 
-fprintf(stderr,"####\n####\n####\nthis, inbound: [[%s]]\n####\n",
-evt.GetMessage().dump().c_str());
+  fprintf(stderr,"####\n####\n####\nthis, inbound: \n%s\n####\n",
+          evt.GetMessage().dump(1).c_str());
 
   m_sprinkler->Spray(&evt);
 }
@@ -214,7 +214,7 @@ TASMessageEvent::TASMessageEvent (std::string_view _path, nl::json const &_messa
 TASMessageEvent::TASMessageEvent (std::string_view _path, nl::json &&_message)
   : ZeEvent (),
     m_path {_path},
-    m_message {std::move (_message)}
+    m_message (std::move (_message))
 {
 }
 
