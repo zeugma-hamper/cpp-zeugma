@@ -150,6 +150,7 @@ i64 SonoChoosist::ZESpatialMove (ZESpatialMoveEvent *e)
   if (! Active ())
     return 0;
 
+  const std::string &prv = e -> Provenance ();
   const Vect &p = e -> Loc ();
   // a crap geometric job for now; just see if we're in the up-projected
   // parallelepiped...
@@ -160,12 +161,63 @@ i64 SonoChoosist::ZESpatialMove (ZESpatialMoveEvent *e)
   f64 h = (crn_ur.val - crn_lr.val) . Dot (Vect::yaxis);
   Vect c = 0.25 * (crn_lr.val + crn_ur.val + crn_ul.val + crn_ll.val);
   Matrix44 m = from_glm (GetAbsoluteTransformation ().model);
-  m. TransformVectInPlace (c);
+  m . TransformVectInPlace (c);
   Vect hit;
   if (! G::RayRectIntersection (p, -CurNorm (),
                                 c, CurOver (), CurUp (), w, h, &hit))
     return 0;
 fprintf(stderr,"SMACKED old pal SONOCHOOSIST... with w/h = %.2lf/%2lf\n",w,h);
+
+  if (! G::RayPlaneIntersection (p, -CurNorm (), c, CurNorm (), &hit))
+    return 0;  // not actually possible, but we are thorough, yes. yes yes.
+
+  f64 rsq = 0.25 * chz_dia * chz_dia;
+  i64 ind = -1;
+  for (Choizl *chz  :  choizls)
+    { ++ind;
+      if (! chz)
+        continue;
+      c = m . TransformVect (chz->perky_loc.val);
+      if ((c - hit) . AutoDot ()  >  rsq)
+        continue;
+      f64 d = hit . DistFrom (p);
+      if (d  <=  contact_dist)
+        { if (smack . find (prv)  !=  smack . end ())
+            return 1;  // already in contact
+          auto it = hover . find (prv);
+          if (it  !=  hover . end ())
+            hover . erase (it);
+          else  // we weren't hovering over this choizl but... here we are
+            { }
+          smack[prv] = chz;
+          if (behalf_of)
+            { if (ind == 0)
+                behalf_of -> SonoSilence ();
+              else
+                behalf_of -> EnunciateNthSonoOption (ind - 1);
+            }
+          return 1;
+        }
+      else
+        { auto it = smack . find (prv);
+          if (it  !=  smack . end ())
+            smack . erase (it);
+
+          auto ht = hover . find (prv);
+          if (ht  ==  hover . end ())
+            { hover[prv] = chz;
+              // and light us up
+            }
+          else if (ht->second  !=  chz)
+            { ht->second = chz;
+              // and also light up new hoveree, unlight old
+            }
+          else
+            { // it's just the same dull choizl again. anything to do?
+            }
+          return 1;
+        }
+    }
 
   return 1;
 }

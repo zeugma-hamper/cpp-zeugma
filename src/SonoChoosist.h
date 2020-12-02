@@ -40,6 +40,9 @@ class SonoChoosist  :  public Alignifer,
   std::vector <Choizl *> in_storage;
   Ticato *behalf_of;
   InterpFloat active;
+  f64 contact_dist;
+  std::unordered_map <std::string, Choizl *> hover;
+  std::unordered_map <std::string, Choizl *> smack;
   f64 wid, hei;
   f64 brd_thc;
   f64 chz_dia;

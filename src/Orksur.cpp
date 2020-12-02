@@ -25,6 +25,7 @@ Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
   soncho->loc . Set (Loc ()  +  0.5 * (soncho->hei + 2.0 * soncho->brd_thc
                                        - ma . Height ()) * ma . Up ());
   soncho -> Furl ();
+  soncho->contact_dist = this->contact_dist;
 }
 
 
