@@ -4,6 +4,7 @@
 #include <base_types.hpp>
 #include <class_utils.hpp>
 #include <ch_ptr.hpp>
+#include <VideoSystem.hpp>
 
 #include <boost/signals2/signal.hpp>
 
@@ -14,7 +15,6 @@
 #include <mutex>
 #include <string_view>
 
-
 namespace charm {
 
 class PipelineTerminus;
@@ -23,8 +23,6 @@ struct LoopStatus
 {
   gint64 loop_start = -1;
   gint64 loop_end = -1;
-  gint64 adjusted_loop_start = -1;
-  gint64 adjusted_loop_end = -1;
 };
 
 struct QueuedSeek
@@ -53,18 +51,14 @@ using EOSSignal = boost::signals2::signal<void (DecodePipeline *)>;
 using EOSCallback = EOSSignal::slot_function_type;
 using EOSExCallback = EOSSignal::extended_slot_function_type;
 
+using AsyncDoneSignal = boost::signals2::signal<void (DecodePipeline *)>;
+using AsyncDoneCallback = AsyncDoneSignal::slot_function_type;
+using AsyncDoneExCallback = AsyncDoneSignal::extended_slot_function_type;
+
+
 struct DecodePipeline : public CharmBase<DecodePipeline>
 {
   friend PipelineTerminus;
-
-  enum class MediaStatus
-  {
-    Void = 0, //shouldn't happen
-    Null, //shouldn't happen
-    Ready,
-    Paused,
-    Playing
-  };
 
   DecodePipeline ();
   ~DecodePipeline ();
@@ -80,7 +74,7 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   void Pause ();
   void Seek (f64 _ts);
 
-  void SetPlaySpeed (f32 _speed, bool _trick_play = false);
+  void SetPlaySpeed (f64 _speed, bool _trick_play = false);
   void TrickModeSeek (f64 _ts, f64 _rate = 10.0);
 
   MediaStatus GetStatus () const;
@@ -94,6 +88,11 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   // of playback when pipeline is next in PLAY state
   void Loop (f64 _from, f64 _to, f32 _play_speed = 0.0f);
   bool IsLooping () const;
+
+  // timestamp of gstreamer's idea of current position, usually the
+  // timestamp of the demuxer's last buffer, I think.
+  f64 CurrentPosition () const;
+  gint64 CurrentPositionNS () const;
 
   // timestamp of the latest video buffer
   f64 CurrentTimestamp () const;
@@ -133,6 +132,8 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   boost::signals2::connection AddSegmentDoneExCallback (SegmentDoneExCallback &&_cb);
   boost::signals2::connection AddEOSCallback (EOSCallback &&_cb);
   boost::signals2::connection AddEOSExCallback (EOSExCallback &&_cb);
+  boost::signals2::connection AddAsyncDoneCallback (AsyncDoneCallback &&_cb);
+  boost::signals2::connection AddAsyncDoneExCallback (AsyncDoneExCallback &&_cb);
 
   std::unique_ptr<PipelineTerminus> m_video_terminus;
   std::unique_ptr<PipelineTerminus> m_audio_terminus;
@@ -154,6 +155,7 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   QueuedSeek m_queued_seek;
   SegmentDoneSignal m_segment_done_signal;
   EOSSignal m_eos_signal;
+  AsyncDoneSignal m_async_done_signal;
 };
 
 }

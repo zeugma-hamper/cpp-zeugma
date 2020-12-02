@@ -35,7 +35,7 @@ class MattedVideoRenderable final : public Renderable
   ~MattedVideoRenderable () override;
 
   ch_ptr<VideoTexture> const &GetVideoTexture () const;
-  ch_ptr<DecodePipeline> GetPipeline () const;
+  ch_ptr<VideoPipeline> GetVideoPipeline () const;
 
   v2i32 GetVideoDimensions ()  const;
 

@@ -23,11 +23,9 @@ namespace charm
 
 class VideoRenderable;
 class MattedVideoRenderable;
-class DecodePipeline;
 class TampVideoTerminus;
 class VideoSystem;
-
-//sketch
+struct DecodePipeline;
 
 enum class VideoComponent
 {
@@ -43,6 +41,15 @@ enum class VideoFormat
 {
   RGB = 0,
   I420 = 1,
+};
+
+enum class MediaStatus
+{
+  Void = 0, //shouldn't happen
+  Null, //shouldn't happen
+  Ready,
+  Paused,
+  Playing
 };
 
 class VideoTexture : public CharmBase<VideoTexture>
@@ -117,11 +124,45 @@ struct MattePipeline
   ch_ptr<MatteLoaderWorker> worker;
 };
 
+struct ManualTrickPlayState
+{
+  bool ClearIsReady ();
+
+  bool IsInProgress ();
+
+  void ConditionalSetReady ();
+
+  void Clear ();
+
+  f64 Reset (f64 _pts, f64 _current_ts, f64 _num_steps);
+
+  struct UpdateReturn
+  {
+    f64 ts = -1.0;
+    bool is_finished = false;
+  };
+  UpdateReturn ConditionalUpdateNextPTS ();
+
+  // call below methods with mutex
+  bool ClearIsReadyInternal ();
+  bool IsInProgressInternal ();
+  void ClearInternal ();
+  f64 ResetInternal (f64 _pts, f64 _current_ts, f64 _num_steps);
+
+  std::mutex m_state_mutex;
+  f64 m_seek_pts = -1.0;
+  f64 m_seek_dist = -1.0;
+  f64 m_seek_last_pts = -1.0;
+  bool m_is_ready = false;
+};
+
 class VideoPipeline : public CharmBase<VideoPipeline>
 {
  public:
   VideoPipeline ();
   ~VideoPipeline ();
+
+  CHARM_DELETE_MOVE_COPY(VideoPipeline);
 
   ch_ptr<VideoTexture> OpenFile (std::string_view _path);
   bool AddMatte (f64 _loop_start_ts, f64 _loop_end_ts,
@@ -131,12 +172,49 @@ class VideoPipeline : public CharmBase<VideoPipeline>
   ch_ptr<DecodePipeline> const &GetDecoder ();
   ch_ptr<VideoTexture> GetVideoTexture ();
 
+  void Play ();
+  void Pause ();
+  void Seek (f64 _ts);
+
+  void SetPlaySpeed (f64 _speed, bool _trick_play = false);
+
+  MediaStatus GetStatus () const;
+  MediaStatus GetPendingStatus () const;
+  // true if status doesn't equal pending status
+  bool IsInFlux () const;
+
+  void Step (u32 _distance);
+
+  // pass _play_speed as something other than 0.0f to change speed
+  // of playback when pipeline is next in PLAY state
+  void Loop (f64 _from, f64 _to, f32 _play_speed = 0.0f);
+  bool IsLooping () const;
+
+  // timestamp of gstreamer's idea of current position, usually the
+  // timestamp of the demuxer's last buffer, I think.
+  f64 CurrentPosition () const;
+  gint64 CurrentPositionNS () const;
+
+  // timestamp of the latest video buffer
+  f64 CurrentTimestamp () const;
+  gint64 CurrentTimestampNS () const;
+
+  v2i32 CurrentVideoFrameRateAsRatio () const;
+  f64 CurrentVideoFrameRate ()  const;
+
+  v2i32 CurrentAudioFrameRateAsRatio () const;
+
+  f64 Duration () const;
+  gint64 DurationNanoseconds () const;
+
+  f32 PlaySpeed () const;
+
   i64 MatteCount () const;
   MattePipeline &NthMatte (i64 _nth);
-
   void SetActiveMatte (i64 _nth);
-
   void ClearMattes ();
+
+  void TrickSeekTo (f64 _pts, f64 _duration);
 
   // called by Terminus from the streaming thread
   void NewBufferCallback (GstBuffer *_buffer, GstVideoInfo *_info,
@@ -147,6 +225,7 @@ class VideoPipeline : public CharmBase<VideoPipeline>
   TampVideoTerminus *terminus = nullptr;
   ch_weak_ptr<VideoTexture> texture;
   boost::signals2::connection buffer_connection;
+  ManualTrickPlayState trick_mode_state;
 
   std::mutex m_matte_lock; //heh
   std::vector<MattePipeline> mattes;
@@ -223,7 +302,6 @@ class VideoSystem
   VideoBrace DuplicateMatte (ch_ptr<VideoPipeline> const &_pipeline,
                              i64 _matte_index);
 
-  ch_ptr<DecodePipeline> FindDecodePipeline (ch_ptr<VideoTexture> const &_texture);
   ch_ptr<VideoPipeline> FindVideoPipeline (ch_ptr<VideoTexture> const &_texture);
 
   //NOTE: this is internal. you shouldn't need to call this.

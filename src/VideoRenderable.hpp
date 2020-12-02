@@ -27,7 +27,7 @@ class VideoRenderable final : public Renderable
   ~VideoRenderable ()  override;
 
   ch_ptr<VideoTexture> const &GetVideoTexture () const;
-  ch_ptr<DecodePipeline> GetPipeline () const;
+  ch_ptr<VideoPipeline> GetVideoPipeline () const;
 
   void Draw (u16 vyu_id) override;
 
