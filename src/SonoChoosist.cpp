@@ -159,6 +159,9 @@ i64 SonoChoosist::ZESpatialMove (ZESpatialMoveEvent *e)
 // some sort of lesson. in the above, the crn are in local coords; ovr & upp not.
   f64 w = (crn_ur.val - crn_ul.val) . Dot (Vect::xaxis);
   f64 h = (crn_ur.val - crn_lr.val) . Dot (Vect::yaxis);
+  w += h;
+  h += h;
+
   Vect c = 0.25 * (crn_lr.val + crn_ur.val + crn_ul.val + crn_ll.val);
   Matrix44 m = from_glm (GetAbsoluteTransformation ().model);
   m . TransformVectInPlace (c);
