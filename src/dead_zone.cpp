@@ -6,6 +6,7 @@
 #include <Node.hpp>
 #include <PlatonicMaes.h>
 #include <Renderable.hpp>
+#include <TampVideoTerminus.hpp>
 #include <TexturedRenderable.hpp>
 #include <VideoRenderable.hpp>
 #include <ZEYowlEvent.h>
@@ -60,13 +61,11 @@ static void AddMatteToPipeline (VideoPipeline *pipe, ClipInfo const &ci)
 
 i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
 {
-  fprintf (stderr, "handle key press\n");
   ch_ptr<VideoPipeline> pipe = s_pipeline.ref ();
   if (! pipe)
     return 0;
 
-  ch_ptr<DecodePipeline> dec = pipe->GetDecoder();
-  if (! dec)
+  if (! pipe->GetDecoder())
     return 0;
 
   std::string utt = _event->Utterance();
@@ -75,11 +74,13 @@ i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
 
   if (utt == "q") //quit
     {
+      fprintf (stderr, "%s\n", utt.c_str ());
       s_pipeline.reset ();
       GraphicsApplication::GetApplication()->StopRunning();
     }
   else if (utt == "w" || utt == "s") //previous/next video
     {
+      fprintf (stderr, "%s\n", utt.c_str ());
       if (utt == "w")
         mod_dec_index(s_film_index, s_films.GetFilmCount ());
       else
@@ -100,107 +101,81 @@ i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
       s_renderable_owner->AppendRenderable (renderable);
       s_renderable = renderable;
       s_pipeline_is_playing = true;
+      //s_clip_index = film_info.GetClipCount() - 1;
     }
   else if (utt == "a" || utt == "d") //previous/next clip
     {
+      fprintf (stderr, "%s\n", utt.c_str ());
       FilmInfo const &fi = s_films.GetNthFilm(s_film_index);
       if (utt == "a")
         mod_dec_index(s_clip_index, fi.GetClipCount ());
       else
         mod_inc_index(s_clip_index, fi.GetClipCount ());
 
-
-      auto pipe = s_pipeline.ref ();
-      if (pipe)
-        {
-          pipe->ClearMattes();
-          FilmInfo const &fi = s_films.GetNthFilm(s_film_index);
-          ClipInfo const &ci = fi.GetNthClip(s_clip_index);
-          AddMatteToPipeline(pipe.get (), ci);
-          pipe->SetActiveMatte(0);
-          pipe->GetDecoder()->Loop(ci.start_time, ci.start_time + ci.duration);
-          s_renderable->EnableMatte();
-          s_renderable->SetEnableMixColor(true);
-        }
+      pipe->ClearMattes();
+      ClipInfo const &ci = fi.GetNthClip(s_clip_index);
+      AddMatteToPipeline(pipe.get (), ci);
+      pipe->Loop(ci.start_time, ci.start_time + ci.duration);
+      s_renderable->EnableMatte();
+      s_renderable->SetEnableMixColor(true);
     }
   else if (utt == "z" || utt == "c") //fast play to next clip
     {
+      fprintf (stderr, "%s\n", utt.c_str ());
       FilmInfo const &fi = s_films.GetNthFilm(s_film_index);
       if (utt == "z")
         mod_dec_index(s_clip_index, fi.GetClipCount ());
       else
         mod_inc_index(s_clip_index, fi.GetClipCount ());
 
-
-      auto pipe = s_pipeline.ref ();
-      if (pipe)
-        {
-          pipe->ClearMattes();
-          ClipInfo const &ci = s_films.GetNthFilm(s_film_index).GetNthClip(s_clip_index);
-          pipe->GetDecoder()->TrickModeSeek(ci.start_time, 120.0);
-          // so this works pretty well, but the fast playback is (i
-          // think) hiding a discontinuity. segment done message is
-          // sent quite a bit before the last frame of the segment
-          // reaches the pipeline sink. will probably need something
-          // tighter for audio sync.
-          auto seg_done_cb = [pipe, ci] (boost::signals2::connection conn,
-                                         DecodePipeline *, SegmentDoneBehavior)
-          {
-            AddMatteToPipeline(pipe.get (), ci);
-            pipe->SetActiveMatte(0);
-            pipe->GetDecoder()->Loop(ci.start_time, ci.start_time + ci.duration, 1.0f);
-            s_renderable->EnableMatte();
-            s_renderable->SetEnableMixColor(true);
-            conn.disconnect();
-          };
-          s_seg_done = pipe->GetDecoder()->AddSegmentDoneExCallback(std::move (seg_done_cb));
-        }
+      pipe->ClearMattes();
+      ClipInfo const &ci = s_films.GetNthFilm(s_film_index).GetNthClip(s_clip_index);
+      pipe->TrickSeekTo (ci.start_time, 1.0);
     }
   else if (utt == "e") //increase playspeed 5x
     {
-      auto pipe = s_pipeline.ref ();
+      fprintf (stderr, "%s\n", utt.c_str ());
       f32 const ps = pipe->GetDecoder()->PlaySpeed();
-      pipe->GetDecoder()->SetPlaySpeed(ps + 5.0f);
+      pipe->SetPlaySpeed(ps + 5.0f);
     }
   else if (utt == "f") //step forward 1 frame
     {
-      auto pipe = s_pipeline.ref ();
-      pipe->GetDecoder()->Step(1);
+      fprintf (stderr, "%s\n", utt.c_str ());
+      pipe->Step(1);
     }
-  else if (utt == "r") //step backward 1 frame
-    {
-      auto pipe = s_pipeline.ref ();
-      pipe->GetDecoder()->Step(-1);
-    }
+  // else if (utt == "r") //step backward 1 frame
+  //   {
+  //     auto pipe = s_pipeline.ref ();
+  //     pipe->Step(-1);
+  //   }
   else if (utt == "p") //toggle play/pause
     {
+      fprintf (stderr, "%s\n", utt.c_str ());
       if (s_pipeline_is_playing)
         {
           fprintf (stderr, "set to paused\n");
-          dec->Pause();
+          pipe->Pause();
         }
       else
        {
           fprintf (stderr, "set to playing\n");
-          dec->Play();
+          pipe->Play();
        }
 
       s_pipeline_is_playing = !s_pipeline_is_playing;
     }
   else if (utt == "b")
     {
-      auto pipe = s_pipeline.ref ();
-      if (pipe)
-        {
-          f64 pos = pipe->GetDecoder()->CurrentTimestamp();
-          pipe->ClearMattes();
-          s_renderable->DisableMatte ();
-          s_renderable->SetEnableMixColor(false);
-          pipe->GetDecoder()->Seek(pos);
-        }
+      fprintf (stderr, "%s\n", utt.c_str ());
+      f64 pos = pipe->CurrentTimestamp();
+      pipe->ClearMattes();
+      s_renderable->DisableMatte ();
+      s_renderable->SetEnableMixColor(false);
+      pipe->Seek(pos);
     }
   else if (utt == "i") // loop over first three clips of itmfl
     {
+      fprintf (stderr, "%s\n", utt.c_str ());
       s_film_index = 5;
       s_clip_index = 0;
       FilmInfo const &film_info = s_films.GetNthFilm(s_film_index);
@@ -219,28 +194,21 @@ i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
       s_renderable = renderable;
       s_pipeline_is_playing = true;
 
-      auto pipe = s_pipeline.ref ();
-      if (pipe)
+      for (szt i = 0; i < 3; ++i)
         {
-          for (szt i = 0; i < 3; ++i)
-            {
-              ClipInfo const &ci = film_info.GetNthClip(i);
-              AddMatteToPipeline(pipe.get (), ci);
-            }
-          ClipInfo const &ci = film_info.GetNthClip(0);
-          pipe->SetActiveMatte(0);
-          pipe->GetDecoder()->Loop(ci.start_time, ci.start_time + ci.duration, 1.0f);
+          ClipInfo const &ci = film_info.GetNthClip(i);
+          AddMatteToPipeline(pipe.get (), ci);
         }
+      ClipInfo const &ci = film_info.GetNthClip(0);
+      pipe->SetActiveMatte(0);
+      pipe->GetDecoder()->Loop(ci.start_time, ci.start_time + ci.duration, 1.0f);
     }
   else if (utt == "j")
     {
-      auto pipe = s_pipeline.ref ();
-      if (pipe)
-        {
-          i64 am = pipe->active_matte;
-          mod_inc_index(am, pipe->MatteCount());
-          pipe->SetActiveMatte(am);
-        }
+      fprintf (stderr, "%s\n", utt.c_str ());
+      i64 am = pipe->active_matte;
+      mod_inc_index(am, pipe->MatteCount());
+      pipe->SetActiveMatte(am);
     }
 
   return 0;

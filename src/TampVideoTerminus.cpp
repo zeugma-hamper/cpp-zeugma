@@ -33,6 +33,7 @@ static GstFlowReturn video_term_handle_new_sample (GstAppSink *_sink, gpointer _
 
 bool TampVideoTerminus::HandleDecodedPad (GstElement *, GstPad *_src_pad, GstCaps *)
 {
+  fprintf (stderr, "handle decode pad\n");
   GstAppSinkCallbacks callbacks {};
   callbacks.eos = video_term_handle_eos;
   callbacks.new_preroll = video_term_handle_new_preroll;
@@ -46,14 +47,16 @@ bool TampVideoTerminus::HandleDecodedPad (GstElement *, GstPad *_src_pad, GstCap
     return false;
   gst_app_sink_set_callbacks(GST_APP_SINK (as), &callbacks, this, nullptr);
 
-  // TODO: expand caps support to save colorspace conversion and PCIe bandwidth
+  // TODO: expand caps support to handle hardware decoding
   // gst_caps_append (caps, gst_caps_new_simple ("video/x-raw", "format", G_TYPE_STRING, "NV12", NULL));
   // gst_caps_append (caps, gst_caps_new_simple ("video/x-raw", "format", G_TYPE_STRING, "I420", NULL));
 
   gst_app_sink_set_caps(GST_APP_SINK (as), m_accepted_caps.get ());
   gst_app_sink_set_drop (GST_APP_SINK (as), TRUE);
-  gst_app_sink_set_max_buffers(GST_APP_SINK (as), 2);
-  gst_base_sink_set_sync(GST_BASE_SINK(as), TRUE);
+  gst_app_sink_set_max_buffers(GST_APP_SINK (as), 1);
+  // gst_base_sink_set_sync(GST_BASE_SINK(as), TRUE);
+  // gst_base_sink_set_qos_enabled(GST_BASE_SINK(as), TRUE);
+  g_object_set (as, "sync", TRUE, "qos", FALSE, "enable-last-sample", FALSE, NULL);
 
   convert = gst_element_factory_make ("videoconvert", "vconvert");
   if (! convert)
@@ -156,6 +159,7 @@ void TampVideoTerminus::NotifyOfEOS ()
 
 void TampVideoTerminus::NotifyOfSample (SampleStatus _status, gst_ptr<GstSample> const &_sample)
 {
+  // fprintf (stderr, "%p got sample\n", this);
   std::unique_lock lock {m_sample_mutex};
   m_sample_status = _status;
   m_sample = _sample;
@@ -167,6 +171,7 @@ void TampVideoTerminus::NotifyOfSample (SampleStatus _status, gst_ptr<GstSample>
 
 void TampVideoTerminus::NotifyOfSample (SampleStatus _status, gst_ptr<GstSample> &&_sample)
 {
+  // fprintf (stderr, "%p got sample\n", this);
   std::unique_lock lock {m_sample_mutex};
   m_sample_status = _status;
   m_sample = std::move (_sample);

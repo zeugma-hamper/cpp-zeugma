@@ -87,14 +87,13 @@ void GraumanPalace::TogglePlayPause ()
   if (! vire)
     return;
 
-  const ch_ptr <DecodePipeline> deep = vire -> GetPipeline ();
-  if (! deep)
-    assert (3 == 5);  // let's hope not.
+  const ch_ptr <VideoPipeline> deep = vire -> GetVideoPipeline ();
+  assert (deep.get ());
 
-  DecodePipeline::MediaStatus mest = deep -> GetStatus ();
-  if (mest  ==  DecodePipeline::MediaStatus::Paused)
+  MediaStatus mest = deep -> GetStatus ();
+  if (mest  ==  MediaStatus::Paused)
     deep -> Play ();
-  else if (mest  ==  DecodePipeline::MediaStatus::Playing)
+  else if (mest  ==  MediaStatus::Playing)
     deep -> Pause ();
 }
 

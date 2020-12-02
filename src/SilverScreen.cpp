@@ -29,26 +29,26 @@ void SilverScreen::FadeDown ()
 
 void SilverScreen::Pause ()
 { if (! vren)  return;
-  ch_ptr <DecodePipeline> deep = vren -> GetPipeline ();
+  ch_ptr <VideoPipeline> deep = vren -> GetVideoPipeline ();
   if (deep)
     deep -> Pause ();
 }
 
 void SilverScreen::Play ()
 { if (! vren)  return;
-  ch_ptr <DecodePipeline> deep = vren -> GetPipeline ();
+  ch_ptr <VideoPipeline> deep = vren -> GetVideoPipeline ();
   if (deep)
     deep -> Play ();
 }
 
 void SilverScreen::TogglePlayPause ()
 { if (! vren)  return;
-  ch_ptr <DecodePipeline> deep = vren -> GetPipeline ();
+  ch_ptr <VideoPipeline> deep = vren -> GetVideoPipeline ();
   if (! deep)  return;
-  DecodePipeline::MediaStatus mest = deep -> GetStatus ();
-  if (mest  ==  DecodePipeline::MediaStatus::Paused)
+  MediaStatus mest = deep -> GetStatus ();
+  if (mest  ==  MediaStatus::Paused)
     deep -> Play ();
-  else if (mest  ==  DecodePipeline::MediaStatus::Playing)
+  else if (mest  ==  MediaStatus::Playing)
     deep -> Pause ();
 }
 
@@ -56,7 +56,7 @@ void SilverScreen::TogglePlayPause ()
 bool SilverScreen::StepBy (i32 num_frames)
 { if (! vren)
     return false;
-  ch_ptr <DecodePipeline> deep = vren -> GetPipeline ();
+  ch_ptr <VideoPipeline> deep = vren -> GetVideoPipeline ();
   if (! deep)
     return false;
 
@@ -68,7 +68,7 @@ bool SilverScreen::StepBy (i32 num_frames)
 
 f64 SilverScreen::Duration ()
 { if (! vren)  return -1.0;
-  ch_ptr <DecodePipeline> deep = vren -> GetPipeline ();
+  ch_ptr <VideoPipeline> deep = vren -> GetVideoPipeline ();
   if (deep)
     return deep -> Duration ();
   return -1.0;
@@ -77,7 +77,7 @@ f64 SilverScreen::Duration ()
 
 f64 SilverScreen::CurTimestamp ()
 { if (! vren)  return -1.0;
-  ch_ptr <DecodePipeline> deep = vren -> GetPipeline ();
+  ch_ptr <VideoPipeline> deep = vren -> GetVideoPipeline ();
   if (deep)
     return deep -> CurrentTimestamp ();
   return -1.0;
@@ -87,7 +87,7 @@ f64 SilverScreen::CurTimestamp ()
 bool SilverScreen::JumpToTime (f64 tstamp)
 { if (! vren)
     return false;
-  ch_ptr <DecodePipeline> deep = vren -> GetPipeline ();
+  ch_ptr <VideoPipeline> deep = vren -> GetVideoPipeline ();
   if (! deep)
     return false;
   deep -> Seek (tstamp);
@@ -98,7 +98,7 @@ bool SilverScreen::JumpToTime (f64 tstamp)
 bool SilverScreen::ScootToTime (f64 tstamp)
 { if (! vren  ||  ! vpip)
     return false;
-  ch_ptr <DecodePipeline> deep = vren -> GetPipeline ();
+  ch_ptr <VideoPipeline> deep = vren -> GetVideoPipeline ();
   if (! deep)
     return false;
   if (tstamp < 0.0  ||  tstamp > deep -> Duration ())
@@ -115,7 +115,10 @@ bool SilverScreen::ScootToTime (f64 tstamp)
   f64 tdist = fabs (tstamp - curt);
 //  f64 frate = deep -> CurrentVideoFrameRate ();
   f64 scootrate = tdist < 1.5  ?  tdist  :  tdist / 1.5;
-  deep -> TrickModeSeek (tstamp, scootrate);
+  deep -> TrickSeekTo (tstamp, scootrate);
+  deep -> ReadTheCommentBelowThis();
+  //jh, the second parameter to TrickSeekTo is how long the duration should take
+  //not the "play speed". this is, I think, easier for you and for me.
 
   return true;
 }

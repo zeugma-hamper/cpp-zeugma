@@ -99,4 +99,9 @@ bool BasicPipelineTerminus::HasSink () const
   return m_sink;
 }
 
+GstElement *BasicPipelineTerminus::GetSink () const
+{
+  return m_sink;
+}
+
 }

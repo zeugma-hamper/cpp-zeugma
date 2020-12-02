@@ -95,11 +95,7 @@ bool DecodePipeline::OpenVideoFile (std::string_view _uri, PipelineTerminus *_vi
 
   m_pipeline = gst_pipeline_new ("decode-pipeline");
 
-  GstElement *filesrc = gst_element_factory_make ("filesrc", "fsrc");
-  g_object_set (filesrc, "location", &_uri.data()[7], NULL);
-  gst_bin_add (GST_BIN (m_pipeline), filesrc);
-  gst_element_sync_state_with_parent(filesrc);
-  m_uridecodebin = gst_element_factory_make ("decodebin", "db");
+  m_uridecodebin = gst_element_factory_make ("uridecodebin", "db");
 
   if (! m_pipeline || ! m_uridecodebin)
     {
@@ -116,15 +112,18 @@ bool DecodePipeline::OpenVideoFile (std::string_view _uri, PipelineTerminus *_vi
     raw_caps = gst_ptr {gst_caps_merge (raw_caps.transfer(),
                                         gst_caps_from_string("audio/x-raw"))};
 
+  gchar *cstr = gst_caps_to_string (raw_caps.get ());
+  fprintf (stderr, "we accept %s\n", cstr);
+  g_free(cstr);
+
   g_object_set (m_uridecodebin,
-                // "uri", _uri.data (),
+                "uri", _uri.data (),
                 "caps", raw_caps.get(),
-                "expose-all-streams", FALSE,
+                // "expose-all-streams", FALSE,
                 NULL);
 
   m_bus = gst_pipeline_get_bus(GST_PIPELINE(m_pipeline));
   gst_bin_add (GST_BIN (m_pipeline), m_uridecodebin);
-  gst_element_link (filesrc, m_uridecodebin);
   assert (gst_element_sync_state_with_parent(m_uridecodebin));
 
 
@@ -163,8 +162,14 @@ void DecodePipeline::Seek (double _ts)
           fprintf (stderr, "couldn't query position. bailing.\n");
           return;
         }
+
+      GstSeekFlags flags = (GstSeekFlags)(GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE);
+      if (m_pending_state != GST_STATE_PLAYING)
+        flags = GstSeekFlags (flags | GST_SEEK_FLAG_FLUSH);
+
       SeekFull (m_play_speed,
-                GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE),
+                GST_FORMAT_TIME,
+                flags,
                 GST_SEEK_TYPE_SET, 0,
                 GST_SEEK_TYPE_END, 0);
     }
@@ -174,8 +179,7 @@ void DecodePipeline::Seek (double _ts)
   SeekFull (m_play_speed,
             // GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_SNAP_AFTER |
             //                                 GST_SEEK_FLAG_FLUSH),
-            GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_SNAP_AFTER |
-                                            GST_SEEK_FLAG_FLUSH |
+            GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_FLUSH |
                                             GST_SEEK_FLAG_ACCURATE),
             GST_SEEK_TYPE_SET, (gint64)(_ts * seconds_to_ns),
             GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
@@ -203,7 +207,7 @@ void DecodePipeline::Pause ()
 //                     GST_SEEK_TYPE_SET, _start_ts,
 //                     GST_SEEK_TYPE_SET, _end_ts);
 // }
-void DecodePipeline::SetPlaySpeed (f32 _speed, bool _trick_play)
+void DecodePipeline::SetPlaySpeed (f64 _speed, bool _trick_play)
 {
   gint64 ts = 0;
   if (! gst_element_query_position(m_pipeline, GST_FORMAT_TIME, &ts))
@@ -215,8 +219,7 @@ void DecodePipeline::SetPlaySpeed (f32 _speed, bool _trick_play)
   GstSeekFlags flags = (GstSeekFlags) (GST_SEEK_FLAG_FLUSH |
                                        GST_SEEK_FLAG_ACCURATE);
   if (_trick_play)
-    flags = (GstSeekFlags) (flags | GST_SEEK_FLAG_TRICKMODE |
-                             GST_SEEK_FLAG_TRICKMODE_NO_AUDIO);
+    flags = (GstSeekFlags) (flags | GST_SEEK_FLAG_TRICKMODE);
 
   if (_speed > 0)
     SeekFull(_speed, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, ts, GST_SEEK_TYPE_NONE, 0);
@@ -240,30 +243,37 @@ void DecodePipeline::TrickModeSeek (f64 _ts, f64 _rate)
       return;
     }
 
-  GstSeekFlags flags = (GstSeekFlags) (GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE |
-                                       GST_SEEK_FLAG_TRICKMODE | GST_SEEK_FLAG_TRICKMODE_NO_AUDIO |
+  GstSeekFlags flags = (GstSeekFlags) (GST_SEEK_FLAG_FLUSH |
+                                       GST_SEEK_FLAG_ACCURATE |
+                                       GST_SEEK_FLAG_TRICKMODE |
                                        GST_SEEK_FLAG_SEGMENT);
   // GstSeekFlags flags = (GstSeekFlags) (GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE |
   //                                      GST_SEEK_FLAG_TRICKMODE |
   //                                      GST_SEEK_FLAG_SEGMENT);
 
   if (current_ts < ts)
-    SeekFull(rate, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, current_ts, GST_SEEK_TYPE_SET, ts);
+    SeekFull(rate, GST_FORMAT_TIME, flags,
+             GST_SEEK_TYPE_SET, current_ts,
+             GST_SEEK_TYPE_SET, ts);
   else if (ts < current_ts)
-    SeekFull(-rate, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, ts, GST_SEEK_TYPE_SET, current_ts);
+    SeekFull(-rate, GST_FORMAT_TIME, flags,
+             GST_SEEK_TYPE_SET, ts,
+             GST_SEEK_TYPE_SET, current_ts);
+  else
+    return;
 
   if (m_pending_state != GST_STATE_PLAYING)
     Play ();
 }
 
-DecodePipeline::MediaStatus DecodePipeline::GetStatus () const
+MediaStatus DecodePipeline::GetStatus () const
 {
-  return DecodePipeline::MediaStatus (m_media_state);
+  return MediaStatus (m_media_state);
 }
 
-DecodePipeline::MediaStatus DecodePipeline::GetPendingStatus () const
+MediaStatus DecodePipeline::GetPendingStatus () const
 {
-  return DecodePipeline::MediaStatus (m_pending_state);
+  return MediaStatus (m_pending_state);
 }
 
 bool DecodePipeline::IsInFlux () const
@@ -296,6 +306,8 @@ void DecodePipeline::Loop (f64 _from, f64 _to, f32 _play_speed)
            GST_SEEK_TYPE_SET, from_ns,
            GST_SEEK_TYPE_SET, to_ns);
 
+  //seek full with segment will modify loop status, so set to correct
+  //values after seek.
   m_loop_status.loop_start = from_ns;
   m_loop_status.loop_end = to_ns;
 }
@@ -304,6 +316,20 @@ bool DecodePipeline::IsLooping () const
 {
   return m_loop_status.loop_start >= 0 &&
     m_loop_status.loop_end >= 0;
+}
+
+f64 DecodePipeline::CurrentPosition () const
+{
+  return f64(CurrentPositionNS ()) / f64 (1e9);
+}
+
+gint64 DecodePipeline::CurrentPositionNS () const
+{
+  gint64 ts = -1;
+  if (gst_element_query_position(m_pipeline, GST_FORMAT_TIME, &ts))
+    return ts;
+
+  return ts;
 }
 
 f64 DecodePipeline::CurrentTimestamp () const
@@ -401,10 +427,20 @@ bool DecodePipeline::SeekFull (f64 _rate, GstFormat _format, GstSeekFlags _flags
     {
       m_segment_start = _start;
       m_segment_end = _stop;
+
+      if (IsLooping())
+        {
+          m_loop_status.loop_start = -1;
+          m_loop_status.loop_end = -1;
+        }
     }
 
-  bool ret = gst_element_seek (m_pipeline, m_play_speed, _format, _flags,
+  GstElement *elem = m_video_terminus->GetSink();
+  assert (elem);
+  bool ret = gst_element_seek (elem, m_play_speed, _format, _flags,
                                _start_type, _start, _stop_type, _stop);
+  // bool ret = gst_element_seek (m_pipeline, m_play_speed, _format, _flags,
+  //                              _start_type, _start, _stop_type, _stop);
 
   if (ret)
     m_has_queued_seek = false;
@@ -503,25 +539,25 @@ void DecodePipeline::HandleSegmentDone (GstMessage *)
   if (m_loop_status.loop_start < 0 ||
       m_loop_status.loop_end < 0)
     {
-      gint64 current_ts = 0;
-      if (! gst_element_query_position(m_pipeline, GST_FORMAT_TIME, &current_ts))
-        {
-          fprintf (stderr, "couldn't query position. bailing.\n");
-          return;
-        }
+      // gint64 current_ts = 0;
+      // if (! gst_element_query_position(m_pipeline, GST_FORMAT_TIME, &current_ts))
+      //   {
+      //     fprintf (stderr, "couldn't query position. bailing.\n");
+      //     return;
+      //   }
 
-      gint64 const seg_ts = m_play_speed > 0.0 ? m_segment_end : m_segment_start;
+      // gint64 const seg_ts = m_play_speed > 0.0 ? m_segment_end : m_segment_start;
 
-      SeekFull (1.0,
-                GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE),
-                GST_SEEK_TYPE_SET, 0,
-                GST_SEEK_TYPE_END, 0);
+      // SeekFull (1.0,
+      //           GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE),
+      //           GST_SEEK_TYPE_SET, 0,
+      //           GST_SEEK_TYPE_END, 0);
 
-      SeekFull (1.0,
-                GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_ACCURATE | GST_SEEK_FLAG_FLUSH),
-                GST_SEEK_TYPE_SET, seg_ts,
-                GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
-      Pause ();
+      // SeekFull (1.0,
+      //           GST_FORMAT_TIME, (GstSeekFlags)(GST_SEEK_FLAG_ACCURATE | GST_SEEK_FLAG_FLUSH),
+      //           GST_SEEK_TYPE_SET, seg_ts,
+      //           GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
+      // Pause ();
 
       m_segment_done_signal (this, SegmentDoneBehavior::NotLooping);
       return;
@@ -567,6 +603,7 @@ void DecodePipeline::HandleDuration (GstMessage *)
 void DecodePipeline::HandleAsyncDone (GstMessage *)
 {
   m_awaiting_async_done = false;
+  m_async_done_signal (this);
 }
 
 boost::signals2::connection
@@ -596,6 +633,7 @@ DecodePipeline::AddEOSExCallback (EOSExCallback &&_cb)
 /* This function will be called by the pad-added signal */
 static void db_pad_added_handler (GstElement *src, GstPad *new_pad, DecodePipeline *data)
 {
+  fprintf (stderr, "pad added\n");
   data->NewDecodedPad (src, new_pad);
 }
 

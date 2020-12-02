@@ -75,10 +75,10 @@ ch_ptr<VideoTexture> const &MattedVideoRenderable::GetVideoTexture () const
   return m_video_texture;
 }
 
-ch_ptr<DecodePipeline> MattedVideoRenderable::GetPipeline () const
+ch_ptr<VideoPipeline> MattedVideoRenderable::GetVideoPipeline () const
 {
   if (auto *system = VideoSystem::GetSystem(); system)
-    return system->FindDecodePipeline(GetVideoTexture ());
+    return system->FindVideoPipeline(GetVideoTexture ());
 
   return {};
 }

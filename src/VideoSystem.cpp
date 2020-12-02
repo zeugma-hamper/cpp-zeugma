@@ -169,6 +169,89 @@ bgfx::ProgramHandle const &VideoTexture::GetProgram () const
   return program;
 }
 
+///////////////// ManualTrickPlayState
+
+bool ManualTrickPlayState::ClearIsReady ()
+{
+  std::unique_lock lock {m_state_mutex};
+  return ClearIsReadyInternal ();
+}
+
+bool ManualTrickPlayState::IsInProgress ()
+{
+  std::unique_lock lock {m_state_mutex};
+  return IsInProgressInternal();
+}
+
+void ManualTrickPlayState::ConditionalSetReady ()
+{
+  std::unique_lock lock {m_state_mutex};
+  if (IsInProgressInternal ())
+    m_is_ready = true;
+}
+
+void ManualTrickPlayState::Clear ()
+{
+  std::unique_lock lock {m_state_mutex};
+  ClearInternal ();
+}
+
+f64 ManualTrickPlayState::Reset (f64 _pts, f64 _current_ts, f64 _num_steps)
+{
+  std::unique_lock lock {m_state_mutex};
+  ClearInternal ();
+  if (_pts >= 0.0 && _num_steps > 0.0)
+    return ResetInternal (_pts, _current_ts, _num_steps);
+
+  return -1.0;
+}
+
+//next pts, is finished flag
+ManualTrickPlayState::UpdateReturn ManualTrickPlayState::ConditionalUpdateNextPTS ()
+{
+  std::unique_lock lock {m_state_mutex};
+  if (! IsInProgressInternal() || ! m_is_ready)
+    return {-1.0, false};
+
+  if (std::abs (m_seek_pts - m_seek_last_pts) <= std::abs (m_seek_dist))
+    {
+      f64 const ret = m_seek_pts;
+      m_seek_last_pts = m_seek_pts;
+      return {ret, true};
+    }
+
+  m_is_ready = false;
+  m_seek_last_pts += m_seek_dist;
+  return {m_seek_last_pts, false};
+}
+
+bool ManualTrickPlayState::ClearIsReadyInternal ()
+{
+  return std::exchange (m_is_ready, false);
+}
+
+bool ManualTrickPlayState::IsInProgressInternal ()
+{
+  return m_seek_pts != m_seek_last_pts;
+}
+
+void ManualTrickPlayState::ClearInternal ()
+{
+  m_is_ready = false;
+  m_seek_pts = -1.0;
+  m_seek_dist = -1.0;
+  m_seek_last_pts = -1.0;
+}
+
+f64 ManualTrickPlayState::ResetInternal (f64 _pts, f64 _current_ts, f64 _num_steps)
+{
+  m_is_ready = false;
+
+  m_seek_pts = _pts;
+  m_seek_dist = (_pts - _current_ts) / _num_steps;
+  m_seek_last_pts = _current_ts + m_seek_dist;
+  return m_seek_last_pts;
+}
 
 ///////////////// VideoPipeline
 
@@ -182,6 +265,7 @@ VideoPipeline::VideoPipeline ()
 VideoPipeline::~VideoPipeline ()
 {
   buffer_connection.disconnect();
+
   {
     std::unique_lock lock {m_matte_lock};
     mattes.clear();
@@ -203,7 +287,7 @@ ch_ptr<VideoTexture> VideoPipeline::OpenFile (std::string_view _path)
   terminus = dynamic_cast<TampVideoTerminus *> (pipeline->m_video_terminus.get ());
   auto buffer_cb = [t = this] (GstBuffer *b, GstVideoInfo *vi, i64 pts, i64 fn)
     { t->NewBufferCallback(b, vi, pts, fn); };
-  terminus->AddBufferCallback(std::move (buffer_cb));
+  buffer_connection = terminus->AddBufferCallback(std::move (buffer_cb));
 
   pipeline->Play ();
 
@@ -239,6 +323,117 @@ ch_ptr<DecodePipeline> const &VideoPipeline::GetDecoder ()
 ch_ptr<VideoTexture> VideoPipeline::GetVideoTexture ()
 {
   return texture.lock ();
+}
+
+void VideoPipeline::Play ()
+{
+  pipeline->Play();
+  trick_mode_state.Clear();
+}
+
+void VideoPipeline::Pause ()
+{
+  pipeline->Pause();
+  trick_mode_state.Clear();
+}
+
+void VideoPipeline::Seek (f64 _ts)
+{
+  pipeline->Seek(_ts);
+  trick_mode_state.Clear();
+}
+
+void VideoPipeline::SetPlaySpeed (f64 _speed, bool _trick_play)
+{
+  pipeline->SetPlaySpeed(_speed, _trick_play);
+}
+
+MediaStatus VideoPipeline::GetStatus () const
+{
+  return pipeline->GetStatus();
+}
+
+MediaStatus VideoPipeline::GetPendingStatus () const
+{
+  return pipeline->GetPendingStatus();
+}
+
+// true if status doesn't equal pending status
+bool VideoPipeline::IsInFlux () const
+{
+  return pipeline->IsInFlux();
+}
+
+void VideoPipeline::Step (u32 _distance)
+{
+  pipeline->Step (_distance);
+  trick_mode_state.Clear();
+}
+
+// pass _play_speed as something other than 0.0f to change speed
+// of playback when pipeline is next in PLAY state
+void VideoPipeline::Loop (f64 _from, f64 _to, f32 _play_speed)
+{
+  pipeline->Loop (_from, _to, _play_speed);
+  trick_mode_state.Clear();
+}
+
+bool VideoPipeline::IsLooping () const
+{
+  return pipeline->IsLooping ();
+}
+
+// timestamp of gstreamer's idea of current position, usually the
+// timestamp of the demuxer's last buffer, I think.
+f64 VideoPipeline::CurrentPosition () const
+{
+  return pipeline->CurrentPosition();
+}
+
+gint64 VideoPipeline::CurrentPositionNS () const
+{
+  return pipeline->CurrentPositionNS ();
+}
+
+// timestamp of the latest video buffer
+f64 VideoPipeline::CurrentTimestamp () const
+{
+  return pipeline->CurrentTimestamp();
+}
+
+gint64 VideoPipeline::CurrentTimestampNS () const
+{
+  return pipeline->CurrentTimestampNS();
+}
+
+v2i32 VideoPipeline::CurrentVideoFrameRateAsRatio () const
+{
+  return pipeline->CurrentVideoFrameRateAsRatio();
+}
+
+f64 VideoPipeline::CurrentVideoFrameRate ()  const
+{
+  return pipeline->CurrentVideoFrameRate();
+}
+
+v2i32 VideoPipeline::CurrentAudioFrameRateAsRatio () const
+{
+  return pipeline->CurrentAudioFrameRateAsRatio();
+}
+
+f64 VideoPipeline::Duration () const
+{
+  return pipeline->Duration();
+}
+
+gint64 VideoPipeline::DurationNanoseconds () const
+{
+  return pipeline->DurationNanoseconds();
+}
+
+f32 VideoPipeline::PlaySpeed () const
+{
+  return pipeline->PlaySpeed();
 }
 
 i64 VideoPipeline::MatteCount () const
@@ -288,9 +483,30 @@ void VideoPipeline::ClearMattes ()
   return;
 }
 
+//basically a flushing seek takes approximately one frame
+static constexpr f64 s_seek_duration = 1.0/60.0;
+
+void VideoPipeline::TrickSeekTo (f64 _pts, f64 _duration)
+{
+  f64 const num_steps = std::floor (_duration / s_seek_duration);
+  f64 const curr_ts = pipeline->CurrentPosition();
+  f64 const dest_ts = trick_mode_state.Reset (_pts, curr_ts, num_steps);
+
+  if (dest_ts < 0.0)
+    {
+      trick_mode_state.Clear();
+      return;
+    }
+
+  pipeline->Pause();
+  pipeline->Seek(dest_ts);
+}
+
 void VideoPipeline::NewBufferCallback (GstBuffer *,  GstVideoInfo *_info,
                                        i64, i64 _frame_number)
 {
+  trick_mode_state.ConditionalSetReady();
+
   std::unique_lock lock {m_matte_lock};
 
   for (MattePipeline &matte : mattes)
@@ -389,25 +605,6 @@ static void update_or_create_texture (bgfx::TextureHandle &_handle, u16 _width, 
   bgfx::updateTexture2D(_handle, 0, 0, 0, 0, _width, _height, _mem, _stride);
 }
 
-// static void ReleaseBimgImageContainer (void *, void *_container)
-// {
-//   auto *cont = reinterpret_cast<bimg::ImageContainer *> (_container);
-//   bimg::imageFree (cont);
-// }
-
-// TODO retry compressed textures later
-// static void update_or_create_texture (bgfx::TextureHandle &_handle, u64 _flags, bimg::ImageContainer *_image)
-// {
-//   if (! bgfx::isValid(_handle))
-//     {
-//       _handle = bgfx::createTexture2D (_image->m_width, _image->m_height, false, 1,
-//                                        (bgfx::TextureFormat::Enum)_image->m_format, _flags);
-//     }
-
-//   bgfx::Memory const *mem = bgfx::makeRef(_image->m_data, _image->m_size, ReleaseBimgImageContainer, _image);
-//   bgfx::updateTexture2D(_handle, 0, 0, 0, 0, _image->m_width, _image->m_height, mem);
-// }
-
 static void upload_frame (gst_ptr<GstSample> const &_sample,
                           ch_ptr<VideoTexture> const &_textures,
                           GstVideoInfo *_video_info)
@@ -436,7 +633,7 @@ static void upload_frame (gst_ptr<GstSample> const &_sample,
   height = GST_VIDEO_INFO_HEIGHT (video_info);
   _textures->SetDimensions({width, height});
 
-  //RGB is all one plane
+  //handling only I420 right now
   assert (GST_VIDEO_INFO_N_PLANES(video_info) < 4);
   for (u32 i = 0; i < GST_VIDEO_INFO_N_COMPONENTS(video_info); ++i)
     {
@@ -477,14 +674,26 @@ void VideoSystem::UploadFrames ()
           upload_frame(sample, texture, &video_info);
           score += 3;
 
-          if (pipe->mattes.empty ())
+          //if we are using trick play, we only seek to the next step
+          //when a frame arrives
+          ManualTrickPlayState::UpdateReturn ur
+            = pipe->trick_mode_state.ConditionalUpdateNextPTS();
+          if (ur.ts >= 0.0)
+            {
+              pipe->pipeline->Seek (ur.ts);
+              if (ur.is_finished) //finished
+                pipe->trick_mode_state.Clear();
+            }
+
+          if (pipe->MatteCount() == 0)
             return;
 
           GstBuffer *buffer = gst_sample_get_buffer (sample.get ());
           guint64 pts = GST_BUFFER_PTS(buffer);
 
-          guint64 frame_num = guint64 (std::round (pts * GST_VIDEO_INFO_FPS_N(&video_info)
-                                                   / GST_VIDEO_INFO_FPS_D(&video_info) / f64(1e9)));
+          guint64 frame_num
+            = guint64 (std::round (pts * GST_VIDEO_INFO_FPS_N(&video_info)
+                                   / GST_VIDEO_INFO_FPS_D(&video_info) / f64(1e9)));
           for (MattePipeline &matte : pipe->mattes)
             matte.awaited = i32 (frame_num);
           //printf ("pts: %f, pf %lu\n", pts/f64(1e9), frame_num);
@@ -672,18 +881,6 @@ VideoBrace VideoSystem::DuplicateMatte (ch_ptr<VideoPipeline> const &_pipeline,
   m_pipelines.push_back(pipeline);
 
   return {pipeline, text};
-}
-
-ch_ptr<DecodePipeline>
-VideoSystem::FindDecodePipeline (ch_ptr<VideoTexture> const &_texture)
-{
-  for (auto &pipe : m_pipelines)
-    {
-      if (_texture == pipe->texture)
-        return pipe->pipeline;
-    }
-
-  return {};
 }
 
 ch_ptr<VideoPipeline>

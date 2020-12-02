@@ -42,6 +42,7 @@ class PipelineTerminus
   virtual void FlushNotify () {};
 
   virtual bool HasSink () const = 0;
+  virtual GstElement *GetSink () const = 0;
 };
 
 enum class SampleStatus
@@ -67,6 +68,7 @@ class BasicPipelineTerminus : public PipelineTerminus
   virtual bool HandleDecodedPad (GstElement *, GstPad *, GstCaps *) = 0;
 
   bool HasSink () const override;
+  GstElement *GetSink () const override;
 
 
   gst_ptr<GstCaps> m_accepted_caps;
