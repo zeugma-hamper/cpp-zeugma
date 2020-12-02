@@ -115,8 +115,8 @@ bool SilverScreen::ScootToTime (f64 tstamp)
   f64 tdist = fabs (tstamp - curt);
 //  f64 frate = deep -> CurrentVideoFrameRate ();
   f64 scootrate = tdist < 1.5  ?  tdist  :  tdist / 1.5;
-  deep -> TrickSeekTo (tstamp, scootrate);
-  deep -> ReadTheCommentBelowThis();
+  deep -> TrickSeekTo (tstamp, 2.5);  // scootrate);
+//  deep -> ReadTheCommentBelowThis();
   //jh, the second parameter to TrickSeekTo is how long the duration should take
   //not the "play speed". this is, I think, easier for you and for me.
 
