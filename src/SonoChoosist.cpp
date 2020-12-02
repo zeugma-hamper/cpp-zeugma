@@ -5,6 +5,8 @@
 
 #include "TrGrappler.h"
 
+#include "vector_interop.hpp"
+
 
 using namespace charm;
 
@@ -25,7 +27,11 @@ Choizl::Choizl ()  :  Node ()
 }
 
 
-SonoChoosist::SonoChoosist (const PlatonicMaes *maes)  :  Alignifer ()
+#define ERPTI (Tamparams::Current ()->sono_choosist_furl_time)
+
+
+SonoChoosist::SonoChoosist (const PlatonicMaes *maes)  :  Alignifer (),
+                                                          behalf_of (NULL)
 { if (! maes)
     { wid = 200.0;  hei = 40.0;  brd_thc = 5.0; }
   else
@@ -58,6 +64,14 @@ SonoChoosist::SonoChoosist (const PlatonicMaes *maes)  :  Alignifer ()
   crn_ul . SetHard (frl_ul);
   crn_ll . SetHard (frl_ll);
 
+  crn_lr . SetInterpTime (ERPTI);
+  crn_ur . SetInterpTime (ERPTI);
+  crn_ul . SetInterpTime (ERPTI);
+  crn_ll . SetInterpTime (ERPTI);
+
+  active . SetInterpTime (ERPTI);
+active . SetHard (1.0);
+
   chz_dia = 0.9 * hei;
 }
 
@@ -86,6 +100,15 @@ else if (curn == 4) chz->texre->SetAdjColor(ZeColor(1.0,1.0,0.0,0.2));
     }
 }
 
+
+void SonoChoosist::InitiateAtomicContact (Ticato *tic)
+{ if (! tic)
+    return;
+  if (behalf_of)
+    { // some farewell gesture to whomever we'd been serving?
+    }
+  behalf_of = tic;
+}
 
 void SonoChoosist::Furl ()
 { crn_lr . Set (frl_lr);  crn_ur . Set (frl_ur);
@@ -117,4 +140,32 @@ void SonoChoosist::Unfurl ()
     { choizls[q]->perky_loc . Set (p);
       p -= spcng * Vect::xaxis;
     }
+}
+
+
+i64 SonoChoosist::ZESpatialMove (ZESpatialMoveEvent *e)
+{ if (! e)
+    return -1;
+
+  if (! Active ())
+    return 0;
+
+  const Vect &p = e -> Loc ();
+  // a crap geometric job for now; just see if we're in the up-projected
+  // parallelepiped...
+  // f64 w = (crn_ur.val - crn_ul.val) . Dot (CurOver ());
+  // f64 h = (crn_ur.val - crn_lr.val) . Dot (CurUp ());
+// some sort of lesson. in the above, the crn are in local coords; ovr & upp not.
+  f64 w = (crn_ur.val - crn_ul.val) . Dot (Vect::xaxis);
+  f64 h = (crn_ur.val - crn_lr.val) . Dot (Vect::yaxis);
+  Vect c = 0.25 * (crn_lr.val + crn_ur.val + crn_ul.val + crn_ll.val);
+  Matrix44 m = from_glm (GetAbsoluteTransformation ().model);
+  m. TransformVectInPlace (c);
+  Vect hit;
+  if (! G::RayRectIntersection (p, -CurNorm (),
+                                c, CurOver (), CurUp (), w, h, &hit))
+    return 0;
+fprintf(stderr,"SMACKED old pal SONOCHOOSIST... with w/h = %.2lf/%2lf\n",w,h);
+
+  return 1;
 }

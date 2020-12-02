@@ -18,4 +18,3 @@ void CoGrappler::SetViaNormalizedBasisVectors (const Vect &e0, const Vect &e1,
   nm . Load (pm);
   inm . Load (ipm);
 }
-

@@ -57,6 +57,14 @@ stringy_list Orksur::CollageAtomsNameList ()
 }
 
 
+void Orksur::AtomicFirstStrike (Ticato *tic)
+{ if (! tic)
+    return;
+  if (soncho)
+    soncho -> InitiateAtomicContact (tic);
+}
+
+
 Ticato *Orksur::ClosestAtom (const Vect &p)
 { Ticato *ct = NULL;
   f64 d, cd = CHRM_MAX_F64;
@@ -169,7 +177,7 @@ i64 Orksur::ZESpatialMove (ZESpatialMoveEvent *e)
 assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
   Ticato *ca = ClosestAtom (proj);
 
-  if (! ca  ||  tt  >  sentient_dist)  // but wait... what if grasping?
+  if (tt  >  sentient_dist)  // but wait... what if grasping?
     { if (heff  !=  hoverees . end ())
         { hoverees . erase (heff);
           // and whatever else's polite on un-hover
@@ -181,6 +189,14 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
       DistinguishHoverees ();
       return 0;
     }
+
+  // we'll give the sonochoosist first dibs
+  if (soncho)
+    if (soncho -> ZESpatialMove (e)  >  0)
+      return 1;
+
+  if (! ca)
+    return 0;  // but when would... when would this actually...
 
   if (tt  <=  contact_dist)
     { if (geff  !=  graspees . end ())
@@ -200,6 +216,7 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
             { hoverees . erase (heff);
               graspees[prv] = { ca, (ca -> CurLoc () - proj) };
               ca -> MakeRenderablesForemostInLayer ();
+              AtomicFirstStrike (ca);
             }
           else  // weird, but possible
             { Fondlish *fon = NULL;
@@ -211,6 +228,7 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
                   hoverees . erase (heff);
                   graspees[prv] = { ca, (ca -> CurLoc () - proj) };
                   ca -> MakeRenderablesForemostInLayer ();
+                  AtomicFirstStrike (ca);
                 }
               else  // somebody else is grasping ca
                 { // if (heff->second.tic  !=  ca)  // can't be the case

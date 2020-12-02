@@ -41,6 +41,8 @@ struct Tamparams
   f64 lateral_slide_interp_time = 0.3;
   f64 pb_snapback_fade_time = 0.5;
 
+  f64 sono_choosist_furl_time = 0.35;
+
   f64 room_minify_factor = 0.478128;  // that's 4372mm / 9144mm, folks...
 
   static Tamparams ur_params;

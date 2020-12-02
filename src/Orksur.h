@@ -62,6 +62,8 @@ class Orksur  :  public PlatonicMaes, public Node,
 
   stringy_list CollageAtomsNameList ();
 
+  void AtomicFirstStrike (Ticato *tic);  // called when an atom's first touched
+
   Ticato *ClosestAtom (const Vect &p);
 
   i64 NumHoverees ()  const

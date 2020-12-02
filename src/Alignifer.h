@@ -17,6 +17,7 @@ class Alignifer  :  public Zeubject, public Node
 { public:
   ZoftVect loc;
   ZoftVect sca;
+  Vect ovr, upp, nrm;
 
   void WellAndTrulyConstruct ();
 
@@ -32,6 +33,13 @@ class Alignifer  :  public Zeubject, public Node
     { return loc; }
   ZoftVect &ScaleZoft ()
     { return sca; }
+
+  const Vect &CurOver ()  const
+    { return ovr; }
+  const Vect &CurUp ()  const
+    { return upp; }
+  const Vect &CurNorm ()  const
+    { return nrm; }
 
   void AlignOverUp (const Vect &ov, const Vect &up);
   void AlignToMaes (const PlatonicMaes *maes)

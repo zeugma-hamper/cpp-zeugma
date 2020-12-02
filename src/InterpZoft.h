@@ -178,13 +178,13 @@ class InterpZoft  :  public ZoftThing <T>
         { g -> ProceedTo (next_bz);  return true; }
       return false;
     }
-  bool ProceedTo (const Vect &next_b)
-    { ZoftVect nbz (next_b);  return ProceedTo (nbz); }
+  bool ProceedTo (const T &next_b)
+    { ZoftThing <T> nbz (next_b);  return ProceedTo (nbz); }
 
-  bool Set (const Vect &p)
+  bool Set (const T &p)
     { return ProceedTo (p)  &&  Commence (); }
 
-  bool SetHard (const Vect &p)
+  bool SetHard (const T &p)
     { return ProceedTo (p)  &&  Finish (); }
 
   ZoftThing <T> &PointA ()

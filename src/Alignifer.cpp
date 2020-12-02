@@ -27,13 +27,18 @@ void Alignifer::WellAndTrulyConstruct ()
 }
 
 
-Alignifer::Alignifer ()  :  Zeubject (), Node (), sca (Vect::onesv)
+Alignifer::Alignifer ()  :  Zeubject (), Node (), sca (Vect::onesv),
+                            ovr (Vect::xaxis), upp (Vect::yaxis),
+                            nrm (Vect::zaxis)
 { WellAndTrulyConstruct (); }
 
 
 Alignifer::Alignifer (Renderable *ren)  :  Zeubject (), Node (ren),
-                                           sca (Vect::onesv)
+                                           sca (Vect::onesv),
+                                           ovr (Vect::xaxis), upp (Vect::yaxis),
+                                           nrm (Vect::zaxis)
 { WellAndTrulyConstruct (); }
+
 
 
 void Alignifer::AlignOverUp (const Vect &ov, const Vect &up)
@@ -42,15 +47,7 @@ void Alignifer::AlignOverUp (const Vect &ov, const Vect &up)
   Vect n = o . Cross (u);
 
   if (CoGrappler *g = dynamic_cast <CoGrappler *> (FindGrappler ("alignment")))
-    { g -> PointMatrix () . Load (o.x, o.y, o.z, 0.0,
-                                  u.x, u.y, u.z, 0.0,
-                                  n.x, n.y, n.z, 0.0,
-                                  0.0, 0.0, 0.0, 1.0);
-      g -> InversePointMatrix () . Load (o.x, u.x, n.x, 0.0,
-                                         o.y, u.y, n.y, 0.0,
-                                         o.z, u.z, n.z, 0.0,
-                                         0.0, 0.0, 0.0, 1.0);
-      g -> SetNormalMatrix (g -> PointMatrix ());
-      g -> SetInverseNormalMatrix (g -> InversePointMatrix ());
-    }
+    g -> SetViaNormalizedBasisVectors (o, u, n);
+
+  ovr = o;  upp = u;  nrm = n;
 }

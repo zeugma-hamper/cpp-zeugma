@@ -186,7 +186,8 @@ spanking_time = true;
                                                 BGFX_STATE_BLEND_INV_SRC_ALPHA)
                       |  BGFX_STATE_WRITE_Z);
 
-      bgfx::setUniform (unif_primc, glm::value_ptr (as_glm (fill_iro)));
+      ZeColor use_col = m_adjc.val * fill_iro.val;
+      bgfx::setUniform (unif_primc, glm::value_ptr (as_glm (use_col)));
 
       bgfx::submit (vyu_id, shad_prog, m_graph_id);
     }
@@ -201,7 +202,8 @@ spanking_time = true;
                                                 BGFX_STATE_BLEND_INV_SRC_ALPHA)
                       |  BGFX_STATE_WRITE_Z);
 
-      bgfx::setUniform (unif_primc, glm::value_ptr (as_glm (edge_iro)));
+      ZeColor use_col = m_adjc.val * edge_iro.val;
+      bgfx::setUniform (unif_primc, glm::value_ptr (as_glm (use_col)));
 
       bgfx::submit (vyu_id, shad_prog, m_graph_id);
     }

@@ -10,6 +10,11 @@
 
 #include "InterpZoft.h"
 
+#include "ZESpatialEvent.h"
+#include "ZEYowlEvent.h"
+#include "ZEBulletinEvent.h"
+#include "Ticato.h"
+
 
 using namespace charm;
 
@@ -23,7 +28,9 @@ struct Choizl  :  public Node
 };
 
 
-class SonoChoosist  :  public Alignifer
+class SonoChoosist  :  public Alignifer,
+                       public ZESpatialPhagy, public ZEYowlPhagy,
+                       public ZEBulletinPhagy
 { public:
 
   SonoChoosist (const PlatonicMaes *maes);
@@ -31,6 +38,8 @@ class SonoChoosist  :  public Alignifer
   PolygonRenderable *brdr_re;
   std::vector <Choizl *> choizls;
   std::vector <Choizl *> in_storage;
+  Ticato *behalf_of;
+  InterpFloat active;
   f64 wid, hei;
   f64 brd_thc;
   f64 chz_dia;
@@ -42,8 +51,17 @@ class SonoChoosist  :  public Alignifer
     { return choizls . size (); }
   void SetNumChoizls (i64 nc);
 
+  void InitiateAtomicContact (Ticato *tic);
+
+  bool Active ()
+    { return (active.val  >=  1.0); }
+  f64 Activeishness ()
+    { return active.val; }
+
   void Furl ();
   void Unfurl ();
+
+  i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
 };
 
 
