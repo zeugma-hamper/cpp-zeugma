@@ -172,6 +172,9 @@ void DecodePipeline::Seek (double _ts)
                 flags,
                 GST_SEEK_TYPE_SET, 0,
                 GST_SEEK_TYPE_END, 0);
+
+      m_loop_status.loop_start = -1;
+      m_loop_status.loop_end = -1;
     }
 
   gint64 const seconds_to_ns = 1000000000;
@@ -427,12 +430,6 @@ bool DecodePipeline::SeekFull (f64 _rate, GstFormat _format, GstSeekFlags _flags
     {
       m_segment_start = _start;
       m_segment_end = _stop;
-
-      if (IsLooping())
-        {
-          m_loop_status.loop_start = -1;
-          m_loop_status.loop_end = -1;
-        }
     }
 
   GstElement *elem = m_video_terminus->GetSink();
