@@ -16,7 +16,10 @@ AtomicFreezone::AtomicFreezone ()  :  Zeubject (), cineganz (NULL),
                                       inter_arrival_t (5.0),
                                       min_speed (75.0), max_speed (250.0),
                                       privileged_atom_probability (0.0)
-{ }
+{ // try auto-inhale
+  // if (IronLung *irlu = IronLung::GlobalByName ("omni-lung"))
+  //   irlu -> AppendBreathee (this);
+}
 
 
 void AtomicFreezone::AppendSwath (Swath *sw)
@@ -103,7 +106,7 @@ tic -> BBoxSetColor (Tamglobals::Only ()->escatom_bbox_color);
 
   f64 spd = min_speed + drand48 () * (max_speed - min_speed);
   spd *= (direc == 0)  ?  (drand48 () > 0.5 ? 1.0 : -1.0)  :  direc;
-  tic->vel . SetHard (Vect (spd, 0.0, 0.0));
+  tic->wander_vel . SetHard (Vect (spd, 0.0, 0.0));
 
   field_amok -> AppendChild (tic);
   atoms . push_back (tic);
@@ -155,7 +158,7 @@ void AtomicFreezone::PerambulizeAtoms (f64 dt)
       { if (! tic -> CurYanker () . empty ())
           continue;
 
-        f64 vx = tic->vel.val.x;
+        f64 vx = tic->wander_vel.val.x;
         const Vect &ovr = tic->cur_maes -> Over ();
         Vect newloc = tic->loc.val  +  dt * vx * ovr;
 

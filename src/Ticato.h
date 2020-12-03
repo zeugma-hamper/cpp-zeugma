@@ -31,15 +31,19 @@ class Ticato  :  public Alignifer
   MattedVideoRenderable *re;
   RectRenderableFrontier *fr;
   Alignifer *bbox_subno;
-  ZoftVect vel;
+
+  ZoftVect wander_vel;
   ZoftVect accom_sca;
   f64 atom_dur;
   PlatonicMaes *cur_maes;
+
   stringy_list sono_options;
   i32 playing_sono;
   i64 playing_prfm_id;
+
   std::string hvrr;
   std::string ynkr;
+  Vect shov_vel;
   Node *from_node;
   LoopFloat shabby_loop_minder;
 

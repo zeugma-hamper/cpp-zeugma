@@ -22,6 +22,30 @@ bool VelvetLung::RemoveBreathee (Zeubject *z)
 }
 
 
+//
+/// VelvetLung above; ProtoZoftThingGuts below
+//
+
+
+VelvetLung *ProtoZoftThingGuts::InstallMassBreather (VelvetLung *vl)
+{ if (vl != NULL  &&  vl != sole_mass_breather)
+    return vl;
+  VelvetLung *outcumbent = mass_breather;
+  mass_breather = vl;
+  return outcumbent;
+}
+
+VelvetLung *ProtoZoftThingGuts::InstallMassBreather ()
+{ if (! sole_mass_breather)
+    sole_mass_breather = new VelvetLung;
+  return InstallMassBreather (sole_mass_breather);
+}
+
+VelvetLung *ProtoZoftThingGuts::ClearMassBreather ()
+{ return InstallMassBreather (NULL); }
+
+
+
 i64 VelvetLung::Inhale (i64 ratch, f64 thyme)
 { if (ratch  <  0)
     return IronLung::Inhale (ratch, thyme);

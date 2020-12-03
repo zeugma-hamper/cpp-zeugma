@@ -45,6 +45,8 @@ struct Tamparams
 
   f64 room_minify_factor = 0.478128;  // that's 4372mm / 9144mm, folks...
 
+  f64 disposal_speed_threshold = 400.0;  // mm per sec, is the thing.
+
   static Tamparams ur_params;
   static std::vector <Tamparams *> tampa_stack;
   static Tamparams *Current ();
@@ -56,7 +58,10 @@ namespace charm
 
 
 struct Tamglobals
-{ Node *front_wall = NULL;
+{ f64 frame_tm = 0.0;
+  f64 frame_dt = 0.0;
+
+  Node *front_wall = NULL;
   Node *left_wall = NULL;
   Node *wallpaper = NULL;
   Node *tablecloth = NULL;

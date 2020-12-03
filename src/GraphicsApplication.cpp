@@ -290,10 +290,10 @@ void GraphicsApplication::UpdateSceneGraph(i64 ratch, f64 thyme)
   std::array<graph_id, 2> ids {0, 0};
   for (Layer *layer : m_scene_graph_layers)
     {
-      layer->GetRootNode()
-        ->UpdateTransformsHierarchically (ratch, thyme);
-      ids = layer->GetRootNode()->EnumerateGraph(ids[0], ids[1]);
-      layer->SortFrontiers ();
+      layer -> GetRootNode()
+        -> UpdateTransformsHierarchically (ratch, thyme);
+      ids = layer -> GetRootNode () -> EnumerateGraph (ids[0], ids[1]);
+      layer -> SortFrontiers ();
     }
 }
 

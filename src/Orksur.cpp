@@ -10,6 +10,8 @@
 
 #include "tamparams.h"
 
+#include "GraphicsApplication.hpp"
+
 #include <vector>
 
 
@@ -150,7 +152,7 @@ i64 Orksur::ZESpatialMove (ZESpatialMoveEvent *e)
   f64 tt = n . Dot (p - loc);
   Vect proj = p  -  tt * n;
   s->loc . Set (proj);
-  tt = fabs (tt);
+//  tt = fabs (tt);
 
   Vect bloff = proj - CornerBL ();
   Vect troff = CornerTR () - proj;
@@ -201,15 +203,19 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
 
   if (tt  <=  contact_dist)
     { if (geff  !=  graspees . end ())
-        { if (geff->second.tic  ==  ca)
-            { ca -> LocZoft () . Set (proj + geff->second.gropoff);
+        { Vect newp = proj + geff->second.gropoff;
+          f64 dt = GraphicsApplication::GetFrameTime () -> GetCurrentDelta ();
+          ca->shov_vel
+            = dt > 0.0  ?  (newp - ca -> CurLoc ()) / dt  :  Vect::zerov;
+          if (geff->second.tic  ==  ca)
+            { ca -> LocZoft () . Set (newp);
               // 'ca' is the same as 'geff.second.tic', as below
             }
           else // i.e. a different atom is 'closer', but...
             { // ... too bad! we're modally grasping an atom already;
               // thus still manipulate the grasped atom
               geff->second.tic
-                -> LocZoft () . Set (proj + geff->second.gropoff);
+                -> LocZoft () . Set (newp);
             }
         }
       else if (heff  !=  hoverees . end ())
@@ -217,6 +223,7 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
             { hoverees . erase (heff);
               graspees[prv] = { ca, (ca -> CurLoc () - proj) };
               ca -> MakeRenderablesForemostInLayer ();
+              ca->shov_vel = Vect::zerov;
               AtomicFirstStrike (ca);
             }
           else  // weird, but possible
@@ -229,6 +236,7 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
                   hoverees . erase (heff);
                   graspees[prv] = { ca, (ca -> CurLoc () - proj) };
                   ca -> MakeRenderablesForemostInLayer ();
+                  ca->shov_vel = Vect::zerov;
                   AtomicFirstStrike (ca);
                 }
               else  // somebody else is grasping ca
@@ -256,6 +264,14 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
     { if (geff  !=  graspees . end ())
         { graspees . erase (geff);   // plus whatever else to detach grasping
           hoverees[prv] = { ca, Vect::zerov };
+          // see if we're moving fast enough to qualify for deletion ballistics
+          if (ca->shov_vel . Mag ()
+              >=  Tamparams::Current ()->disposal_speed_threshold)
+            { fprintf (stderr, "PREYZDE LAWD -- <%p> gon' scoot to die!", ca);
+              // and but then as well... what.
+            }
+          else
+            ca->shov_vel = Vect::zerov;
         }
       else if (heff  !=  hoverees . end ())
         { if (heff->second.tic  !=  ca)

@@ -35,20 +35,9 @@ class ProtoZoftThingGuts  :  public Zeubject
     { return (mass_breather != NULL); }
   static VelvetLung *MassBreather ()
     { return mass_breather; }
-  static VelvetLung *InstallMassBreather (VelvetLung *vl)
-    { if (vl != NULL  &&  vl != sole_mass_breather)
-        return vl;
-      VelvetLung *outcumbent = mass_breather;
-      mass_breather = vl;
-      return outcumbent;
-    }
-  static VelvetLung *InstallMassBreather ()
-    { if (! sole_mass_breather)
-        sole_mass_breather = new VelvetLung;
-      return InstallMassBreather (sole_mass_breather);
-    }
-  static VelvetLung *ClearMassBreather ()
-    { return InstallMassBreather (NULL); }
+  static VelvetLung *InstallMassBreather (VelvetLung *vl);
+  static VelvetLung *InstallMassBreather ();
+  static VelvetLung *ClearMassBreather ();
 
   ProtoZoftThingGuts ()  :  Zeubject (), rat_fresh (-1), num_hosts (0)
     { }
