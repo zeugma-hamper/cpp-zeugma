@@ -101,4 +101,27 @@ bool G::LineAnnulusIntersection (const Vect &frm, const Vect &aim,
 }
 
 
+bool G::PointRectContainment (const Vect &p,
+                              const Vect &cnt, const Vect &ovr, const Vect &upp,
+                              f64 wid, f64 hei, Vect *proj_pnt)
+{ Vect nrm = ovr . Cross (upp) . Norm ();
+  f64 t = (p - cnt) . Dot (nrm);
+  Vect pp = p - t * nrm;
+
+  if (proj_pnt)
+    *proj_pnt = pp;
+
+  wid *= 0.5;
+  hei *= 0.5;
+  pp -= cnt;
+  t = pp . Dot (ovr);
+  if (t < -wid  ||  t > wid)
+    return false;
+  t = pp . Dot (upp);
+  if (t < -hei  ||  t > hei)
+    return false;
+  return true;
+}
+
+
 }  // foul play was not suspected in the demise of namespace charm

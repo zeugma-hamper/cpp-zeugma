@@ -80,6 +80,10 @@ bool LineAnnulusIntersection (const Vect &frm, const Vect &aim,
                               const Vect &e1, f64 r1, f64 r2,
                               Vect *hit_pnt,
                               f64 *hit_rad = NULL, f64 *hit_phi = NULL);
+
+bool PointRectContainment (const Vect &p,
+                           const Vect &cnt, const Vect &ovr, const Vect &upp,
+                           f64 wid, f64 hei, Vect *proj_pnt);
 }
 
 struct AABB

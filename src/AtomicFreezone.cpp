@@ -310,6 +310,36 @@ assert (iitt  !=  atoms . end ());
 }
 
 
+i64 AtomicFreezone::ZEBulletin (ZEBulletinEvent *e)
+{ if (! e)
+    return -1;
+  ZEBObjPhrase *phr;
+  Ticato *tic;
+
+  if (e -> Says ("atom-deposit"))
+    { if (tic = dynamic_cast <Ticato *> (e -> ObjByTag ("inbound-atom")))
+        if (PlatonicMaes *emm
+            = dynamic_cast <PlatonicMaes *> (e -> ObjByTag ("onto-maes")))
+          if (std::find (underlying_maeses . begin (),
+                         underlying_maeses . end (), emm)
+              !=  underlying_maeses . end ())
+            { tic->accom_sca . Set (Vect (1.0));
+              tic->shov_vel = Vect::zerov;
+
+              field_amok -> AppendChild (tic);
+              atoms . push_back (tic);
+
+              f64 spd = min_speed
+                +  2.0 * (drand48 () - 0.5) * (max_speed - min_speed);
+              tic->wander_vel . SetHard (Vect (spd, 0.0, 0.0));
+              tic -> SetAndAlignToMaes (emm);
+              // tic -> BBoxSetColor (Tamglobals::Only ()->tabatom_bbox_color);
+            }
+    }
+  return 0;
+}
+
+
 i64 AtomicFreezone::Inhale (i64, f64 thyme)
 { float dt = thyme - prev_time;
   PerambulizeAtoms (dt);

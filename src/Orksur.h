@@ -47,6 +47,7 @@ class Orksur  :  public PlatonicMaes, public Node,
   const PlatonicMaes *underlying_maes;
   Node *collage;
   SonoChoosist *soncho;
+  PlatonicMaes *associated_wallmaes;
   std::vector <Ticato *> players;
   std::vector <Ticato *> inchoates;
   std::unordered_map <std::string, Splort *> splorts;
@@ -76,13 +77,24 @@ class Orksur  :  public PlatonicMaes, public Node,
   bool AppendAtomToCollage (Ticato *tic);
   bool RemoveAtomFromCollage (Ticato *tic);
 
+  bool AtomIsGrasped (Ticato *tic)
+    { if (tic)
+        for (auto gr  :  graspees)  if (gr.second.tic  ==  tic)  return true;
+      return false;
+    }
+
+  void SilenceAllAtoms ();
+
+  void ImpelFreeAtom (Ticato *tic, f64 dt);
+
+  void DisposeOfCollage ();
+
   i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
-
   i64 ZEYowlAppear (ZEYowlAppearEvent *e)  override;
-
   i64 ZEBulletin (ZEBulletinEvent *e)  override;
-
   i64 TASSuggestion (TASSuggestionEvent *e)  override;
+
+  i64 Inhale (i64 ratch, f64 thyme)  override;
 };
 
 

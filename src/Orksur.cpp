@@ -19,6 +19,7 @@ Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
                                             underlying_maes (&ma),
                                             collage (new Node),
                                             soncho (new SonoChoosist (&ma)),
+                                            associated_wallmaes (NULL),
                                             sentient_dist (200.0),
                                             contact_dist (25.0)
 { AppendChild (collage);
@@ -132,6 +133,70 @@ bool Orksur::RemoveAtomFromCollage (Ticato *tic)
   FindErase (players, tic);
   tic -> Parent () -> RemoveChild (tic);
   return true;
+}
+
+
+void Orksur::SilenceAllAtoms ()
+{ for (Ticato *tic  :  players)
+    tic -> SonoSilence ();
+}
+
+
+void Orksur::ImpelFreeAtom (Ticato *tic, f64 dt)
+{ if (! tic)
+    return;
+
+  Vect newp = tic -> CurLoc ()  +  dt * tic->shov_vel;
+  if (G::PointRectContainment (newp, Loc (), Over (), Up (),
+                               Width (), Height (), NULL))
+    { tic -> LocZoft () . SetHard (newp);
+      return;
+    }
+
+  // we're off the edge of the table; project to wall.
+  Vect hit;
+  if (! G::RayPlaneIntersection (tic -> CurLoc (), tic->shov_vel,
+                                 associated_wallmaes -> Loc (),
+                                 associated_wallmaes -> Norm (), &hit))
+    { // how can we not've hit the wall?
+      assert (0 == 1);
+    }
+
+  tic -> LocZoft () . SetHard (hit);
+  auto it = std::find (players . begin (), players . end (), tic);
+  if (it  ==  players . end ())
+    { // well, that's if not impossible then certaianly horrible.
+      assert ('a' == 'z');
+    }
+  players . erase (it);
+
+  ZEBulletinEvent *bev = new ZEBulletinEvent ("atom-deposit");
+  bev -> AppendObjPhrase ("inbound-atom", tic);
+  bev -> AppendObjPhrase ("from-zone", this);
+  bev -> AppendObjPhrase ("onto-maes", associated_wallmaes);
+  GraphicsApplication::GetApplication () -> GetSprinkler () . Spray (bev);
+  delete bev;
+}
+
+
+void Orksur::DisposeOfCollage ()
+{ Vect o = Over ();
+  Vect u = Up ();
+  f64 halfang;
+  Vect hit;
+  if (associated_wallmaes
+      &&  G::RayPlaneIntersection (Loc (), u, associated_wallmaes -> Loc (),
+                                   associated_wallmaes -> Norm (), &hit))
+    halfang = atan2 (0.9 * 0.5 * associated_wallmaes -> Width (),
+                     Loc () . DistFrom (hit));
+  else
+    halfang = M_PI / 180.0 * 30.0;
+  for (Ticato *tic  :  players)
+    { f64 ang = 2.0 * (drand48 () - 0.5) * halfang;
+      f64 spd = Tamparams::Current ()->disposal_speed_threshold
+         * (1.0 + drand48 ());
+      tic->shov_vel = spd * (cos (ang) * u  +  sin (ang) * o);
+    }
 }
 
 
@@ -318,6 +383,10 @@ i64 Orksur::ZEYowlAppear (ZEYowlAppearEvent *e)
     { if (soncho)  soncho -> Furl (); }
   else if (utt  ==  "]")
     { if (soncho)  soncho -> Unfurl (); }
+  else if (utt  ==  "]")
+    { if (soncho)  soncho -> Unfurl (); }
+  else if (utt  ==  "/")
+    { DisposeOfCollage (); }
   return 0;
 }
 
@@ -382,5 +451,17 @@ fprintf(stderr,"\n");
   //       fprintf(stderr,"about to request %d = [%s]...\n",ind,suggs[ind].c_str());
   //       sherm -> SendPlaySound (suggs . at (ind));
   //     }
+  return 0;
+}
+
+
+
+i64 Orksur::Inhale (i64 ratch, f64 thyme)
+{ f64 dt = GraphicsApplication::GetFrameTime () -> GetCurrentDelta ();
+  for (Ticato *tic  :  players)
+    if (tic->shov_vel . AutoDot ()  >  0.0
+        &&  ! AtomIsGrasped (tic))
+      ImpelFreeAtom (tic, dt);
+
   return 0;
 }

@@ -385,7 +385,13 @@ bool Tampo::DoWhatThouWilt (i64 ratch, f64 thyme)
         }
     }
 
-  if (freezo)//  &&  timey.val > 3.0)
+  if (orksu)
+    orksu -> Inhale (ratch, thyme);
+
+  if (gegyp)
+    gegyp -> Inhale (ratch, thyme);
+
+  if (freezo)
     freezo -> Inhale (ratch, thyme);
   return true;
 }
@@ -616,6 +622,7 @@ int main (int ac, char **av)
 
   Orksur *orkp = new Orksur (*tabl);
   tamp.orksu = ch_ptr <Orksur> (orkp);
+  orkp->associated_wallmaes = frnt;
   g_tablecloth -> AppendChild (orkp);
   AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.orksu);
   AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.orksu);
@@ -713,12 +720,15 @@ int main (int ac, char **av)
   tamp.freezo = ch_ptr <AtomicFreezone> (afz);
   afz->cineganz = &film_infos;
   afz->field_amok = g_wallpaper;
+  afz->underlying_maeses . push_back (frnt);
+  afz->underlying_maeses . push_back (left);
   stringy_list spethial = { "c=carnosaur_01", "noth=bunny_right",
                             "pt=drunk", "pb=flashing_light", "mr=ship_01" };
   for (const std::string &s  :  spethial)
     if (! afz -> AppendPrivilegedAtom (s))
       fprintf (stderr, "phailed privileging atom [%s]...\n", s . c_str ());
   afz -> SetPrivlegedAtomProbability (0.5);
+  AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.freezo);
 
   LinePileRenderable *lpr = new LinePileRenderable;
   InterpColor constru_col ((SinuColor (ZeColor (0.2, 0.2), 0.25,

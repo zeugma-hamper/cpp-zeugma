@@ -7,6 +7,7 @@
 
 #include "ZESpatialEvent.h"
 #include "ZEYowlEvent.h"
+#include "ZEBulletinEvent.h"
 
 #include "GeomFumble.h"
 
@@ -34,11 +35,13 @@ using AtomInfoPair = std::pair <const FilmInfo *, const ClipInfo *>;
 
 class AtomicFreezone  :  public Zeubject,
                          public ZESpatialPhagy,
-                         public ZEYowlPhagy
+                         public ZEYowlPhagy,
+                         public ZEBulletinPhagy
 { public:
   std::vector <FilmInfo> *cineganz;
   std::vector <Ticato *> atoms;
   Node *field_amok;
+  std::vector <PlatonicMaes *> underlying_maeses;
   f64 atom_count_goal;
   f64 inter_arrival_t;
   f64 max_speed, min_speed;
@@ -90,6 +93,8 @@ class AtomicFreezone  :  public Zeubject,
   i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
   i64 ZESpatialHarden (ZESpatialHardenEvent *e)  override;
   i64 ZESpatialSoften (ZESpatialSoftenEvent *e)  override;
+
+  i64 ZEBulletin (ZEBulletinEvent *e)  override;
 
   i64 Inhale (i64 ratchet, f64 thyme)  override;
 };
