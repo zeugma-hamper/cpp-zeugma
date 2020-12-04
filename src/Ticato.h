@@ -25,6 +25,10 @@
 using namespace charm;
 
 
+enum class AtomThusness {
+  CONT, STOP, NUKE
+};
+
 class Ticato  :  public Alignifer
 { public:
   const ClipInfo *atom_info;

@@ -85,7 +85,7 @@ class Orksur  :  public PlatonicMaes, public Node,
 
   void SilenceAllAtoms ();
 
-  void ImpelFreeAtom (Ticato *tic, f64 dt);
+  AtomThusness ImpelFreeAtom (Ticato *tic, f64 dt);
 
   void DisposeOfCollage ();
 

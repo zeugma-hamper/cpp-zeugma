@@ -142,15 +142,15 @@ void Orksur::SilenceAllAtoms ()
 }
 
 
-void Orksur::ImpelFreeAtom (Ticato *tic, f64 dt)
+AtomThusness Orksur::ImpelFreeAtom (Ticato *tic, f64 dt)
 { if (! tic)
-    return;
+    return AtomThusness::CONT;
 
   Vect newp = tic -> CurLoc ()  +  dt * tic->shov_vel;
   if (G::PointRectContainment (newp, Loc (), Over (), Up (),
                                Width (), Height (), NULL))
     { tic -> LocZoft () . SetHard (newp);
-      return;
+      return AtomThusness::CONT;
     }
 
   // we're off the edge of the table; project to wall.
@@ -158,8 +158,8 @@ void Orksur::ImpelFreeAtom (Ticato *tic, f64 dt)
   if (! G::RayPlaneIntersection (tic -> CurLoc (), tic->shov_vel,
                                  associated_wallmaes -> Loc (),
                                  associated_wallmaes -> Norm (), &hit))
-    { // how can we not've hit the wall?
-      assert (0 == 1);
+    { // off the table in a direction that doesn't hit a wall
+      return AtomThusness::NUKE;
     }
 
   tic -> LocZoft () . SetHard (hit);
@@ -176,6 +176,8 @@ void Orksur::ImpelFreeAtom (Ticato *tic, f64 dt)
   bev -> AppendObjPhrase ("onto-maes", associated_wallmaes);
   GraphicsApplication::GetApplication () -> GetSprinkler () . Spray (bev);
   delete bev;
+
+  return AtomThusness::CONT;
 }
 
 
@@ -400,7 +402,7 @@ i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
     { if (tic = dynamic_cast <Ticato *> (e -> ObjByTag ("dragee")))
         if (e -> ObjByTag ("to-maes")  ==  underlying_maes)
           { auto it = std::find (inchoates . begin (), inchoates . end (), tic);
-            if (it == inchoates . end ())
+            if (it  ==  inchoates . end ())
               { inchoates . push_back (tic);
                 tic->accom_sca
                   . Set (Vect (Tamparams::Current ()->table_scale_factor));
@@ -408,7 +410,7 @@ i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
           }
         else if (e -> ObjByTag ("from-maes")  ==  underlying_maes)
           { auto it = std::find (inchoates . begin (), inchoates . end (), tic);
-            if (it  != inchoates . end ())
+            if (it  !=  inchoates . end ())
               { inchoates . erase (it);
                 tic->accom_sca . Set (Vect (1.0));
               }
@@ -419,6 +421,9 @@ i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
         if (e -> ObjByTag ("onto-maes")  ==  underlying_maes)
           { AppendAtomToCollage (tic);
             tic -> BBoxSetColor (Tamglobals::Only ()->tabatom_bbox_color);
+            auto it = std::find (inchoates . begin (), inchoates . end (), tic);
+            if (it  !=  inchoates . end ())
+              inchoates . erase (it);
           }
     }
   return 0;
@@ -457,11 +462,28 @@ fprintf(stderr,"\n");
 
 
 i64 Orksur::Inhale (i64 ratch, f64 thyme)
-{ f64 dt = GraphicsApplication::GetFrameTime () -> GetCurrentDelta ();
+{ std::vector <Ticato *> *mort = NULL;
+  f64 dt = GraphicsApplication::GetFrameTime () -> GetCurrentDelta ();
   for (Ticato *tic  :  players)
     if (tic->shov_vel . AutoDot ()  >  0.0
         &&  ! AtomIsGrasped (tic))
-      ImpelFreeAtom (tic, dt);
+      if (ImpelFreeAtom (tic, dt)  ==  AtomThusness::NUKE)
+        { if (! mort)
+            mort = new std::vector <Ticato *> ();
+          mort -> push_back (tic);
+        }
+
+  if (mort)
+    { for (Ticato *mortic  :  *mort)
+        { auto it = std::find (players . begin (), players . end (), mortic);
+          if (it  ==  players . end ())
+            {  // whuh?
+              assert (M_PI == 3.0);
+            }
+          players . erase (it);
+        }
+      delete mort;
+    }
 
   return 0;
 }

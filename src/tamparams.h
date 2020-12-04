@@ -45,7 +45,7 @@ struct Tamparams
 
   f64 room_minify_factor = 0.478128;  // that's 4372mm / 9144mm, folks...
 
-  f64 disposal_speed_threshold = 400.0;  // mm per sec, is the thing.
+  f64 disposal_speed_threshold = 900.0;  // mm per sec, is the thing.
 
   static Tamparams ur_params;
   static std::vector <Tamparams *> tampa_stack;
