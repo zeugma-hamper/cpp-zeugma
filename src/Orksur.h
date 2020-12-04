@@ -54,6 +54,7 @@ class Orksur  :  public PlatonicMaes, public Node,
   std::unordered_map <std::string, Fondlish> hoverees;
   std::unordered_map <std::string, Fondlish> graspees;
   f64 sentient_dist, contact_dist;
+  std::unordered_map <std::string, f64> prev_prox_by_prov;
   std::map <u64, Ticato *> awaiting_audio_sooth;
   Ticato *sel_atom;
 
@@ -89,7 +90,14 @@ class Orksur  :  public PlatonicMaes, public Node,
 
   void DisposeOfCollage ();
 
+  void WhisperSplortily (const std::string &prv, const Vect &proj, f64 dst);
+
+  i64 ConfectSpatialPointingFromPosition (ZESpatialMoveEvent *e);
+
   i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
+  i64 ZESpatialHarden (ZESpatialHardenEvent *e)  override;
+  i64 ZESpatialSoften (ZESpatialSoftenEvent *e)  override;
+
   i64 ZEYowlAppear (ZEYowlAppearEvent *e)  override;
   i64 ZEBulletin (ZEBulletinEvent *e)  override;
   i64 TASSuggestion (TASSuggestionEvent *e)  override;

@@ -202,24 +202,14 @@ void Orksur::DisposeOfCollage ()
 }
 
 
-i64 Orksur::ZESpatialMove (ZESpatialMoveEvent *e)
-{ if (! e)
-    return -1;
-
-  const std::string &prv = e -> Provenance ();
-  Splort *s;
+void Orksur::WhisperSplortily (const std::string &prv, const Vect &proj, f64 dst)
+{ Splort *s;
   try  { s = splorts . at (prv); }
   catch (const std::out_of_range &e)
     { AppendChild (s = new Splort);
       splorts[prv] = s;
     }
-
-  Vect n = Norm ();
-  const Vect &p = e -> Loc ();
-  f64 tt = n . Dot (p - loc);
-  Vect proj = p  -  tt * n;
   s->loc . Set (proj);
-//  tt = fabs (tt);
 
   Vect bloff = proj - CornerBL ();
   Vect troff = CornerTR () - proj;
@@ -228,134 +218,183 @@ i64 Orksur::ZESpatialMove (ZESpatialMoveEvent *e)
   const Vect &o = ovr.val, &u = upp.val;
   f64 l = o . Dot (bloff), r = o . Dot (troff);
   if (l < 0.0  ||  r < 0.0)
-    return 0;
+    return;
   f64 b = u . Dot (bloff), t = u . Dot (troff);
   if (b < 0.0  ||  t < 0.0)
-    return 0;
+    return;
 
   s->re -> AppendLine (proj - l * o, proj + r * o);
   s->re -> AppendLine (proj - b * u, proj + t * u);
-  float aa = (tt - contact_dist) / (sentient_dist - contact_dist);
+  float aa = (dst - contact_dist) / (sentient_dist - contact_dist);
   if (aa < 0.0)
     aa = 0.0;
   else if (aa > 1.0)
     aa = 1.0;
   s->re -> SetLinesColor (ZeColor (1.0, 0.5 * (1.0 - aa)));
+}
+
+
+i64 Orksur::ConfectSpatialPointingFromPosition (ZESpatialMoveEvent *e)
+{ if (! e)
+    return -1;
+
+  const std::string &prv = e -> Provenance ();
+  Vect n = Norm ();
+  const Vect &p = e -> Loc ();
+  f64 t = n . Dot (p - loc);
+  Vect proj = p  -  t * n;
+
+  if (prev_prox_by_prov . find (prv)  ==  prev_prox_by_prov . end ())
+    prev_prox_by_prov[prv] = 2.0 * sentient_dist;
+  f64 pprox = prev_prox_by_prov[prv];
+
+  if (t >  sentient_dist)
+    { // perhaps start a timer whose runout triggers de-hovering etc.?
+      if (pprox  <=  sentient_dist)
+        {  // spatial-vanish event
+        }
+      prev_prox_by_prov[prv] = t;
+      return 0;
+    }
+
+  static std::string syn_s = "synth-";
+  std::string newprv = syn_s + prv;
+
+  if (pprox  >  sentient_dist)
+    {  // spatial-appear event
+    }
+
+  // no matter what at this point we needs must emit a move event
+  ZESpatialMoveEvent zsme (newprv, e -> Loc (), -Norm (), Over ());
+  zsme . SetForebearEvent (e);
+  // now the big question: do we route through general event distribution,
+  // or just send to ourselves? maybe the latter for now?
+  ZESpatialMove (&zsme);
+
+  if (t  <=  contact_dist)
+    { if (pprox  >  contact_dist)  // this here's the harden case
+        { ZESpatialHardenEvent zshe (zsme, 0);
+          zshe . SetForebearEvent (e);
+          ZESpatialHarden (&zshe);
+        }
+    }
+  else  // that is: we're hover -- between harden and oblivion
+    { if (pprox  <=  contact_dist)  // soften, wouldn't you know...
+        { ZESpatialSoftenEvent zsse (zsme, 0);
+          zsse . SetForebearEvent (e);
+          ZESpatialSoften (&zsse);
+        }
+    }
+  prev_prox_by_prov[prv] = t;
+  return 1;
+}
+
+
+i64 Orksur::ZESpatialMove (ZESpatialMoveEvent *e)
+{ if (! e)
+    return -1;
+
+  if (e -> Aim () . Norm () . Dot (Norm ())  >  -0.99)
+    return ConfectSpatialPointingFromPosition (e);
+
+  const std::string &prv = e -> Provenance ();
+
+  Vect n = Norm ();
+  const Vect &p = e -> Loc ();
+  f64 tt = n . Dot (p - loc);
+  Vect proj = p  -  tt * n;
+//  tt = fabs (tt);
+
+  WhisperSplortily (prv, proj, tt);
 
   auto heff = hoverees . find (prv);
   auto geff = graspees . find (prv);
 assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
-  Ticato *ca = ClosestAtom (proj);
-
-  if (tt  >  sentient_dist)  // but wait... what if grasping?
-    { if (heff  !=  hoverees . end ())
-        { hoverees . erase (heff);
-          // and whatever else's polite on un-hover
-        }
-      else if (geff  !=  graspees . end ())
-        { graspees . erase (geff);
-          // plus other leave-taking gubbish
-        }
-      DistinguishHoverees ();
-      return 0;
-    }
 
   // we'll give the sonochoosist first dibs
   if (soncho)
     if (soncho -> ZESpatialMove (e)  >  0)
       return 1;
 
-  if (! ca)
-    return 0;  // but when would... when would this actually...
-
-  if (tt  <=  contact_dist)
-    { if (geff  !=  graspees . end ())
-        { Vect newp = proj + geff->second.gropoff;
-          f64 dt = GraphicsApplication::GetFrameTime () -> GetCurrentDelta ();
-          ca->shov_vel
+  if (geff  !=  graspees . end ())  // we're dragging some atom around
+    { Vect newp = proj + geff->second.gropoff;
+      f64 dt = GraphicsApplication::GetFrameTime () -> GetCurrentDelta ();
+      geff->second.tic->shov_vel
 = Vect::zerov;
-//            = dt > 0.0  ?  (newp - ca -> CurLoc ()) / dt  :  Vect::zerov;
-          if (geff->second.tic  ==  ca)
-            { ca -> LocZoft () . Set (newp);
-              // 'ca' is the same as 'geff.second.tic', as below
-            }
-          else // i.e. a different atom is 'closer', but...
-            { // ... too bad! we're modally grasping an atom already;
-              // thus still manipulate the grasped atom
-              geff->second.tic
-                -> LocZoft () . Set (newp);
-            }
-        }
-      else if (heff  !=  hoverees . end ())
-        { if (heff->second.tic  ==  ca)  // expected case; same was hovered
-            { hoverees . erase (heff);
-              graspees[prv] = { ca, (ca -> CurLoc () - proj) };
-              ca -> MakeRenderablesForemostInLayer ();
-              ca->shov_vel = Vect::zerov;
-              AtomicFirstStrike (ca);
-            }
-          else  // weird, but possible
-            { Fondlish *fon = NULL;
-              for (auto &gr  :  graspees)
-                if (gr.second.tic  ==  ca)
-                  { fon = &gr.second;  break; }
-              if (! fon)  // nobody else is grasping ca (which != the hoveree)
-                { // bid frond frarewell to whoever's in the heff, and then...
-                  hoverees . erase (heff);
-                  graspees[prv] = { ca, (ca -> CurLoc () - proj) };
-                  ca -> MakeRenderablesForemostInLayer ();
-                  ca->shov_vel = Vect::zerov;
-                  AtomicFirstStrike (ca);
-                }
-              else  // somebody else is grasping ca
-                { // if (heff->second.tic  !=  ca)  // can't be the case
-                  heff->second.tic = ca;  // so we'll just keep hovering
-                }
-            }
-        }
-      else
-        { Fondlish *fon = NULL;
-          for (auto &fo  :  graspees)
-            if (fo.second.tic  ==  ca)
-              { fon = &fo.second;  break; }
-          if (! fon)
-            { // acquiring ca as graspee without history or hovering
-              graspees[prv] = { ca, (ca -> CurLoc () - proj) };
-            }
-          else  // ca already seeing some other wand...
-            { // and so... we hover? uh... sure.
-              hoverees[prv] = { ca, Vect::zerov };
-            }
-        }
+      geff->second.tic -> LocZoft () . Set (newp);
+      return 1;
     }
-  else  // we're between contact and hover
-    { if (geff  !=  graspees . end ())
-        { graspees . erase (geff);   // plus whatever else to detach grasping
-          hoverees[prv] = { ca, Vect::zerov };
-          // see if we're moving fast enough to qualify for deletion ballistics
-          if (ca->shov_vel . Mag ()
-              >=  Tamparams::Current ()->disposal_speed_threshold)
-            { fprintf (stderr, "PREYZDE LAWD -- <%p> gon' scoot to die!", ca);
-              // and but then as well... what.
-// QQQ ca->shov_vel = Vect::zerov;
-            }
-          else
-            ca->shov_vel = Vect::zerov;
-        }
-      else if (heff  !=  hoverees . end ())
-        { if (heff->second.tic  !=  ca)
-            { // adios, other-tic
-              heff->second.tic = ca;
-            }
-          // glow or other hover-y appurtenances
-        }
-      else
-        { hoverees[prv] = { ca, Vect::zerov };
-          // plus: hello hoveree!
-        }
+
+  Ticato *ca = ClosestAtom (proj);
+  if (heff  ==  hoverees . end ())
+    { if (ca)
+        hoverees[prv] = { ca, Vect::zerov };
+    }
+  else if (heff->second.tic  !=  ca)
+    { // lighting change for outgoing?
+      heff->second.tic = ca;
     }
 
   DistinguishHoverees ();
+  return 0;
+}
+
+
+i64 Orksur::ZESpatialHarden (ZESpatialHardenEvent *e)
+{ if (! e)
+    return -1;
+
+  const std::string &prv = e -> Provenance ();
+  auto heff = hoverees . find (prv);
+  if (heff  ==  hoverees . end ())
+    return 0;  // anythig else to do besides, you know, nothing?
+
+  Vect n = Norm ();
+  const Vect &p = e -> Loc ();
+  f64 tt = n . Dot (p - loc);
+  Vect proj = p  -  tt * n;
+
+  Ticato *tic = heff->second.tic;
+  hoverees . erase (heff);
+
+  if (graspees . find (prv)  !=  graspees . end ())
+    {  // it's shouldn't be possible... and yet... well, let's figure it out:
+      assert (true == false);
+    }
+
+  graspees[prv] = { tic, (tic -> CurLoc () - proj) };
+  tic -> MakeRenderablesForemostInLayer ();
+  tic->shov_vel = Vect::zerov;
+  AtomicFirstStrike (tic);
+  // and also... light the lucky atom up? or like that?
+  return 1;
+}
+
+
+i64 Orksur::ZESpatialSoften (ZESpatialSoftenEvent *e)
+{ if (! e)
+    return -1;
+
+  const std::string &prv = e -> Provenance ();
+  auto geff = graspees . find (prv);
+  if (geff  ==  graspees . end ())
+    return 0;  // really just that simple?
+
+  if (hoverees . find (prv)  !=  hoverees . end ())
+    {  // the heck?
+      assert (0.1  ==  1.0);
+    }
+
+  hoverees[prv] = geff->second;
+  graspees . erase (geff);
+/*
+  if (ca->shov_vel . Mag ()
+      >=  Tamparams::Current ()->disposal_speed_threshold)
+    { fprintf (stderr, "PREYZDE LAWD -- <%p> gon' scoot to die!", ca);
+      // and but then as well... what.
+// QQQ ca->shov_vel = Vect::zerov;
+    }
+*/
   return 0;
 }
 
