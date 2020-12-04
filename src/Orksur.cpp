@@ -273,7 +273,8 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
         { Vect newp = proj + geff->second.gropoff;
           f64 dt = GraphicsApplication::GetFrameTime () -> GetCurrentDelta ();
           ca->shov_vel
-            = dt > 0.0  ?  (newp - ca -> CurLoc ()) / dt  :  Vect::zerov;
+= Vect::zerov;
+//            = dt > 0.0  ?  (newp - ca -> CurLoc ()) / dt  :  Vect::zerov;
           if (geff->second.tic  ==  ca)
             { ca -> LocZoft () . Set (newp);
               // 'ca' is the same as 'geff.second.tic', as below
@@ -336,6 +337,7 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
               >=  Tamparams::Current ()->disposal_speed_threshold)
             { fprintf (stderr, "PREYZDE LAWD -- <%p> gon' scoot to die!", ca);
               // and but then as well... what.
+// QQQ ca->shov_vel = Vect::zerov;
             }
           else
             ca->shov_vel = Vect::zerov;
@@ -389,6 +391,8 @@ i64 Orksur::ZEYowlAppear (ZEYowlAppearEvent *e)
     { if (soncho)  soncho -> Unfurl (); }
   else if (utt  ==  "/")
     { DisposeOfCollage (); }
+  else if (utt  ==  ".")
+    { SilenceAllAtoms (); }
   return 0;
 }
 
@@ -420,6 +424,7 @@ i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
     { if (tic = dynamic_cast <Ticato *> (e -> ObjByTag ("inbound-atom")))
         if (e -> ObjByTag ("onto-maes")  ==  underlying_maes)
           { AppendAtomToCollage (tic);
+            tic->wander_vel = Vect::zerov;
             tic -> BBoxSetColor (Tamglobals::Only ()->tabatom_bbox_color);
             auto it = std::find (inchoates . begin (), inchoates . end (), tic);
             if (it  !=  inchoates . end ())
