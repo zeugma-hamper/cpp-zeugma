@@ -119,7 +119,8 @@ void Timeline::EstablishCineReceiver (SilverScreen *essess)
 }
 
 
-bool Timeline::TimeFromSpatialPointing (ZESpatialEvent *e, f64 &out_time)
+bool Timeline::TimeFromSpatialPointing (ZESpatialEvent *e, f64 &out_time,
+                                        bool ignore_bounds)
 { if (! e)
     return false;
 
@@ -133,8 +134,9 @@ bool Timeline::TimeFromSpatialPointing (ZESpatialEvent *e, f64 &out_time)
     { hitp -= cnt;
       f64 ov = hitp . Dot (ovr);
       f64 up = hitp . Dot (upp);
-      if (ov < 0.65 * width  &&  ov > -0.65 * width
-          &&  up < 20.0 * thickth  &&  up > -20.0 * thickth)
+      if (ignore_bounds
+          ||  (ov < 0.65 * width  &&  ov > -0.65 * width
+               &&  up < 20.0 * thickth  &&  up > -20.0 * thickth))
         { f64 t = ov / width  +  0.5;
           if (t < 0.0)       t = 0.0;
           else if (t > 1.0)  t = 1.0;
@@ -146,29 +148,57 @@ bool Timeline::TimeFromSpatialPointing (ZESpatialEvent *e, f64 &out_time)
 }
 
 
+#define MIN_INTER_SCRUB_INTERVAL (1.0 / 25.0)
+
+
 i64 Timeline::ZESpatialMove (ZESpatialMoveEvent *e)
 { if (! e)
     return -1;
+
   f64 t;
-  if (TimeFromSpatialPointing (e, t))
-    SetHoverTime (t);
+  if (scrubber . empty ())
+    { if (TimeFromSpatialPointing (e, t))
+        SetHoverTime (t);
+      return 0;
+    }
+  else if (scrubber  ==  e -> Provenance ())
+    { if (scrub_timer . CurTimeGlance ()  >=  0.0)  // wait for initial t-detent
+        { TimeFromSpatialPointing (e, t, true);
+          SetPlayTime (t);
+          SetHoverTime (t);
+          if (cine_receiver)
+            if (scrub_timer . CurTimeGlance ()  >  MIN_INTER_SCRUB_INTERVAL)
+              { cine_receiver -> JumpToTime (t);
+                scrub_timer . ZeroTime ();
+              }
+        }
+    }
   return 0;
 }
 
 i64 Timeline::ZESpatialHarden (ZESpatialHardenEvent *e)
 { if (! e)
     return -1;
+
+  const std::string &prv = e -> Provenance ();
+  if (! scrubber . empty ()  &&  scrubber != prv)
+    return 0;
+
   f64 t;
   if (TimeFromSpatialPointing (e, t))
     { SetPlayTime (t);
       if (cine_receiver)
         cine_receiver -> JumpToTime (t);
+      scrubber = prv;
+      scrub_timer . SetTime (-0.225);
     }
   return 0;
 }
 
+
 i64 Timeline::ZESpatialSoften (ZESpatialSoftenEvent *e)
-{
+{ if (scrubber  ==  e -> Provenance ())
+    scrubber . clear ();
   return 0;
 }
 

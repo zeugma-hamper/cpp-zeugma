@@ -230,11 +230,15 @@ i64 GraumanPalace::ZESpatialHarden (ZESpatialHardenEvent *e)
 i64 GraumanPalace::ZESpatialSoften (ZESpatialSoftenEvent *e)
 { if (! e)
     return -1;
-  if (e -> Provenance ()  !=  effecting_pushback)
-    return 0;  // the phone's not for you
 
-  ReleasePushback ();
-  effecting_pushback . clear ();
+  if (e -> Provenance ()  ==  effecting_pushback)
+    { ReleasePushback ();
+      effecting_pushback . clear ();
+      return 0;
+    }
+  else if (sole_tline)
+    return sole_tline -> ZESpatialSoften (e);
+
   return 0;
 }
 

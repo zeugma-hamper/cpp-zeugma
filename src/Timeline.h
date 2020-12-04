@@ -43,6 +43,8 @@ class Timeline  :  public Zeubject, public Node,
   PolygonRenderable *track_rend;
 
   SilverScreen *cine_receiver;
+  std::string scrubber;
+  MotherTime scrub_timer;
 
   Timeline ();
   ~Timeline ()  override;
@@ -59,7 +61,8 @@ class Timeline  :  public Zeubject, public Node,
   void SetPlayTime (f64 pt);
   void SetHoverTime (f64 ht);
 
-  bool TimeFromSpatialPointing (ZESpatialEvent *e, f64 &out_time);
+  bool TimeFromSpatialPointing (ZESpatialEvent *e, f64 &out_time,
+                                bool ignore_bounds = false);
 
   i64 ZESpatialMove (ZESpatialMoveEvent *e);
   i64 ZESpatialHarden (ZESpatialHardenEvent *e);
