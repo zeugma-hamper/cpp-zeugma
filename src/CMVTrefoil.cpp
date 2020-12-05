@@ -1,14 +1,15 @@
+
 #include <CMVTrefoil.h>
 
 #include <Bolex.h>
 #include <PlatonicMaes.h>
 
-namespace charm
-{
+
+namespace charm  {
+
 
 Bolex *CameraFromMaes (const PlatonicMaes &m)
-{
-  Bolex *cam = new Bolex;
+{ Bolex *cam = new Bolex;
 
   Vect nrm = m . Over () . Cross (m . Up ()) . Norm ();
   f64 dst = 0.8 * m . Width ();
@@ -27,11 +28,14 @@ Bolex *CameraFromMaes (const PlatonicMaes &m)
   return cam;
 }
 
+
 i64 CMVTrefoil::Inhale (i64 ratch, f64 thyme)
-{
-  if (cam)  cam -> Inhale (ratch, thyme);
-  if (maes)  maes -> Inhale (ratch, thyme);
+{ if (cam)
+    cam -> Inhale (ratch, thyme);
+  if (maes)
+    maes -> Inhale (ratch, thyme);
   return 0;
 }
+
 
 }

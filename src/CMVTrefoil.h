@@ -42,18 +42,26 @@ class CMVTrefoil  :  public Zeubject
   Bolex *cam;
   PlatonicMaes *maes;
   BGFXView view;
+
   std::vector <Layer *> layers;
+  f64 synthetic_spatial_event_dist;
 
   CMVTrefoil (PlatonicMaes *_maes)  :  Zeubject (),
-                                       cam (nullptr), maes (_maes), view ()
+                                       cam (nullptr), maes (_maes), view (),
+                                       synthetic_spatial_event_dist (-1.0)
     { }
 
   CMVTrefoil (Bolex *_cam, PlatonicMaes *_maes)  :  Zeubject (),
-                                                    cam (_cam), maes (_maes),
-                                                    view ()
+     cam (_cam), maes (_maes), view (),
+     synthetic_spatial_event_dist (-1.0)
     { }
 
   i64 Inhale (i64 ratch, f64 thyme)  override;
+
+  f64 SyntheticSpatialEventDist ()  const
+    { return synthetic_spatial_event_dist; }
+  void SetSyntheticSpatialEventDist (f64 ssed)
+    { synthetic_spatial_event_dist = ssed; }
 };
 
 

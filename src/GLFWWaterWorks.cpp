@@ -249,20 +249,23 @@ void GLFWWaterWorks::CreateZEMoveFromGLFW (GLFWwindow *_window, f64 _x, f64 _y)
   f64 const x_normed = _x / (f64)(leaf->view.fb_pix_r - leaf->view.fb_pix_l);
   f64 const y_normed = _y / (f64)(leaf->view.fb_pix_t - leaf->view.fb_pix_b);
   Bolex *c = leaf->cam;
+  f64 vd = c -> ViewDist ();
 
-  Vect thr = c -> ViewLoc ()  +  c -> ViewDist () * c -> ViewAim ();
+  Vect thr = c -> ViewLoc ()  +  vd * c -> ViewAim ();
   f64 wid = c -> IsProjectionTypeOrthographic ()  ?  c -> ViewOrthoWid ()
-    :  c -> ViewDist () * 2.0 * tan (0.5 * c -> ViewHorizAngle ());
+    :  vd * 2.0 * tan (0.5 * c -> ViewHorizAngle ());
   f64 hei = c -> IsProjectionTypeOrthographic ()  ?  c -> ViewOrthoHei ()
-    :  c -> ViewDist () * 2.0 * tan (0.5 * c -> ViewVertAngle ());
+    :  vd * 2.0 * tan (0.5 * c -> ViewVertAngle ());
   Vect ovr = c -> ViewAim () . Cross (c -> ViewUp ()) . Norm ();
   Vect upp = ovr . Cross (c -> ViewAim ());
 
   thr += (x_normed - 0.5) * wid * ovr  +  (y_normed - 0.5) * hei * upp;
+  f64 backoff = (leaf -> SyntheticSpatialEventDist ()  <  0.0)
+    ?  vd  :  leaf -> SyntheticSpatialEventDist ();
   Vect frm
     = (c -> IsProjectionTypePerspective ()  &&  ! m_mouse_to_spatial_ortho_style)
     ?  c -> ViewLoc ()
-    :  thr - c -> ViewDist () * c -> ViewAim ();
+    :  thr - backoff * c -> ViewAim ();
 
   ZESpatialMoveEvent smev (s_glfw_mouse_name, frm, (thr - frm) . Norm (), ovr);
 

@@ -305,6 +305,11 @@ i64 Orksur::ZESpatialMove (ZESpatialMoveEvent *e)
   Vect proj = p  -  tt * n;
 //  tt = fabs (tt);
 
+  // let's constrain to some reasonably-bounded airspace above the table
+  if (! G::PointRectContainment (proj, Loc (), Over (), Up (),
+                                 1.1 * Width (), 1.1 * Height ()))
+    return 0;
+
   WhisperSplortily (prv, proj, tt);
 
   auto heff = hoverees . find (prv);

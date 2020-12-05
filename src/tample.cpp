@@ -538,8 +538,9 @@ int main (int ac, char **av)
           leaf->layers . push_back (walls_layer);
         }
       if (leaf->maes -> Name ()  ==  "table")
-        leaf->layers . push_back (table_layer);
-
+        { leaf->layers . push_back (table_layer);
+          leaf -> SetSyntheticSpatialEventDist (100.0);
+        }
       //ee_layer goes on all
       leaf->layers . push_back (omni_layer);
     }
