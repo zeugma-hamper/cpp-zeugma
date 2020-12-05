@@ -176,6 +176,52 @@ gst_app_dep   = dependency ('gstreamer-app-1.0')
 gst_video_dep = dependency ('gstreamer-video-1.0')
 
 ##### CHARM #####
+
+# be sure to run `./install_bgfx_tools.sh <BIN_DIR>` before building charm
+shaderc_prog = find_program ('shaderc', dirs : [get_option ('shaderc-path')])
+
+# NOTE: this is only for shaders that turn into headers, most go below
+header_shaders = [
+  ['vertex',   'font/vs_font_basic.sc',
+               'font/varying.def.sc',
+               'vs_font_basic.bin.h'],
+  ['fragment', 'font/fs_font_basic.sc',
+               'font/varying.def.sc',
+               'fs_font_basic.bin.h'],
+  ['vertex',   'font/vs_font_distance_field.sc',
+               'font/varying.def.sc',
+               'vs_font_distance_field.bin.h'],
+  ['fragment', 'font/fs_font_distance_field.sc',
+               'font/varying.def.sc',
+               'fs_font_distance_field.bin.h'],
+  ['vertex',   'font/vs_font_distance_field_subpixel.sc',
+               'font/varying.def.sc',
+               'vs_font_distance_field_subpixel.bin.h'],
+  ['fragment', 'font/fs_font_distance_field_subpixel.sc',
+               'font/varying.def.sc',
+               'fs_font_distance_field_subpixel.bin.h'],
+]
+
+header_shader_files = []
+
+foreach shader : header_shaders
+  fl = custom_target (shader[3],
+                      input : [shader[1], shader[2]],
+                      output : [shader[3]],
+                      command : [shaderc_prog,
+                                 '-i', meson.source_root () + '/bgfx/src',
+                                 '-i', meson.source_root () + '/src/shaders/include',
+                                 '-i', meson.source_root () + '/bgfx/examples',
+                                 '-f', '@INPUT0@',
+                                 '-o', '@OUTPUT0@',
+                                 '--bin2c',
+                                 '--type', shader[0],
+                                 '--varyingdef', '@INPUT1@',
+                                 '--profile', '460'],
+                      build_by_default : true)
+  header_shader_files += [fl]
+endforeach
+
 lib_sources = ['src/application.cpp',
                'src/Alignifer.cpp',
                'src/AudioMessenger.cpp',
@@ -216,6 +262,8 @@ lib_sources = ['src/application.cpp',
                'src/ScGrappler.cpp',
                'src/SpaceThing.cpp',
                'src/TampVideoTerminus.cpp',
+               'src/TextRenderable.cpp',
+               'src/TextSystem.cpp',
                'src/TexturedRenderable.cpp',
                'src/TrGrappler.cpp',
                'src/Vect.cpp',
@@ -235,28 +283,32 @@ lib_sources = ['src/application.cpp',
                'src/conjure-from-toml.cpp',
                'src/global-params.cpp']
 
+font_sources = ['font/cube_atlas.cpp',
+                'font/font_manager.cpp',
+                'font/text_buffer_manager.cpp',
+                'font/text_metrics.cpp',
+                'font/utf8.cpp']
 
 charm_inc = include_directories ('src')
 toml_inc = include_directories ('toml11')
+font_inc = include_directories ('font')
 
 charm_definition_deps = [bx_dep, bimg_dep, bgfx_dep, glfw_dep,
                          gst_dep, gst_app_dep, gst_video_dep,
                          oiio_dep, boost_dep, lo_dep]
 
-charm_lib = static_library ('charm', lib_sources,
-                            include_directories : [charm_inc, toml_inc],
+charm_lib = static_library ('charm', lib_sources + font_sources + header_shader_files,
+                            include_directories : [charm_inc, toml_inc, font_inc],
                             dependencies : charm_definition_deps,
                             cpp_args : bgfx_build_args,
                             install : true)
 
-charm_dep = declare_dependency (include_directories : [charm_inc, toml_inc],
+charm_dep = declare_dependency (include_directories : [charm_inc, toml_inc, font_inc],
                                 link_with : [charm_lib],
                                 dependencies : charm_definition_deps)
 
 
 ##### SHADERS #####
-# be sure to run `./install_bgfx_tools.sh <BIN_DIR>` before building charm
-shaderc_prog = find_program ('shaderc', dirs : [get_option ('shaderc-path')])
 
 # [type, input file, varying file, output file]
 shaders = [
@@ -310,6 +362,8 @@ foreach shader : shaders
                  build_by_default : true)
 endforeach
 
+
+
 ##### EXECUTABLES #####
 bgfx_test_exec = executable ('bgfx_test',
                              sources : ['src/bgfx_test.cpp'],
@@ -317,6 +371,10 @@ bgfx_test_exec = executable ('bgfx_test',
 
 dead_zone_exec = executable ('dead_zone',
                              sources : ['src/dead_zone.cpp'],
+                             dependencies : [charm_dep])
+
+text_zone_exec = executable ('text_zone',
+                             sources : ['src/text_zone.cpp'],
                              dependencies : [charm_dep])
 
 config_parser_exec = executable ('config_parser',

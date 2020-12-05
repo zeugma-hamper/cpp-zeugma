@@ -231,38 +231,31 @@ bgfx::TextureHandle UpdateWholeTexture2D (bgfx::TextureHandle _texture,
   return _texture;
 }
 
-struct MappedFile
-{
-  MappedFile (std::string_view _path)
+MappedFile::MappedFile (std::string_view _path)
     : fd {-1},
       size {0},
       ptr {nullptr}
-  {
-    fd = open (_path.data (), O_RDONLY | O_CLOEXEC);
-    if (fd <= 0)
-      return;
+{
+  fd = open (_path.data (), O_RDONLY | O_CLOEXEC);
+  if (fd <= 0)
+    return;
 
-    size = lseek (fd, 0, SEEK_END);
-    lseek (fd, 0, SEEK_SET);
+  size = lseek (fd, 0, SEEK_END);
+  lseek (fd, 0, SEEK_SET);
 
-    ptr = mmap (NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
-  }
+  ptr = mmap (NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
+}
 
-  ~MappedFile ()
-  {
-    if (ptr)
-      munmap (ptr, size);
-    ptr = nullptr;
+MappedFile::~MappedFile ()
+{
+  if (ptr)
+    munmap (ptr, size);
+  ptr = nullptr;
 
-    if (fd > 0)
-      close (fd);
-    fd = 0;
-  }
-
-  int fd;
-  off_t size;
-  void *ptr;
-};
+  if (fd > 0)
+    close (fd);
+  fd = 0;
+}
 
 bimg_ptr LoadKTXImage (std::string_view _path, bx::Error *_error)
 {
