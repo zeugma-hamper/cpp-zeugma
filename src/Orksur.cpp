@@ -244,6 +244,17 @@ i64 Orksur::ConfectSpatialPointingFromPosition (ZESpatialMoveEvent *e)
   f64 t = n . Dot (p - loc);
   Vect proj = p  -  t * n;
 
+  // ensure that we're within the airspace of the surface.
+  // note: may want to restrict this check to harden...
+  f64 w = 0.5 * wid.val;
+  f64 h = 0.5 * hei.val;
+  Vect locl = proj - loc.val;
+  f64 u = locl . Dot (ovr.val);
+  if (u < -w  ||  u > w)
+    return 0;
+  if ((u = locl . Dot (upp . val))  <  -h  ||  u > h)
+    return 0;
+
   if (prev_prox_by_prov . find (prv)  ==  prev_prox_by_prov . end ())
     prev_prox_by_prov[prv] = 2.0 * sentient_dist;
   f64 pprox = prev_prox_by_prov[prv];
@@ -305,7 +316,7 @@ i64 Orksur::ZESpatialMove (ZESpatialMoveEvent *e)
   Vect proj = p  -  tt * n;
 //  tt = fabs (tt);
 
-  // let's constrain to some reasonably-bounded airspace above the table
+  // constrain to some reasonable laterally-bounded airspace o'er the table
   if (! G::PointRectContainment (proj, Loc (), Over (), Up (),
                                  1.1 * Width (), 1.1 * Height ()))
     return 0;
@@ -349,16 +360,22 @@ i64 Orksur::ZESpatialHarden (ZESpatialHardenEvent *e)
 { if (! e)
     return -1;
 
+  // let's reject if not over our airspace
+  Vect proj;
+  if (! G::PointRectContainment (e -> Loc (), Loc (), Over (), Up (),
+                                 Width (), Height (), &proj))
+    return 0;
+
   const std::string &prv = e -> Provenance ();
   auto heff = hoverees . find (prv);
   if (heff  ==  hoverees . end ())
     return 0;  // anythig else to do besides, you know, nothing?
-
+/*
   Vect n = Norm ();
   const Vect &p = e -> Loc ();
   f64 tt = n . Dot (p - loc);
   Vect proj = p  -  tt * n;
-
+*/
   Ticato *tic = heff->second.tic;
   hoverees . erase (heff);
 
