@@ -1,6 +1,11 @@
 root="/opt/trelopro/tamper/o-g/cine"
 roto_root="rotopro"
 
+# dimensions determined with
+# ffprobe -v error -show_entries stream=coded_width,coded_height film.mov
+# duration determined with
+# ffprobe -v error -select_streams v:0 -show_entries stream=duration film.mov
+
 [boaa]
 name="Belly of an Architect"
 path="boaa-mpeg4.mov"
