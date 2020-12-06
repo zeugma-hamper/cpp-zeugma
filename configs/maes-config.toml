@@ -22,13 +22,16 @@ ideal-pixhei = 2160
 [[maeses]]
 name = "table"
 # location = [0.0, 1077.0, 292.0]  // table thinks it's higher than it is
-location = [0.0, 1077.0, 292.0]
+#location = [0.0, 1077.0, 292.0]
+location = [0.0, 1028.0, -60.0]
 over = [1.0, 0.0, 0.0]
 up = [0.0, 0.422618, -0.906308]
-width = 1210.0
-height = 680.0
-ideal-pixwid = 1920
-ideal-pixhei = 1080
+width = 1327.6
+height = 746.8
+#ideal-pixwid = 1920
+#ideal-pixhei = 1080
+ideal-pixwid = 3840
+ideal-pixhei = 2160
 
 # [[maeses]]
 # name = "table"

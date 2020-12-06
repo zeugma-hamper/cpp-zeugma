@@ -1,7 +1,8 @@
 [[windows]]
-name = "only"
+name = "lone"
 position = [0, 0]
-size = [9600, 2160]
+#size = [9600, 2160]
+size = [11520, 2160]
 color-size = [8, 8, 8, 8]
 ds-size = [24, 8]
 decorated = false
@@ -23,4 +24,5 @@ size = [3840, 2160]
 name = "table"
 maes = "table"
 offset = [7680, 0]
-size = [1920, 1080]
+#size = [1920, 1080]
+size = [3840, 2160]
