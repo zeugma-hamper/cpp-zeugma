@@ -14,6 +14,7 @@ uniform vec4 u_up;
 #define VIDEO 1.0
 
 #define SIZE_REFERENT u_flags.x
+#define ENABLE_MIX    u_flags.y
 
 void main()
 {
