@@ -124,6 +124,17 @@ struct MattePipeline
   ch_ptr<MatteLoaderWorker> worker;
 };
 
+enum class FinishType
+{
+  Canceled,
+  Successful
+};
+
+namespace s2 = boost::signals2;
+using TrickPlayFinishSignal = s2::signal<void(FinishType)>;
+using TrickPlayFinishCallback = TrickPlayFinishSignal::slot_function_type;
+using TrickPlayFinishExCallback = TrickPlayFinishSignal::extended_slot_function_type;
+
 struct ManualTrickPlayState
 {
   bool ClearIsReady ();
@@ -132,7 +143,7 @@ struct ManualTrickPlayState
 
   void ConditionalSetReady ();
 
-  void Clear ();
+  void Clear (FinishType _finish);
 
   f64 Reset (f64 _pts, f64 _current_ts, f64 _num_steps);
 
@@ -146,9 +157,10 @@ struct ManualTrickPlayState
   // call below methods with mutex
   bool ClearIsReadyInternal ();
   bool IsInProgressInternal ();
-  void ClearInternal ();
+  bool ClearInternal ();
   f64 ResetInternal (f64 _pts, f64 _current_ts, f64 _num_steps);
 
+  TrickPlayFinishSignal m_finish_signal;
   std::mutex m_state_mutex;
   f64 m_seek_pts = -1.0;
   f64 m_seek_dist = -1.0;
@@ -215,6 +227,8 @@ class VideoPipeline : public CharmBase<VideoPipeline>
   void ClearMattes ();
 
   void TrickSeekTo (f64 _pts, f64 _duration);
+  s2::connection TrickSeekTo (f64 _pts, f64 _duration, TrickPlayFinishCallback &&cb);
+  s2::connection TrickSeekToEx (f64 _pts, f64 _duration, TrickPlayFinishExCallback &&cb);
 
   // called by Terminus from the streaming thread
   void NewBufferCallback (GstBuffer *_buffer, GstVideoInfo *_info,

@@ -190,20 +190,32 @@ void ManualTrickPlayState::ConditionalSetReady ()
     m_is_ready = true;
 }
 
-void ManualTrickPlayState::Clear ()
+void ManualTrickPlayState::Clear (FinishType _finish)
 {
-  std::unique_lock lock {m_state_mutex};
-  ClearInternal ();
+  bool did_cancelling = false;
+  {
+    std::unique_lock lock {m_state_mutex};
+    did_cancelling = ClearInternal ();
+  }
+
+  if (did_cancelling)
+    m_finish_signal (_finish);
 }
 
 f64 ManualTrickPlayState::Reset (f64 _pts, f64 _current_ts, f64 _num_steps)
 {
-  std::unique_lock lock {m_state_mutex};
-  ClearInternal ();
-  if (_pts >= 0.0 && _num_steps > 0.0)
-    return ResetInternal (_pts, _current_ts, _num_steps);
+  bool did_cancelling = false;
+  f64 ts = -1.0;
+  {
+    std::unique_lock lock {m_state_mutex};
+    did_cancelling = ClearInternal ();
+    if (_pts >= 0.0 && _num_steps > 0.0)
+      ts = ResetInternal (_pts, _current_ts, _num_steps);
+  }
+  if (did_cancelling)
+    m_finish_signal (FinishType::Canceled);
 
-  return -1.0;
+  return ts;
 }
 
 //next pts, is finished flag
@@ -235,12 +247,16 @@ bool ManualTrickPlayState::IsInProgressInternal ()
   return m_seek_pts != m_seek_last_pts;
 }
 
-void ManualTrickPlayState::ClearInternal ()
+bool ManualTrickPlayState::ClearInternal ()
 {
+  bool const ret = m_seek_pts >= 0.0;
+
   m_is_ready = false;
   m_seek_pts = -1.0;
   m_seek_dist = -1.0;
   m_seek_last_pts = -1.0;
+
+  return ret;
 }
 
 f64 ManualTrickPlayState::ResetInternal (f64 _pts, f64 _current_ts, f64 _num_steps)
@@ -328,19 +344,19 @@ ch_ptr<VideoTexture> VideoPipeline::GetVideoTexture ()
 void VideoPipeline::Play ()
 {
   pipeline->Play();
-  trick_mode_state.Clear();
+  trick_mode_state.Clear(FinishType::Canceled);
 }
 
 void VideoPipeline::Pause ()
 {
   pipeline->Pause();
-  trick_mode_state.Clear();
+  trick_mode_state.Clear(FinishType::Canceled);
 }
 
 void VideoPipeline::Seek (f64 _ts)
 {
   pipeline->Seek(_ts);
-  trick_mode_state.Clear();
+  trick_mode_state.Clear(FinishType::Canceled);
 }
 
 void VideoPipeline::SetPlaySpeed (f64 _speed, bool _trick_play)
@@ -367,7 +383,7 @@ bool VideoPipeline::IsInFlux () const
 void VideoPipeline::Step (u32 _distance)
 {
   pipeline->Step (_distance);
-  trick_mode_state.Clear();
+  trick_mode_state.Clear(FinishType::Canceled);
 }
 
 // pass _play_speed as something other than 0.0f to change speed
@@ -375,7 +391,7 @@ void VideoPipeline::Step (u32 _distance)
 void VideoPipeline::Loop (f64 _from, f64 _to, f32 _play_speed)
 {
   pipeline->Loop (_from, _to, _play_speed);
-  trick_mode_state.Clear();
+  trick_mode_state.Clear(FinishType::Canceled);
 }
 
 bool VideoPipeline::IsLooping () const
@@ -494,12 +510,28 @@ void VideoPipeline::TrickSeekTo (f64 _pts, f64 _duration)
 
   if (dest_ts < 0.0)
     {
-      trick_mode_state.Clear();
+      trick_mode_state.Clear(FinishType::Canceled);
       return;
     }
 
   pipeline->Pause();
   pipeline->Seek(dest_ts);
+}
+
+s2::connection VideoPipeline::TrickSeekTo (f64 _pts, f64 _duration, TrickPlayFinishCallback &&cb)
+{
+  auto conn = trick_mode_state.m_finish_signal.connect (std::move (cb));
+  TrickSeekTo (_pts, _duration);
+
+  return conn;
+}
+
+s2::connection VideoPipeline::TrickSeekToEx (f64 _pts, f64 _duration, TrickPlayFinishExCallback &&cb)
+{
+  auto conn = trick_mode_state.m_finish_signal.connect_extended (std::move (cb));
+  TrickSeekTo (_pts, _duration);
+
+  return conn;
 }
 
 void VideoPipeline::NewBufferCallback (GstBuffer *,  GstVideoInfo *_info,
@@ -682,7 +714,7 @@ void VideoSystem::UploadFrames ()
             {
               pipe->pipeline->Seek (ur.ts);
               if (ur.is_finished) //finished
-                pipe->trick_mode_state.Clear();
+                pipe->trick_mode_state.Clear(FinishType::Successful);
             }
 
           if (pipe->MatteCount() == 0)

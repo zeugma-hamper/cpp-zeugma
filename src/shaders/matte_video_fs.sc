@@ -33,7 +33,7 @@ void main()
   vec4 oc = u_adj_color * vec4 (convert_bt601_scaled (yuv), alpha);
   if (ENABLE_MIX > 0.0 && alpha * alpha < 0.25)
     {
-      oc = u_adj_color * u_mix_color * vec4 (yuv.r, yuv.r, yuv.r, 1.0);
+      oc = vec4 (u_mix_color.rgb * oc.rgb, 1.0);
     }
 
   out_color = oc;

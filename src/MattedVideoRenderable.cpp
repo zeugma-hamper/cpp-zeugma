@@ -21,7 +21,7 @@ MattedVideoRenderable::MattedVideoRenderable ()
     m_size_referent {SizeReferent::Matte},
     m_enable_matte {true},
     m_enable_mix_color {false},
-    m_mix_color {0.5f, 0.5f, 0.5f, 1.0f}
+    m_mix_color {0.20f, 0.20f, 0.20f, 1.0f}
 {
   EnableMatte();
 }
