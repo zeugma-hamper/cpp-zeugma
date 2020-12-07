@@ -49,6 +49,7 @@ class Ticato  :  public Alignifer
   std::string hvrr;
   std::string ynkr;
   Vect shov_vel;
+  InterpVect gropoff;
   Node *from_node;
   LoopFloat shabby_loop_minder;
 

@@ -210,7 +210,7 @@ i64 GraumanPalace::RummageInCurrentFlick (ZESpatialMoveEvent *e)
   const ClipInfo *clp = ss -> NthNascentAtom (cls_ind);
   assert (clp  !=  NULL);
 
-  curclip_by_prv[prv] = clp;
+  curclip_by_prv[prv] = { clp, bbb };
 
 const char *nm = clp -> UniqueAtomName () . c_str ();
 fprintf (stderr, "well, we CERTAINLY WHACKED clip <%s>\n", nm);
@@ -242,8 +242,9 @@ i64 GraumanPalace::PounceInCurrentFlick (ZESpatialHardenEvent *e)
   if (cit  ==  curclip_by_prv . end ())
     return 0;
 
-  const ClipInfo *clip = cit->second;
-  if (clip  ==  NULL)
+  const ClipInfo *clip = cit->second.first;
+  WoCoLoBbox *bbo = cit->second.second;
+  if (clip == NULL  ||  bbo == NULL)
     { assert ('a'  ==  'f');  // unspeakably bad grades
       return 0;
     }
@@ -262,7 +263,9 @@ i64 GraumanPalace::PounceInCurrentFlick (ZESpatialHardenEvent *e)
   if (WoCoLoBbox *bb = ss -> NatomBboxByClip (clip))
     s = (bb->widt > bb->heig)  ?  bb->widt  :  bb->heig;
   newt->sca . SetHard (s);
-  newt->loc . SetHard (hitp);  // accommodate offset as next step
+  newt->loc . SetHard (bbo->cntr);  // accommodate offset as next step
+  newt->gropoff . SetHard (bbo->cntr - hitp);
+  newt->gropoff . Set (Vect::zerov);
   newt -> SetCurMaes (backing_maes);
   creatom_by_prv[prv] = newt;
 
@@ -330,30 +333,7 @@ i64 GraumanPalace::ZESpatialHarden (ZESpatialHardenEvent *e)
     { }
   else
     { return sole_tline -> ZESpatialHarden (e); }
-  // else if (SilverScreen *s = CurSilverScreen ())
-  //   { Vect hit;
-  //     if (s->vren
-  //         &&  s->frtr -> CheckHit (G::Ray (e -> Loc (), e -> Aim ()), &hit))
-  //        {fprintf (stderr, "hit CINEMA! namely <%s>! and at ",
-  //                  s->finf.name . c_str ());
-  //          hit . SpewToStderr ();  fprintf (stderr, "\n");
-  //          Vect rig = 0.5 * s->vren -> Over ();
-  //          Vect lef = -rig;
-  //          Matrix44 m = from_glm (s -> GetAbsoluteTransformation ().model);
-  //          m . TransformVectInPlace (lef);
-  //          m . TransformVectInPlace (rig);
-  //          f64 ww = rig . DistFrom (lef);
-  //          f64 t = (hit - lef) . Dot ((rig - lef) . Norm ());
-  //          if (ww  !=  0.0)
-  //            t /= ww;
-  //          fprintf (stderr, "HEY! HEY YOU! YEAH, YOU! WELL GUESS WHAT: TEE "
-  //                   " = %.2lf\n", t);
-  //          ch_ptr <DecodePipeline> depi = s->vren -> GetPipeline ();
-  //          f64 dur = depi -> Duration ();
-  //          if (t < 0.0)  t = 0.0;  else if (t > 1.0) t = 1.0;
-  //          depi -> Seek (t * dur);
-  //        }
-  //   }
+
   return 0;
 }
 

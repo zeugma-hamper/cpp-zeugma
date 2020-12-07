@@ -55,7 +55,8 @@ class GraumanPalace  :  public Zeubject, public Node,
 
   Timeline *sole_tline;
 
-  std::unordered_map <std::string, const ClipInfo *> curclip_by_prv;
+  std::unordered_map <std::string,
+                      std::pair <const ClipInfo *, WoCoLoBbox *>> curclip_by_prv;
   std::unordered_map <std::string, Ticato *> creatom_by_prv;
 
 LinePileRenderable *elpyar;

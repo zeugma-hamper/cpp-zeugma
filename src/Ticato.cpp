@@ -38,6 +38,9 @@ void Ticato::WellAndTrulyConstruct (const FilmInfo &finf, const ClipInfo &clinf)
   atom_dur = clinf.duration;
   if (IronLung *irlu = IronLung::GlobalByName ("omni-lung"))
     irlu -> AppendBreathee (this);
+
+  gropoff . SetInterpTime (0.2);
+  gropoff . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
 }
 
 

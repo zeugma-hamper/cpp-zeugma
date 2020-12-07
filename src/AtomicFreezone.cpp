@@ -223,7 +223,7 @@ i64 AtomicFreezone::ZESpatialMove (ZESpatialMoveEvent *e)
         { Vect hit (INITLESS);
           if (PlatonicMaes *maes
               = g -> ClosestIntersectedMaes (e -> Loc (), e -> Aim (), &hit))
-            { tic -> LocZoft () . Set (hit);
+            { tic -> LocZoft () . Set (hit + tic->gropoff);
               if (maes  !=  tic -> CurMaes ())
                 { ZEBulletinEvent *bev
                     = new ZEBulletinEvent ("drag-maes-change");
@@ -274,6 +274,14 @@ i64 AtomicFreezone::ZESpatialHarden (ZESpatialHardenEvent *e)
     { tic -> BeNotHoveredBy (prv);
       tic -> BeYankedBy (prv);
       yankees[prv] = tic;
+      Vect hit (INITLESS);
+      if (! tic->cur_maes
+          ||  ! G::RayPlaneIntersection (e -> Loc (), e -> Aim (),
+                                         tic->cur_maes -> Loc (),
+                                         tic->cur_maes -> Norm (), &hit))
+        assert (&"good" == &"evil");
+      tic->gropoff . SetHard (tic -> CurLoc ()  -  hit);
+      tic->gropoff . Set (Vect::zerov);
       auto it = hoverees . find (prv);
       if (it  !=  hoverees . end ())
         hoverees . erase (it);
