@@ -35,6 +35,7 @@ class Ticato  :  public Alignifer
   MattedVideoRenderable *re;
   RectRenderableFrontier *fr;
   Alignifer *bbox_subno;
+  bool born_from_flick;  // else spontaneously generated
 
   ZoftVect wander_vel;
   ZoftVect accom_sca;
@@ -68,6 +69,11 @@ class Ticato  :  public Alignifer
         return atom_info->geometry.niq_atomname;
       return empty_s;
     }
+
+  bool BornViaFlickPluck ()  const
+    { return born_from_flick; }
+  bool BornViaSpontaneousGeneration ()  const
+    { return ! born_from_flick; }
 
   PlatonicMaes *CurMaes ()  const
     { return cur_maes; }

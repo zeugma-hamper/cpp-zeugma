@@ -97,6 +97,8 @@ Ticato *AtomicFreezone::InstanitateAtom (const Vect &loc, PlatonicMaes *mae,
       tic = new Ticato (*aip.first, *aip.second);
     }
 
+  tic->born_from_flick = false;
+
   tic->sca . SetHard (400.0 + drand48 () * 300.0);
   tic->loc . SetHard (loc);
 //tic->re->SetAdjColor (ZeColor (0.1, 1.0, 0.1, 1.0));

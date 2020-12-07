@@ -57,6 +57,7 @@ class GraumanPalace  :  public Zeubject, public Node,
 
   std::unordered_map <std::string, const ClipInfo *> curclip_by_prv;
   std::unordered_map <std::string, Ticato *> creatom_by_prv;
+
 LinePileRenderable *elpyar;
 Node *elpy_no;
 

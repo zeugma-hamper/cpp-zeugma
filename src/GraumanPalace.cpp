@@ -257,6 +257,7 @@ i64 GraumanPalace::PounceInCurrentFlick (ZESpatialHardenEvent *e)
     { assert (&"uppp"  ==  &"down"); }
 
   Ticato *newt = new Ticato (ss->finf, *clip);
+  newt->born_from_flick = true;
   f64 s = 1.0;
   if (WoCoLoBbox *bb = ss -> NatomBboxByClip (clip))
     s = (bb->widt > bb->heig)  ?  bb->widt  :  bb->heig;

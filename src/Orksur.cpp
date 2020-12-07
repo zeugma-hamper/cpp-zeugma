@@ -111,7 +111,9 @@ bool Orksur::AppendAtomToCollage (Ticato *tic)
   collage -> AppendChild (tic);  // excises from former parent, see?
   players . push_back (tic);
   tic->accom_sca
-    . Set (Vect (Tamparams::Current ()->table_scale_factor));
+    . Set (tic -> BornViaFlickPluck ()
+           ?  Vect (Tamparams::Current ()->table_flmatom_scale_factor)
+           :  Vect (Tamparams::Current ()->table_escatom_scale_factor));
 
   if (AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes)
     { sherm -> SendPlayBoop (5);
@@ -469,8 +471,10 @@ i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
           { auto it = std::find (inchoates . begin (), inchoates . end (), tic);
             if (it  ==  inchoates . end ())
               { inchoates . push_back (tic);
-                tic->accom_sca
-                  . Set (Vect (Tamparams::Current ()->table_scale_factor));
+                tic->accom_sca . Set
+                  (tic -> BornViaFlickPluck ()
+                   ?  Vect (Tamparams::Current ()->table_flmatom_scale_factor)
+                   :  Vect (Tamparams::Current ()->table_escatom_scale_factor));
               }
           }
         else if (e -> ObjByTag ("from-maes")  ==  underlying_maes)

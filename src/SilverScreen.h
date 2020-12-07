@@ -79,6 +79,8 @@ class SilverScreen  :  public Node
   i64 NumNascentAtoms ()
     { return nascent_atoms . size (); }
   const ClipInfo *NthNascentAtom (i64 ind);
+  void ClearNascentAtoms ()
+    { nascent_atoms . clear (); }
   WoCoLoBbox *NthNatomBbox (i64 ind);
   WoCoLoBbox *NatomBboxByClip (const ClipInfo *clinf);
   void ReckonNatomBboxes ();
