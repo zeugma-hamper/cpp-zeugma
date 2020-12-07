@@ -72,6 +72,11 @@ ReadFilmInfo (std::filesystem::path const &_path)
           FilmInfo fc;
           fc.abbreviation = key;
           fc.name = value.at("name").as_string ();
+          auto dims {toml::get<std::array<u32, 2>> (value.at("dimensions"))};
+          fc.dimensions.x = dims[0];
+          fc.dimensions.y = dims[1];
+
+          fc.duration = value.at("duration").as_floating();
 
           fs::path tmp {toml::get<std::string> (value.at("path"))};
           if (tmp.is_relative ())

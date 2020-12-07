@@ -158,6 +158,8 @@ struct FilmInfo
   std::filesystem::path clip_path;
   std::string name;
   std::string abbreviation;
+  v2u32 dimensions;
+  f64 duration;
   std::vector<ClipInfo> clips;
 };
 

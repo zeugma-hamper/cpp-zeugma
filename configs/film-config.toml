@@ -1,77 +1,112 @@
 root="/opt/trelopro/tamper/o-g/cine"
 roto_root="rotopro"
 
+# dimensions determined with
+# ffprobe -v error -show_entries stream=coded_width,coded_height film.mov
+# duration determined with
+# ffprobe -v error -select_streams v:0 -show_entries stream=duration film.mov
+
 [boaa]
 name="Belly of an Architect"
 path="boaa-mpeg4.mov"
 clip_path="boaa"
+dimensions=[848,468]
+duration=7106.333333
 
 [btk]
 name="Branded to Kill"
 path="btk-mpeg4.mov"
 clip_path="btk"
+dimensions=[624,284]
+duration=5455.541667
 
 [c]
 name="Carnosaur"
 path="c-mpeg4.mov"
 clip_path="c"
+dimensions=[632,480]
+duration=4969.375
 
 [cs]
 name="Chameleon Street"
 path="cs-mpeg4.mov"
 clip_path="cs"
+dimensions=[856,472]
+duration=5669.833333
 
 [f]
 name="The Fall"
 path="f-mpeg4.mov"
 clip_path="f"
+dimensions=[856,464]
+duration=7016.833333
 
 [itmfl]
 name="In the Mood for Love"
 path="itmfl-mpeg4.mov"
 clip_path="itmfl"
+dimensions=[794,480]
+duration=5913.458333
 
 [mr]
 name="Minority Report"
 path="mr-mpeg4.mov"
 clip_path="mr"
+dimensions=[844,352]
+duration=8647.375
 
 [ms]
 name="Mysterious Skin"
 path="ms-mpeg4.mov"
 clip_path="ms"
+dimensions=[856,480]
+duration=6305.375
 
 [nk]
 name="Naked Kiss"
 path="nk-mpeg4.mov"
 clip_path="nk"
+dimensions=[712,416]
+duration=5430.083333
 
 [noth]
 name="Night of the Hunter"
 path="noth-mpeg4.mov"
 clip_path="noth"
+dimensions=[632,480]
+duration=5581.333333
 
 [notld]
 name="Night of the Living Dead"
 path="notld-mpeg4.mov"
 clip_path="notld"
+dimensions=[704,524]
+duration=5786.833333
 
 [ouatitw]
 name="Once Upon a Time in the West"
 path="ouatitw-mpeg4.mov"
 clip_path="ouatitw"
+dimensions=[854,364]
+duration=9906.000000
 
 [pb]
 name="Point Blank"
 path="pb-mpeg4.mov"
 clip_path="pb"
+dimensions=[848,360]
+duration=5500.291667
 
 [pt]
 name="Playtime"
 path="pt-mpeg4.mov"
 clip_path="pt"
+dimensions=[854,466]
+duration=7394.333333
 
 [vp]
 name="Vanishing Point"
 path="vp-mpeg4.mov"
 clip_path="vp"
+dimensions=[846,458]
+duration=5914.625

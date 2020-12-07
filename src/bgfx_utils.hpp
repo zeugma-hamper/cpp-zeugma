@@ -2,6 +2,7 @@
 #define BGFX_IS_AWFULLY_CLOSE_TO_BUGFIX
 
 #include <base_types.hpp>
+#include <class_utils.hpp>
 
 #include <bx/bx.h>
 #include <bimg/bimg.h>
@@ -61,6 +62,18 @@ struct BImgFree
   {
     bimg::imageFree (img);
   }
+};
+
+struct MappedFile
+{
+  MappedFile (std::string_view _path);
+  ~MappedFile ();
+
+  CHARM_DELETE_MOVE_COPY(MappedFile);
+
+  int fd;
+  off_t size;
+  void *ptr;
 };
 
 using bimg_ptr = std::unique_ptr<bimg::ImageContainer, BImgFree>;

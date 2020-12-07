@@ -6,6 +6,7 @@
 #include <GLFWWaterWorks.hpp>
 #include <OSCWandWaterWorks.hpp>
 #include <Renderable.hpp>
+#include <TextSystem.hpp>
 #include <VideoSystem.hpp>
 
 #include <conjure-from-toml.h>
@@ -244,6 +245,7 @@ bool GraphicsApplication::StartUp ()
 
   bool ret = InitWindowingAndGraphics();
   VideoSystem::Initialize ();
+  TextSystem::Initialize ();
 
   AppendWaterWorks (new OSCWandWaterWorks);
 
@@ -343,6 +345,7 @@ void GraphicsApplication::ShutDownSceneGraph()
 bool GraphicsApplication::ShutDown ()
 {
   ShutDownSceneGraph ();
+  TextSystem::ShutDown ();
   VideoSystem::ShutDown();
   ShutDownGraphics ();
 
