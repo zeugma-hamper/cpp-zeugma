@@ -129,6 +129,9 @@ struct ClipInfo
 
   const std::string &UniqueAtomName ()  const
     { return geometry . UniqueAtomName (); }
+
+  const MatteGeometry &Geometry ()  const
+    { return geometry.dir_geometry; }
 };
 
 

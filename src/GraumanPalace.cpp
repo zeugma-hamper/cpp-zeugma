@@ -28,6 +28,9 @@ GraumanPalace::GraumanPalace ()  :  Zeubject (), Node (),
   sole_tline = new Timeline;
   AppendChild (sole_tline);
   sole_tline -> SetWidthAndThickth (1.1 * flick_wid, 25.0);
+
+elpy_no = new Node (elpyar = new LinePileRenderable);
+Tamglobals::Only ()->wallpaper -> AppendChild (elpy_no);
 }
 
 
@@ -42,6 +45,37 @@ MattedVideoRenderable *GraumanPalace::NthFlick (i64 ind)
 { if (SilverScreen *s = NthSilverScreen (ind))
     return s -> vren;
   return NULL;
+}
+
+
+void GraumanPalace::ImportExhibitionRoster (const std::vector <FilmInfo> &fimmz)
+{ VideoSystem *vsys = VideoSystem::GetSystem ();
+
+  u32 cnt = fimmz . size ();
+  for (u32 q = 0  ;  q < cnt  ;  ++q)
+    { const FilmInfo &finf = fimmz[q];
+      fprintf (stderr, "oh yes: about to load <%s>\n", finf.name . c_str ());
+
+      //VideoRenderable *vire = new VideoRenderable (finf);
+      const VideoBrace br = vsys -> OpenVideoFile (finf.film_path.string ());
+      MattedVideoRenderable *vire = new MattedVideoRenderable (br.video_texture);
+      vire -> SetEnableMatte (false);
+      vire -> SetSizeReferent (SizeReferent::Video);
+      if (! vire)
+        continue;  // is this even possible? doubt it; but just in case...
+      vire -> SetOver (Over ());
+      vire -> SetUp (Up ());
+vire->SetAdjColor(ZeColor(1.0,1.0,0.1,1.0));
+      SilverScreen *sisc = new SilverScreen (vire, br.control_pipeline, finf);
+      screens . push_back (sisc);
+      sisc -> AppendRenderable (vire);
+
+      slider -> AppendChild (sisc);
+      sisc -> Scale (flick_wid);
+      sisc -> Translate ((f64)q * flick_spacing * Over ());
+    }
+  if (cnt  >  0)
+    JumpToFlick (0);
 }
 
 
@@ -98,37 +132,6 @@ void GraumanPalace::TogglePlayPause ()
 }
 
 
-void GraumanPalace::ImportExhibitionRoster (const std::vector <FilmInfo> &fimmz)
-{ VideoSystem *vsys = VideoSystem::GetSystem ();
-
-  u32 cnt = fimmz . size ();
-  for (u32 q = 0  ;  q < cnt  ;  ++q)
-    { const FilmInfo &finf = fimmz[q];
-      fprintf (stderr, "oh yes: about to load <%s>\n", finf.name . c_str ());
-
-      //VideoRenderable *vire = new VideoRenderable (finf);
-      const VideoBrace br = vsys -> OpenVideoFile (finf.film_path.string ());
-      MattedVideoRenderable *vire = new MattedVideoRenderable (br.video_texture);
-      vire -> SetEnableMatte (false);
-      vire -> SetSizeReferent (SizeReferent::Video);
-      if (! vire)
-        continue;  // is this even possible? doubt it; but just in case...
-      vire -> SetOver (Over ());
-      vire -> SetUp (Up ());
-vire->SetAdjColor(ZeColor(1.0,1.0,0.1,1.0));
-      SilverScreen *sisc = new SilverScreen (vire, br.control_pipeline, finf);
-      screens . push_back (sisc);
-      sisc -> AppendRenderable (vire);
-
-      slider -> AppendChild (sisc);
-      sisc -> Scale (flick_wid);
-      sisc -> Translate ((f64)q * flick_spacing * Over ());
-    }
-  if (cnt  >  0)
-    JumpToFlick (0);
-}
-
-
 void GraumanPalace::EngagePushback ()
 { SilverScreen *curss = CurSilverScreen ();
   for (SilverScreen *ss  :  screens)
@@ -152,6 +155,72 @@ void GraumanPalace::ReleasePushback ()
 }
 
 
+i64 GraumanPalace::RummageInCurrentFlick (ZESpatialMoveEvent *e)
+{ SilverScreen *ss = CurSilverScreen ();
+  if (! ss)
+    return 0;
+
+  if (! ss -> IsPaused ())
+    return 0;
+
+  MattedVideoRenderable *vren = ss -> Flick ();
+  Vect cnt = ss -> WoCoCenter ();
+  auto wh = ss -> WoCoWidHei ();
+  f64 ww = wh.first;
+  f64 hh = wh.second;
+
+  const Vect &o = Over ();
+  const Vect &u = Up ();
+  Vect hitp;
+  if (! G::RayRectIntersection (e -> Loc (), e -> Aim (),
+                                cnt, o, u, ww, hh, &hitp))
+    { elpyar -> ClearAllLines ();
+      return 0;
+    }
+
+  i64 num = ss -> NumNascentAtoms ();
+  if (num  <  1)
+    return 0;
+
+  i64 cls_ind = -1;
+  f64 clsdst = CHRM_MAX_F64;
+  WoCoLoBbox *bbb = NULL;
+  for (i64 q = 0  ;  q < num  ;  ++q)
+    if (WoCoLoBbox *bb = ss -> NthNatomBbox (q))
+//      if (G::PointRectContainment (hitp, bb->cntr, o, u, bb->widt, bb->heit))
+      { f64 d = (hitp - bb->cntr) . AutoDot ();
+        if (d < clsdst)
+          { clsdst = d;
+            cls_ind = q;
+            bbb = bb;
+          }
+      }
+    else
+      assert (true  ==  ! true);
+
+  assert (cls_ind  >  -1);
+  const ClipInfo *clp = ss -> NthNascentAtom (cls_ind);
+  assert (clp  !=  NULL);
+
+const char *nm = clp -> UniqueAtomName () . c_str ();
+fprintf (stderr, "well, we CERTAINLY WHACKED clip <%s>\n", nm);
+
+  if (bbb)
+    { elpyar -> ClearAllLines ();
+      elpyar -> AppendLine ( {bbb->lr, bbb->ur} );
+      elpyar -> AppendLine ( {bbb->ur, bbb->ul} );
+      elpyar -> AppendLine ( {bbb->ul, bbb->ll} );
+      elpyar -> AppendLine ( {bbb->ll, bbb->lr} );
+    }
+  return 1;
+}
+
+i64 GraumanPalace::PounceInCurrentFlick (ZESpatialHardenEvent *e)
+{
+  return 0;
+}
+
+
 i64 GraumanPalace::ZESpatialMove (ZESpatialMoveEvent *e)
 { if (! e)
     return -1;
@@ -170,6 +239,8 @@ i64 GraumanPalace::ZESpatialMove (ZESpatialMoveEvent *e)
       push_depth . ProceedTo (puba * nrm);
       ltrl_slide . ProceedTo (latr * ovr);
     }
+  else if (RummageInCurrentFlick (e))
+    { }
   else
     { return sole_tline -> ZESpatialMove (e); }
   return 0;
@@ -198,6 +269,8 @@ i64 GraumanPalace::ZESpatialHarden (ZESpatialHardenEvent *e)
     { if (SilverScreen *ss = CurSilverScreen ())
         ss -> ScootToPrevClip ();
     }
+  else if (PounceInCurrentFlick (e))
+    { }
   else
     { return sole_tline -> ZESpatialHarden (e); }
   // else if (SilverScreen *s = CurSilverScreen ())

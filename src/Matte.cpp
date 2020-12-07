@@ -434,7 +434,7 @@ std::vector<ClipInfo const *> FilmInfo::GetClipsAfter (f64 _ts,
 
 ClipList FilmInfo::ClipsSurrounding (f64 tstamp)  const
 { std::vector <const ClipInfo *> exudate;
-  for (auto ci  :  clips)
+  for (auto &ci  :  clips)
     if (ci.start_time <= tstamp  &&  tstamp <= ci.end_time)
       exudate . push_back (&ci);
   return exudate;

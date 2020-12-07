@@ -17,6 +17,7 @@
 #include <Matte.hpp>
 #include <VideoRenderable.hpp>
 #include <MattedVideoRenderable.hpp>
+#include "LinePileRenderable.h"
 
 #include "SilverScreen.h"
 #include "Timeline.h"
@@ -52,6 +53,8 @@ class GraumanPalace  :  public Zeubject, public Node,
   f64 pb_max_push, pb_max_pull;
 
   Timeline *sole_tline;
+LinePileRenderable *elpyar;
+Node *elpy_no;
 
   GraumanPalace ();
 
@@ -86,6 +89,8 @@ class GraumanPalace  :  public Zeubject, public Node,
   MattedVideoRenderable *CurFlick ()
     { return NthFlick (now_showing); }
 
+  void ImportExhibitionRoster (const std::vector <FilmInfo> &fimmz);
+
   void JumpToFlick (i64 which_flick);
   void JumpToNextFlick ()
     { JumpToFlick (now_showing + 1); }
@@ -96,10 +101,11 @@ class GraumanPalace  :  public Zeubject, public Node,
 
   void TogglePlayPause ();
 
-  void ImportExhibitionRoster (const std::vector <FilmInfo> &fimmz);
-
   void EngagePushback ();
   void ReleasePushback ();
+
+  i64 RummageInCurrentFlick (ZESpatialMoveEvent *e);
+  i64 PounceInCurrentFlick (ZESpatialHardenEvent *e);
 
   i64 ZESpatialMove (ZESpatialMoveEvent *e);
   i64 ZESpatialHarden (ZESpatialHardenEvent *e);

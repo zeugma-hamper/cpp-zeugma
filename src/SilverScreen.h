@@ -29,6 +29,13 @@
 using namespace charm;
 
 
+struct WoCoLoBbox {
+  Vect cntr;
+  f64 widt, heit;
+  Vect lr, ur, ul, ll;
+};
+
+
 class SilverScreen  :  public Node
 { public:
   const FilmInfo &finf;
@@ -37,32 +44,29 @@ class SilverScreen  :  public Node
   RectRenderableFrontier *frtr;
   InterpColor scr_fader;
   Timeline *timmy;
+  ClipList nascent_atoms;
+  std::vector <WoCoLoBbox> natom_bboxes;
+
+  SilverScreen (MattedVideoRenderable *vr,
+                ch_ptr <VideoPipeline> vp,
+                const FilmInfo &fi);
 
   const std::string &Name ()
     { return finf.name; }
 
-//  SilverScreen (VideoRenderable *vr,
-  SilverScreen (MattedVideoRenderable *vr,
-                ch_ptr <VideoPipeline> vp,
-                const FilmInfo &fi)  :  Node (),
-                                        finf (fi), vren (vr), vpip (vp),
-                                        timmy (NULL)
-    { frtr = new RectRenderableFrontier (vr, Vect::zerov, 1.0, 1.0);
-      SetFrontier (frtr);
-      scr_fader . SetInterpTime (Tamparams::Current ()->pb_snapback_fade_time);
-      scr_fader . PointA () . Set (ZeColor (1.0, 1.0, 1.0, 0.0));
-      scr_fader . PointB () . Set (ZeColor (1.0));
-      scr_fader . Finish ();
-      scr_fader . MakeBecomeLikable ();
-      vren -> AdjColorZoft () . BecomeLike (scr_fader);
-    }
+  MattedVideoRenderable *Flick ()
+    { return vren; }
 
   f64 AspectRatio ();
+  Vect WoCoCenter ();
+  std::pair <f64, f64> WoCoWidHei ();
 
   void FadeUp ();
   void FadeDown ();
 
-  void Pause ();
+  bool IsPaused ();
+
+  void Pause (bool including_post_pause_rigamarole = true);
   void Play ();
   void TogglePlayPause ();
 
@@ -70,6 +74,12 @@ class SilverScreen  :  public Node
 
   f64 Duration ();
   f64 CurTimestamp ();
+
+  i64 NumNascentAtoms ()
+    { return nascent_atoms . size (); }
+  const ClipInfo *NthNascentAtom (i64 ind);
+  WoCoLoBbox *NthNatomBbox (i64 ind);
+  void ReckonNatomBboxes ();
 
   bool JumpToTime (f64 tstamp);
 
