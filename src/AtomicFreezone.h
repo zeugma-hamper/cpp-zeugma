@@ -85,6 +85,7 @@ class AtomicFreezone  :  public Zeubject,
 
   void DetachAndDisposeOfAtom (Ticato *icat);
   Ticato *InstanitateAtom (const Vect &loc, PlatonicMaes *mae, i32 direc = 0);
+//  Ticato *ReceiveAtomGraciously (Ticato *tic);
   void SpontaneouslyGenerateAtomAtBoundary ();
   void PopulateFromScratch ();
 

@@ -20,6 +20,7 @@
 #include "LinePileRenderable.h"
 
 #include "SilverScreen.h"
+#include "Ticato.h"
 #include "Timeline.h"
 
 #include "tamparams.h"
@@ -53,10 +54,18 @@ class GraumanPalace  :  public Zeubject, public Node,
   f64 pb_max_push, pb_max_pull;
 
   Timeline *sole_tline;
+
+  std::unordered_map <std::string, const ClipInfo *> curclip_by_prv;
+  std::unordered_map <std::string, Ticato *> creatom_by_prv;
 LinePileRenderable *elpyar;
 Node *elpy_no;
 
   GraumanPalace ();
+
+  PlatonicMaes *BackingMaes ()
+    { return backing_maes; }
+  void SetBackingMaes (PlatonicMaes *ma)
+    { backing_maes = ma; }
 
   const Vect &Over ()  const
     { return ovr; }
@@ -88,6 +97,17 @@ Node *elpy_no;
   //VideoRenderable *CurFlick ()
   MattedVideoRenderable *CurFlick ()
     { return NthFlick (now_showing); }
+
+  Ticato *CurDraggedNewlyCreatedAtomBy (const std::string &prv)
+    { auto it = creatom_by_prv . find (prv);
+      return (it != creatom_by_prv . end ())  ?  it->second  :  NULL;
+    }
+  void ClearCurSelClipBy (const std::string &prv)
+    { auto it = curclip_by_prv . find (prv);
+      if (it  !=  curclip_by_prv . end ())  curclip_by_prv . erase (it);
+    }
+  void ClearAllCurSelClips ()
+    { curclip_by_prv . clear (); }
 
   void ImportExhibitionRoster (const std::vector <FilmInfo> &fimmz);
 

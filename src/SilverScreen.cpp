@@ -146,6 +146,15 @@ WoCoLoBbox *SilverScreen::NthNatomBbox (i64 ind)
   return &(natom_bboxes . at (ind));
 }
 
+
+WoCoLoBbox *SilverScreen::NatomBboxByClip (const ClipInfo *clinf)
+{ if (clinf)
+    for (WoCoLoBbox &bb  :  natom_bboxes)
+      if (bb.clnf  ==  clinf)
+        return &bb;
+  return NULL;
+}
+
 void SilverScreen::ReckonNatomBboxes ()
 { if (! vren)
     assert (&"black"  ==  &"white");
@@ -171,9 +180,10 @@ void SilverScreen::ReckonNatomBboxes ()
         emm . TransformVectInPlace (zee);
         widph -= zee;  widph *= 0.5;
         heiph -= zee;  heiph *= 0.5;
-        natom_bboxes . push_back ( {clip_cnt,
-                                    widph . Mag (),
-                                    heiph . Mag (),
+        natom_bboxes . push_back ( {clip,
+                                    clip_cnt,
+                                    2.0 * widph . Mag (),
+                                    2.0 * heiph . Mag (),
                                     clip_cnt + widph - heiph,
                                     clip_cnt + widph + heiph,
                                     clip_cnt - widph + heiph,

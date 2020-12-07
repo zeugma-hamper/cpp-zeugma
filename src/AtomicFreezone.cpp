@@ -114,6 +114,21 @@ tic -> BBoxSetColor (Tamglobals::Only ()->escatom_bbox_color);
   return tic;
 }
 
+/*
+Ticato *AtomicFreezone::ReceiveAtomGraciously (Ticato *tic)
+{ if (! tic)
+    return NULL;
+
+  f64 spd = min_speed + drand48 () * (max_speed - min_speed);
+  spd *= (drand48 () > 0.5 ? 1.0 : -1.0);
+  tic->wander_vel . SetHard (Vect (spd, 0.0, 0.0));
+
+//  field_amok -> AppendChild (tic);
+  if (std::find (atoms . begin (), atoms . end (), tic)  ==  atoms . end ())
+    atoms . push_back (tic);
+  return tic;
+}
+*/
 
 void AtomicFreezone::SpontaneouslyGenerateAtomAtBoundary ()
 { i64 which_coast = drand48 () < 0.5  ?  0  :  1;
@@ -313,7 +328,7 @@ assert (iitt  !=  atoms . end ());
 i64 AtomicFreezone::ZEBulletin (ZEBulletinEvent *e)
 { if (! e)
     return -1;
-  ZEBObjPhrase *phr;
+  const ZEBStrPhrase *phr;
   Ticato *tic;
 
   if (e -> Says ("atom-deposit"))
@@ -326,14 +341,24 @@ i64 AtomicFreezone::ZEBulletin (ZEBulletinEvent *e)
             { tic->accom_sca . Set (Vect (1.0));
               tic->shov_vel = Vect::zerov;
 
-              field_amok -> AppendChild (tic);
               atoms . push_back (tic);
-
-              f64 spd = min_speed
-                +  2.0 * (drand48 () - 0.5) * (max_speed - min_speed);
-              tic->wander_vel . SetHard (Vect (spd, 0.0, 0.0));
+              field_amok -> AppendChild (tic);
               tic -> SetAndAlignToMaes (emm);
+
+              f64 spd = min_speed  +  drand48 () * (max_speed - min_speed);
+              spd *= (drand48 () < 0.5  ?  -1.0  :  1.0);
+              tic->wander_vel . SetHard (Vect (spd, 0.0, 0.0));
               // tic -> BBoxSetColor (Tamglobals::Only ()->tabatom_bbox_color);
+
+              if (phr = e -> FindStrPhrase ("plucked-from-flick-by"))
+                { tic -> BeYankedBy (phr->str);  // that's the provenance
+                  yankees[phr->str] = tic;
+                  if (Node *conv = Tamglobals::Only ()->conveyor)
+                    { //tic->from_node = tic -> Parent ();
+                      conv -> AppendChild (tic);
+                    }
+                  // ReceiveAtomGraciously (tic);  // don' need no mo'
+                }
             }
     }
   return 0;

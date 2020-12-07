@@ -656,6 +656,7 @@ int main (int ac, char **av)
   GraumanPalace *grau_egyp = new GraumanPalace;
   grau_egyp -> ImportExhibitionRoster (film_infos);
   grau_egyp -> JumpToFlick (0);
+  grau_egyp -> SetBackingMaes (frnt);
   (grau_egyp -> Translate (cine_cnt)) -> SetName ("transly");
   g_front_wall -> AppendChild (grau_egyp);
 
@@ -675,6 +676,7 @@ int main (int ac, char **av)
   drand48 ();
   grau_chin -> ReleasePushback ();
   grau_chin -> JumpToRandomFlick ();
+  grau_chin -> SetBackingMaes (left);
   g_left_wall -> AppendChild (grau_chin);
 
   tamp.gchin = ch_ptr <GraumanPalace> (grau_chin);

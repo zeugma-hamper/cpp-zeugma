@@ -2,6 +2,9 @@
 #include "GraumanPalace.h"
 
 #include <VideoSystem.hpp>
+#include <GraphicsApplication.hpp>
+
+#include "ZEBulletinEvent.h"
 
 #include <vector_interop.hpp>
 
@@ -163,6 +166,10 @@ i64 GraumanPalace::RummageInCurrentFlick (ZESpatialMoveEvent *e)
   if (! ss -> IsPaused ())
     return 0;
 
+  const std::string &prv = e -> Provenance ();
+  if (CurDraggedNewlyCreatedAtomBy (prv))
+    return 0;  // 'hardened', by any other name
+
   MattedVideoRenderable *vren = ss -> Flick ();
   Vect cnt = ss -> WoCoCenter ();
   auto wh = ss -> WoCoWidHei ();
@@ -175,6 +182,7 @@ i64 GraumanPalace::RummageInCurrentFlick (ZESpatialMoveEvent *e)
   if (! G::RayRectIntersection (e -> Loc (), e -> Aim (),
                                 cnt, o, u, ww, hh, &hitp))
     { elpyar -> ClearAllLines ();
+      ClearCurSelClipBy (prv);
       return 0;
     }
 
@@ -202,6 +210,8 @@ i64 GraumanPalace::RummageInCurrentFlick (ZESpatialMoveEvent *e)
   const ClipInfo *clp = ss -> NthNascentAtom (cls_ind);
   assert (clp  !=  NULL);
 
+  curclip_by_prv[prv] = clp;
+
 const char *nm = clp -> UniqueAtomName () . c_str ();
 fprintf (stderr, "well, we CERTAINLY WHACKED clip <%s>\n", nm);
 
@@ -216,8 +226,54 @@ fprintf (stderr, "well, we CERTAINLY WHACKED clip <%s>\n", nm);
 }
 
 i64 GraumanPalace::PounceInCurrentFlick (ZESpatialHardenEvent *e)
-{
-  return 0;
+{ SilverScreen *ss = CurSilverScreen ();
+  if (! ss)
+    return 0;
+
+  const std::string &prv = e -> Provenance ();
+
+  auto ait = creatom_by_prv . find (prv);
+  if (ait  !=  creatom_by_prv . end ())
+    { assert (22  ==  7);  // really shouldn't. really not.
+      return 0;
+    }
+
+  auto cit = curclip_by_prv . find (prv);
+  if (cit  ==  curclip_by_prv . end ())
+    return 0;
+
+  const ClipInfo *clip = cit->second;
+  if (clip  ==  NULL)
+    { assert ('a'  ==  'f');  // unspeakably bad grades
+      return 0;
+    }
+
+  const Vect &o = Over ();
+  const Vect &u = Up ();
+  Vect hitp;
+  if (! G::RayPlaneIntersection (e -> Loc (), e -> Aim (),
+                                 backing_maes -> Loc (), backing_maes -> Norm (),
+                                 &hitp))
+    { assert (&"uppp"  ==  &"down"); }
+
+  Ticato *newt = new Ticato (ss->finf, *clip);
+  f64 s = 1.0;
+  if (WoCoLoBbox *bb = ss -> NatomBboxByClip (clip))
+    s = (bb->widt > bb->heig)  ?  bb->widt  :  bb->heig;
+  newt->sca . SetHard (s);
+  newt->loc . SetHard (hitp);  // accommodate offset as next step
+  newt -> SetCurMaes (backing_maes);
+  creatom_by_prv[prv] = newt;
+
+  ZEBulletinEvent *bev = new ZEBulletinEvent ("atom-deposit");
+  bev -> AppendObjPhrase ("inbound-atom", newt);
+  bev -> AppendObjPhrase ("from-zone", this);
+  bev -> AppendObjPhrase ("onto-maes", backing_maes);
+  bev -> AppendStrPhrase ("plucked-from-flick-by", prv);
+  GraphicsApplication::GetApplication () -> GetSprinkler () . Spray (bev);
+  delete bev;
+
+  return 1;
 }
 
 
@@ -304,9 +360,15 @@ i64 GraumanPalace::ZESpatialSoften (ZESpatialSoftenEvent *e)
 { if (! e)
     return -1;
 
-  if (e -> Provenance ()  ==  effecting_pushback)
+  const std::string &prv = e -> Provenance ();
+  if (prv  ==  effecting_pushback)
     { ReleasePushback ();
       effecting_pushback . clear ();
+      return 0;
+    }
+  auto atit = creatom_by_prv . find (prv);
+  if (atit  !=  creatom_by_prv . end ())
+    { creatom_by_prv . erase (atit);
       return 0;
     }
   else if (sole_tline)

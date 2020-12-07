@@ -30,8 +30,9 @@ using namespace charm;
 
 
 struct WoCoLoBbox {
+  const ClipInfo *clnf;
   Vect cntr;
-  f64 widt, heit;
+  f64 widt, heig;
   Vect lr, ur, ul, ll;
 };
 
@@ -79,6 +80,7 @@ class SilverScreen  :  public Node
     { return nascent_atoms . size (); }
   const ClipInfo *NthNascentAtom (i64 ind);
   WoCoLoBbox *NthNatomBbox (i64 ind);
+  WoCoLoBbox *NatomBboxByClip (const ClipInfo *clinf);
   void ReckonNatomBboxes ();
 
   bool JumpToTime (f64 tstamp);
