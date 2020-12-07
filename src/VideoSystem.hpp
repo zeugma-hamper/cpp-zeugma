@@ -157,7 +157,7 @@ struct ManualTrickPlayState
   // call below methods with mutex
   bool ClearIsReadyInternal ();
   bool IsInProgressInternal ();
-  void ClearInternal (FinishType _finish);
+  bool ClearInternal ();
   f64 ResetInternal (f64 _pts, f64 _current_ts, f64 _num_steps);
 
   TrickPlayFinishSignal m_finish_signal;

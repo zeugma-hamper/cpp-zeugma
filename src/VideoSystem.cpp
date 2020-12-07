@@ -192,18 +192,30 @@ void ManualTrickPlayState::ConditionalSetReady ()
 
 void ManualTrickPlayState::Clear (FinishType _finish)
 {
-  std::unique_lock lock {m_state_mutex};
-  ClearInternal (_finish);
+  bool did_cancelling = false;
+  {
+    std::unique_lock lock {m_state_mutex};
+    did_cancelling = ClearInternal ();
+  }
+
+  if (did_cancelling)
+    m_finish_signal (_finish);
 }
 
 f64 ManualTrickPlayState::Reset (f64 _pts, f64 _current_ts, f64 _num_steps)
 {
-  std::unique_lock lock {m_state_mutex};
-  ClearInternal (FinishType::Canceled);
-  if (_pts >= 0.0 && _num_steps > 0.0)
-    return ResetInternal (_pts, _current_ts, _num_steps);
+  bool did_cancelling = false;
+  f64 ts = -1.0;
+  {
+    std::unique_lock lock {m_state_mutex};
+    did_cancelling = ClearInternal ();
+    if (_pts >= 0.0 && _num_steps > 0.0)
+      ts = ResetInternal (_pts, _current_ts, _num_steps);
+  }
+  if (did_cancelling)
+    m_finish_signal (FinishType::Canceled);
 
-  return -1.0;
+  return ts;
 }
 
 //next pts, is finished flag
@@ -235,15 +247,16 @@ bool ManualTrickPlayState::IsInProgressInternal ()
   return m_seek_pts != m_seek_last_pts;
 }
 
-void ManualTrickPlayState::ClearInternal (FinishType _finish)
+bool ManualTrickPlayState::ClearInternal ()
 {
-  if (m_seek_pts >= 0.0)
-    m_finish_signal (_finish);
+  bool const ret = m_seek_pts >= 0.0;
 
   m_is_ready = false;
   m_seek_pts = -1.0;
   m_seek_dist = -1.0;
   m_seek_last_pts = -1.0;
+
+  return ret;
 }
 
 f64 ManualTrickPlayState::ResetInternal (f64 _pts, f64 _current_ts, f64 _num_steps)
