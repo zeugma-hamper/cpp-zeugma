@@ -130,7 +130,12 @@ i64 handle_key_press (s2::connection , ZEYowlAppearEvent *_event)
 
       pipe->ClearMattes();
       ClipInfo const &ci = s_films.GetNthFilm(s_film_index).GetNthClip(s_clip_index);
-      pipe->TrickSeekTo (ci.start_time, 1.0);
+      auto excb = [] (boost::signals2::connection conn, FinishType fin)
+      {
+        fprintf (stderr, "finished %s\n", fin == FinishType::Successful ? "successfully" : "poorly");
+        conn.disconnect();
+      };
+      pipe->TrickSeekToEx (ci.start_time, 1.0, std::move (excb));
     }
   else if (utt == "e") //increase playspeed 5x
     {
