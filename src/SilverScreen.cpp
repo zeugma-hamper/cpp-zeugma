@@ -208,16 +208,23 @@ bool SilverScreen::JumpToTime (f64 tstamp)
 bool SilverScreen::ScootToTime (f64 tstamp)
 { if (! vren  ||  ! vpip)
     return false;
-  ch_ptr <VideoPipeline> deep = vren -> GetVideoPipeline ();
-  if (! deep)
+  ch_ptr <VideoPipeline> veep = vren -> GetVideoPipeline ();
+  if (! veep)
     return false;
-  if (tstamp < 0.0  ||  tstamp > deep -> Duration ())
+  if (tstamp < 0.0  ||  tstamp > veep -> Duration ())
     return false;
 
   f64 curt = CurTimestamp ();
   f64 tdist = fabs (tstamp - curt);
 
-  deep -> TrickSeekTo (tstamp, 1.25);  // scootrate);
+  auto kawlbacque
+    = [=] (boost::signals2::connection conn, FinishType fin)
+    { this->nascent_atoms = this->finf . ClipsSurrounding (tstamp);
+      this -> ReckonNatomBboxes ();
+      conn . disconnect ();
+    };
+
+  veep -> TrickSeekToEx (tstamp, 1.25, std::move (kawlbacque));
   ClearNascentAtoms ();
 
   return true;
