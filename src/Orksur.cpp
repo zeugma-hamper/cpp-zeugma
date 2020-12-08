@@ -81,18 +81,18 @@ Ticato *Orksur::ClosestAtom (const Vect &p)
 }
 
 
-void Orksur::DistinguishHoverees ()
+void Orksur::DistinguishManipulees ()
 { static ZeColor fullc (1.0, 1.0);
   static ZeColor fadec (0.4, 1.0);
 
   bool never_mind = (hoverees . size ()  ==  0);
   for (Ticato *tic  :  players)
     if (tic)
-      tic->re -> SetAdjColor (never_mind ? fullc : fadec);
+      tic->re -> SetAdjColor (never_mind ? fullc : fullc); //fadec);
 
-  for (auto &f  :  hoverees)
+  for (auto &f  :  graspees)
     if (f.second.tic)
-      f.second.tic->re -> SetAdjColor (fullc);
+      f.second.tic->re -> SetAdjColor (ZeColor (2.0, 1.0));
 }
 
 
@@ -353,7 +353,7 @@ assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
       heff->second.tic = ca;
     }
 
-  DistinguishHoverees ();
+//  DistinguishManipulees ();
   return 0;
 }
 
@@ -389,6 +389,7 @@ i64 Orksur::ZESpatialHarden (ZESpatialHardenEvent *e)
   graspees[prv] = { tic, (tic -> CurLoc () - proj) };
   tic -> MakeRenderablesForemostInLayer ();
   tic->shov_vel = Vect::zerov;
+  tic->interp_adjc . Set (ZeColor (2.0, 1.0));
   AtomicFirstStrike (tic);
   // and also... light the lucky atom up? or like that?
   return 1;
@@ -411,6 +412,7 @@ i64 Orksur::ZESpatialSoften (ZESpatialSoftenEvent *e)
 
   hoverees[prv] = geff->second;
   graspees . erase (geff);
+  geff->second.tic->interp_adjc . Set (ZeColor (1.0, 1.0));
 /*
   if (ca->shov_vel . Mag ()
       >=  Tamparams::Current ()->disposal_speed_threshold)
@@ -490,7 +492,7 @@ i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
         if (e -> ObjByTag ("onto-maes")  ==  underlying_maes)
           { AppendAtomToCollage (tic);
             tic->wander_vel = Vect::zerov;
-            tic -> BBoxSetColor (Tamglobals::Only ()->tabatom_bbox_color);
+            //tic -> BBoxSetColor (Tamglobals::Only ()->tabatom_bbox_color);
             auto it = std::find (inchoates . begin (), inchoates . end (), tic);
             if (it  !=  inchoates . end ())
               inchoates . erase (it);

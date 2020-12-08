@@ -73,7 +73,7 @@ class Orksur  :  public PlatonicMaes, public Node,
   i64 NumGraspees ()  const
     { return graspees . size (); }
 
-  void DistinguishHoverees ();
+  void DistinguishManipulees ();
 
   bool AppendAtomToCollage (Ticato *tic);
   bool RemoveAtomFromCollage (Ticato *tic);

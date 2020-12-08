@@ -35,6 +35,7 @@ class Ticato  :  public Alignifer
   MattedVideoRenderable *re;
   RectRenderableFrontier *fr;
   Alignifer *bbox_subno;
+  InterpColor interp_adjc;
   bool born_from_flick;  // else spontaneously generated
 
   ZoftVect wander_vel;
