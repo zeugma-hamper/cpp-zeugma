@@ -143,6 +143,8 @@ bool DecodePipeline::OpenVideoFile (std::string_view _uri, PipelineTerminus *_vi
   if (scret != GST_STATE_CHANGE_SUCCESS)
     fprintf (stderr, "pipeline couldn't get to PAUSED; returned %d\n", scret);
 
+  PollMessages();
+
   return ret;
 }
 
