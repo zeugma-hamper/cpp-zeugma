@@ -205,6 +205,8 @@ lib_sources = ['src/application.cpp',
                'src/MultiSprinkler.cpp',
                'src/Node.cpp',
                'src/OSCWandWaterWorks.cpp',
+               'src/OverlayTest.cpp',
+               'src/OverlayInstancing.cpp',
                'src/PipelineTerminus.cpp',
                'src/PlatonicMaes.cpp',
                'src/PolygonRenderable.cpp',
@@ -293,6 +295,16 @@ shaders = [
    'src/shaders/grid_varying.def.sc', 'grid_vs.bin'],
   ['fragment', 'src/shaders/grid_fs.sc',
    'src/shaders/grid_varying.def.sc', 'grid_fs.bin'],
+  # overlay testing
+  ['vertex',   'src/shaders/overlay_vs.sc',
+   'src/shaders/overlay_varying.def.sc', 'overlay_vs.bin'],
+  ['fragment', 'src/shaders/overlay_fs.sc',
+   'src/shaders/overlay_varying.def.sc', 'overlay_fs.bin'],
+  # overlay testing
+  ['vertex',   'src/shaders/overlay_instance_vs.sc',
+   'src/shaders/overlay_varying.def.sc', 'overlay_instance_vs.bin'],
+  ['fragment', 'src/shaders/overlay_instance_fs.sc',
+   'src/shaders/overlay_varying.def.sc', 'overlay_instance_fs.bin'],
 ]
 
 foreach shader : shaders
@@ -319,6 +331,10 @@ dead_zone_exec = executable ('dead_zone',
                              sources : ['src/dead_zone.cpp'],
                              dependencies : [charm_dep])
 
+overlay_zone_exec = executable ('overlay_zone',
+                                sources : ['src/overlay_zone.cpp'],
+                                dependencies : [charm_dep])
+
 config_parser_exec = executable ('config_parser',
                                  sources : ['src/config_parser.cpp'],
                                  dependencies : [charm_dep])
@@ -327,21 +343,11 @@ chud_zone_exec = executable ('chud-zone',
                              sources : ['src/chud-zone.cpp'],
                              dependencies : [charm_dep])
 
-# cz_the_sequel_exec = executable ('cz_the_sequel',
-#                              sources : ['src/cz_the_sequel.cpp'],
-#                              dependencies : [charm_dep])
-
 tri_demo_exec = executable ('tri_demo',
                             sources : ['src/tri_demo.cpp',
                                        'src/Collage.cpp',
                                        'src/TriBand.cpp'],
                             dependencies : [charm_dep, glu_dep])
-
-# tri_cleanup_exec = executable ('tri_cleanup',
-#                             sources : ['src/tri_cleanup.cpp',
-#                                        'src/Collage.cpp',
-#                                        'src/TriBand.cpp'],
-#                             dependencies : [charm_dep])
 
 tample_exec = executable ('tample',
                            sources : ['src/AtomicFreezone.cpp',

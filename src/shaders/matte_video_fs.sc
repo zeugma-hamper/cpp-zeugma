@@ -13,7 +13,6 @@ SAMPLER2D (u_video_matte, 3);
 
 uniform vec4 u_flags;
 uniform vec4 u_mix_color;
-uniform vec4 u_rois;
 
 layout (location = 0) out vec4 out_color;
 
