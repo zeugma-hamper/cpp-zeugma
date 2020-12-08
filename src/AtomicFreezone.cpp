@@ -11,7 +11,8 @@
 #include <GraphicsApplication.hpp>
 
 
-AtomicFreezone::AtomicFreezone ()  :  Zeubject (), cineganz (NULL),
+AtomicFreezone::AtomicFreezone ()  :  SpectacleCauseway (),
+                                      cineganz (NULL),
                                       field_amok (NULL), atom_count_goal (45),
                                       inter_arrival_t (5.0),
                                       min_speed (75.0), max_speed (250.0),
@@ -19,25 +20,6 @@ AtomicFreezone::AtomicFreezone ()  :  Zeubject (), cineganz (NULL),
 { // try auto-inhale
   // if (IronLung *irlu = IronLung::GlobalByName ("omni-lung"))
   //   irlu -> AppendBreathee (this);
-}
-
-
-void AtomicFreezone::AppendSwath (Swath *sw)
-{ if (! sw)
-    return;
-  if (Swath *prev_sw
-        = meander . size () > 0  ?  meander[meander . size () - 1] : NULL)
-    { prev_sw -> nxt = sw;
-      sw -> prv = prev_sw;
-    }
-  meander . push_back (sw);
-}
-
-Swath *AtomicFreezone::SwathFor (PlatonicMaes *ma)
-{ for (Swath *sw  :  meander)
-    if (sw  &&  ma == sw->supporting_maes)
-      return sw;
-  return NULL;
 }
 
 
