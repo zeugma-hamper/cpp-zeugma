@@ -75,6 +75,7 @@
 #include "Orksur.h"
 #include "Ticato.h"
 #include "AtomicFreezone.h"
+#include "OeuvreAfterlife.h"
 #include "GraumanPalace.h"
 #include "tamparams.h"
 
@@ -190,6 +191,7 @@ class Tampo final : public GraphicsApplication
   f64 elev_trans_mult;
   VideoRenderable *steenbeck;
   ch_ptr <AtomicFreezone> freezo;
+  ch_ptr <OeuvreAfterlife> vreaft;
   ch_ptr <Orksur> orksu;
   ch_ptr<Sensorium> sensy;
   ch_ptr<GraumanPalace> gegyp;
@@ -393,6 +395,10 @@ bool Tampo::DoWhatThouWilt (i64 ratch, f64 thyme)
 
   if (freezo)
     freezo -> Inhale (ratch, thyme);
+
+  if (vreaft)
+    vreaft -> Inhale (ratch, thyme);
+
   return true;
 }
 
@@ -722,7 +728,7 @@ int main (int ac, char **av)
   AtomicFreezone *afz = new AtomicFreezone;
   tamp.freezo = ch_ptr <AtomicFreezone> (afz);
   afz->cineganz = &film_infos;
-  afz->field_amok = g_wallpaper;
+  afz -> SetAmokField (g_wallpaper);
   afz->underlying_maeses . push_back (frnt);
   afz->underlying_maeses . push_back (left);
   stringy_list spethial = { "c=carnosaur_01", "noth=bunny_right",
@@ -732,6 +738,12 @@ int main (int ac, char **av)
       fprintf (stderr, "phailed privileging atom [%s]...\n", s . c_str ());
   afz -> SetPrivlegedAtomProbability (0.5);
   AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.freezo);
+
+  OeuvreAfterlife *ova = new OeuvreAfterlife;
+  tamp.vreaft = ch_ptr <OeuvreAfterlife> (ova);
+  ova -> SetAmokField (g_wallpaper);
+  ova->underlying_maeses . push_back (frnt);
+  ova->underlying_maeses . push_back (left);
 
   LinePileRenderable *lpr = new LinePileRenderable;
   InterpColor constru_col ((SinuColor (ZeColor (0.2, 0.2), 0.25,
@@ -747,18 +759,34 @@ int main (int ac, char **av)
   for (PlatonicMaes *emm  :  plams)
     { Vect v = 0.5 * emm->wid.val * emm->ovr.val;
       Vect l = emm->loc.val - emm->upp.val * (emm->upp.val . Dot (emm->loc.val));
+      Vect l2 = l - v + Tamparams::Current ()->collband_mid * emm->upp.val;
       l += -v + Tamparams::Current ()->escaband_mid * emm->upp.val;
       Vect r = l + 2.0 * v;
+      Vect r2 = l2 + 2.0 * v;
       v = 0.5 * Tamparams::Current ()->escaband_hei * emm->upp.val;
+      Vect v2 = 0.5 * Tamparams::Current ()->collband_hei * emm->upp.val;
       Vect b = l - v;
       Vect t = l + v;
-      afz -> AppendSwath (new Swath ({l, r}, {b, t}, emm));
+      Vect b2 = l2 - v2;
+      Vect t2 = l2 + v2;
+      afz -> AppendSwath (new Swath ({l,  r},  {b,  t},  emm));
+      ova -> AppendSwath (new Swath ({l2, r2}, {b2, t2}, emm));
 
       lpr -> AppendLine ({l - v, l + v});
       lpr -> AppendLine ({l + v, r + v});
       lpr -> AppendLine ({r + v, r - v});
       lpr -> AppendLine ({r - v, l - v});
     }
+
+  ova -> AppendCollage (new Ollag
+    ("/opt/trelopro/tamper/demo-temp/fin-col/collage06-half-cyan.mp4"));
+  ova -> AppendCollage (new Ollag
+    ("/opt/trelopro/tamper/demo-temp/fin-col/collage06_Half-GrayRnd.mp4"));
+  ova -> AppendCollage (new Ollag
+    ("/opt/trelopro/tamper/demo-temp/fin-col/Collage5a-blk-half.mp4"));
+  ova -> AppendCollage (new Ollag
+    ("/opt/trelopro/tamper/demo-temp/fin-col/Collage5a-cyan-half.mp4"));
+  ova -> DistributeCollagesEquitably ();
 
   Node *wframe_node = new Node (lpr);
 

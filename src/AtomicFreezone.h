@@ -21,7 +21,6 @@ class AtomicFreezone  :  public SpectacleCauseway
  public:
   std::vector <FilmInfo> *cineganz;
   std::vector <Ticato *> atoms;
-  Node *field_amok;
   f64 atom_count_goal;
   f64 inter_arrival_t;
   f64 max_speed, min_speed;

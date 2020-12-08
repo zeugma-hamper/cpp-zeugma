@@ -13,7 +13,7 @@
 
 AtomicFreezone::AtomicFreezone ()  :  SpectacleCauseway (),
                                       cineganz (NULL),
-                                      field_amok (NULL), atom_count_goal (45),
+                                      atom_count_goal (45),
                                       inter_arrival_t (5.0),
                                       min_speed (75.0), max_speed (250.0),
                                       privileged_atom_probability (0.0)
@@ -93,7 +93,7 @@ tic -> BBoxSetColor (ZeColor (1.0, 0.0));
   spd *= (direc == 0)  ?  (drand48 () > 0.5 ? 1.0 : -1.0)  :  direc;
   tic->wander_vel . SetHard (Vect (spd, 0.0, 0.0));
 
-  field_amok -> AppendChild (tic);
+  amok_field -> AppendChild (tic);
   atoms . push_back (tic);
 
   return tic;
@@ -108,7 +108,7 @@ Ticato *AtomicFreezone::ReceiveAtomGraciously (Ticato *tic)
   spd *= (drand48 () > 0.5 ? 1.0 : -1.0);
   tic->wander_vel . SetHard (Vect (spd, 0.0, 0.0));
 
-//  field_amok -> AppendChild (tic);
+//  amok_field -> AppendChild (tic);
   if (std::find (atoms . begin (), atoms . end (), tic)  ==  atoms . end ())
     atoms . push_back (tic);
   return tic;
@@ -127,9 +127,9 @@ void AtomicFreezone::SpontaneouslyGenerateAtomAtBoundary ()
 
 
 void AtomicFreezone::PopulateFromScratch ()
-{ meander_len = 0.0;
-  for (Swath *sw  :  meander)
-    meander_len += sw->prone . Length ();
+{ meander_len = MeanderLength (); //0.0;
+  // for (Swath *sw  :  meander)
+  //   meander_len += sw->prone . Length ();
 
   for (i64 q = (i64)atom_count_goal  ;  q > 0  ;  --q)
     { f64 linpos = meander_len * drand48 ();
@@ -335,7 +335,7 @@ i64 AtomicFreezone::ZEBulletin (ZEBulletinEvent *e)
               tic->shov_vel = Vect::zerov;
 
               atoms . push_back (tic);
-              field_amok -> AppendChild (tic);
+              amok_field -> AppendChild (tic);
               tic -> SetAndAlignToMaes (emm);
 
               f64 spd = min_speed  +  drand48 () * (max_speed - min_speed);

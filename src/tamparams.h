@@ -35,6 +35,9 @@ struct Tamparams
   f64 collband_hei = 2400.0;
   f64 collabband_elevstop = 7950.0;
 
+  f64 coll_scale = 2600.0;
+  f64 coll_spacing = 3600.0;
+
   f64 table_escatom_scale_factor = 0.5;
   f64 table_flmatom_scale_factor = 0.2;
 

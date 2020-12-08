@@ -11,6 +11,8 @@
 
 #include "PlatonicMaes.h"
 
+#include "Node.hpp"
+
 #include <vector>
 
 
@@ -36,11 +38,20 @@ class SpectacleCauseway  :  public Zeubject,
 { public:
   std::vector <PlatonicMaes *> underlying_maeses;
   std::vector <Swath *> meander;
+  Node *amok_field;
 
   SpectacleCauseway ();
 
   void AppendSwath (Swath *sw);
   Swath *SwathFor (PlatonicMaes *ma);
+
+  Node *AmokField ()
+    { return amok_field; }
+  void SetAmokField (Node *af)
+    { amok_field = af; }
+
+  f64 MeanderLength ();
+  std::pair <PlatonicMaes *, Vect> MaesAndPosFromMeanderDist (f64 d);
 };
 
 

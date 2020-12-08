@@ -41,8 +41,8 @@ class Alignifer  :  public Zeubject, public Node
   const Vect &CurNorm ()  const
     { return nrm; }
 
-  void AlignOverUp (const Vect &ov, const Vect &up);
-  void AlignToMaes (const PlatonicMaes *maes)
+  virtual void AlignOverUp (const Vect &ov, const Vect &up);
+  virtual void AlignToMaes (const PlatonicMaes *maes)
     { if (maes)  AlignOverUp (maes -> Over (), maes -> Up ()); }
 };
 
