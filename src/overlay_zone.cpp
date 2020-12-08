@@ -45,6 +45,8 @@ int main (int, char **)
   renderable->SetRadius(100.0);
   renderable->SetDimensions (maes->Width(), maes->Height());
 #else
+  //OverlayInstancing takes a array of points and renders AdjColor'ed circles of
+  //configured radius around them.
   nodal->Translate (maes->Loc());
   OverlayInstancing *renderable = new OverlayInstancing;
   Vect v (0.0);
