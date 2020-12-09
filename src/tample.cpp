@@ -781,12 +781,12 @@ int main (int ac, char **av)
 
 std::vector <std::string>  collanomer {
 "Collage01-Half-GryRnd.mp4",
-"Collage02b_Half-GryRndv2.mp4",
-"collage03-Half-GryRnd.mp4",
-"collage06_Half-GryRndv2.mp4",
-"collage07b-Half-GryRnd.mp4",
-"Collage08-Half-GryRnd.mp4",
-"Collage5a-Half-GryRnd.mp4"
+"Collage08-Half-GryRnd.mp4",    // door-bachelors
+"Collage5a-Half-GryRnd.mp4",     // turtle
+"collage06_Half-GryRndv2.mp4",  // cake-milk-tony
+"collage03-Half-GryRnd.mp4",    // bronson-dentures-mancandy
+"Collage02b_Half-GryRndv2.mp4", // zombie-vu
+"collage07b-Half-GryRnd.mp4"   // ufo
 };
 
  for (std::string &nm  :  collanomer)
