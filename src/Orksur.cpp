@@ -203,6 +203,19 @@ void Orksur::DisposeOfCollage ()
     }
 }
 
+void Orksur::EliminateCollage ()
+{ for (Ticato *tic  :  players)
+    { if (Node *par = tic -> Parent ())
+        par -> RemoveChild (tic);
+      else
+        delete tic;
+    }
+  players . clear ();
+  hoverees . clear ();
+  graspees . clear ();
+}
+
+
 
 void Orksur::WhisperSplortily (const std::string &prv, const Vect &proj, f64 dst)
 { Splort *s;
@@ -456,6 +469,8 @@ i64 Orksur::ZEYowlAppear (ZEYowlAppearEvent *e)
     { if (soncho)  soncho -> Unfurl (); }
   else if (utt  ==  "/")
     { DisposeOfCollage (); }
+  else if (utt  ==  "?")
+    { EliminateCollage (); }
   else if (utt  ==  ".")
     { SilenceAllAtoms (); }
   return 0;

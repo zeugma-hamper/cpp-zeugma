@@ -163,7 +163,7 @@ bool GraphicsApplication::InitWindowingAndGraphics ()
 
       //TODO: add color back
       //u8 gray = u8 (global_param_background_gray * 255.0);
-      u8 gray = 26u;
+      u8 gray = 0; //26u;
       u32 bg_rgba = (0xFF | gray << 8 | gray << 16 | gray << 24);
         bgfx::setViewClear (i,
                           BGFX_CLEAR_COLOR |

@@ -8,9 +8,8 @@
 using namespace charm;
 
 
-Ollag::Ollag (const std::string &fname)  :  Alignifer (),
-                                            re (NULL), fr (NULL),
-                                            cur_maes (NULL),
+Ollag::Ollag (const std::string &fname)  :  Alignifer (), re (NULL),
+                                            fr (NULL), cur_maes (NULL),
                                             own_private_over (Vect::xaxis),
                                             own_private_up (Vect::yaxis)
 { VideoSystem *vsys = VideoSystem::GetSystem ();
@@ -23,16 +22,20 @@ Ollag::Ollag (const std::string &fname)  :  Alignifer (),
   AppendRenderable (re);
 
   pi = br.control_pipeline;
-  f64 dur = pi -> Duration ();
-  // if (pi)
-  //   pi -> Loop (0.0, pi -> Duration ());
+  if (pi)
+    { f64 dur = pi -> Duration ();
+      pi -> Loop (0.0, pi -> Duration () - 0.04 * dur * drand48 ());
+//      pi -> Seek (dur * drand48 ());
+    }
+
+  central_loc . MakeBecomeLikable ();
 
   ScaleVect lat_slosh (own_private_over, lateral_sway);
   ScaleVect vrt_bobbl (own_private_up, vertical_bobble);
   aggregate_local_motion . SummandA () . BecomeLike (vrt_bobbl);
   aggregate_local_motion . SummandB () . BecomeLike (lat_slosh);
   SumVect totality (central_loc, aggregate_local_motion);
-  LocZoft () . BecomeLike (central_loc); //totality);
+  LocZoft () . BecomeLike (totality);
 
   if (TrGrappler *trg
       = dynamic_cast <TrGrappler *> (FindGrappler ("loc")))
@@ -72,11 +75,17 @@ void OeuvreAfterlife::AppendCollage (Ollag *ol)
 { if (! ol)
     return;
 
-//  ol -> ClearTransforms ();
-//  ol -> Scale (Tamparams::Current ()->coll_scale);
+  f64 s = Tamparams::Current ()->coll_scale;
+
   if (ScGrappler *scg
       = dynamic_cast <ScGrappler *> (ol -> FindGrappler ("scale")))
-    scg -> ScaleZoft () . Set (Tamparams::Current ()->coll_scale);
+    scg -> ScaleZoft () . Set (s);
+
+  ol->vertical_bobble . Frequency () . Set (0.035 + 0.035 * drand48 ());
+  ol->vertical_bobble . Amplitude () . Set (s * 0.0425 * (1.0 + drand48 ()));
+
+  ol->lateral_sway . Frequency () . Set (0.025 + 0.025 * drand48 ());
+  ol->lateral_sway . Amplitude () . Set (s * 0.0374 * (1.0 + drand48 ()));
 
   llages . push_back (ol);
   if (amok_field)

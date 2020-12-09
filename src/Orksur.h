@@ -89,6 +89,7 @@ class Orksur  :  public PlatonicMaes, public Node,
   AtomThusness ImpelFreeAtom (Ticato *tic, f64 dt);
 
   void DisposeOfCollage ();
+  void EliminateCollage ();
 
   void WhisperSplortily (const std::string &prv, const Vect &proj, f64 dst);
 

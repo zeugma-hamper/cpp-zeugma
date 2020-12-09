@@ -29,14 +29,14 @@ struct Tamparams
   f64 escaband_mid = 4875.0;
 //  f64 escaband_hei = 3750.0;
   f64 escaband_hei = 4350.0;
-  f64 escband_elevstop = 4875;
+  f64 escband_elevstop = 1950.0;
 
   f64 collband_mid = 7950.0;
   f64 collband_hei = 2400.0;
-  f64 collabband_elevstop = 7950.0;
+  f64 collabband_elevstop = 5500.0;
 
-  f64 coll_scale = 2600.0;
-  f64 coll_spacing = 3600.0;
+  f64 coll_scale = 2266.6;
+  f64 coll_spacing = 2600.0;
 
   f64 table_escatom_scale_factor = 0.5;
   f64 table_flmatom_scale_factor = 0.2;

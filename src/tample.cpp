@@ -681,7 +681,8 @@ int main (int ac, char **av)
   (grau_chin -> Translate (cine_cnt)) -> SetName ("transly");
   drand48 ();
   grau_chin -> ReleasePushback ();
-  grau_chin -> JumpToRandomFlick ();
+//  grau_chin -> JumpToRandomFlick ();
+  grau_chin -> JumpToFlick (11);
   grau_chin -> SetBackingMaes (left);
   g_left_wall -> AppendChild (grau_chin);
 
@@ -736,7 +737,7 @@ int main (int ac, char **av)
   for (const std::string &s  :  spethial)
     if (! afz -> AppendPrivilegedAtom (s))
       fprintf (stderr, "phailed privileging atom [%s]...\n", s . c_str ());
-  afz -> SetPrivlegedAtomProbability (0.5);
+  afz -> SetPrivlegedAtomProbability (0.05);
   AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.freezo);
 
   OeuvreAfterlife *ova = new OeuvreAfterlife;
@@ -778,14 +779,32 @@ int main (int ac, char **av)
       lpr -> AppendLine ({r - v, l - v});
     }
 
+std::vector <std::string>  collanomer {
+"Collage01-Half-GryRnd.mp4",
+"Collage02b_Half-GryRndv2.mp4",
+"collage03-Half-GryRnd.mp4",
+"collage06_Half-GryRndv2.mp4",
+"collage07b-Half-GryRnd.mp4",
+"Collage08-Half-GryRnd.mp4",
+"Collage5a-Half-GryRnd.mp4"
+};
+
+ for (std::string &nm  :  collanomer)
+   { std::string path = "/opt/trelopro/tamper/demo-temp/fin-col/" + nm;
+     ova -> AppendCollage (new Ollag (path));
+   }
+/*
+  ova -> AppendCollage (new Ollag
+    ("/opt/trelopro/tamper/demo-temp/fin-col/Collage5a-blk-half.mp4"));
+  ova -> AppendCollage (new Ollag
+    ("/opt/trelopro/tamper/demo-temp/fin-col/Collage5a-cyan-half.mp4"));
   ova -> AppendCollage (new Ollag
     ("/opt/trelopro/tamper/demo-temp/fin-col/collage06-half-cyan.mp4"));
   ova -> AppendCollage (new Ollag
     ("/opt/trelopro/tamper/demo-temp/fin-col/collage06_Half-GrayRnd.mp4"));
   ova -> AppendCollage (new Ollag
-    ("/opt/trelopro/tamper/demo-temp/fin-col/Collage5a-blk-half.mp4"));
-  ova -> AppendCollage (new Ollag
-    ("/opt/trelopro/tamper/demo-temp/fin-col/Collage5a-cyan-half.mp4"));
+    ("/opt/trelopro/tamper/demo-temp/fin-col/Collage02b_Half-Gry-rnd.mp4"));
+*/
   ova -> DistributeCollagesEquitably ();
 
   Node *wframe_node = new Node (lpr);
