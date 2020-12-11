@@ -106,7 +106,7 @@ void GraumanPalace::JumpToFlick (i64 which_flick)
       ss -> FadeUp ();
 //      ss -> AttachTimeline (sole_tline);
       if (sole_tline)
-        { sole_tline -> EstablishCineReceiver (ss);
+        { sole_tline -> EstablishCineSymbiote (ss);
           sole_tline->shift . Set ((-0.5 * ss -> AspectRatio () * flick_wid
                                     - 6.0 * sole_tline->thickth) * upp);
         }
@@ -394,5 +394,13 @@ i64 GraumanPalace::ZEYowlAppear (ZEYowlAppearEvent *e)
     { if (SilverScreen *ss = CurSilverScreen ())
         ss -> StepBy (-1);
     }
+  return 0;
+}
+
+
+
+i64 GraumanPalace::Inhale (i64 ratch, f64 thyme)
+{ if (sole_tline)
+    sole_tline -> MaybeUpdatePlayTime ();
   return 0;
 }

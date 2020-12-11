@@ -42,9 +42,11 @@ class Timeline  :  public Zeubject, public Node,
   LinePileRenderable *hover_ren;
   PolygonRenderable *track_rend;
 
-  SilverScreen *cine_receiver;
+  SilverScreen *cine_symbiote;
   std::string scrubber;
   MotherTime scrub_timer;
+  f64 uncoerced_update_interval;
+  MotherTime uncoerced_update_timer;
 
   Timeline ();
   ~Timeline ()  override;
@@ -53,13 +55,20 @@ class Timeline  :  public Zeubject, public Node,
 
   void SetWidthAndThickth (f64 wi, f64 th);
 
-  SilverScreen *CineReceiver ()
-    { return cine_receiver; }
-  void EstablishCineReceiver (SilverScreen *essess);
+  SilverScreen *CineSymbiote ()
+    { return cine_symbiote; }
+  void EstablishCineSymbiote (SilverScreen *essess);
+
+  f64 UncoercedUpdateInterval ()  const
+    { return uncoerced_update_interval; }
+  void SetUncoercedUpdateInterval (f64 uui)
+    { uncoerced_update_interval = uui; }
 
   void SetRepDuration (f64 dur);
   void SetPlayTime (f64 pt);
   void SetHoverTime (f64 ht);
+
+  void MaybeUpdatePlayTime ();
 
   bool TimeFromSpatialPointing (ZESpatialEvent *e, f64 &out_time,
                                 bool ignore_bounds = false);

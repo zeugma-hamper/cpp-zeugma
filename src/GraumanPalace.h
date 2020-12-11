@@ -134,6 +134,8 @@ Node *elpy_no;
   i64 ZESpatialSoften (ZESpatialSoftenEvent *e);
 
   i64 ZEYowlAppear (ZEYowlAppearEvent *e);
+
+  i64 Inhale (i64 ratch, f64 thyme)  override;
 };
 
 

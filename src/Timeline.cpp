@@ -15,7 +15,7 @@
 Timeline::Timeline ()  :  Zeubject (), Node (),
                           ovr (Vect::xaxis), upp (Vect::yaxis),
                           width (100.0), thickth (10.0), rep_duration (1.0),
-                          cine_receiver (NULL)
+                          cine_symbiote (NULL), uncoerced_update_interval (0.1)
 { AppendChild (play_nub = new Node);
   AppendChild (hover_nub = new Node);
 
@@ -100,7 +100,12 @@ void Timeline::SetRepDuration (f64 dur)
 }
 
 void Timeline::SetPlayTime (f64 pt)
-{ play_time = pt;
+{ if (pt  <  0.0)
+    pt = 0.0;
+  else if (pt  >  rep_duration)
+    pt = rep_duration;
+
+  play_time = pt;
   pnub_pos . Set (width * (pt / rep_duration - 0.5) * Vect::xaxis);
 }
 
@@ -110,12 +115,23 @@ void Timeline::SetHoverTime (f64 ht)
 }
 
 
-void Timeline::EstablishCineReceiver (SilverScreen *essess)
-{ if (cine_receiver)
-    cine_receiver -> DetachTimeline (this);
+void Timeline::EstablishCineSymbiote (SilverScreen *essess)
+{ if (cine_symbiote)
+    cine_symbiote -> DetachTimeline (this);
 
-  if (cine_receiver = essess)
-    { cine_receiver -> AttachTimeline (this); }
+  if (cine_symbiote = essess)
+    { cine_symbiote -> AttachTimeline (this); }
+}
+
+
+void Timeline::MaybeUpdatePlayTime ()
+{ if (! cine_symbiote)
+    return;
+  if (uncoerced_update_timer . CurTimeGlance () < uncoerced_update_interval)
+    return;
+
+  f64 ts = cine_symbiote -> CurTimestamp ();
+  SetPlayTime (ts);
 }
 
 
@@ -166,9 +182,9 @@ i64 Timeline::ZESpatialMove (ZESpatialMoveEvent *e)
         { TimeFromSpatialPointing (e, t, true);
           SetPlayTime (t);
           SetHoverTime (t);
-          if (cine_receiver)
+          if (cine_symbiote)
             if (scrub_timer . CurTimeGlance ()  >  MIN_INTER_SCRUB_INTERVAL)
-              { cine_receiver -> JumpToTime (t);
+              { cine_symbiote -> JumpToTime (t);
                 scrub_timer . ZeroTime ();
               }
         }
@@ -187,8 +203,8 @@ i64 Timeline::ZESpatialHarden (ZESpatialHardenEvent *e)
   f64 t;
   if (TimeFromSpatialPointing (e, t))
     { SetPlayTime (t);
-      if (cine_receiver)
-        cine_receiver -> JumpToTime (t);
+      if (cine_symbiote)
+        cine_symbiote -> JumpToTime (t);
       scrubber = prv;
       scrub_timer . SetTime (-0.225);
     }
