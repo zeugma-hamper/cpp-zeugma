@@ -272,6 +272,7 @@ i64 AtomicFreezone::ZESpatialHarden (ZESpatialHardenEvent *e)
         { tic->from_node = tic -> Parent ();
           conv -> AppendChild (tic);
         }
+      return 1;  // i.e. nobody else should see the harden, mkay?
     }
   else
     fprintf (stderr, "baseless CLICKsterism. here in AFreezo's SpHarden...\n");

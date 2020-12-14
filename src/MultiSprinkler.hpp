@@ -25,7 +25,7 @@ class Sprinkler final : public ZeEvent::ProtoSprinkler
   using EVT_HANDLER_FUNC = typename SPRNKLR::extended_slot_function_type;
 
   template <typename U>
-  using MEMB_FUNC_SIG = i64 (U::*) (HOOKUP const &, T *);
+   using MEMB_FUNC_SIG = i64 (U::*) (HOOKUP const &, T *);
 
   operator SPRNKLR & ();
 
@@ -33,7 +33,7 @@ class Sprinkler final : public ZeEvent::ProtoSprinkler
 
   HOOKUP AppendHandler (EVT_HANDLER_FUNC &&_f);
   template <typename U>
-  HOOKUP AppendHandler (U *_receiver, MEMB_FUNC_SIG<U> _func);
+   HOOKUP AppendHandler (U *_receiver, MEMB_FUNC_SIG<U> _func);
 
   // who owns these? time for ch_ptr?
   void AppendPhage (ch_ptr<OmNihil> const &phage);
@@ -56,15 +56,15 @@ class MultiSprinkler
   CHARM_DEFAULT_MOVE (MultiSprinkler);
 
   template <typename T>
-  void Spray (T *_event);
+   void Spray (T *_event);
 
   template <typename It>
-  void Spray (It _begin, It _end);
+   void Spray (It _begin, It _end);
 
   template <typename T>
-  ch_ptr<Sprinkler<T>> AssuredSprinklerForEventType ();
+   ch_ptr<Sprinkler<T>> AssuredSprinklerForEventType ();
   template <typename T>
-  ch_ptr<Sprinkler <T>> UnsecuredSprinklerForEventType ();
+   ch_ptr<Sprinkler <T>> UnsecuredSprinklerForEventType ();
 
   template <typename T>
    ZeEvent::ProtoSprinkler::HOOKUP
@@ -76,11 +76,11 @@ class MultiSprinkler
                    i64 (U::*) (ZeEvent::ProtoSprinkler::HOOKUP const &, T *));
 
   template <typename T>
-  void AppendPhage (ch_ptr<OmNihil> const &phage);
+   void AppendPhage (ch_ptr<OmNihil> const &phage);
   template <typename T>
-  void RemovePhage (ch_ptr<OmNihil> const &phage);
+   void RemovePhage (ch_ptr<OmNihil> const &phage);
   template <typename T>
-  ch_ptr<OmNihil> ExcisePhage (ch_ptr<OmNihil> const &phage);
+   ch_ptr<OmNihil> ExcisePhage (ch_ptr<OmNihil> const &phage);
 
  protected:
   std::unordered_map <u32, ch_ptr<ZeEvent::ProtoSprinkler>> sprinkler_map;
@@ -95,10 +95,11 @@ i64 Sprinkler<T>::Spray (ZeEvent *_event)
   assert (event);
   sp (event);
   for (ch_weak_ptr<OmNihil> weak_ph : phages)
-    {
+    { i64 ret;
       ch_ptr<OmNihil> ph {weak_ph.lock ()};
       if (ph)
-        _event->ProfferAsSnackTo (ph.get());
+        if ((ret = _event->ProfferAsSnackTo (ph . get ()))  >  0)
+          return ret;
     }
 
   return 0;
@@ -110,7 +111,7 @@ Sprinkler<T>::operator SPRNKLR & ()
 
 template <typename T>
  ZeEvent::ProtoSprinkler::HOOKUP
-Sprinkler<T>::AppendHandler (EVT_HANDLER_FUNC &&_f)
+  Sprinkler<T>::AppendHandler (EVT_HANDLER_FUNC &&_f)
 {
   return sp.connect_extended (std::forward<EVT_HANDLER_FUNC> (_f));
 }

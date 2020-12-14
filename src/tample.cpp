@@ -631,9 +631,6 @@ int main (int ac, char **av)
   tamp.orksu = ch_ptr <Orksur> (orkp);
   orkp->associated_wallmaes = frnt;
   g_tablecloth -> AppendChild (orkp);
-  AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.orksu);
-  AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.orksu);
-  AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.orksu);
   tamp . GetSprinkler () . AppendPhage <TASSuggestionEvent> (tamp.orksu);
 
   for (i64 q = 0  ;  q < tamp . NumWaterWorkses ()  ;  ++q)
@@ -667,9 +664,6 @@ int main (int ac, char **av)
   g_front_wall -> AppendChild (grau_egyp);
 
   tamp.gegyp = ch_ptr <GraumanPalace> (grau_egyp);
-  AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
-  AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
-  AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
 
   cine_cnt = auth_left_cntr;
   cine_cnt -= cine_cnt . Dot (left -> Up ()) * left -> Up ();
@@ -815,6 +809,14 @@ std::vector <std::string>  collanomer {
 //  afz -> PopulateFromScratch ();
   AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.freezo);
   AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.freezo);
+
+  AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.orksu);
+  AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.orksu);
+  AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.orksu);
+
+  AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
+  AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
+  AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
 
 GridRenderable *griddy = new GridRenderable;
 Node *gridno = new Node (griddy);
