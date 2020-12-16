@@ -9,6 +9,7 @@ $output wrld_p
 
 void main()
 {
-  wrld_p = mul (u_modelView, vec4 (a_position, 1.0));
+//  wrld_p = mul (u_modelView, vec4 (a_position, 1.0));
+  wrld_p = mul (u_model[0], vec4 (a_position, 1.0));
   gl_Position = mul (u_modelViewProj, vec4 (a_position, 1.0));
 }
