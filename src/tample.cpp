@@ -827,6 +827,9 @@ griddy -> SetWidth (0.5 * tabl -> Width ());
 griddy -> SetHeight (0.5 * tabl -> Height ());
 griddy -> SetWarp (0.05 * tabl -> Over ());
 griddy -> SetWeft (0.05 * tabl -> Up ());
+griddy -> SetDiscRadius (220.0);
+griddy -> SetDiscCenter (tabl -> Loc () + 150.0 * tabl -> Up ()
+                         + 50.0 * tabl -> Norm ());
 griddy -> SetGridColor (ZeColor (1.0, 0.0, 1.0, 0.5));
 g_tablecloth -> AppendChild (gridno);
 

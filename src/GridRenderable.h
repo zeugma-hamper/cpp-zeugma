@@ -20,12 +20,15 @@ class GridRenderable  :  public Renderable
   ZoftFloat wid, hei;
   ZoftVect warp, weft;
   ZoftColor grid_iro;
+  ZoftFloat disc_rad;
+  ZoftVect disc_cnt;
 
   bgfx::ProgramHandle shad_prog;
   bgfx::DynamicVertexBufferHandle vbuf;
   bgfx::UniformHandle unif_gridc;
   bgfx::UniformHandle unif_warp;
   bgfx::UniformHandle unif_weft;
+  bgfx::UniformHandle unif_dsc_cntrad;
 
   GridRenderable ();
   ~GridRenderable ();
@@ -71,6 +74,20 @@ class GridRenderable  :  public Renderable
     { grid_iro . Set (gc); }
   ZoftColor &GridColorZoft ()
     { return grid_iro; }
+
+  f64 DiscRadius ()  const
+    { return disc_rad; }
+  void SetDiscRadius (f64 dr)
+    { disc_rad = dr; }
+  ZoftFloat &DiscRadiusZoft ()
+    { return disc_rad; }
+
+  const Vect &DiscCenter ()  const
+    { return disc_cnt; }
+  void SetDiscCenter (const Vect &dc)
+    { disc_cnt . Set (dc); }
+  ZoftVect &DiscCenterZoft ()
+    { return disc_cnt; }
 
   void Draw (u16 vuy_id)  override;
 };

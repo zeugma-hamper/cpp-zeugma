@@ -14,15 +14,18 @@ namespace charm  {
 static const char *color_unif_s = "u_color";
 static const char *warp_unif_s = "u_warp";
 static const char *weft_unif_s = "u_weft";
+static const char *cntrad_unif_s = "u_cntrad";
 
 
 GridRenderable::GridRenderable ()  :  Renderable (), wid (10.0), hei (10.0),
                                       warp (Vect::xaxis), weft (Vect::yaxis),
                                       shad_prog {BGFX_INVALID_HANDLE},
-                                      vbuf {BGFX_INVALID_HANDLE}
+                                      vbuf {BGFX_INVALID_HANDLE},
+                                      disc_rad (-1.0)
 { unif_gridc = bgfx::createUniform (color_unif_s, bgfx::UniformType::Vec4);
   unif_warp = bgfx::createUniform (warp_unif_s, bgfx::UniformType::Vec4);
   unif_weft = bgfx::createUniform (weft_unif_s, bgfx::UniformType::Vec4);
+  unif_dsc_cntrad = bgfx::createUniform (cntrad_unif_s, bgfx::UniformType::Vec4);
 
   bx::FilePath shader_path = "grid_vs.bin";
   bgfx::ShaderHandle vs = CreateShader (shader_path);
@@ -80,6 +83,10 @@ void GridRenderable::Draw (u16 vyu_id)
   glm::vec4 wft = {weft.val.x, weft.val.y, weft.val.z, 0.0};
   bgfx::setUniform (unif_warp, glm::value_ptr (wrp));
   bgfx::setUniform (unif_weft, glm::value_ptr (wft));
+
+  glm::vec4 dsc = {disc_cnt.val.x, disc_cnt.val.y, disc_cnt.val.z,
+                   disc_rad.val};
+  bgfx::setUniform (unif_dsc_cntrad, glm::value_ptr (dsc));
 
   bgfx::submit (vyu_id, shad_prog, m_graph_id);
 }
