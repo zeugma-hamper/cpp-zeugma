@@ -830,6 +830,7 @@ griddy -> SetWeft (0.05 * tabl -> Up ());
 griddy -> SetDiscRadius (220.0);
 griddy -> SetDiscCenter (tabl -> Loc () + 150.0 * tabl -> Up ()
                          + 50.0 * tabl -> Norm ());
+griddy -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
 griddy -> SetGridColor (ZeColor (1.0, 0.0, 1.0, 0.5));
 g_tablecloth -> AppendChild (gridno);
 

@@ -22,6 +22,7 @@ class GridRenderable  :  public Renderable
   ZoftColor grid_iro;
   ZoftFloat disc_rad;
   ZoftVect disc_cnt;
+  ZoftFloat span_frc;
 
   bgfx::ProgramHandle shad_prog;
   bgfx::DynamicVertexBufferHandle vbuf;
@@ -29,6 +30,7 @@ class GridRenderable  :  public Renderable
   bgfx::UniformHandle unif_warp;
   bgfx::UniformHandle unif_weft;
   bgfx::UniformHandle unif_dsc_cntrad;
+  bgfx::UniformHandle unif_span_frc;
 
   GridRenderable ();
   ~GridRenderable ();
@@ -88,6 +90,13 @@ class GridRenderable  :  public Renderable
     { disc_cnt . Set (dc); }
   ZoftVect &DiscCenterZoft ()
     { return disc_cnt; }
+
+  f64 SpanFraction ()  const
+    { return span_frc.val; }
+  void SetSpanFraction (f64 sf)
+    { span_frc . Set (sf); }
+  ZoftFloat &SpanFractionZoft ()
+    { return span_frc; }
 
   void Draw (u16 vuy_id)  override;
 };
