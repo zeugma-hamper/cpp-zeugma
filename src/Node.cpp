@@ -272,6 +272,26 @@ void Node::AppendChild (Node *_node)
   m_children . push_back (_node);
 }
 
+void Node::InsertChild (Node *_node, i64 pos)
+{ if (! _node)
+    return;
+
+  if (_node->m_parent)
+    _node->m_parent -> ExciseChild (_node);
+
+  _node->m_parent = this;
+  _node -> SetLayer (m_layer);
+
+  auto it = m_children . begin ();
+  if (pos  >=  m_children . size ())
+    it = m_children . end ();
+  else if (pos  >=  0)
+    it += pos;
+  //  and, implicitly, if pos < 0, we're still at *.begin() ...
+
+  m_children . insert (it, _node);
+}
+
 void Node::RemoveChild (Node *_node)
 {
   if (ExciseChild (_node))
@@ -289,6 +309,28 @@ Node *Node::ExciseChild (Node *_node)
   n -> SetLayer (nullptr);
   return n;
 }
+
+bool Node::MakeChildFirst (Node *nd)
+{ if (! nd  ||  ! ExciseChild (nd))
+    return false;
+  InsertChild (nd, 0);
+  return true;
+}
+
+bool Node::MakeChildLast (Node *nd)
+{ if (! nd  ||  ! ExciseChild (nd))
+    return false;
+  InsertChild (nd, ChildCount ());
+  return true;
+}
+
+bool Node::MakeChildNth (Node *nd, i64 ind)
+{ if (! nd  ||  ! ExciseChild (nd))
+    return false;
+  InsertChild (nd, ind);
+  return true;
+}
+
 
 void Node::AppendRenderable (Renderable *_render)
 {
@@ -340,34 +382,6 @@ Renderable *Node::NthRenderable (i64 ind)
 { if (ind < 0  ||  ind >= m_renderables . size ())
     return NULL;
   return m_renderables . at (ind);
-}
-
-bool Node::MakeRenderablesForemostInLayer (bool recurse_of_course)
-{ if (! m_layer)
-    return false;
-
-  for (Renderable *re  :  m_renderables)
-    m_layer -> RenderableToForemost (re);
-
-  if (recurse_of_course)
-    for (Node *no  :  m_children)
-      no -> MakeRenderablesForemostInLayer (recurse_of_course);
-
-  return true;
-}
-
-bool Node::MakeRenderablesRearmostInLayer (bool recurse_of_course)
-{ if (! m_layer)
-    return false;
-
-  for (Renderable *re  :  m_renderables)
-    m_layer -> RenderableToRearmost (re);
-
-  if (recurse_of_course)
-    for (Node *no  :  m_children)
-      no -> MakeRenderablesForemostInLayer (recurse_of_course);
-
-  return true;
 }
 
 

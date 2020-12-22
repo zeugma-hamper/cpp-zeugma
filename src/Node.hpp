@@ -114,6 +114,7 @@ class Node
   // node takes ownership of child nodes
   void  AppendChild (Node *_node);
   // excise with feeling (deletes)
+  void InsertChild (Node *_node, i64 pos);
   void  RemoveChild (Node *_node);
   Node *ExciseChild (Node *_node);
 
@@ -123,6 +124,10 @@ class Node
     { return (ind < 0  ||  ind > ChildCount ())  ?  NULL  :  m_children[ind]; }
   std::vector <Node *> ChildListCopy ()
     { return m_children; }
+
+  bool MakeChildFirst (Node *nd);
+  bool MakeChildLast (Node *nd);
+  bool MakeChildNth (Node *nd, i64 ind);
 
   // node takes ownership of renderables
   void        AppendRenderable (Renderable *_render);
@@ -135,9 +140,6 @@ class Node
 
   i64 NumRenderables ()  const;
   Renderable *NthRenderable (i64 ind);
-
-  bool MakeRenderablesForemostInLayer (bool recurse_of_course = true);
-  bool MakeRenderablesRearmostInLayer (bool recurse_of_course = true);
 
   void   SetLayer (Layer *_layer);
   Layer *GetLayer () const;

@@ -47,40 +47,6 @@ std::vector<Frontier *> &Layer::GetFrontiers ()
 }
 
 
-bool Layer::RenderableToForemost (Renderable *re)
-{ if (! re)
-    return false;
-
-  auto omega = m_renderables . end ();
-  auto it = std::find (m_renderables . begin (), omega, re);
-  if (it  ==  omega)
-    return false;
-
-  if (it  !=  omega - 1)
-    { m_renderables . erase (it);
-      m_renderables . push_back (re);
-    }
-  return true;
-}
-
-bool Layer::RenderableToRearmost (Renderable *re)
-{ if (! re)
-    return false;
-
-  auto omega = m_renderables . end ();
-  auto alpha = m_renderables . begin ();
-  auto it = std::find (m_renderables . begin (), omega, re);
-  if (it  ==  omega)
-    return false;
-
-  if (it  !=  alpha)
-    { m_renderables . erase (it);
-      m_renderables . insert (m_renderables . begin (), re);
-    }
-  return true;
-}
-
-
 void Layer::SortFrontiers ()
 {
   std::sort (m_frontiers.begin (), m_frontiers.end (),

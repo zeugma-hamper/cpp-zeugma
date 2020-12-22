@@ -400,7 +400,7 @@ i64 Orksur::ZESpatialHarden (ZESpatialHardenEvent *e)
     }
 
   graspees[prv] = { tic, (tic -> CurLoc () - proj) };
-  tic -> MakeRenderablesForemostInLayer ();
+  collage -> MakeChildLast (tic);
   tic->shov_vel = Vect::zerov;
   tic->interp_adjc . Set (ZeColor (2.0, 1.0));
   AtomicFirstStrike (tic);
