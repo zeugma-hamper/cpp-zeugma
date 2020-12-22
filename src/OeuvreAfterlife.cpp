@@ -10,8 +10,8 @@ using namespace charm;
 
 Ollag::Ollag (const std::string &fname)  :  Alignifer (), re (NULL),
                                             fr (NULL), cur_maes (NULL),
-                                            own_private_over (Vect::xaxis),
-                                            own_private_up (Vect::yaxis)
+                                            own_private_idahover (Vect::xaxis),
+                                            own_private_idahup (Vect::yaxis)
 { VideoSystem *vsys = VideoSystem::GetSystem ();
 
   const VideoBrace br = vsys -> OpenVideoFile (fname);
@@ -30,8 +30,8 @@ Ollag::Ollag (const std::string &fname)  :  Alignifer (), re (NULL),
 
   central_loc . MakeBecomeLikable ();
 
-  ScaleVect lat_slosh (own_private_over, lateral_sway);
-  ScaleVect vrt_bobbl (own_private_up, vertical_bobble);
+  ScaleVect lat_slosh (own_private_idahover, lateral_sway);
+  ScaleVect vrt_bobbl (own_private_idahup, vertical_bobble);
   aggregate_local_motion . SummandA () . BecomeLike (vrt_bobbl);
   aggregate_local_motion . SummandB () . BecomeLike (lat_slosh);
   SumVect totality (central_loc, aggregate_local_motion);
@@ -46,8 +46,8 @@ Ollag::Ollag (const std::string &fname)  :  Alignifer (), re (NULL),
 void Ollag::AlignOverUp (const Vect &ov, const Vect &up)
 { Alignifer::AlignOverUp (ov, up);
 
-  own_private_over . Set (ov);
-  own_private_up . Set (up);
+  own_private_idahover . Set (ov);
+  own_private_idahup . Set (up);
 }
 
 

@@ -1,5 +1,7 @@
+
 #ifndef NODULAR_BITS
 #define NODULAR_BITS
+
 
 #include <base_types.hpp>
 #include <class_utils.hpp>
@@ -11,18 +13,21 @@
 
 #include "GrapplerPile.h"
 
-namespace charm
-{
+
+namespace charm  {
+
 
 class Layer;
 class Renderable;
 class Frontier;
+
 
 struct Transformation
 {
   glm::mat4 model{1.0f};
   glm::mat4 normal{1.0f};
 };
+
 
 class Node
 {
@@ -35,7 +40,8 @@ class Node
   CHARM_DELETE_COPY (Node);
   CHARM_DELETE_MOVE (Node);
 
-  std::array<graph_id, 2> EnumerateGraph (graph_id _base_id = 0, graph_id _base_rend_id = 0);
+  std::array<graph_id, 2> EnumerateGraph (graph_id _base_id = 0,
+                                          graph_id _base_rend_id = 0);
   void SetGraphID (graph_id _id);
   graph_id GetGraphID () const;
 
@@ -45,7 +51,7 @@ class Node
 
   // callable with one parameter 'Node &'
   template<typename Functor>
-  void VisitDepthFirst (Functor &&_func);
+   void VisitDepthFirst (Functor &&_func);
 
   Transformation const &GetAbsoluteTransformation () const;
 
@@ -111,6 +117,13 @@ class Node
   void  RemoveChild (Node *_node);
   Node *ExciseChild (Node *_node);
 
+  i64 ChildCount ()  const
+    { return m_children . size (); }
+  Node *NthChild (i64 ind)
+    { return (ind < 0  ||  ind > ChildCount ())  ?  NULL  :  m_children[ind]; }
+  std::vector <Node *> ChildListCopy ()
+    { return m_children; }
+
   // node takes ownership of renderables
   void        AppendRenderable (Renderable *_render);
   //excise with feeling (deletes)
@@ -147,6 +160,7 @@ class Node
   bool m_local_tx_dirty_flag;
 };
 
+
 template<typename Functor>
 void Node::VisitDepthFirst (Functor &&_func)
 {
@@ -154,9 +168,11 @@ void Node::VisitDepthFirst (Functor &&_func)
 
   szt const count = m_children.size ();
   for (szt i = 0; i < count; ++i)
-    m_children[i]->VisitDepthFirst (_func);
+    m_children[i] -> VisitDepthFirst (_func);
 }
 
-}
+
+}  // unto namespace charm as to veronica cartwright in alien, witches of e'wick
+
 
 #endif //NODULAR_BITS

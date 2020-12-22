@@ -31,8 +31,8 @@ class Ollag  :  public Alignifer
   SumVect aggregate_local_motion;
   SinuFloat vertical_bobble;
   SinuFloat lateral_sway;
-  ZoftVect own_private_over;
-  ZoftVect own_private_up;
+  ZoftVect own_private_idahover;
+  ZoftVect own_private_idahup;
   ZoftVect central_loc;
 
   Ollag (const std::string &fname);

@@ -1,3 +1,4 @@
+
 #include "Node.hpp"
 
 #include <Layer.hpp>
@@ -14,7 +15,9 @@
 
 #include <algorithm>
 
-namespace charm {
+
+namespace charm  {
+
 
 Node::Node ()
   : m_layer {nullptr},
@@ -23,8 +26,7 @@ Node::Node ()
     m_frontier {nullptr},
     m_id {0u},
     m_local_tx_dirty_flag {true}
-{
-}
+{ }
 
 Node::Node (Renderable *_renderable)
   : Node {}
@@ -80,8 +82,8 @@ void Node::UpdateTransformsHierarchically (Transformation const &_parent,
 
   size_t const child_count = m_children.size ();
   for (size_t i = 0u; i < child_count; ++i)
-    m_children[i]->UpdateTransformsHierarchically (m_absolute_tx, needs_update,
-                                                   ratch, thyme);
+    m_children[i] -> UpdateTransformsHierarchically (m_absolute_tx, needs_update,
+                                                     ratch, thyme);
 }
 
 Transformation const &Node::GetAbsoluteTransformation () const
@@ -96,23 +98,23 @@ struct RenderableEnumerator
   { }
 
   void operator () (Node &_node)
-  {
-    _node.SetGraphID(id++);
-    std::vector<Renderable *> &rs = _node.GetRenderables();
-    size_t const rend_count = rs.size ();
-    for (size_t i = 0; i < rend_count; ++i)
-      rs[i]->SetGraphID (rend_id++);
-  }
+    {
+      _node . SetGraphID (id++);
+      std::vector<Renderable *> &rs = _node . GetRenderables();
+      size_t const rend_count = rs.size ();
+      for (size_t i = 0; i < rend_count; ++i)
+        rs[i] -> SetGraphID (rend_id++);
+    }
 
   graph_id id;
   graph_id rend_id;
 };
 
-std::array<graph_id, 2> Node::EnumerateGraph (graph_id _base_id, graph_id _base_rend_id)
+std::array<graph_id, 2> Node::EnumerateGraph (graph_id _base_id,
+                                              graph_id _base_rend_id)
 {
   RenderableEnumerator re {_base_id, _base_rend_id};
   VisitDepthFirst (re);
-
 
   return {re.id, re.rend_id};
 }
@@ -136,7 +138,7 @@ void Node::SetLocalTransformation (Transformation const &_local)
 void Node::SetLocalTransformation (glm::mat4 const &_vertex_tx)
 {
   m_local_tx.model = _vertex_tx;
-  m_local_tx.normal = glm::inverseTranspose(glm::mat3 (_vertex_tx));
+  m_local_tx.normal = glm::inverseTranspose (glm::mat3 (_vertex_tx));
   m_local_tx_dirty_flag = true;
 }
 
@@ -262,12 +264,12 @@ Node *Node::Parent ()
 void Node::AppendChild (Node *_node)
 {
   if (_node->m_parent)
-    _node->m_parent->ExciseChild (_node);
+    _node->m_parent -> ExciseChild (_node);
 
   _node->m_parent = this;
-  _node->SetLayer (m_layer);
+  _node -> SetLayer (m_layer);
 
-  m_children.push_back (_node);
+  m_children . push_back (_node);
 }
 
 void Node::RemoveChild (Node *_node)
@@ -284,7 +286,7 @@ Node *Node::ExciseChild (Node *_node)
 
   Node *n = *it;
   m_children.erase (it);
-  n->SetLayer (nullptr);
+  n -> SetLayer (nullptr);
   return n;
 }
 
@@ -293,11 +295,11 @@ void Node::AppendRenderable (Renderable *_render)
   if (! _render)
     return;
 
-  m_renderables.push_back (_render);
+  m_renderables . push_back (_render);
   _render->m_node = this;
 
   if (m_layer)
-    m_layer->GetRenderables().push_back(_render);
+    m_layer -> GetRenderables () . push_back (_render);
 }
 
 void Node::RemoveRenderable (Renderable *_render)
@@ -313,9 +315,9 @@ Renderable *Node::ExciseRenderable (Renderable *_render)
     return nullptr;
 
   Renderable *r = *it;
-  m_renderables.erase (it);
+  m_renderables . erase (it);
   if (m_layer)
-    m_layer->RemoveRenderable (r);
+    m_layer -> RemoveRenderable (r);
 
   return r;
 }
@@ -373,22 +375,22 @@ void Node::SetLayer (Layer *_layer)
 {
   if (m_layer)
     {
-      m_layer->RemoveRenderables(m_renderables);
-      m_layer->RemoveFrontier(m_frontier);
+      m_layer -> RemoveRenderables (m_renderables);
+      m_layer -> RemoveFrontier (m_frontier);
     }
 
   m_layer = _layer;
   if (m_layer)
     {
-      m_layer->m_renderables.insert(m_layer->m_renderables.end (),
-                                    m_renderables.begin (),
-                                    m_renderables.end ());
+      m_layer->m_renderables . insert (m_layer->m_renderables.end (),
+                                       m_renderables.begin (),
+                                       m_renderables.end ());
       if (m_frontier)
-        m_layer->m_frontiers.push_back(m_frontier);
+        m_layer->m_frontiers . push_back (m_frontier);
     }
 
   for (Node *child : m_children)
-    child->SetLayer (_layer);
+    child -> SetLayer (_layer);
 }
 
 Layer *Node::GetLayer () const
@@ -408,7 +410,7 @@ void Node::SetFrontier (Frontier *_frontier)
 
   if (m_frontier)
     {
-      m_layer->RemoveFrontier(m_frontier);
+      m_layer -> RemoveFrontier (m_frontier);
       delete m_frontier;
       m_frontier = nullptr;
     }
@@ -417,7 +419,7 @@ void Node::SetFrontier (Frontier *_frontier)
     {
       _frontier->m_node = this;
       m_frontier = _frontier;
-      m_layer->m_frontiers.push_back(_frontier);
+      m_layer->m_frontiers . push_back (_frontier);
     }
 }
 

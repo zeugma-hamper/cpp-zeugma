@@ -195,7 +195,7 @@ void GraphicsApplication::Render ()
 
   for (CMVTrefoil *leaf : m_trefoils)
     {
-      u16 vuid = leaf->view.ViewID ();
+      u16 vuid = leaf->view . ViewID ();
       bgfx::touch (vuid);
 
       Bolex *c = leaf->cam;
@@ -213,7 +213,7 @@ void GraphicsApplication::Render ()
                               glm::value_ptr (proj_transform));
 
       for (Layer *l : leaf->layers)
-        for (Renderable *r  :  l->GetRenderables())
+        for (Renderable *r  :  l -> GetRenderables ())
           if (r -> ShouldDraw ())
             r -> Draw (vuid);
     }
