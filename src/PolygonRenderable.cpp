@@ -18,6 +18,7 @@ static const char *color_unif_s = "u_color";
 PolygonRenderable::PolygonRenderable ()  :  Renderable (),
                                             should_fill (true),
                                             should_edge (false),
+                                            should_close (true),
                                             shad_prog {BGFX_INVALID_HANDLE},
                                             fill_vbuf {BGFX_INVALID_HANDLE},
                                             edge_vbuf {BGFX_INVALID_HANDLE}
@@ -126,45 +127,60 @@ static void PRErrorCB (GLenum err, void */*bonus*/)
 
 
 void PolygonRenderable::SpankularlyTesselate ()
-{ GLUtesselator *gt = (GLUtesselator *)tessy_obj;
+{ if (! should_fill)
+    { raw_verts . clear ();
+      for (auto &it  :  verts)
+        raw_verts . push_back (as_glm (it.val));
+      if (raw_verts . size () > 2  &&  should_close)
+        raw_verts . push_back (raw_verts[0]);
+    }
+  else
+    { GLUtesselator *gt = (GLUtesselator *)tessy_obj;
 
-  gluTessProperty (gt, GLU_TESS_BOUNDARY_ONLY, GL_FALSE);
+      gluTessProperty (gt, GLU_TESS_BOUNDARY_ONLY, GL_FALSE);
 //  gluTessProperty (gt, GLU_TESS_WINDING_RULE, GLU_TESS_WINDING_NONZERO);
 
-  gluTessCallback (gt, GLU_TESS_BEGIN_DATA,
-                   reinterpret_cast <GLUCB> (&PRBeginCB));
-  gluTessCallback (gt, GLU_TESS_VERTEX_DATA,
-                   reinterpret_cast <GLUCB> (&PRVertexCB));
-  gluTessCallback (gt, GLU_TESS_END_DATA,
-                   reinterpret_cast <GLUCB> (&PREndCB));
-  gluTessCallback (gt, GLU_TESS_ERROR_DATA,
-                   reinterpret_cast <GLUCB> (&PRErrorCB));
+      gluTessCallback (gt, GLU_TESS_BEGIN_DATA,
+                       reinterpret_cast <GLUCB> (&PRBeginCB));
+      gluTessCallback (gt, GLU_TESS_VERTEX_DATA,
+                       reinterpret_cast <GLUCB> (&PRVertexCB));
+      gluTessCallback (gt, GLU_TESS_END_DATA,
+                       reinterpret_cast <GLUCB> (&PREndCB));
+      gluTessCallback (gt, GLU_TESS_ERROR_DATA,
+                       reinterpret_cast <GLUCB> (&PRErrorCB));
 
-  raw_verts . clear ();
-  tessd_verts . clear ();
-  gluTessBeginPolygon (gt, this);
-  gluTessBeginContour (gt);
-  for (auto &it  :  verts)
-    { raw_verts . push_back (as_glm (it.val));
-      gluTessVertex (gt, &it.val.x,  &it.val.x);
+      raw_verts . clear ();
+      tessd_verts . clear ();
+      gluTessBeginPolygon (gt, this);
+      gluTessBeginContour (gt);
+      for (auto &it  :  verts)
+        { raw_verts . push_back (as_glm (it.val));
+          gluTessVertex (gt, &it.val.x,  &it.val.x);
+        }
+      if (raw_verts . size ()  >  2)
+        raw_verts . push_back (raw_verts[0]);
+      gluTessEndContour (gt);
+      gluTessEndPolygon (gt);
+
+      ts_vrt_cnt = tessd_verts . size ();
+
+      if (! bgfx::isValid (fill_vbuf))
+        return;
     }
-  if (raw_verts . size ()  >  2)
-    raw_verts . push_back (raw_verts[0]);
-  gluTessEndContour (gt);
-  gluTessEndPolygon (gt);
 
-  ts_vrt_cnt = tessd_verts . size ();
+  if (should_fill)
+    { const bgfx::Memory *memmy
+        = bgfx::copy (tessd_verts . data (),
+                      ts_vrt_cnt * sizeof (glm::vec3));
+      bgfx::update (fill_vbuf, 0, memmy);
+    }
 
-  if (! bgfx::isValid (fill_vbuf))
-    return;
-
-  const bgfx::Memory *memmy
-    = bgfx::copy (tessd_verts . data (), ts_vrt_cnt * sizeof (glm::vec3));
-  bgfx::update (fill_vbuf, 0, memmy);
-
-  const bgfx::Memory *mimmy
-    = bgfx::copy (raw_verts . data (), raw_verts . size () * sizeof (glm::vec3));
-  bgfx::update (edge_vbuf, 0, mimmy);
+  if (should_edge)
+    { const bgfx::Memory *mimmy
+        = bgfx::copy (raw_verts . data (),
+                      raw_verts . size () * sizeof (glm::vec3));
+      bgfx::update (edge_vbuf, 0, mimmy);
+    }
 
   spanking_time = false;
 }

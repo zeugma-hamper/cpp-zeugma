@@ -683,16 +683,15 @@ int main (int ac, char **av)
   tamp.gchin = ch_ptr <GraumanPalace> (grau_chin);
 
 
-/*
   Node *splat = new Node;
   PolygonRenderable *polysplat = new PolygonRenderable;
   i64 nv = 14;
-  SinuVect centz (1000.0 * frnt -> Over (), 0.3, frnt -> Loc ());
+  SinuVect centz (1000.0 * frnt -> Over (), 0.05, frnt -> Loc ());
   for (i64 q = 0  ;  q < nv  ;  ++q)
     { f64 r = 0.3 * frnt -> Height ();
       f64 theeeta = 2.0 * M_PI / (f64)nv * (f64)q;
       Vect radv = cos (theeeta) * Vect::xaxis  +  sin (theeeta) * Vect::yaxis;
-      SinuVect arm (0.3 * r * radv, 1.0 + 0.3 * drand48 (),
+      SinuVect arm (0.3 * r * radv, 0.166 + 0.05 * drand48 (),
                     0.5 * (1.0 + q%2) * r * radv);
       SumVect voit (arm, centz);
       polysplat -> AppendVertex (voit);
@@ -701,8 +700,10 @@ int main (int ac, char **av)
                                        ZeColor (1.0, 1.0, 0.0, 0.3)));
   splat -> AppendRenderable (polysplat);
   polysplat -> SetShouldEdge (true);
+  polysplat -> SetShouldFill (false);
+  polysplat -> SetShouldClose (false);
 //  g_windshield -> AppendChild (splat);
-*/
+
   TextureParticulars tipi
     = CreateTexture2D ("/tmp/SIGN.jpg", DefaultTextureFlags);
   TexturedRenderable *texre = new TexturedRenderable (tipi);

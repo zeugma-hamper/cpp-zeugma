@@ -24,8 +24,9 @@ namespace charm  {
 class PolygonRenderable  :  public Renderable
 { public:
   std::vector <ZoftVect> verts;
-  bool should_fill, should_edge;
   ZoftColor fill_iro, edge_iro;
+  bool should_fill, should_edge;
+  bool should_close;
   bool spanking_time;
   static void *tessy_obj;
   std::vector <glm::vec3> raw_verts;
@@ -60,10 +61,16 @@ class PolygonRenderable  :  public Renderable
     { return should_fill; }
   void SetShouldFill (bool sf)
     { should_fill = sf;  }
+
   bool ShouldEdge ()  const
     { return should_edge; }
   void SetShouldEdge (bool ss)
     { should_edge = ss;  }
+
+  bool ShouldClose ()  const
+    { return should_close; }
+  void SetShouldClose (bool sc)
+    { should_close = sc;  }
 
   const ZeColor &FillColor ()
     { return fill_iro.val; }
