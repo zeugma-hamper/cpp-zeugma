@@ -703,7 +703,7 @@ int main (int ac, char **av)
   polysplat -> SetShouldEdge (true);
   polysplat -> SetShouldFill (false);
   polysplat -> SetShouldClose (false);
-//  g_windshield -> AppendChild (splat);
+  g_windshield -> AppendChild (splat);
 
   splat = new Node (polysplat = new PolygonRenderable);
   f64 jiglet = 0.025 * frnt -> Height ();
@@ -721,7 +721,7 @@ int main (int ac, char **av)
   splat -> AppendRenderable (polysplat);
   polysplat -> SetShouldEdge (true);
   polysplat -> SetShouldFill (false);
-  g_windshield -> AppendChild (splat);
+//  g_windshield -> AppendChild (splat);
 
   TextureParticulars tipi
     = CreateTexture2D ("/tmp/SIGN.jpg", DefaultTextureFlags);

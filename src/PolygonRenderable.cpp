@@ -210,7 +210,7 @@ spanking_time = true;
 
   if (should_edge)
     { bgfx::setTransform (&(m_node -> GetAbsoluteTransformation ().model));
-      bgfx::setVertexBuffer (0, edge_vbuf, 0, 1 + verts . size ());
+      bgfx::setVertexBuffer (0, edge_vbuf, 0, raw_verts . size ());
       bgfx::setState (BGFX_STATE_WRITE_RGB
                       |  BGFX_STATE_PT_LINESTRIP
                       |  BGFX_STATE_LINEAA
