@@ -90,6 +90,7 @@ class PolygonRenderable  :  public Renderable
   void SetEdgeColor (const ZoftColor &zc)
     { edge_iro . BecomeLike (zc); }
 
+//  virtual void PopulateRawVerts ();
   void SpankularlyTesselate ();
   void Draw (u16 vyu_id)  override;
 };

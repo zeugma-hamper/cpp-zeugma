@@ -80,6 +80,17 @@ class Vect  :  public v3f64
   Vect operator /= (f64 s)
     { x /= s;  y /= s;  z /= s;  return *this; }
 
+// this next bunch of componentwise operators is extremely... uncomfortable
+  Vect operator * (const Vect &v)  const
+    { return Vect (x * v.x, y * v.y, z * v.z); }
+  Vect &operator *= (const Vect &v)
+    { x *= v.x;  y *= v.y;  z *= v.z;  return *this; }
+
+  Vect operator / (const Vect &v)  const
+    { return Vect (x / v.x, y / v.y, z / v.z); }
+  Vect &operator /= (const Vect &v)
+    { x /= v.x;  y /= v.y;  z /= v.z;  return *this; }
+
   f64 DistFrom (const Vect &v)  const
     { return sqrt ((*this - v) . AutoDot ()); }
 
