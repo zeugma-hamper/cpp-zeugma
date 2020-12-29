@@ -13,12 +13,11 @@ namespace charm  {
 
 template <typename T> T UnifMultiRand ();
 
-template <> f64 UnifMultiRand <f64> ()
-  { return drand48 (); }
-template <> Vect UnifMultiRand <Vect> ()
-  { return Vect (drand48 (), drand48 (), drand48 ()); }
-template <> ZeColor UnifMultiRand <ZeColor> ()
-  { return ZeColor (drand48 (), drand48 (), drand48 (), drand48 ()); }
+template <> f64 UnifMultiRand <f64> ();
+template <> Vect UnifMultiRand <Vect> ();
+template <> ZeColor UnifMultiRand <ZeColor> ();
+
+// specializations actually, ahem, defined over in .cpp file...
 
 
 template <typename T>
@@ -82,6 +81,8 @@ class RandZoft  :  public ZoftThing <T>
     { this -> InstallGuts (NewGuts (a)); }
   RandZoft (const T &a, const T &c)  :  ZoftThing <T> ()
     { this -> InstallGuts (NewGuts (a, c)); }
+  RandZoft (const ZoftThing <T> &az)  :  ZoftThing <T> ()
+    { this -> InstallGuts (NewGuts (az, ZoftThing <T> ())); }
   RandZoft (const ZoftThing <T> &az,
             const ZoftThing <T> &cz)  :  ZoftThing <T> ()
     { this -> InstallGuts (NewGuts (az, cz)); }

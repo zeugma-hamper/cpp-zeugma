@@ -703,12 +703,12 @@ int main (int ac, char **av)
   polysplat -> SetShouldEdge (true);
   polysplat -> SetShouldFill (false);
   polysplat -> SetShouldClose (false);
-  g_windshield -> AppendChild (splat);
+//  g_windshield -> AppendChild (splat);
 
   splat = new Node (polysplat = new PolygonRenderable);
   f64 jiglet = 0.025 * frnt -> Height ();
   SinuVect jigamp (Vect (jiglet, jiglet, 0.0), 0.2975);
-  for (i64 q = 0  ;  q < 4  ;  ++q)
+  for (i64 q = 0  ;  q < 12  ;  ++q)
     { f64 r = 0.3 * frnt -> Height ();
       f64 theeeta = 0.5 * M_PI * (f64)q;
       ZoftVect crnr (frnt -> Loc ()
@@ -720,8 +720,9 @@ int main (int ac, char **av)
     }
   splat -> AppendRenderable (polysplat);
   polysplat -> SetShouldEdge (true);
+  polysplat -> SetEdgeColor (ZeColor (1.0, 0.25));
   polysplat -> SetShouldFill (false);
-//  g_windshield -> AppendChild (splat);
+  g_windshield -> AppendChild (splat);
 
   TextureParticulars tipi
     = CreateTexture2D ("/tmp/SIGN.jpg", DefaultTextureFlags);

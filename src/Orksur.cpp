@@ -1,8 +1,9 @@
 
 #include "Orksur.h"
 
+#include "Jigglegon.h"
+
 #include "SinuZoft.h"
-#include "SumZoft.h"
 
 #include "ZeUUID.h"
 
@@ -29,6 +30,18 @@ Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
                                        - ma . Height ()) * ma . Up ());
   soncho -> Furl ();
   soncho->contact_dist = this->contact_dist;
+
+Jigglegon *jg = new Jigglegon;
+jg -> AlignToMaes (&ma);
+Vect c = ma . Loc ();
+f64 rad = 0.25 * ma . Height ();
+jg -> SetNumVertices (6);
+for (i64 q = 0  ;  q < 6  ;  ++q)
+  jg -> NthVertex (q)
+    . Set (c + rad * (cos (M_PI / 3.0 * (f64)q) * Vect::xaxis
+                      + sin (M_PI / 3.0 * (f64)q) * Vect::yaxis));
+jg -> Populate (26, Vect (0.1 * rad, 0.1 * rad, 0.0));
+AppendChild (jg);
 }
 
 
