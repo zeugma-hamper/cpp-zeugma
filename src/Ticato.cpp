@@ -51,7 +51,7 @@ void Ticato::WellAndTrulyConstruct (const FilmInfo &finf, const ClipInfo &clinf)
 
 Ticato::Ticato ()
   :  Alignifer (),
-     atom_info (NULL), re (NULL), fr (NULL), bbox_subno (NULL),
+     atom_info (NULL), re (NULL), fr (NULL), bbox_subno (NULL), aura (NULL),
      accom_sca (1.0), atom_dur (-1.0),
      cur_maes (NULL), playing_sono (-1),
      playing_prfm_id (-1), from_node (NULL)
@@ -83,12 +83,9 @@ Ticato::~Ticato ()
 }
 
 
-void Ticato::ProvisionVisibleBounds ()
-{ if (bbox_subno  ||  ! re  ||  ! atom_info)
-    return;
-
-  LinePileRenderable *lpr = new LinePileRenderable;
-  bbox_subno = new Alignifer (lpr);
+bool Ticato::CalcUnitBoundingCorners (Vect (&crnrs)[4])
+{ if (! re  ||  ! atom_info)
+    return false;
 
   f64 hrz = atom_info->geometry.dir_geometry.dimensions.x;
   f64 vrt = atom_info->geometry.dir_geometry.dimensions.y;
@@ -101,10 +98,29 @@ void Ticato::ProvisionVisibleBounds ()
   Vect ov = 0.5 * hrz * Vect::xaxis;
   Vect up = 0.5 * vrt * Vect::yaxis;
 
-  lpr -> AppendLine ( {-ov - up, -ov + up } );
-  lpr -> AppendLine ( {-ov + up,  ov + up } );
-  lpr -> AppendLine ( { ov + up,  ov - up } );
-  lpr -> AppendLine ( { ov - up, -ov - up } );
+  crnrs[0] = -ov - up;
+  crnrs[1] = -ov + up;
+  crnrs[2] =  ov + up;
+  crnrs[3] =  ov - up;
+
+  return true;
+}
+
+void Ticato::ProvisionVisibleBounds ()
+{ if (bbox_subno)
+    return;
+
+  Vect crn[4];
+  if (! CalcUnitBoundingCorners (crn))
+    return;
+
+  LinePileRenderable *lpr = new LinePileRenderable;
+  lpr -> AppendLine ( { crn[0], crn[1] } );
+  lpr -> AppendLine ( { crn[1], crn[2] } );
+  lpr -> AppendLine ( { crn[2], crn[3] } );
+  lpr -> AppendLine ( { crn[3], crn[0] } );
+
+  bbox_subno = new Alignifer (lpr);
   AppendChild (bbox_subno);
 }
 

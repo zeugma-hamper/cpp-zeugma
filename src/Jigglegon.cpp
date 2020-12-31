@@ -5,6 +5,19 @@
 #include "ScaleZoft.h"
 #include "SumZoft.h"
 
+#include "TrGrappler.h"
+
+
+Jigglegon::Jigglegon ()  :  Alignifer (),
+                            re (new PolygonRenderable), amp_sca (1.0)
+{ re -> SetEdgeColor (ZeColor (1.0, 0.15));
+  re -> SetShouldEdge (true);
+  re -> SetShouldFill (false);
+
+  voits . resize (4);
+  AppendRenderable (re);
+}
+
 
 void Jigglegon::SetCorners (ZoftVect &az, ZoftVect &bz,
                             ZoftVect &cz, ZoftVect &dz)
@@ -36,4 +49,20 @@ void Jigglegon::Populate (u32 num_winds, const Vect &ampl)
         SumVect vrt (voits[q], sca_jig);
         re -> AppendVertex (vrt);
       }
+}
+
+
+void Jigglegon::SetLoc (const Vect &l)
+{ if (TrGrappler *tgr = dynamic_cast <TrGrappler *> (FindGrappler ("loc")))
+    tgr -> SetTranslation (l);
+  else
+    fprintf (stderr, "Jigglegon::SetLoc() -- no translation Grappler...\n");
+}
+
+
+void Jigglegon::HitchLocTo (const ZoftVect &lz)
+{ if (TrGrappler *tgr = dynamic_cast <TrGrappler *> (FindGrappler ("loc")))
+    tgr -> TranslationZoft () . BecomeLike (lz);
+  else
+    fprintf (stderr, "Jigglegon::HitchLocTo() -- no translation Grappler...\n");
 }

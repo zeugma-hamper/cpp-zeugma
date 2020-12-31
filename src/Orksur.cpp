@@ -1,8 +1,6 @@
 
 #include "Orksur.h"
 
-#include "Jigglegon.h"
-
 #include "SinuZoft.h"
 
 #include "ZeUUID.h"
@@ -14,6 +12,10 @@
 #include "GraphicsApplication.hpp"
 
 #include <vector>
+
+
+std::vector <Jigglegon *> Orksur::fallow_jigs;
+std::vector <Jigglegon *> Orksur::active_jigs;
 
 
 Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
@@ -35,11 +37,13 @@ Jigglegon *jg = new Jigglegon;
 jg -> AlignToMaes (&ma);
 Vect c = ma . Loc ();
 f64 rad = 0.25 * ma . Height ();
-jg -> SetNumVertices (6);
-for (i64 q = 0  ;  q < 6  ;  ++q)
+#define BRP 5
+jg -> SetNumVertices (BRP);
+for (i64 q = 0  ;  q < BRP  ;  ++q)
   jg -> NthVertex (q)
-    . Set (c + rad * (cos (M_PI / 3.0 * (f64)q) * Vect::xaxis
-                      + sin (M_PI / 3.0 * (f64)q) * Vect::yaxis));
+    . Set (rad * (cos (2.0 * M_PI / (f64)BRP * (f64)q) * Vect::xaxis
+                  + sin (2.0 * M_PI / (f64)BRP * (f64)q) * Vect::yaxis));
+jg -> SetLoc (c);
 jg -> Populate (26, Vect (0.1 * rad, 0.1 * rad, 0.0));
 AppendChild (jg);
 }
@@ -74,12 +78,60 @@ stringy_list Orksur::CollageAtomsNameList ()
 }
 
 
+Jigglegon *Orksur::FurnishFreeJiggler ()
+{ Jigglegon *jig = NULL;
+  if (fallow_jigs . size ()  <  1)
+    jig = new Jigglegon;
+  else
+    { jig = fallow_jigs . back ();
+      fallow_jigs . pop_back ();
+    }
+
+  active_jigs . push_back (jig);
+  return jig;
+}
+
+void Orksur::ReturnJigglerToShelf (Jigglegon *jig)
+{ if (! jig)
+    return;
+
+  if (std::find (active_jigs . begin (), active_jigs . end (), jig)
+      ==  active_jigs . end ())
+    { // well, that just ain't right. here's your opportunity to fix it!
+      throw;
+    }
+
+  if (Node *par = jig -> Parent ())
+    par -> ExciseChild (jig);
+  fallow_jigs . push_back (jig);
+  active_jigs . pop_back ();
+}
+
+
 void Orksur::AtomicFirstStrike (Ticato *tic)
 { if (! tic)
     return;
   if (soncho)
     soncho -> InitiateAtomicContact (tic);
+
+  Vect crn[4];
+  if (tic -> CalcUnitBoundingCorners (crn))
+    { Jigglegon *jig = FurnishFreeJiggler ();
+      jig -> SetCorners (crn[0], crn[1], crn[2], crn[3]);
+      jig -> Populate (26, Vect (0.05, 0.05, 0.0));
+//      jig -> HitchLocTo (tic -> LocZoft ());
+      jig -> AlignToMaes (underlying_maes);
+      tic -> AppendChild (tic->aura = jig);
+    }
 }
+
+void Orksur::AtomicFinalGutter (Ticato *tic)
+{ if (! tic)
+    return;
+  ReturnJigglerToShelf (dynamic_cast <Jigglegon *> (tic->aura));
+  tic->aura = NULL;
+}
+
 
 
 Ticato *Orksur::ClosestAtom (const Vect &p)
@@ -353,7 +405,7 @@ i64 Orksur::ZESpatialMove (ZESpatialMoveEvent *e)
 
   auto heff = hoverees . find (prv);
   auto geff = graspees . find (prv);
-assert (! (heff != hoverees . end ()  &&  geff != graspees . end ()));
+assert (heff == hoverees . end ()  ||  geff == graspees . end ());
 
   // we'll give the sonochoosist first dibs
   if (soncho)
@@ -388,7 +440,7 @@ i64 Orksur::ZESpatialHarden (ZESpatialHardenEvent *e)
 { if (! e)
     return -1;
 
-  // let's reject if not over our airspace
+  // let's reject if not in our airspace
   Vect proj;
   if (! G::PointRectContainment (e -> Loc (), Loc (), Over (), Up (),
                                  Width (), Height (), &proj))
@@ -398,17 +450,12 @@ i64 Orksur::ZESpatialHarden (ZESpatialHardenEvent *e)
   auto heff = hoverees . find (prv);
   if (heff  ==  hoverees . end ())
     return 0;  // anythig else to do besides, you know, nothing?
-/*
-  Vect n = Norm ();
-  const Vect &p = e -> Loc ();
-  f64 tt = n . Dot (p - loc);
-  Vect proj = p  -  tt * n;
-*/
+
   Ticato *tic = heff->second.tic;
   hoverees . erase (heff);
 
   if (graspees . find (prv)  !=  graspees . end ())
-    {  // it's shouldn't be possible... and yet... well, let's figure it out:
+    { // it shouldn't be possible... and yet... well, let's figure it out:
       assert (true == false);
     }
 
@@ -439,6 +486,7 @@ i64 Orksur::ZESpatialSoften (ZESpatialSoftenEvent *e)
   hoverees[prv] = geff->second;
   graspees . erase (geff);
   geff->second.tic->interp_adjc . Set (ZeColor (1.0, 1.0));
+  AtomicFinalGutter (geff->second.tic);
 /*
   if (ca->shov_vel . Mag ()
       >=  Tamparams::Current ()->disposal_speed_threshold)
@@ -476,8 +524,6 @@ i64 Orksur::ZEYowlAppear (ZEYowlAppearEvent *e)
     }
   else if (utt  ==  "[")
     { if (soncho)  soncho -> Furl (); }
-  else if (utt  ==  "]")
-    { if (soncho)  soncho -> Unfurl (); }
   else if (utt  ==  "]")
     { if (soncho)  soncho -> Unfurl (); }
   else if (utt  ==  "/")

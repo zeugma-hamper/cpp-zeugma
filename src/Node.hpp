@@ -113,9 +113,10 @@ class Node
 
   // node takes ownership of child nodes
   void  AppendChild (Node *_node);
-  // excise with feeling (deletes)
   void InsertChild (Node *_node, i64 pos);
+  // 'Remove' deletes its argument...
   void  RemoveChild (Node *_node);
+  // while 'Excise' simply removes it from the child list withot deleting
   Node *ExciseChild (Node *_node);
 
   i64 ChildCount ()  const

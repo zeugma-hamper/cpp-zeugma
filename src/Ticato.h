@@ -35,6 +35,7 @@ class Ticato  :  public Alignifer
   MattedVideoRenderable *re;
   RectRenderableFrontier *fr;
   Alignifer *bbox_subno;
+  Node *aura;
   InterpColor interp_adjc;
   bool born_from_flick;  // else spontaneously generated
 
@@ -63,6 +64,7 @@ class Ticato  :  public Alignifer
 
   ~Ticato ()  override;
 
+  bool CalcUnitBoundingCorners (Vect (&crnrs)[4]);
   void ProvisionVisibleBounds ();
 
   const std::string &AtomName ()  const

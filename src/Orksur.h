@@ -16,6 +16,7 @@
 #include "Ticato.h"
 #include "SonoChoosist.h"
 #include "AudioMessenger.hpp"
+#include "Jigglegon.h"
 
 #include <map>
 #include <unordered_map>
@@ -58,13 +59,20 @@ class Orksur  :  public PlatonicMaes, public Node,
   std::map <u64, Ticato *> awaiting_audio_sooth;
   Ticato *sel_atom;
 
+  static std::vector <Jigglegon *> fallow_jigs;
+  static std::vector <Jigglegon *> active_jigs;
+
   Orksur (const PlatonicMaes &ma);
 
 //  Splort *NewSplort (f64 rad, i64 num_verts = 6)  const;
 
   stringy_list CollageAtomsNameList ();
 
+  Jigglegon *FurnishFreeJiggler ();
+  void ReturnJigglerToShelf (Jigglegon *jig);
+
   void AtomicFirstStrike (Ticato *tic);  // called when an atom's first touched
+  void AtomicFinalGutter (Ticato *tic);  // for the calling on soften
 
   Ticato *ClosestAtom (const Vect &p);
 
