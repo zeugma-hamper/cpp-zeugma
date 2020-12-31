@@ -11,7 +11,7 @@
 using namespace charm;
 
 
-Choizl::Choizl ()  :  Node ()
+Choizl::Choizl ()  :  Node (), index (-1)
 { TextureParticulars tepa
     = CreateTexture2D ("../ui-visuals/bordered-circle-tridot-256-alpha.png",
                        DefaultTextureFlags);
@@ -76,7 +76,7 @@ active . SetHard (1.0);
 }
 
 
-void SonoChoosist::SetNumChoizls (i64 nc)
+void SonoChoosist::PopulateChoizls (i64 nc)
 { if (nc  <  0)
     nc = 0;
 
@@ -128,18 +128,48 @@ void SonoChoosist::Unfurl ()
 { crn_lr . Set (unf_lr);  crn_ur . Set (unf_ur);
   crn_ul . Set (unf_ul);  crn_ll . Set (unf_ll);
 
-  i64 nc = NumChoizls ();
+  i64 nc = 1 + NumChoizls ();
   if (nc  <  1)
     return;
 
   f64 spcng = wid - (f64)nc * chz_dia;
   spcng /= (f64)(nc + 1);
-  Vect p = (0.5 * wid  - spcng - 0.5 * chz_dia) * Vect::xaxis;
+  Vect p = (0.5 * wid - spcng - 0.5 * chz_dia) * Vect::xaxis;
   spcng += chz_dia;
   for (i64 q = 0  ;  q < nc  ;  ++q)
-    { choizls[q]->perky_loc . Set (p);
+    { if (q > 0)
+        choizls[q-1]->perky_loc . Set (p);
       p -= spcng * Vect::xaxis;
     }
+}
+
+
+bool SonoChoosist::PointInAirspaceOver (const Vect &p, Vect *hit_out)
+{ // a crap geometric job for now; just see if we're in the up-projected
+  // parallelepiped...
+  // f64 w = (crn_ur.val - crn_ul.val) . Dot (CurOver ());
+  // f64 h = (crn_ur.val - crn_lr.val) . Dot (CurUp ());
+// some sort of lesson. in the above, the crn are in local coords; ovr & upp not.
+  f64 w = (crn_ur.val - crn_ul.val) . Dot (Vect::xaxis);
+  f64 h = (crn_ur.val - crn_lr.val) . Dot (Vect::yaxis);
+  w += h;
+  h += h;
+
+  Vect c = Centerdom ();
+  Matrix44 m = from_glm (GetAbsoluteTransformation ().model);
+  m . TransformVectInPlace (c);
+  Vect hit;
+  if (! G::RayRectIntersection (p, -CurNorm (),
+                                c, CurOver (), CurUp (), w, h, &hit))
+    return false;
+fprintf(stderr,"SMACKED old pal SONOCHOOSIST... with w/h = %.2lf/%2lf\n",w,h);
+
+  if (! G::RayPlaneIntersection (p, -CurNorm (), c, CurNorm (), &hit))
+    return false;  // not actually possible, but we are thorough, yes. yes yes.
+
+  if (hit_out)
+    *hit_out = hit;
+  return true;
 }
 
 
@@ -152,30 +182,15 @@ i64 SonoChoosist::ZESpatialMove (ZESpatialMoveEvent *e)
 
   const std::string &prv = e -> Provenance ();
   const Vect &p = e -> Loc ();
-  // a crap geometric job for now; just see if we're in the up-projected
-  // parallelepiped...
-  // f64 w = (crn_ur.val - crn_ul.val) . Dot (CurOver ());
-  // f64 h = (crn_ur.val - crn_lr.val) . Dot (CurUp ());
-// some sort of lesson. in the above, the crn are in local coords; ovr & upp not.
-  f64 w = (crn_ur.val - crn_ul.val) . Dot (Vect::xaxis);
-  f64 h = (crn_ur.val - crn_lr.val) . Dot (Vect::yaxis);
-  w += h;
-  h += h;
-
-  Vect c = 0.25 * (crn_lr.val + crn_ur.val + crn_ul.val + crn_ll.val);
-  Matrix44 m = from_glm (GetAbsoluteTransformation ().model);
-  m . TransformVectInPlace (c);
-  Vect hit;
-  if (! G::RayRectIntersection (p, -CurNorm (),
-                                c, CurOver (), CurUp (), w, h, &hit))
+  Vect hit (INITLESS);
+  if (! PointInAirspaceOver (p, &hit))
     return 0;
-fprintf(stderr,"SMACKED old pal SONOCHOOSIST... with w/h = %.2lf/%2lf\n",w,h);
 
-  if (! G::RayPlaneIntersection (p, -CurNorm (), c, CurNorm (), &hit))
-    return 0;  // not actually possible, but we are thorough, yes. yes yes.
-
+  Matrix44 m = from_glm (GetAbsoluteTransformation ().model);
+  Vect c = m . TransformVect (Centerdom ());
   f64 rsq = 0.25 * chz_dia * chz_dia;
   i64 ind = -1;
+
   for (Choizl *chz  :  choizls)
     { ++ind;
       if (! chz)
@@ -183,28 +198,29 @@ fprintf(stderr,"SMACKED old pal SONOCHOOSIST... with w/h = %.2lf/%2lf\n",w,h);
       c = m . TransformVect (chz->perky_loc.val);
       if ((c - hit) . AutoDot ()  >  rsq)
         continue;
-      f64 d = hit . DistFrom (p);
-      if (d  <=  contact_dist)
-        { if (smack . find (prv)  !=  smack . end ())
-            return 1;  // already in contact
-          auto it = hover . find (prv);
-          if (it  !=  hover . end ())
-            hover . erase (it);
-          else  // we weren't hovering over this choizl but... here we are
-            { }
-          smack[prv] = chz;
-          if (behalf_of)
-            { if (ind == 0)
-                behalf_of -> SonoSilence ();
-              else
-                behalf_of -> EnunciateNthSonoOption (ind - 1);
-            }
-          return 1;
-        }
-      else
-        { auto it = smack . find (prv);
-          if (it  !=  smack . end ())
-            smack . erase (it);
+
+      // f64 d = hit . DistFrom (p);
+      // if (d  <=  contact_dist)
+      //   { if (smack . find (prv)  !=  smack . end ())
+      //       return 1;  // already in contact
+      //     auto it = hover . find (prv);
+      //     if (it  !=  hover . end ())
+      //       hover . erase (it);
+      //     else  // we weren't hovering over this choizl but... here we are
+      //       { }
+      //     smack[prv] = chz;
+      //     if (behalf_of)
+      //       { if (ind == 0)
+      //           behalf_of -> SonoSilence ();
+      //         else
+      //           behalf_of -> EnunciateNthSonoOption (ind - 1);
+      //       }
+      //     return 1;
+      //   }
+      // else
+        // { auto it = smack . find (prv);
+        //   if (it  !=  smack . end ())
+        //     smack . erase (it);
 
           auto ht = hover . find (prv);
           if (ht  ==  hover . end ())
@@ -219,8 +235,57 @@ fprintf(stderr,"SMACKED old pal SONOCHOOSIST... with w/h = %.2lf/%2lf\n",w,h);
             { // it's just the same dull choizl again. anything to do?
             }
           return 1;
-        }
+        // }
     }
 
+  return 0;
+}
+
+
+i64 SonoChoosist::ZESpatialHarden (ZESpatialHardenEvent *e)
+{ const std::string &prv = e -> Provenance ();
+
+  if (! PointInAirspaceOver (e -> Loc ()))
+    return 0;
+
+  if (smack . find (prv)  !=  smack . end ())
+    return 1;  // already in contact
+  auto it = hover . find (prv);
+  if (it  !=  hover . end ())
+    hover . erase (it);
+  else  // weren't hovering over a choizl prior to contact
+    return 0;
+
+  Choizl *chz = it->second;
+  auto cit = std::find (choizls . begin (), choizls . end (), chz);
+  if (cit  ==  choizls . end ())  // nonsense! now then:
+    assert (&"poop" == &"gold");
+
+  i64 ind = cit - choizls . begin ();
+  smack[prv] = chz;
+  // Highlight (chz);
+  if (behalf_of)
+    { if (ind == 0)
+        behalf_of -> SonoSilence ();
+      else
+        behalf_of -> EnunciateNthSonoOption (ind - 1);
+    }
+
+  return 1;
+}
+
+
+i64 SonoChoosist::ZESpatialSoften (ZESpatialSoftenEvent *e)
+{ const std::string &prv = e -> Provenance ();
+
+  // in this case we won't do the airspace test, as we might have been in
+  // legitimate contact with a choizl but then slipped out of the airspace...
+  auto it = smack . find (prv);
+  if (it  ==  smack . end ())
+    return 0;
+
+  smack . erase (it);
+  Choizl *chz = it->second;
+  // Lowlight (chz);
   return 1;
 }

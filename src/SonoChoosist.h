@@ -23,6 +23,7 @@ struct Choizl  :  public Node
 { TexturedRenderable *texre;
   InterpVect perky_loc;
   InterpVect mopey_sca;
+  i64 index;
 
   Choizl ();
 };
@@ -52,7 +53,10 @@ class SonoChoosist  :  public Alignifer,
 
   i64 NumChoizls ()  const
     { return choizls . size (); }
-  void SetNumChoizls (i64 nc);
+  void PopulateChoizls (i64 nc);
+
+  Vect Centerdom ()  const
+    { return 0.25 * (crn_lr.val + crn_ur.val + crn_ul.val + crn_ll.val); }
 
   void InitiateAtomicContact (Ticato *tic);
 
@@ -64,7 +68,11 @@ class SonoChoosist  :  public Alignifer,
   void Furl ();
   void Unfurl ();
 
+  bool PointInAirspaceOver (const Vect &p, Vect *hit_out = NULL);
+
   i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
+  i64 ZESpatialHarden (ZESpatialHardenEvent *e)  override;
+  i64 ZESpatialSoften (ZESpatialSoftenEvent *e)  override;
 };
 
 

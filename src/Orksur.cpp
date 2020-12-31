@@ -27,7 +27,7 @@ Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
                                             contact_dist (25.0)
 { AppendChild (collage);
   AppendChild (soncho);
-  soncho -> SetNumChoizls (5);
+  soncho -> PopulateChoizls (5);
   soncho->loc . Set (Loc ()  +  0.5 * (soncho->hei + 2.0 * soncho->brd_thc
                                        - ma . Height ()) * ma . Up ());
   soncho -> Furl ();
@@ -407,10 +407,11 @@ i64 Orksur::ZESpatialMove (ZESpatialMoveEvent *e)
   auto geff = graspees . find (prv);
 assert (heff == hoverees . end ()  ||  geff == graspees . end ());
 
+  i64 sponse;
   // we'll give the sonochoosist first dibs
   if (soncho)
-    if (soncho -> ZESpatialMove (e)  >  0)
-      return 1;
+    if (sponse = (soncho -> ZESpatialMove (e))  >  0)
+      return sponse;
 
   if (geff  !=  graspees . end ())  // we're dragging some atom around
     { Vect newp = proj + geff->second.gropoff;
@@ -446,6 +447,12 @@ i64 Orksur::ZESpatialHarden (ZESpatialHardenEvent *e)
                                  Width (), Height (), &proj))
     return 0;
 
+  i64 sponse;
+  // as ever, sonochoosist goes first
+  if (soncho)
+    if (sponse = (soncho -> ZESpatialHarden (e))  >  0)
+      return sponse;
+
   const std::string &prv = e -> Provenance ();
   auto heff = hoverees . find (prv);
   if (heff  ==  hoverees . end ())
@@ -472,6 +479,12 @@ i64 Orksur::ZESpatialHarden (ZESpatialHardenEvent *e)
 i64 Orksur::ZESpatialSoften (ZESpatialSoftenEvent *e)
 { if (! e)
     return -1;
+
+  i64 sponse;
+  // once more: sonochoosist jumps the line
+  if (soncho)
+    if (sponse = (soncho -> ZESpatialSoften (e))  >  0)
+      return sponse;
 
   const std::string &prv = e -> Provenance ();
   auto geff = graspees . find (prv);
