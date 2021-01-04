@@ -385,6 +385,20 @@ Renderable *Node::NthRenderable (i64 ind)
 }
 
 
+void Node::RenderablesSetShouldDraw ()
+{ for (Renderable *ren  :  m_renderables)
+    if (ren)
+      ren -> SetShouldDraw (true);
+}
+
+void Node::RenderablesSetShouldNotDraw ()
+{ for (Renderable *ren  :  m_renderables)
+    if (ren)
+      ren -> SetShouldDraw (false);
+}
+
+
+
 void Node::SetLayer (Layer *_layer)
 {
   if (m_layer)

@@ -73,6 +73,19 @@ SonoChoosist::SonoChoosist (const PlatonicMaes *maes)  :  Alignifer (),
 active . SetHard (1.0);
 
   chz_dia = 0.9 * hei;
+
+  AppendChild (chz_node = new Node);
+
+  hexajig = new Jigglegon;
+#define BRP 6
+  hexajig -> SetNumVertices (BRP);
+  for (i64 q = 0  ;  q < BRP  ;  ++q)
+    hexajig -> NthVertex (q) . Set
+      (0.6 * chz_dia * (cos (2.0 * M_PI / (f64)BRP * (f64)q) * Vect::xaxis
+                        + sin (2.0 * M_PI / (f64)BRP * (f64)q) * Vect::yaxis));
+  hexajig -> Populate (6, chz_dia * Vect (0.1, 0.1, 0.0));
+
+  AppendChild (hexajig);
 }
 
 
@@ -89,7 +102,7 @@ void SonoChoosist::PopulateChoizls (i64 nc)
         { Choizl *chz = new Choizl;
           choizls . push_back (chz);
           chz->mopey_sca .SetHard (Vect (chz_dia));
-          AppendChild (chz);
+          chz_node -> AppendChild (chz);
 if (curn == 0)      chz->texre->SetAdjColor(ZeColor(1.0,0.0,0.0,0.2));
 else if (curn == 1) chz->texre->SetAdjColor(ZeColor(0.0,1.0,0.0,0.2));
 else if (curn == 2) chz->texre->SetAdjColor(ZeColor(0.0,0.0,1.0,0.2));
@@ -108,6 +121,9 @@ void SonoChoosist::InitiateAtomicContact (Ticato *tic)
     { // some farewell gesture to whomever we'd been serving?
     }
   behalf_of = tic;
+  i64 ind = 1 + tic->playing_sono;
+  if (ind  <  choizls . size ())
+    hexajig -> LocZoft () . Set (choizls[ind]->perky_loc.val);
 }
 
 void SonoChoosist::Furl ()
@@ -121,6 +137,8 @@ void SonoChoosist::Furl ()
   Vect p = 0.25 * (frl_ll + frl_ul + frl_ur + frl_lr);
   for (i64 q = 0  ;  q < nc  ;  ++q)
     { choizls[q]->perky_loc . Set (p); }
+
+  hexajig -> RenderablesSetShouldNotDraw ();
 }
 
 
@@ -141,10 +159,13 @@ void SonoChoosist::Unfurl ()
         choizls[q-1]->perky_loc . Set (p);
       p -= spcng * Vect::xaxis;
     }
+
+  hexajig -> RenderablesSetShouldDraw ();
 }
 
 
-bool SonoChoosist::PointInAirspaceOver (const Vect &p, Vect *hit_out)
+bool SonoChoosist::PointInAirspaceOver (const Vect &p,
+                                        Vect *hit_out, Matrix44 *mat_out)
 { // a crap geometric job for now; just see if we're in the up-projected
   // parallelepiped...
   // f64 w = (crn_ur.val - crn_ul.val) . Dot (CurOver ());
@@ -169,6 +190,8 @@ fprintf(stderr,"SMACKED old pal SONOCHOOSIST... with w/h = %.2lf/%2lf\n",w,h);
 
   if (hit_out)
     *hit_out = hit;
+  if (mat_out)
+    *mat_out = m;
   return true;
 }
 
@@ -183,11 +206,10 @@ i64 SonoChoosist::ZESpatialMove (ZESpatialMoveEvent *e)
   const std::string &prv = e -> Provenance ();
   const Vect &p = e -> Loc ();
   Vect hit (INITLESS);
-  if (! PointInAirspaceOver (p, &hit))
+  Matrix44 m (INITLESS);
+  if (! PointInAirspaceOver (p, &hit, &m))
     return 0;
 
-  Matrix44 m = from_glm (GetAbsoluteTransformation ().model);
-  Vect c = m . TransformVect (Centerdom ());
   f64 rsq = 0.25 * chz_dia * chz_dia;
   i64 ind = -1;
 
@@ -195,47 +217,23 @@ i64 SonoChoosist::ZESpatialMove (ZESpatialMoveEvent *e)
     { ++ind;
       if (! chz)
         continue;
-      c = m . TransformVect (chz->perky_loc.val);
+      Vect c = m . TransformVect (chz->perky_loc.val);
       if ((c - hit) . AutoDot ()  >  rsq)
         continue;
 
-      // f64 d = hit . DistFrom (p);
-      // if (d  <=  contact_dist)
-      //   { if (smack . find (prv)  !=  smack . end ())
-      //       return 1;  // already in contact
-      //     auto it = hover . find (prv);
-      //     if (it  !=  hover . end ())
-      //       hover . erase (it);
-      //     else  // we weren't hovering over this choizl but... here we are
-      //       { }
-      //     smack[prv] = chz;
-      //     if (behalf_of)
-      //       { if (ind == 0)
-      //           behalf_of -> SonoSilence ();
-      //         else
-      //           behalf_of -> EnunciateNthSonoOption (ind - 1);
-      //       }
-      //     return 1;
-      //   }
-      // else
-        // { auto it = smack . find (prv);
-        //   if (it  !=  smack . end ())
-        //     smack . erase (it);
-
-          auto ht = hover . find (prv);
-          if (ht  ==  hover . end ())
-            { hover[prv] = chz;
-              // and light us up
-            }
-          else if (ht->second  !=  chz)
-            { ht->second = chz;
-              // and also light up new hoveree, unlight old
-            }
-          else
-            { // it's just the same dull choizl again. anything to do?
-            }
-          return 1;
-        // }
+      auto ht = hover . find (prv);
+      if (ht  ==  hover . end ())
+        { hover[prv] = chz;
+          // and light us up
+        }
+      else if (ht->second  !=  chz)
+        { ht->second = chz;
+          // and also light up new hoveree, unlight old
+        }
+      else
+        { // it's just the same dull choizl again. anything to do?
+        }
+      return 1;
     }
 
   return 0;
@@ -263,7 +261,7 @@ i64 SonoChoosist::ZESpatialHarden (ZESpatialHardenEvent *e)
 
   i64 ind = cit - choizls . begin ();
   smack[prv] = chz;
-  // Highlight (chz);
+  hexajig -> LocZoft () . Set (chz->perky_loc.val);
   if (behalf_of)
     { if (ind == 0)
         behalf_of -> SonoSilence ();

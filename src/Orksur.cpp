@@ -15,7 +15,7 @@
 
 
 std::vector <Jigglegon *> Orksur::fallow_jigs;
-std::vector <Jigglegon *> Orksur::active_jigs;
+//std::vector <Jigglegon *> Orksur::active_jigs;
 
 
 Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
@@ -33,19 +33,19 @@ Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
   soncho -> Furl ();
   soncho->contact_dist = this->contact_dist;
 
-Jigglegon *jg = new Jigglegon;
-jg -> AlignToMaes (&ma);
-Vect c = ma . Loc ();
-f64 rad = 0.25 * ma . Height ();
-#define BRP 5
-jg -> SetNumVertices (BRP);
-for (i64 q = 0  ;  q < BRP  ;  ++q)
-  jg -> NthVertex (q)
-    . Set (rad * (cos (2.0 * M_PI / (f64)BRP * (f64)q) * Vect::xaxis
-                  + sin (2.0 * M_PI / (f64)BRP * (f64)q) * Vect::yaxis));
-jg -> SetLoc (c);
-jg -> Populate (26, Vect (0.1 * rad, 0.1 * rad, 0.0));
-AppendChild (jg);
+// Jigglegon *jg = new Jigglegon;
+// jg -> AlignToMaes (&ma);
+// Vect c = ma . Loc ();
+// f64 rad = 0.25 * ma . Height ();
+// #define BRP 5
+// jg -> SetNumVertices (BRP);
+// for (i64 q = 0  ;  q < BRP  ;  ++q)
+//   jg -> NthVertex (q)
+//     . Set (rad * (cos (2.0 * M_PI / (f64)BRP * (f64)q) * Vect::xaxis
+//                   + sin (2.0 * M_PI / (f64)BRP * (f64)q) * Vect::yaxis));
+// jg -> SetLoc (c);
+// jg -> Populate (26, Vect (0.1 * rad, 0.1 * rad, 0.0));
+// AppendChild (jg);
 }
 
 
@@ -87,7 +87,7 @@ Jigglegon *Orksur::FurnishFreeJiggler ()
       fallow_jigs . pop_back ();
     }
 
-  active_jigs . push_back (jig);
+//  active_jigs . push_back (jig);
   return jig;
 }
 
@@ -95,16 +95,16 @@ void Orksur::ReturnJigglerToShelf (Jigglegon *jig)
 { if (! jig)
     return;
 
-  if (std::find (active_jigs . begin (), active_jigs . end (), jig)
-      ==  active_jigs . end ())
-    { // well, that just ain't right. here's your opportunity to fix it!
-      throw;
-    }
+  // if (std::find (active_jigs . begin (), active_jigs . end (), jig)
+  //     ==  active_jigs . end ())
+  //   { // well, that just ain't right. here's your opportunity to fix it!
+  //     throw;
+  //   }
 
   if (Node *par = jig -> Parent ())
     par -> ExciseChild (jig);
   fallow_jigs . push_back (jig);
-  active_jigs . pop_back ();
+//  active_jigs . pop_back ();
 }
 
 
@@ -114,22 +114,24 @@ void Orksur::AtomicFirstStrike (Ticato *tic)
   if (soncho)
     soncho -> InitiateAtomicContact (tic);
 
-  Vect crn[4];
-  if (tic -> CalcUnitBoundingCorners (crn))
-    { Jigglegon *jig = FurnishFreeJiggler ();
-      jig -> SetCorners (crn[0], crn[1], crn[2], crn[3]);
-      jig -> Populate (26, Vect (0.05, 0.05, 0.0));
-//      jig -> HitchLocTo (tic -> LocZoft ());
-      jig -> AlignToMaes (underlying_maes);
-      tic -> AppendChild (tic->aura = jig);
+  if (! tic->aura)
+    { Vect crn[4];
+      if (tic -> CalcUnitBoundingCorners (crn))
+        { Jigglegon *jig = FurnishFreeJiggler ();
+          jig -> SetCorners (crn[0], crn[1], crn[2], crn[3]);
+          jig -> Populate (26, Vect (0.05, 0.05, 0.0));
+          jig -> AlignToMaes (underlying_maes);
+          tic -> AppendChild (tic->aura = jig);
+        }
     }
+  tic->aura->fadist . SetHard (ZeColor (1.0, 1.0));
 }
 
 void Orksur::AtomicFinalGutter (Ticato *tic)
 { if (! tic)
     return;
-  ReturnJigglerToShelf (dynamic_cast <Jigglegon *> (tic->aura));
-  tic->aura = NULL;
+  if (tic->aura)
+    tic->aura->fadist . Set (ZeColor (1.0, 0.0));
 }
 
 
@@ -624,13 +626,26 @@ i64 Orksur::Inhale (i64 ratch, f64 thyme)
 { std::vector <Ticato *> *mort = NULL;
   f64 dt = GraphicsApplication::GetFrameTime () -> GetCurrentDelta ();
   for (Ticato *tic  :  players)
-    if (tic->shov_vel . AutoDot ()  >  0.0
-        &&  ! AtomIsGrasped (tic))
-      if (ImpelFreeAtom (tic, dt)  ==  AtomThusness::NUKE)
-        { if (! mort)
-            mort = new std::vector <Ticato *> ();
-          mort -> push_back (tic);
-        }
+    { if (! tic)
+        continue;
+//
+/// the following (which seeks to re-use jigglers) shows up buggy
+/// behavior in which some percentage of the time you don't get a
+/// jiggle-halo when clicking on a table-atom... no time to figure
+/// it out right now.
+//
+      // if (tic->aura  &&  tic->aura -> FullyFaded ())
+      //   { ReturnJigglerToShelf (tic->aura);
+      //     tic->aura = NULL;
+      //   }
+      if (tic->shov_vel . AutoDot ()  >  0.0
+          &&  ! AtomIsGrasped (tic))
+        if (ImpelFreeAtom (tic, dt)  ==  AtomThusness::NUKE)
+          { if (! mort)
+              mort = new std::vector <Ticato *> ();
+            mort -> push_back (tic);
+          }
+    }
 
   if (mort)
     { for (Ticato *mortic  :  *mort)

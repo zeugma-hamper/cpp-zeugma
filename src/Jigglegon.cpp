@@ -14,6 +14,10 @@ Jigglegon::Jigglegon ()  :  Alignifer (),
   re -> SetShouldEdge (true);
   re -> SetShouldFill (false);
 
+  fadist . SetInterpTime (0.93);
+  fadist . SetHard (ZeColor (1.0, 1.0));
+  re -> AdjColorZoft () . BecomeLike (fadist);
+
   voits . resize (4);
   AppendRenderable (re);
 }

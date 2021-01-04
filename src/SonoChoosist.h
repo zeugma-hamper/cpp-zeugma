@@ -14,6 +14,7 @@
 #include "ZEYowlEvent.h"
 #include "ZEBulletinEvent.h"
 #include "Ticato.h"
+#include "Jigglegon.h"
 
 
 using namespace charm;
@@ -37,8 +38,10 @@ class SonoChoosist  :  public Alignifer,
   SonoChoosist (const PlatonicMaes *maes);
 
   PolygonRenderable *brdr_re;
+  Node *chz_node;
   std::vector <Choizl *> choizls;
   std::vector <Choizl *> in_storage;
+  Jigglegon *hexajig;
   Ticato *behalf_of;
   InterpFloat active;
   f64 contact_dist;
@@ -68,7 +71,8 @@ class SonoChoosist  :  public Alignifer,
   void Furl ();
   void Unfurl ();
 
-  bool PointInAirspaceOver (const Vect &p, Vect *hit_out = NULL);
+  bool PointInAirspaceOver (const Vect &p,
+                            Vect *hit_out = NULL, Matrix44 *mat_out = NULL);
 
   i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
   i64 ZESpatialHarden (ZESpatialHardenEvent *e)  override;

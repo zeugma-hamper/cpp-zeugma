@@ -142,6 +142,9 @@ class Node
   i64 NumRenderables ()  const;
   Renderable *NthRenderable (i64 ind);
 
+  void RenderablesSetShouldDraw ();
+  void RenderablesSetShouldNotDraw ();
+
   void   SetLayer (Layer *_layer);
   Layer *GetLayer () const;
 

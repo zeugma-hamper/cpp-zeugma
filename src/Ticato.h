@@ -29,13 +29,16 @@ enum class AtomThusness {
   CONT, STOP, NUKE
 };
 
+class Jigglegon;
+
+
 class Ticato  :  public Alignifer
 { public:
   const ClipInfo *atom_info;
   MattedVideoRenderable *re;
   RectRenderableFrontier *fr;
   Alignifer *bbox_subno;
-  Node *aura;
+  Jigglegon *aura;
   InterpColor interp_adjc;
   bool born_from_flick;  // else spontaneously generated
 

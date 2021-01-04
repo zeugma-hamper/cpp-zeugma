@@ -722,7 +722,7 @@ int main (int ac, char **av)
   polysplat -> SetShouldEdge (true);
   polysplat -> SetEdgeColor (ZeColor (1.0, 0.25));
   polysplat -> SetShouldFill (false);
-  g_windshield -> AppendChild (splat);
+//  g_windshield -> AppendChild (splat);
 
   TextureParticulars tipi
     = CreateTexture2D ("/tmp/SIGN.jpg", DefaultTextureFlags);

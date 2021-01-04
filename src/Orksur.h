@@ -60,7 +60,7 @@ class Orksur  :  public PlatonicMaes, public Node,
   Ticato *sel_atom;
 
   static std::vector <Jigglegon *> fallow_jigs;
-  static std::vector <Jigglegon *> active_jigs;
+//  static std::vector <Jigglegon *> active_jigs;
 
   Orksur (const PlatonicMaes &ma);
 
