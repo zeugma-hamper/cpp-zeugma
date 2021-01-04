@@ -5,6 +5,8 @@
 
 #include "LinePileRenderable.h"
 
+#include "Jigglegon.h"
+
 #include "AudioMessenger.hpp"
 
 #include "ZeUUID.h"
@@ -174,6 +176,34 @@ void Ticato::BBoxSetColor (const ZoftColor &zc)
   if (LinePileRenderable *lpr
       = dynamic_cast <LinePileRenderable *> (bbox_subno -> NthRenderable (0)))
     lpr -> LinesColorZoft () . BecomeLike (zc);
+}
+
+
+void Ticato::OutfitWithAura (Jigglegon *jig)
+{ if (aura)  // let's at least do no harm if we already have one.
+    return;
+  if (! jig)
+    jig = new Jigglegon;
+
+  Vect crn[4];
+  if (! CalcUnitBoundingCorners (crn))
+    jig -> SetNumVertices (4);
+  else
+    jig -> SetCorners (crn[0], crn[1], crn[2], crn[3]);
+  jig -> Populate (26, Vect (0.05, 0.05, 0.0));
+  if (cur_maes)
+    jig -> AlignToMaes (cur_maes);
+
+  jig->fadist . SetHard (ZeColor (1.0, 0.0));
+
+  AppendChild (aura = jig);
+}
+
+void Ticato::FlashAura ()
+{ if (aura  &&  aura->re)
+    { aura->fadist . SetHard (ZeColor (1.0, 1.0));
+      aura->fadist . Set (ZeColor (1.0, 0.0));
+    }
 }
 
 

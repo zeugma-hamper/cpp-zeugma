@@ -32,20 +32,6 @@ Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
                                        - ma . Height ()) * ma . Up ());
   soncho -> Furl ();
   soncho->contact_dist = this->contact_dist;
-
-// Jigglegon *jg = new Jigglegon;
-// jg -> AlignToMaes (&ma);
-// Vect c = ma . Loc ();
-// f64 rad = 0.25 * ma . Height ();
-// #define BRP 5
-// jg -> SetNumVertices (BRP);
-// for (i64 q = 0  ;  q < BRP  ;  ++q)
-//   jg -> NthVertex (q)
-//     . Set (rad * (cos (2.0 * M_PI / (f64)BRP * (f64)q) * Vect::xaxis
-//                   + sin (2.0 * M_PI / (f64)BRP * (f64)q) * Vect::yaxis));
-// jg -> SetLoc (c);
-// jg -> Populate (26, Vect (0.1 * rad, 0.1 * rad, 0.0));
-// AppendChild (jg);
 }
 
 
@@ -115,15 +101,7 @@ void Orksur::AtomicFirstStrike (Ticato *tic)
     soncho -> InitiateAtomicContact (tic);
 
   if (! tic->aura)
-    { Vect crn[4];
-      if (tic -> CalcUnitBoundingCorners (crn))
-        { Jigglegon *jig = FurnishFreeJiggler ();
-          jig -> SetCorners (crn[0], crn[1], crn[2], crn[3]);
-          jig -> Populate (26, Vect (0.05, 0.05, 0.0));
-          jig -> AlignToMaes (underlying_maes);
-          tic -> AppendChild (tic->aura = jig);
-        }
-    }
+    tic -> OutfitWithAura (FurnishFreeJiggler ());
   tic->aura->fadist . SetHard (ZeColor (1.0, 1.0));
 }
 
@@ -191,6 +169,9 @@ bool Orksur::AppendAtomToCollage (Ticato *tic)
          (tic->atom_info ? tic->atom_info->duration : 0.0),
          disc_id);
     }
+
+  if (soncho)
+    soncho -> InitiateAtomicContact (tic);
 
   return true;
 }
@@ -582,6 +563,9 @@ i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
           { AppendAtomToCollage (tic);
             tic->wander_vel = Vect::zerov;
             //tic -> BBoxSetColor (Tamglobals::Only ()->tabatom_bbox_color);
+            tic -> OutfitWithAura (FurnishFreeJiggler ());
+            if (soncho  &&  soncho -> Active ())
+              tic -> FlashAura ();
             auto it = std::find (inchoates . begin (), inchoates . end (), tic);
             if (it  !=  inchoates . end ())
               inchoates . erase (it);

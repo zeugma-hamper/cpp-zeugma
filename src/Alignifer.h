@@ -5,6 +5,10 @@
 
 #include "ZoftThing.h"
 
+#include "TrGrappler.h"
+#include "ScGrappler.h"
+#include "CoGrappler.h"
+
 #include "Node.hpp"
 
 #include "PlatonicMaes.h"
@@ -24,6 +28,19 @@ class Alignifer  :  public Zeubject, public Node
   Alignifer ();
   explicit Alignifer (Renderable *ren);
 
+  TrGrappler *LocGrappler ()
+    { return dynamic_cast <TrGrappler *> (FindGrappler ("loc")); }
+  ScGrappler *ScaleGrappler ()
+    { return dynamic_cast <ScGrappler *> (FindGrappler ("scale")); }
+  CoGrappler *AlignmentGrappler ()
+    { return dynamic_cast <CoGrappler *> (FindGrappler ("alignment")); }
+
+  ZoftVect *LocGrapplerZoftVect ()
+    { if (TrGrappler *trg = LocGrappler ())
+        return &(trg->trans);
+      return NULL;
+    }
+
   Vect CurLoc ()  const
     { return loc.val; }
   Vect CurScale ()  const
@@ -42,6 +59,8 @@ class Alignifer  :  public Zeubject, public Node
     { return nrm; }
 
   virtual void AlignOverUp (const Vect &ov, const Vect &up);
+  virtual void AlignToOther (const Alignifer *alig)
+    { if (alig)  AlignOverUp (alig -> CurOver (), alig -> CurUp ()); }
   virtual void AlignToMaes (const PlatonicMaes *maes)
     { if (maes)  AlignOverUp (maes -> Over (), maes -> Up ()); }
 };

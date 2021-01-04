@@ -70,7 +70,7 @@ SonoChoosist::SonoChoosist (const PlatonicMaes *maes)  :  Alignifer (),
   crn_ll . SetInterpTime (ERPTI);
 
   active . SetInterpTime (ERPTI);
-active . SetHard (1.0);
+  active . SetHard (0.0);
 
   chz_dia = 0.9 * hei;
 
@@ -123,7 +123,13 @@ void SonoChoosist::InitiateAtomicContact (Ticato *tic)
   behalf_of = tic;
   i64 ind = 1 + tic->playing_sono;
   if (ind  <  choizls . size ())
-    hexajig -> LocZoft () . Set (choizls[ind]->perky_loc.val);
+    if (ZoftVect *zv = hexajig -> LocGrapplerZoftVect ())
+      zv -> BecomeLike (choizls[ind]->perky_loc);
+    else
+      hexajig -> LocZoft () . Set (choizls[ind]->perky_loc.val);
+
+  if (Active ())
+    hexajig -> RenderablesSetShouldDraw ();  // unnecessary unless 'first time'
 }
 
 void SonoChoosist::Furl ()
@@ -139,6 +145,7 @@ void SonoChoosist::Furl ()
     { choizls[q]->perky_loc . Set (p); }
 
   hexajig -> RenderablesSetShouldNotDraw ();
+  active . Set (0.0);
 }
 
 
@@ -160,7 +167,9 @@ void SonoChoosist::Unfurl ()
       p -= spcng * Vect::xaxis;
     }
 
-  hexajig -> RenderablesSetShouldDraw ();
+  if (behalf_of)
+    hexajig -> RenderablesSetShouldDraw ();
+  active . Set (1.0);
 }
 
 
@@ -261,12 +270,14 @@ i64 SonoChoosist::ZESpatialHarden (ZESpatialHardenEvent *e)
 
   i64 ind = cit - choizls . begin ();
   smack[prv] = chz;
-  hexajig -> LocZoft () . Set (chz->perky_loc.val);
+  if (ZoftVect *zv = hexajig -> LocGrapplerZoftVect ())
+    zv -> BecomeLike (chz->perky_loc);
   if (behalf_of)
     { if (ind == 0)
         behalf_of -> SonoSilence ();
       else
         behalf_of -> EnunciateNthSonoOption (ind - 1);
+      behalf_of -> FlashAura ();
     }
 
   return 1;
