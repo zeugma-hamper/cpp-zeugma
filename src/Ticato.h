@@ -29,7 +29,7 @@ enum class AtomThusness {
   CONT, STOP, NUKE
 };
 
-class Jigglegon;
+struct Jigglegon;
 
 
 class Ticato  :  public Alignifer

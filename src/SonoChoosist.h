@@ -39,6 +39,10 @@ class SonoChoosist  :  public Alignifer,
 
   PolygonRenderable *brdr_re;
   Node *chz_node;
+  Node *oclo_no;
+  InterpVect o_loc;
+  InterpColor o_iro;
+  PolygonRenderable *oclo_re;
   std::vector <Choizl *> choizls;
   std::vector <Choizl *> in_storage;
   Jigglegon *hexajig;
@@ -61,6 +65,7 @@ class SonoChoosist  :  public Alignifer,
   Vect Centerdom ()  const
     { return 0.25 * (crn_lr.val + crn_ur.val + crn_ul.val + crn_ll.val); }
 
+  void MoveHexajigToChoizlN (i64 ind);
   void InitiateAtomicContact (Ticato *tic);
 
   bool Active ()

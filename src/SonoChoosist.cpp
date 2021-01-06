@@ -2,6 +2,8 @@
 #include "SonoChoosist.h"
 
 #include "LoopZoft.h"
+#include "SinuZoft.h"
+#include "ScaleZoft.h"
 
 #include "TrGrappler.h"
 
@@ -86,6 +88,39 @@ SonoChoosist::SonoChoosist (const PlatonicMaes *maes)  :  Alignifer (),
   hexajig -> Populate (6, chz_dia * Vect (0.1, 0.1, 0.0));
 
   AppendChild (hexajig);
+
+  oclo_no = new Node;
+  oclo_re = new PolygonRenderable;
+  oclo_no -> AppendRenderable (oclo_re);
+
+  f64 lmax = 0.5 * chz_dia;
+  f64 l0 = 0.33 * lmax;
+  f64 lmin = 0.5 * l0;
+  f64 ldif = 0.5 * (lmax - lmin);
+  f64 lcnt = 0.5 * (lmax + lmin);
+  SinuFloat sf_a (ldif, 0.15 + 0.1 * drand48 (), lcnt);
+  SinuFloat sf_b (ldif, 0.15 + 0.1 * drand48 (), lcnt);
+
+  for (i64 q = 0  ;  q < 16  ;  ++q)
+    { f64 thayter = (f64)q * M_PI / 8.0;
+      Vect r = cos (thayter) * Vect::xaxis  +  sin (thayter) * Vect::yaxis;
+      if (q % 2)
+        oclo_re -> AppendVertex (l0 * r);
+      else if ((q / 2) % 2)
+        oclo_re -> AppendVertex (ScaleVect (ZoftVect (r), sf_a));
+      else
+        oclo_re -> AppendVertex (ScaleVect (ZoftVect (r), sf_b));
+    }
+//  o_loc . SetInterpTime ();
+  o_loc . SetHard (0.25 * (frl_ll + frl_ul + frl_ur + frl_lr));
+  oclo_no -> Translate (o_loc);
+  o_iro . SetHard (ZeColor (1.0, 0.0));
+  oclo_re -> AdjColorZoft () . BecomeLike (o_iro);
+
+  oclo_re -> SetShouldEdge (true);
+  oclo_re -> SetEdgeColor (ZeColor (1.0, 0.25));
+  oclo_re -> SetFillColor (ZeColor (1.0, 0.05));
+  AppendChild (oclo_no);
 }
 
 
@@ -93,24 +128,43 @@ void SonoChoosist::PopulateChoizls (i64 nc)
 { if (nc  <  0)
     nc = 0;
 
+  nc++;  // yeah, high cheese: an invisible one to 'guide' the op/clo button...
   i64 curn = NumChoizls ();
   if (nc  == curn)
     return;
+
+  Choizl *zeroch = NULL;
 
   if (nc  >  curn)
     { while (curn  <  nc)
         { Choizl *chz = new Choizl;
           choizls . push_back (chz);
-          chz->mopey_sca .SetHard (Vect (chz_dia));
+          chz->mopey_sca . SetHard (Vect (chz_dia));
           chz_node -> AppendChild (chz);
-if (curn == 0)      chz->texre->SetAdjColor(ZeColor(1.0,0.0,0.0,0.2));
-else if (curn == 1) chz->texre->SetAdjColor(ZeColor(0.0,1.0,0.0,0.2));
-else if (curn == 2) chz->texre->SetAdjColor(ZeColor(0.0,0.0,1.0,0.2));
-else if (curn == 3) chz->texre->SetAdjColor(ZeColor(1.0,0.0,1.0,0.2));
-else if (curn == 4) chz->texre->SetAdjColor(ZeColor(1.0,1.0,0.0,0.2));
+if      (curn == 0) chz->texre->SetAdjColor(ZeColor(1.0,0.0));
+else if (curn == 1) chz->texre->SetAdjColor(ZeColor(1.0,0.0,0.0,0.2));
+else if (curn == 2) chz->texre->SetAdjColor(ZeColor(0.0,1.0,0.0,0.2));
+else if (curn == 3) chz->texre->SetAdjColor(ZeColor(0.0,0.0,1.0,0.2));
+else if (curn == 4) chz->texre->SetAdjColor(ZeColor(1.0,0.0,1.0,0.2));
+else if (curn == 5) chz->texre->SetAdjColor(ZeColor(1.0,1.0,0.0,0.2));
+
+          if (! zeroch)
+            { zeroch = chz;
+              oclo_no -> ClearTransforms ();
+              oclo_no -> Translate (zeroch->perky_loc);
+            }
           ++curn;
         }
     }
+}
+
+
+void SonoChoosist::MoveHexajigToChoizlN (i64 ind)
+{ if (ind >= 0  &&  ind  <  choizls . size ())
+    if (ZoftVect *zv = hexajig -> LocGrapplerZoftVect ())
+      zv -> BecomeLike (choizls[ind]->perky_loc);
+    else
+      hexajig -> LocZoft () . Set (choizls[ind]->perky_loc.val);
 }
 
 
@@ -121,12 +175,8 @@ void SonoChoosist::InitiateAtomicContact (Ticato *tic)
     { // some farewell gesture to whomever we'd been serving?
     }
   behalf_of = tic;
-  i64 ind = 1 + tic->playing_sono;
-  if (ind  <  choizls . size ())
-    if (ZoftVect *zv = hexajig -> LocGrapplerZoftVect ())
-      zv -> BecomeLike (choizls[ind]->perky_loc);
-    else
-      hexajig -> LocZoft () . Set (choizls[ind]->perky_loc.val);
+  i64 ind = 2 + tic->playing_sono;
+  MoveHexajigToChoizlN (ind);
 
   if (Active ())
     hexajig -> RenderablesSetShouldDraw ();  // unnecessary unless 'first time'
@@ -143,6 +193,8 @@ void SonoChoosist::Furl ()
   Vect p = 0.25 * (frl_ll + frl_ul + frl_ur + frl_lr);
   for (i64 q = 0  ;  q < nc  ;  ++q)
     { choizls[q]->perky_loc . Set (p); }
+  o_loc . Set (p);
+  o_iro . Set (ZeColor (1.0, 0.0));
 
   hexajig -> RenderablesSetShouldNotDraw ();
   active . Set (0.0);
@@ -153,7 +205,7 @@ void SonoChoosist::Unfurl ()
 { crn_lr . Set (unf_lr);  crn_ur . Set (unf_ur);
   crn_ul . Set (unf_ul);  crn_ll . Set (unf_ll);
 
-  i64 nc = 1 + NumChoizls ();
+  i64 nc = NumChoizls ();
   if (nc  <  1)
     return;
 
@@ -162,13 +214,18 @@ void SonoChoosist::Unfurl ()
   Vect p = (0.5 * wid - spcng - 0.5 * chz_dia) * Vect::xaxis;
   spcng += chz_dia;
   for (i64 q = 0  ;  q < nc  ;  ++q)
-    { if (q > 0)
-        choizls[q-1]->perky_loc . Set (p);
+    { // if (q > 0)
+        choizls[q]->perky_loc . Set (p);
+      // else
+      //   o_loc . Set (p);
       p -= spcng * Vect::xaxis;
     }
+  o_iro . Set (ZeColor (1.0, 1.0));
 
   if (behalf_of)
-    hexajig -> RenderablesSetShouldDraw ();
+    { hexajig -> RenderablesSetShouldDraw ();
+      MoveHexajigToChoizlN (2 + behalf_of->playing_sono);
+    }
   active . Set (1.0);
 }
 
@@ -255,6 +312,11 @@ i64 SonoChoosist::ZESpatialHarden (ZESpatialHardenEvent *e)
   if (! PointInAirspaceOver (e -> Loc ()))
     return 0;
 
+  if (! Active ())
+    { Unfurl ();
+      return 1;
+    }
+
   if (smack . find (prv)  !=  smack . end ())
     return 1;  // already in contact
   auto it = hover . find (prv);
@@ -272,11 +334,14 @@ i64 SonoChoosist::ZESpatialHarden (ZESpatialHardenEvent *e)
   smack[prv] = chz;
   if (ZoftVect *zv = hexajig -> LocGrapplerZoftVect ())
     zv -> BecomeLike (chz->perky_loc);
-  if (behalf_of)
-    { if (ind == 0)
+
+  if (ind == 0)
+    Furl ();
+  else if (behalf_of)
+    { if (ind == 1)
         behalf_of -> SonoSilence ();
       else
-        behalf_of -> EnunciateNthSonoOption (ind - 1);
+        behalf_of -> EnunciateNthSonoOption (ind - 2);
       behalf_of -> FlashAura ();
     }
 
