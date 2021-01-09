@@ -87,20 +87,11 @@ class Ticato  :  public Alignifer
   void SetCurMaes (PlatonicMaes *ma)
     { cur_maes = ma; }
 
-  void AlignToMaes ()
-    { if (cur_maes)
-        { re -> SetOver (cur_maes -> Over ());
-          re -> SetUp (cur_maes -> Up ());
-        }
-    }
-
   void SetAndAlignToMaes (PlatonicMaes *ma)
     { if (! ma)
         return;
        cur_maes = ma;
-       AlignToMaes ();
-       if (bbox_subno)
-         bbox_subno -> AlignToMaes (ma);
+       AlignToMaes (ma);
     }
 
   const std::string CurHoverer ()  const

@@ -191,8 +191,6 @@ void Ticato::OutfitWithAura (Jigglegon *jig)
   else
     jig -> SetCorners (crn[0], crn[1], crn[2], crn[3]);
   jig -> Populate (26, Vect (0.05, 0.05, 0.0));
-  if (cur_maes)
-    jig -> AlignToMaes (cur_maes);
 
   jig->fadist . SetHard (ZeColor (1.0, 0.0));
 
