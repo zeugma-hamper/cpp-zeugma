@@ -20,12 +20,12 @@ std::vector <Jigglegon *> Orksur::fallow_jigs;
 
 Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
                                             underlying_maes (&ma),
-                                            collage (new Node),
+                                            assembly (new Node),
                                             soncho (new SonoChoosist (&ma)),
                                             associated_wallmaes (NULL),
                                             sentient_dist (200.0),
                                             contact_dist (25.0)
-{ AppendChild (collage);
+{ AppendChild (assembly);
   AppendChild (soncho);
   soncho -> PopulateChoizls (5);
   soncho->loc . Set (Loc ()  +  0.5 * (soncho->hei + 2.0 * soncho->brd_thc
@@ -62,6 +62,61 @@ stringy_list Orksur::CollageAtomsNameList ()
       nlist . push_back (tic -> AtomName ());
   return nlist;
 }
+
+
+Alignifer *Orksur::PermaFixCollage ()
+{ Alignifer *collage = new Alignifer;
+  const Vect &cnt = Loc ();
+  Vect o = Over () . Norm ();
+  Vect u = Up () . Norm ();
+
+  // need to neutralizes hovering and grasping, & et-al-ing...
+  hoverees . clear ();
+  graspees . clear ();
+  sel_atom = NULL;
+
+  // what else do we need to turn off? jigglegons, presumably...
+  // and ah yes: reset the state of soncho...
+  soncho -> InitiateAtomicContact (NULL);
+  soncho -> Furl ();
+
+  std::vector <Node *> ticlist = assembly -> ChildListCopy ();
+  for (Node *no  :  ticlist)
+    if (Ticato *tic = dynamic_cast <Ticato *> (no))
+      { collage -> AppendChild (tic);  // implicit excision from assembly
+
+        auto it = std::find (players . begin (), players . end (), tic);
+        if (it  !=  players . end ())
+          players . erase (it);
+        else
+          assert (&"kirk"  ==  &"gorn");
+
+        Vect cured_pos = tic -> CurLoc () - cnt;
+        cured_pos = (cured_pos . Dot (o) * Vect::xaxis
+                     +  cured_pos . Dot (u) * Vect::yaxis);
+        tic -> LocZoft () . Set (cured_pos);
+        tic -> AlignToOther (collage);
+      }
+
+  assert (assembly -> ChildCount ()  ==  0);
+  assert (players . size ()  ==  0);
+
+  return collage;
+}
+
+
+void Orksur::EffectShamAscension ()
+{ Alignifer *colla = PermaFixCollage ();
+  colla -> AlignToMaes (this);
+//  colla -> LocZoft () . Set (Loc ());
+
+  LoopVect floob (Loc (), 30.0 * Up (), 15.51);
+  colla -> LocGrapplerZoftVect () -> BecomeLike (floob);
+
+  AppendChild (colla);
+// this, of course, is wholly temporary and -- indeed -- useless... but:
+}
+
 
 
 Jigglegon *Orksur::FurnishFreeJiggler ()
@@ -153,7 +208,7 @@ bool Orksur::AppendAtomToCollage (Ticato *tic)
 
   stringy_list extant_atoms = CollageAtomsNameList ();
 
-  collage -> AppendChild (tic);  // excises from former parent, see?
+  assembly -> AppendChild (tic);  // excises from former parent, see?
   players . push_back (tic);
   tic->accom_sca
     . Set (tic -> BornViaFlickPluck ()
@@ -450,7 +505,7 @@ i64 Orksur::ZESpatialHarden (ZESpatialHardenEvent *e)
     }
 
   graspees[prv] = { tic, (tic -> CurLoc () - proj) };
-  collage -> MakeChildLast (tic);
+  assembly -> MakeChildLast (tic);
   tic->shov_vel = Vect::zerov;
   tic->interp_adjc . Set (ZeColor (2.0, 1.0));
   AtomicFirstStrike (tic);
@@ -518,6 +573,8 @@ i64 Orksur::ZEYowlAppear (ZEYowlAppearEvent *e)
       if (sel_atom)
         sel_atom -> EnunciateNthSonoOption (ind);
     }
+  else if (utt  ==  "^")
+    { EffectShamAscension (); }
   else if (utt  ==  "[")
     { if (soncho)  soncho -> Furl (); }
   else if (utt  ==  "]")
@@ -528,7 +585,10 @@ i64 Orksur::ZEYowlAppear (ZEYowlAppearEvent *e)
     { EliminateCollage (); }
   else if (utt  ==  ".")
     { SilenceAllAtoms (); }
-  return 0;
+  else
+    return 0;
+
+  return 1;
 }
 
 i64 Orksur::ZEBulletin (ZEBulletinEvent *e)

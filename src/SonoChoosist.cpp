@@ -169,12 +169,17 @@ void SonoChoosist::MoveHexajigToChoizlN (i64 ind)
 
 
 void SonoChoosist::InitiateAtomicContact (Ticato *tic)
-{ if (! tic)
-    return;
+{ // if (! tic)
+  //   return;
   if (behalf_of)
     { // some farewell gesture to whomever we'd been serving?
     }
   behalf_of = tic;
+  if (! tic)
+    { MoveHexajigToChoizlN (2);  // silence; but let's abstract, okay, Jim?
+      hexajig -> RenderablesSetShouldNotDraw ();
+      return;
+    }
   i64 ind = 2 + tic->playing_sono;
   MoveHexajigToChoizlN (ind);
 

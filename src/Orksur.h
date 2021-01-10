@@ -46,7 +46,7 @@ class Orksur  :  public PlatonicMaes, public Node,
   struct Fondlish { Ticato *tic;  Vect gropoff; };
 
   const PlatonicMaes *underlying_maes;
-  Node *collage;
+  Node *assembly;
   SonoChoosist *soncho;
   PlatonicMaes *associated_wallmaes;
   std::vector <Ticato *> players;
@@ -67,6 +67,9 @@ class Orksur  :  public PlatonicMaes, public Node,
 //  Splort *NewSplort (f64 rad, i64 num_verts = 6)  const;
 
   stringy_list CollageAtomsNameList ();
+
+  Alignifer *PermaFixCollage ();
+  void EffectShamAscension ();
 
   Jigglegon *FurnishFreeJiggler ();
   void ReturnJigglerToShelf (Jigglegon *jig);
