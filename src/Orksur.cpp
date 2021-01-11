@@ -91,6 +91,11 @@ Alignifer *Orksur::PermaFixCollage ()
         else
           assert (&"kirk"  ==  &"gorn");
 
+        if (tic->aura)
+          { tic -> RemoveChild (tic->aura);  // should really recycle...
+            tic->aura = NULL;
+          }
+
         Vect cured_pos = tic -> CurLoc () - cnt;
         cured_pos = (cured_pos . Dot (o) * Vect::xaxis
                      +  cured_pos . Dot (u) * Vect::yaxis);
