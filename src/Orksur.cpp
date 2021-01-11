@@ -23,6 +23,8 @@ Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
                                             assembly (new Node),
                                             soncho (new SonoChoosist (&ma)),
                                             associated_wallmaes (NULL),
+                                            ascension_phase (-1),
+                                            ascending_collage (NULL),
                                             sentient_dist (200.0),
                                             contact_dist (25.0)
 { AppendChild (assembly);
@@ -110,16 +112,37 @@ Alignifer *Orksur::PermaFixCollage ()
 }
 
 
-void Orksur::EffectShamAscension ()
+void Orksur::EffectAscension ()
 { Alignifer *colla = PermaFixCollage ();
-  colla -> AlignToMaes (this);
-//  colla -> LocZoft () . Set (Loc ());
 
-  LoopVect floob (Loc (), 30.0 * Up (), 15.51);
-  colla -> LocGrapplerZoftVect () -> BecomeLike (floob);
+  ascending_collage = colla;
+  EffectNextAscensionPhase ();
+}
 
-  AppendChild (colla);
-// this, of course, is wholly temporary and -- indeed -- useless... but:
+
+bool Orksur::AscensionPhaseJustNowDone ()
+{
+  return false;
+}
+
+
+void Orksur::EffectNextAscensionPhase ()
+{
+  switch (ascension_phase)
+    { case -1:
+        { LoopVect floob (Loc (), 30.0 * Up (), 15.51);
+          ascending_collage -> InstallLocGrapplerZoft (floob);
+          ascending_collage -> AlignToMaes (this);
+          AppendChild (ascending_collage);
+          ascension_phase = 0;
+          break;
+        }
+      case 0:
+        fprintf (stderr, "WHAMMO!\nWHAMMO!\nWHAMMO!\nWHAMMO!\n");
+        break;
+      default:
+        break;
+    }
 }
 
 
@@ -579,7 +602,9 @@ i64 Orksur::ZEYowlAppear (ZEYowlAppearEvent *e)
         sel_atom -> EnunciateNthSonoOption (ind);
     }
   else if (utt  ==  "^")
-    { EffectShamAscension (); }
+    { if (! CurrentlyAscending ())
+        EffectAscension ();
+    }
   else if (utt  ==  "[")
     { if (soncho)  soncho -> Furl (); }
   else if (utt  ==  "]")
@@ -672,7 +697,11 @@ fprintf(stderr,"\n");
 
 
 i64 Orksur::Inhale (i64 ratch, f64 thyme)
-{ std::vector <Ticato *> *mort = NULL;
+{ if (CurrentlyAscending ())
+    {
+    }
+
+  std::vector <Ticato *> *mort = NULL;
   f64 dt = GraphicsApplication::GetFrameTime () -> GetCurrentDelta ();
   for (Ticato *tic  :  players)
     { if (! tic)

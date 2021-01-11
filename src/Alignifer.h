@@ -28,12 +28,23 @@ class Alignifer  :  public Zeubject, public Node
   Alignifer ();
   explicit Alignifer (Renderable *ren);
 
-  TrGrappler *LocGrappler ()
-    { return dynamic_cast <TrGrappler *> (FindGrappler ("loc")); }
-  ScGrappler *ScaleGrappler ()
-    { return dynamic_cast <ScGrappler *> (FindGrappler ("scale")); }
   CoGrappler *AlignmentGrappler ()
     { return dynamic_cast <CoGrappler *> (FindGrappler ("alignment")); }
+  ScGrappler *ScaleGrappler ()
+    { return dynamic_cast <ScGrappler *> (FindGrappler ("scale")); }
+  TrGrappler *LocGrappler ()
+    { return dynamic_cast <TrGrappler *> (FindGrappler ("loc")); }
+
+  ZoftVect *ScaleGrapplerScaZoftVect ()
+    { if (ScGrappler *scg = ScaleGrappler ())
+        return &(scg->sca);
+      return NULL;
+    }
+  ZoftVect *ScaleGrapplerCntZoftVect ()
+    { if (ScGrappler *scg = ScaleGrappler ())
+        return &(scg->cnt);
+      return NULL;
+    }
 
   ZoftVect *LocGrapplerZoftVect ()
     { if (TrGrappler *trg = LocGrappler ())
@@ -41,15 +52,18 @@ class Alignifer  :  public Zeubject, public Node
       return NULL;
     }
 
-  Vect CurLoc ()  const
-    { return loc.val; }
+  bool InstallScaleGrapplerZoft (ZoftVect &sgz);
+  bool InstallLocGrapplerZoft (ZoftVect &lgz);
+
   Vect CurScale ()  const
     { return sca.val; }
+  Vect CurLoc ()  const
+    { return loc.val; }
 
-  ZoftVect &LocZoft ()
-    { return loc; }
   ZoftVect &ScaleZoft ()
     { return sca; }
+  ZoftVect &LocZoft ()
+    { return loc; }
 
   const Vect &CurOver ()  const
     { return ovr; }

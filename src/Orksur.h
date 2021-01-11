@@ -49,6 +49,8 @@ class Orksur  :  public PlatonicMaes, public Node,
   Node *assembly;
   SonoChoosist *soncho;
   PlatonicMaes *associated_wallmaes;
+  i64 ascension_phase;
+  Alignifer *ascending_collage;
   std::vector <Ticato *> players;
   std::vector <Ticato *> inchoates;
   std::unordered_map <std::string, Splort *> splorts;
@@ -69,7 +71,12 @@ class Orksur  :  public PlatonicMaes, public Node,
   stringy_list CollageAtomsNameList ();
 
   Alignifer *PermaFixCollage ();
-  void EffectShamAscension ();
+  void EffectAscension ();
+
+  bool CurrentlyAscending ()
+    { return (ascension_phase  >=  0); }
+  bool AscensionPhaseJustNowDone ();
+  void EffectNextAscensionPhase ();
 
   Jigglegon *FurnishFreeJiggler ();
   void ReturnJigglerToShelf (Jigglegon *jig);

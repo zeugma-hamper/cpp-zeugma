@@ -41,6 +41,25 @@ Alignifer::Alignifer (Renderable *ren)  :  Zeubject (), Node (ren),
 
 
 
+bool Alignifer::InstallLocGrapplerZoft (ZoftVect &lgz)
+{ if (TrGrappler *trg = LocGrappler ())
+    { trg->trans . BecomeLike (lgz);
+      loc . BecomeLike (lgz);
+      return true;
+    }
+  return false;
+}
+
+bool Alignifer::InstallScaleGrapplerZoft (ZoftVect &scz)
+{ if (ScGrappler *scg = ScaleGrappler ())
+    { scg->sca . BecomeLike (scz);
+      sca . BecomeLike (scz);
+      return true;
+    }
+  return false;
+}
+
+
 void Alignifer::AlignOverUp (const Vect &ov, const Vect &up)
 { Vect o = ov . Norm ();
   Vect u = up . Norm ();
