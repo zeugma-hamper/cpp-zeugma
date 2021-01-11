@@ -697,13 +697,13 @@ int main (int ac, char **av)
       SumVect voit (arm, centz);
       polysplat -> AppendVertex (voit);
     }
-  polysplat -> SetFillColor (SinuZoft (ZeColor (0.0, 0.0, 0.5, 0.3), 6.0,
+  polysplat -> SetFillColor (SinuZoft (ZeColor (0.0, 0.0, 0.5, 0.3), 0.16,
                                        ZeColor (1.0, 1.0, 0.0, 0.3)));
   splat -> AppendRenderable (polysplat);
   polysplat -> SetShouldEdge (true);
-  polysplat -> SetShouldFill (false);
-  polysplat -> SetShouldClose (false);
-//  g_windshield -> AppendChild (splat);
+//  polysplat -> SetShouldFill (false);
+//  polysplat -> SetShouldClose (false);
+  g_windshield -> AppendChild (splat);
 
   splat = new Node (polysplat = new PolygonRenderable);
   f64 jiglet = 0.025 * frnt -> Height ();

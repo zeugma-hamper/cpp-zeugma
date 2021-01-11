@@ -7,6 +7,8 @@
 
 #include "ZoftThing.h"
 
+#include "vector_interop.hpp"
+
 #include "bgfx_utils.hpp"
 
 #include <vector>
@@ -31,6 +33,7 @@ class PolygonRenderable  :  public Renderable
   static void *tessy_obj;
   std::vector <glm::vec3> raw_verts;
   std::vector <glm::vec3> tessd_verts;
+  std::vector <Vect> raw_verts_f64;
   i64 ts_vrt_cnt;
   bgfx::ProgramHandle shad_prog;
   bgfx::DynamicVertexBufferHandle fill_vbuf;
@@ -55,6 +58,19 @@ class PolygonRenderable  :  public Renderable
 
   i64 VertexCount ()  const
     { return verts . size (); }  // may you roast in hell, stl
+
+
+  void AppendRawVertex (const Vect &v)
+    { raw_verts . push_back (as_glm (v));  spanking_time = true; }
+
+  void AppendVertex (const glm::vec3 &v)
+    { raw_verts . push_back (v);  spanking_time = true; }
+
+  void ClearRawVertices ()
+    { raw_verts . clear ();  spanking_time = true; }
+
+  i64 RawVertexCount ()  const
+    { return raw_verts . size (); }  // may you broil in hades, stl
 
 
   bool ShouldFill ()  const
@@ -90,7 +106,7 @@ class PolygonRenderable  :  public Renderable
   void SetEdgeColor (const ZoftColor &zc)
     { edge_iro . BecomeLike (zc); }
 
-//  virtual void PopulateRawVerts ();
+  virtual void PopulateRawVerts ();
   void SpankularlyTesselate ();
   void Draw (u16 vyu_id)  override;
 };

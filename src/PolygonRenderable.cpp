@@ -3,8 +3,6 @@
 
 #include "Node.hpp"
 
-#include "vector_interop.hpp"
-
 
 namespace charm  {
 
@@ -126,15 +124,36 @@ static void PRErrorCB (GLenum err, void */*bonus*/)
 }
 
 
-void PolygonRenderable::SpankularlyTesselate ()
-{ if (! should_fill)
-    { raw_verts . clear ();
-      for (auto &it  :  verts)
-        raw_verts . push_back (as_glm (it.val));
-      if (raw_verts . size () > 2  &&  should_close)
-        raw_verts . push_back (raw_verts[0]);
+void PolygonRenderable::PopulateRawVerts ()
+{ raw_verts . clear ();
+
+  if (should_fill)
+    { raw_verts_f64 . clear ();
+
+      for (auto &vzft  :  verts)
+        { raw_verts_f64 . push_back (vzft.val);
+          raw_verts . push_back (as_glm (vzft.val));
+        }
+      if (raw_verts . size () > 2)
+        { raw_verts_f64 . push_back (raw_verts_f64[0]);
+          raw_verts . push_back (raw_verts[0]);
+        }
     }
   else
+    { for (auto &vzft  :  verts)
+        raw_verts . push_back (as_glm (vzft.val));
+      if (should_close  &&  raw_verts . size () > 2)
+        raw_verts . push_back (raw_verts[0]);
+    }
+}
+
+
+void PolygonRenderable::SpankularlyTesselate ()
+{ // do we need to check if this next is necessary? or does 'spanking_time'
+  // capture all the circumstances we'd ever need?
+  PopulateRawVerts ();
+
+  if (should_fill)
     { GLUtesselator *gt = (GLUtesselator *)tessy_obj;
 
       gluTessProperty (gt, GLU_TESS_BOUNDARY_ONLY, GL_FALSE);
@@ -149,16 +168,13 @@ void PolygonRenderable::SpankularlyTesselate ()
       gluTessCallback (gt, GLU_TESS_ERROR_DATA,
                        reinterpret_cast <GLUCB> (&PRErrorCB));
 
-      raw_verts . clear ();
       tessd_verts . clear ();
       gluTessBeginPolygon (gt, this);
       gluTessBeginContour (gt);
-      for (auto &it  :  verts)
-        { raw_verts . push_back (as_glm (it.val));
-          gluTessVertex (gt, &it.val.x,  &it.val.x);
+      for (auto &vrt  :  raw_verts_f64)
+        { // hm...
+          gluTessVertex (gt, &vrt.x,  &vrt.x);
         }
-      if (raw_verts . size ()  >  2)
-        raw_verts . push_back (raw_verts[0]);
       gluTessEndContour (gt);
       gluTessEndPolygon (gt);
 
@@ -166,10 +182,8 @@ void PolygonRenderable::SpankularlyTesselate ()
 
       if (! bgfx::isValid (fill_vbuf))
         return;
-    }
 
-  if (should_fill)
-    { const bgfx::Memory *memmy
+      const bgfx::Memory *memmy
         = bgfx::copy (tessd_verts . data (),
                       ts_vrt_cnt * sizeof (glm::vec3));
       bgfx::update (fill_vbuf, 0, memmy);
