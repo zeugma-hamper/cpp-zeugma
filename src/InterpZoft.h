@@ -23,7 +23,7 @@ class InterpZoft  :  public ZoftThing <T>
         f64 interp_time;
         InterpFuncs::INTERP_FUNC interp_funq;
         f64 start_time, recent_time;
-        bool natal;
+        bool natal, replete;
 
         ZGuts ()
            :  ZoftThing<TT>::template ZGuts<TT> (),
@@ -70,6 +70,7 @@ class InterpZoft  :  public ZoftThing <T>
 
         void Commence ()
           { natal = true;
+            replete = false;
             recent_time = 0.0;
             start_time = Zoft::zeit . CurTime ();
           }
@@ -103,6 +104,7 @@ class InterpZoft  :  public ZoftThing <T>
               }
             if (recent_time  >=  interp_time)
               { this -> PuppeteerHosts (pnt_b.val);
+                replete = true;  // use this to short-circuit next inhale?
                 return 0;
               }
             recent_time = thyme - start_time;
@@ -142,6 +144,12 @@ class InterpZoft  :  public ZoftThing <T>
 
   InterpZoft &operator = (const T &v)
     { ZoftThing<T>::Set (v);  return *this; }
+
+  bool Replete ()
+    { if (GutsTyp *g = GutsIfOrigType ())
+        return g->replete;
+      return false;
+    }
 
   bool Commence ()
     { if (GutsTyp *g = GutsIfOrigType ())

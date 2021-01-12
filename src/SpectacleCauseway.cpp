@@ -20,7 +20,7 @@ void SpectacleCauseway::AppendSwath (Swath *sw)
   meander . push_back (sw);
 }
 
-Swath *SpectacleCauseway::SwathFor (PlatonicMaes *ma)
+Swath *SpectacleCauseway::SwathFor (const PlatonicMaes *ma)
 { for (Swath *sw  :  meander)
     if (sw  &&  ma == sw->supporting_maes)
       return sw;

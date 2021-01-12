@@ -8,6 +8,8 @@
 #include "Node.hpp"
 #include "InterpZoft.h"
 
+#include "OeuvreAfterlife.h"
+
 #include <string>
 #include <vector>
 
@@ -71,6 +73,8 @@ struct Tamglobals
   Node *tablecloth = NULL;
   Node *conveyor = NULL;
   Node *windshield = NULL;
+
+  OeuvreAfterlife *valhalla = NULL;
 
   std::vector <Node *> construction_marks;
   InterpColor construction_marks_color;

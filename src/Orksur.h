@@ -18,6 +18,8 @@
 #include "AudioMessenger.hpp"
 #include "Jigglegon.h"
 
+#include "tamparams.h"
+
 #include <map>
 #include <unordered_map>
 
@@ -51,6 +53,7 @@ class Orksur  :  public PlatonicMaes, public Node,
   PlatonicMaes *associated_wallmaes;
   i64 ascension_phase;
   Alignifer *ascending_collage;
+  OeuvreAfterlife *valhalla;
   std::vector <Ticato *> players;
   std::vector <Ticato *> inchoates;
   std::unordered_map <std::string, Splort *> splorts;
@@ -61,12 +64,24 @@ class Orksur  :  public PlatonicMaes, public Node,
   std::map <u64, Ticato *> awaiting_audio_sooth;
   Ticato *sel_atom;
 
+  InterpVect asc_table_slide;
+  InterpVect asc_first_rise;
+  InterpVect asc_perf_bloat;
+  MotherTime asc_perf_zeit;
+  InterpVect asc_final_rise;
+
   static std::vector <Jigglegon *> fallow_jigs;
 //  static std::vector <Jigglegon *> active_jigs;
 
   Orksur (const PlatonicMaes &ma);
 
 //  Splort *NewSplort (f64 rad, i64 num_verts = 6)  const;
+
+  OeuvreAfterlife *RetrieveValhalla ()
+    { if (! valhalla)
+        valhalla = Tamglobals::Only ()->valhalla;
+      return valhalla;
+    }
 
   stringy_list CollageAtomsNameList ();
 
@@ -75,6 +90,7 @@ class Orksur  :  public PlatonicMaes, public Node,
 
   bool CurrentlyAscending ()
     { return (ascension_phase  >=  0); }
+  void ConcludeAscension ();
   bool AscensionPhaseJustNowDone ();
   void EffectNextAscensionPhase ();
 

@@ -43,7 +43,7 @@ class SpectacleCauseway  :  public Zeubject,
   SpectacleCauseway ();
 
   void AppendSwath (Swath *sw);
-  Swath *SwathFor (PlatonicMaes *ma);
+  Swath *SwathFor (const PlatonicMaes *ma);
 
   Node *AmokField ()
     { return amok_field; }

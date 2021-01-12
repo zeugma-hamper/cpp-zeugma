@@ -28,8 +28,9 @@ struct Plane
 struct Segment
 { Vect pt1;
   Vect pt2;
-  f64 Length ()  const
-    { return pt1 . DistFrom (pt2); }
+  f64  Length ()    const  { return pt1 . DistFrom (pt2); }
+  Vect Midpoint ()  const  { return 0.5 * (pt1 + pt2); }
+  Vect SpanVect ()  const  { return pt2 - pt1; }
 };
 
 struct Line
@@ -56,6 +57,9 @@ struct Ray
     { return (dir . AutoDot ()  >  0.0005); }
 };
 
+
+Vect PointOntoPlaneProjection (const Vect &pnt,
+                               const Vect &cnt, const Vect &nrm);
 
 bool RayPlaneIntersection (const Vect &frm, const Vect &aim,
                            const Vect &pnt, const Vect &nrm,

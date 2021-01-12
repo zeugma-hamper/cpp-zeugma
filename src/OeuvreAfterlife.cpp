@@ -4,6 +4,8 @@
 #include "ScGrappler.h"
 #include "TrGrappler.h"
 
+#include "tamparams.h"
+
 
 using namespace charm;
 

@@ -14,8 +14,6 @@
 #include "ScaleZoft.h"
 #include "SinuZoft.h"
 
-#include "tamparams.h"
-
 #include <vector>
 
 

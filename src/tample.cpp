@@ -757,6 +757,7 @@ int main (int ac, char **av)
 
   OeuvreAfterlife *ova = new OeuvreAfterlife;
   tamp.vreaft = ch_ptr <OeuvreAfterlife> (ova);
+  Tamglobals::Only ()->valhalla = ova;
   ova -> SetAmokField (g_wallpaper);
   ova->underlying_maeses . push_back (frnt);
   ova->underlying_maeses . push_back (left);
@@ -808,18 +809,6 @@ std::vector <std::string>  collanomer {
    { std::string path = "/opt/trelopro/tamper/demo-temp/fin-col/" + nm;
      ova -> AppendCollage (new Ollag (path));
    }
-/*
-  ova -> AppendCollage (new Ollag
-    ("/opt/trelopro/tamper/demo-temp/fin-col/Collage5a-blk-half.mp4"));
-  ova -> AppendCollage (new Ollag
-    ("/opt/trelopro/tamper/demo-temp/fin-col/Collage5a-cyan-half.mp4"));
-  ova -> AppendCollage (new Ollag
-    ("/opt/trelopro/tamper/demo-temp/fin-col/collage06-half-cyan.mp4"));
-  ova -> AppendCollage (new Ollag
-    ("/opt/trelopro/tamper/demo-temp/fin-col/collage06_Half-GrayRnd.mp4"));
-  ova -> AppendCollage (new Ollag
-    ("/opt/trelopro/tamper/demo-temp/fin-col/Collage02b_Half-Gry-rnd.mp4"));
-*/
   ova -> DistributeCollagesEquitably ();
 
   Node *wframe_node = new Node (lpr);

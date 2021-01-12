@@ -1,6 +1,8 @@
 
 #include "Orksur.h"
 
+#include "OeuvreAfterlife.h"
+
 #include "SinuZoft.h"
 
 #include "ZeUUID.h"
@@ -25,6 +27,7 @@ Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
                                             associated_wallmaes (NULL),
                                             ascension_phase (-1),
                                             ascending_collage (NULL),
+                                            valhalla (NULL),
                                             sentient_dist (200.0),
                                             contact_dist (25.0)
 { AppendChild (assembly);
@@ -34,6 +37,8 @@ Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
                                        - ma . Height ()) * ma . Up ());
   soncho -> Furl ();
   soncho->contact_dist = this->contact_dist;
+
+  RetrieveValhalla ();
 }
 
 
@@ -120,26 +125,111 @@ void Orksur::EffectAscension ()
 }
 
 
+void Orksur::ConcludeAscension ()
+{ RemoveChild (ascending_collage);
+  ascending_collage = NULL;
+  ascension_phase = -1;
+}
+
+
 bool Orksur::AscensionPhaseJustNowDone ()
-{
+{ switch (ascension_phase)
+    { case 0:
+        return asc_table_slide . Replete ();
+      case 1:
+        return asc_first_rise . Replete ();
+      case 2:
+        return asc_perf_bloat . Replete ();
+      case 3:
+        return (asc_perf_zeit . CurTime ()  >  3.0);
+      case 4:
+        return asc_perf_bloat . Replete ();
+      case 5:
+        return asc_final_rise . Replete ();
+      default:
+        break;
+    }
+
   return false;
 }
 
 
 void Orksur::EffectNextAscensionPhase ()
-{
+{ ++ascension_phase;
   switch (ascension_phase)
-    { case -1:
-        { LoopVect floob (Loc (), 30.0 * Up (), 15.51);
-          ascending_collage -> InstallLocGrapplerZoft (floob);
+    { case 0:
+        { asc_table_slide . SetHard (Loc ());
+          asc_table_slide . Set (Loc () + Height () * Up ());
+          asc_table_slide . SetInterpTime (4.04);
+          asc_table_slide . SetInterpFunc (InterpFuncs::ASYMP_A);
+          ascending_collage -> InstallLocGrapplerZoft (asc_table_slide);
           ascending_collage -> AlignToMaes (this);
           AppendChild (ascending_collage);
-          ascension_phase = 0;
           break;
         }
-      case 0:
-        fprintf (stderr, "WHAMMO!\nWHAMMO!\nWHAMMO!\nWHAMMO!\n");
-        break;
+
+      case 1:
+        { const PlatonicMaes *ma = associated_wallmaes;
+          ascending_collage -> AlignToMaes (ma);
+          ascending_collage -> ScaleZoft ()
+            . SetHard (2.5 * ascending_collage -> CurScale ());
+          Node *amok = RetrieveValhalla () -> AmokField ();
+          amok -> AppendChild (ascending_collage);
+          ascending_collage -> InstallLocGrapplerZoft (asc_first_rise);
+          Vect tabtop = Loc () + 0.5 * Height () * Up ();
+          Vect wallstart
+            = G::PointOntoPlaneProjection (tabtop, ma -> Loc (), ma -> Norm ());
+          asc_first_rise . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
+          asc_first_rise . SetInterpTime (5.05);
+          asc_first_rise . SetHard (wallstart);
+          asc_first_rise . Set (ma -> Loc ()
+                                +  0.5 * ma -> Height () * ma -> Up ());
+          break;
+       }
+
+      case 2:
+        { Vect s = ascending_collage -> CurScale ();
+          asc_perf_bloat . SetHard (Vect (s));
+          asc_perf_bloat . Set (s * 1.75);
+          asc_perf_bloat . SetInterpTime (2.0);
+          asc_perf_bloat . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
+          ascending_collage -> InstallScaleGrapplerZoft (asc_perf_bloat);
+          break;
+        }
+
+      case 3:
+        { asc_perf_zeit . ZeroTime ();
+          // and trigger whatever 'performance' bits there may be...
+          break;
+        }
+
+      case 4:
+        { Vect s = ascending_collage -> CurScale ();
+          asc_perf_bloat . Set (s / 1.75);
+          asc_perf_bloat . SetInterpTime (1.5);
+          break;
+        }
+
+      case 5:
+        { const PlatonicMaes *ma = associated_wallmaes;
+          Swath *sw = RetrieveValhalla () -> SwathFor (ma);
+          asc_final_rise . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
+          asc_final_rise . SetInterpTime (6.06);
+          asc_final_rise . SetHard (ascending_collage -> CurLoc ());
+          Vect term = sw->plumb . Midpoint () +  0.5 * sw->prone . SpanVect ();
+          asc_final_rise . Set (term);
+          Vect s = ascending_collage -> CurScale ();
+          asc_perf_bloat . SetInterpTime (6.06);
+          asc_perf_bloat . Set (0.75 * s);
+          ascending_collage -> InstallLocGrapplerZoft (asc_final_rise);
+          break;
+        }
+
+      case 6:
+        { fprintf (stderr, "WHAMMO!\nWHAMMO!\nWHAMMO!\nWHAMMO!\n");
+            ConcludeAscension ();
+        }
+
       default:
         break;
     }
@@ -156,7 +246,7 @@ Jigglegon *Orksur::FurnishFreeJiggler ()
       fallow_jigs . pop_back ();
     }
 
-//  active_jigs . push_back (jig);
+  //  active_jigs . push_back (jig);
   return jig;
 }
 
@@ -173,7 +263,7 @@ void Orksur::ReturnJigglerToShelf (Jigglegon *jig)
   if (Node *par = jig -> Parent ())
     par -> ExciseChild (jig);
   fallow_jigs . push_back (jig);
-//  active_jigs . pop_back ();
+  //  active_jigs . pop_back ();
 }
 
 
@@ -329,7 +419,7 @@ void Orksur::DisposeOfCollage ()
   for (Ticato *tic  :  players)
     { f64 ang = 2.0 * (drand48 () - 0.5) * halfang;
       f64 spd = Tamparams::Current ()->disposal_speed_threshold
-         * (1.0 + drand48 ());
+        * (1.0 + drand48 ());
       tic->shov_vel = spd * (cos (ang) * u  +  sin (ang) * o);
     }
 }
@@ -460,7 +550,7 @@ i64 Orksur::ZESpatialMove (ZESpatialMoveEvent *e)
   const Vect &p = e -> Loc ();
   f64 tt = n . Dot (p - loc);
   Vect proj = p  -  tt * n;
-//  tt = fabs (tt);
+  //  tt = fabs (tt);
 
   // constrain to some reasonable laterally-bounded airspace o'er the table
   if (! G::PointRectContainment (proj, Loc (), Over (), Up (),
@@ -471,7 +561,7 @@ i64 Orksur::ZESpatialMove (ZESpatialMoveEvent *e)
 
   auto heff = hoverees . find (prv);
   auto geff = graspees . find (prv);
-assert (heff == hoverees . end ()  ||  geff == graspees . end ());
+  assert (heff == hoverees . end ()  ||  geff == graspees . end ());
 
   i64 sponse;
   // we'll give the sonochoosist first dibs
@@ -483,7 +573,7 @@ assert (heff == hoverees . end ()  ||  geff == graspees . end ());
     { Vect newp = proj + geff->second.gropoff;
       f64 dt = GraphicsApplication::GetFrameTime () -> GetCurrentDelta ();
       geff->second.tic->shov_vel
-= Vect::zerov;
+        = Vect::zerov;
       geff->second.tic -> LocZoft () . Set (newp);
       return 1;
     }
@@ -498,7 +588,7 @@ assert (heff == hoverees . end ()  ||  geff == graspees . end ());
       heff->second.tic = ca;
     }
 
-//  DistinguishManipulees ();
+  //  DistinguishManipulees ();
   return 0;
 }
 
@@ -566,14 +656,14 @@ i64 Orksur::ZESpatialSoften (ZESpatialSoftenEvent *e)
   graspees . erase (geff);
   geff->second.tic->interp_adjc . Set (ZeColor (1.0, 1.0));
   AtomicFinalGutter (geff->second.tic);
-/*
-  if (ca->shov_vel . Mag ()
-      >=  Tamparams::Current ()->disposal_speed_threshold)
+  /*
+    if (ca->shov_vel . Mag ()
+    >=  Tamparams::Current ()->disposal_speed_threshold)
     { fprintf (stderr, "PREYZDE LAWD -- <%p> gon' scoot to die!", ca);
-      // and but then as well... what.
-// QQQ ca->shov_vel = Vect::zerov;
+    // and but then as well... what.
+    // QQQ ca->shov_vel = Vect::zerov;
     }
-*/
+  */
   return 0;
 }
 
@@ -677,14 +767,14 @@ i64 Orksur::TASSuggestion (TASSuggestionEvent *e)
   awaiting_audio_sooth . erase (awaiter);
 
   stringy_list suggs = e -> GetSuggestionNames ();
-fprintf (stderr, "WEEEEELLLLLP. Just got %d audio suggestions:\n",suggs.size());
-for (auto &ess  :  suggs)
-fprintf(stderr,"\"%s\", ", ess.c_str ());
-fprintf(stderr,"\n");
+  fprintf (stderr, "WEEEEELLLLLP. Just got %d audio suggestions:\n",suggs.size());
+  for (auto &ess  :  suggs)
+    fprintf(stderr,"\"%s\", ", ess.c_str ());
+  fprintf(stderr,"\n");
   if (! tic)
     return -1;
   tic->sono_options = suggs;
-// and presumably quite a bit more action...
+  // and presumably quite a bit more action...
   // if (AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes)
   //   if (suggs . size ()  >  0)
   //     { i32 ind = drand48 () * suggs . size ();
@@ -698,7 +788,8 @@ fprintf(stderr,"\n");
 
 i64 Orksur::Inhale (i64 ratch, f64 thyme)
 { if (CurrentlyAscending ())
-    {
+    { if (AscensionPhaseJustNowDone ())
+        EffectNextAscensionPhase ();
     }
 
   std::vector <Ticato *> *mort = NULL;

@@ -5,6 +5,14 @@
 namespace charm  {
 
 
+Vect G::PointOntoPlaneProjection (const Vect &pnt,
+                                  const Vect &cnt, const Vect &nrm)
+{ Vect n = nrm . Norm ();
+  Vect proj = pnt  -  (pnt - cnt) . Dot (n) * n;
+  return proj;
+}
+
+
 bool G::RayPlaneIntersection (const Vect &frm, const Vect &aim,
                               const Vect &pnt, const Vect &nrm,
                               Vect *hit_pnt)
