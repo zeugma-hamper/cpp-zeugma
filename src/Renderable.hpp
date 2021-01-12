@@ -35,6 +35,7 @@ class Renderable
   void SetOver (const Vect &o);
   void SetUp (const Vect &u);
   void SetAdjColor (const ZeColor &c);
+  void SetAdjColor (const ZoftColor &zc);
 
   ZoftVect &OverZoft ();
   ZoftVect &UpZoft ();
@@ -59,6 +60,7 @@ class Renderable
   ZoftVect m_over;
   ZoftVect m_up;
   ZoftColor m_adjc;
+  ZeColor m_cumu_adjc;
   sort_key m_sort_key;
   graph_id m_graph_id;
   bool m_should_draw;

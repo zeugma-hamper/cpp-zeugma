@@ -1,6 +1,9 @@
+
 #include "Renderable.hpp"
 
+
 namespace charm {
+
 
 Renderable::Renderable ()
   : Renderable {nullptr}
@@ -13,7 +16,7 @@ Renderable::Renderable (Node *_node)
     m_sort_key {0u},
     m_graph_id {0u},
     m_should_draw {true}
-{}
+{ }
 
 Renderable::~Renderable ()
 { }
@@ -37,6 +40,9 @@ void Renderable::SetUp (const Vect &u)
 
 void Renderable::SetAdjColor (const ZeColor &c)
 { m_adjc = c; }
+
+void Renderable::SetAdjColor (const ZoftColor &zc)
+{ m_adjc . BecomeLike (zc); }
 
 
 ZoftVect &Renderable::OverZoft ()
@@ -78,5 +84,5 @@ void Renderable::SetGraphID (graph_id _id)
   m_graph_id = _id;
 }
 
-}
 
+}

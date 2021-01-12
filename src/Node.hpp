@@ -53,6 +53,11 @@ class Node
   template<typename Functor>
    void VisitDepthFirst (Functor &&_func);
 
+  const ZeColor &AdjColor ()  const;
+  void SetAdjColor (const ZeColor &c);
+  void SetAdjColor (const ZoftColor &zc);
+  ZoftColor &AdjColorZoft ();
+
   Transformation const &GetAbsoluteTransformation () const;
 
   void SetLocalTransformation (Transformation const &_local);
@@ -160,6 +165,9 @@ class Node
 
   std::vector<Node *>       m_children;
   std::vector<Renderable *> m_renderables;
+
+  ZoftColor m_adjc;
+  ZeColor m_cumu_adjc;
 
   Transformation m_local_tx;
   Transformation m_absolute_tx;

@@ -683,7 +683,7 @@ int main (int ac, char **av)
 
   tamp.gchin = ch_ptr <GraumanPalace> (grau_chin);
 
-
+/*
   Node *splat = new Node;
   PolygonRenderable *polysplat = new PolygonRenderable;
   i64 nv = 14;
@@ -704,7 +704,9 @@ int main (int ac, char **av)
 //  polysplat -> SetShouldFill (false);
 //  polysplat -> SetShouldClose (false);
   g_windshield -> AppendChild (splat);
+*/
 
+/*
   splat = new Node (polysplat = new PolygonRenderable);
   f64 jiglet = 0.025 * frnt -> Height ();
   SinuVect jigamp (Vect (jiglet, jiglet, 0.0), 0.2975);
@@ -723,7 +725,9 @@ int main (int ac, char **av)
   polysplat -> SetEdgeColor (ZeColor (1.0, 0.25));
   polysplat -> SetShouldFill (false);
 //  g_windshield -> AppendChild (splat);
+*/
 
+/*
   TextureParticulars tipi
     = CreateTexture2D ("/tmp/SIGN.jpg", DefaultTextureFlags);
   TexturedRenderable *texre = new TexturedRenderable (tipi);
@@ -733,6 +737,7 @@ int main (int ac, char **av)
   texno -> Scale (1300.0);
   texno -> Translate (frnt -> Loc ());
 //  g_wallpaper -> AppendChild (texno);
+*/
 
   InterpColor atmbb_wall_col (ZeColor (0.0, 0.0), ZeColor (0.5, 0.5), 0.4);
   InterpColor atmbb_tabl_col (ZeColor (0.0, 0.0), ZeColor (0.5, 0.5), 0.4);
@@ -761,6 +766,10 @@ int main (int ac, char **av)
   ova -> SetAmokField (g_wallpaper);
   ova->underlying_maeses . push_back (frnt);
   ova->underlying_maeses . push_back (left);
+
+
+  // g_wallpaper -> SetAdjColor (SinuZoft (ZeColor (0.0, 0.0, 0.5, 0.3), 0.16,
+  //                                       ZeColor (1.0, 1.0, 0.0, 0.3)));
 
   LinePileRenderable *lpr = new LinePileRenderable;
   InterpColor constru_col ((SinuColor (ZeColor (0.2, 0.2), 0.25,

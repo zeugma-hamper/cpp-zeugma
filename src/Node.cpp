@@ -82,9 +82,30 @@ void Node::UpdateTransformsHierarchically (Transformation const &_parent,
 
   size_t const child_count = m_children.size ();
   for (size_t i = 0u; i < child_count; ++i)
-    m_children[i] -> UpdateTransformsHierarchically (m_absolute_tx, needs_update,
-                                                     ratch, thyme);
+    { Node *nd = m_children[i];
+      nd -> UpdateTransformsHierarchically (m_absolute_tx, needs_update,
+                                            ratch, thyme);
+      nd->m_cumu_adjc . Set (m_cumu_adjc * nd->m_adjc.val);
+    }
+
+  for (Renderable *re  :  m_renderables)
+    if (re)
+      re->m_cumu_adjc . Set (m_cumu_adjc * re->m_adjc.val);
 }
+
+
+const ZeColor &Node::AdjColor ()  const
+{ return m_adjc.val; }
+
+void Node::SetAdjColor (const ZeColor &c)
+{ m_adjc . Set (c); }
+
+void Node::SetAdjColor (const ZoftColor &zc)
+{ m_adjc . BecomeLike (zc); }
+
+ZoftColor &Node::AdjColorZoft ()
+{ return m_adjc; }
+
 
 Transformation const &Node::GetAbsoluteTransformation () const
 {

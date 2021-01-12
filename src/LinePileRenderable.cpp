@@ -69,7 +69,7 @@ void LinePileRenderable::Draw (u16 vyu_id)
                                             BGFX_STATE_BLEND_INV_SRC_ALPHA));
 //                  |  BGFX_STATE_WRITE_Z);
 
-  ZeColor use_col = m_adjc.val * lines_iro.val;
+  ZeColor use_col = m_cumu_adjc * lines_iro.val;
   bgfx::setUniform (unif_linesc, glm::value_ptr (as_glm (use_col)));
 
   bgfx::submit (vyu_id, shad_prog, m_graph_id);

@@ -80,7 +80,7 @@ void TexturedRenderable::Draw (u16 _view_id)
   glm::vec4 const wh = glm::vec4 (f32 (m_particulars.width),
                                   f32 (m_particulars.height),
                                   1.0f, 1.0f);
-  glm::vec4 const ac = as_glm (m_adjc.val);
+  glm::vec4 const ac = as_glm (m_cumu_adjc);
 
   bgfx::setUniform (m_uni_over, &over);
   bgfx::setUniform (m_uni_up, &up);
