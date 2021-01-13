@@ -515,6 +515,7 @@ int main (int ac, char **av)
     return -1;
 
   Tamparams::UpdateViaTOMLFile ("../configs/seasonings.toml");
+fprintf(stderr,"harumph: <%s>\n", Tamparams::Current ()->asc_table_slide_audio.c_str());
 
   AudioMessenger *a_mess = new AudioMessenger (aud_host, aud_port);
   Tamglobals::Only ()->sono_hermes = a_mess;

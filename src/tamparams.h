@@ -62,6 +62,17 @@ struct Tamparams
   f64 asc_after_preso_hold_time = 0.5;
   f64 asc_ensvelten_time = 1.5;
   f64 asc_second_rise_time = 6.06;
+  f64 asc_enter_heaven_time = 0.0;
+
+  std::string asc_table_slide_audio = "";
+  std::string asc_first_rise_audio = "";
+  std::string asc_enbloaten_audio = "";
+  std::string asc_before_preso_hold_audio = "";
+  std::string asc_presentation_audio = "";
+  std::string asc_after_preso_hold_audio = "";
+  std::string asc_ensvelten_audio = "";
+  std::string asc_second_rise_audio = "";
+  std::string asc_enter_heaven_audio = "";
 
 
   static Tamparams ur_params;

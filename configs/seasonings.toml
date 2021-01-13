@@ -8,3 +8,14 @@ asc-presentation-time = 3.0
 asc-after-preso-hold-time = 0.5
 asc-ensvelten-time = 1.5
 asc-second-rise-time = 6.06
+asc-enter-heaven-time = 0.0
+
+asc-table-slide-audio = "Tamper_Boop101.wav"
+asc-first-rise-audio = "nihil1"
+asc-enbloaten-audio = "nihil2"
+asc-before-preso-hold-audio = "nihil3"
+asc-presentation-audio = "nihil4"
+asc-after-preso-hold-audio = "nihil5"
+asc-ensvelten-audio = "nihil6"
+asc-second-rise-audio = "nihil7"
+asc-enter-heaven-audio = "nihil8"

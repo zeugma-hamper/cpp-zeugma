@@ -134,7 +134,8 @@ void Orksur::ConcludeAscension ()
 
 
 bool Orksur::AscensionPhaseJustNowDone ()
-{ switch (ascension_phase)
+{ Tamparams *tam = Tamparams::Current ();
+  switch (ascension_phase)
     { case ASCPH_TABLE_SLIDE:
         return asc_table_slide . Replete ();
 
@@ -146,15 +147,15 @@ bool Orksur::AscensionPhaseJustNowDone ()
 
       case ASCPH_BEFORE_PRESO:
         return (asc_hold_zeit . CurTime ()
-                >  Tamparams::Current ()->asc_before_preso_hold_time);
+                >  tam->asc_before_preso_hold_time);
 
       case ASCPH_PRESENTATION:
         return (asc_perf_zeit . CurTime ()
-                >  Tamparams::Current ()->asc_presentation_time);
+                >  tam->asc_presentation_time);
 
       case ASCPH_AFTER_PRESO:
         return (asc_hold_zeit . CurTime ()
-                >  Tamparams::Current ()->asc_after_preso_hold_time);
+                >  tam->asc_after_preso_hold_time);
 
       case ASCPH_ENSVELTEN:
         return asc_perf_bloat . Replete ();
@@ -171,17 +172,24 @@ bool Orksur::AscensionPhaseJustNowDone ()
 
 
 void Orksur::EffectNextAscensionPhase ()
-{ ++ascension_phase;
+{ Tamparams *tam = Tamparams::Current ();
+  AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes;
+
+  ++ascension_phase;
   switch (ascension_phase)
     { case ASCPH_TABLE_SLIDE:
         { asc_table_slide . SetHard (Loc ());
           asc_table_slide . Set (Loc () + Height () * Up ());
           asc_table_slide . SetInterpTime
-            (Tamparams::Current ()->asc_table_slide_time);
+            (tam->asc_table_slide_time);
           asc_table_slide . SetInterpFunc (InterpFuncs::ASYMP_A);
           ascending_collage -> InstallLocGrapplerZoft (asc_table_slide);
           ascending_collage -> AlignToMaes (this);
           AppendChild (ascending_collage);
+          if (sherm)
+            { i64 moid = ZeMonotonicID ();
+              sherm -> SendPlaySound (tam->asc_table_slide_audio, moid);
+            }
           break;
         }
 
@@ -198,10 +206,14 @@ void Orksur::EffectNextAscensionPhase ()
             = G::PointOntoPlaneProjection (tabtop, ma -> Loc (), ma -> Norm ());
           asc_first_rise . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
           asc_first_rise . SetInterpTime
-            (Tamparams::Current ()->asc_first_rise_time);
+            (tam->asc_first_rise_time);
           asc_first_rise . SetHard (wallstart);
           asc_first_rise . Set (ma -> Loc ()
                                 +  0.5 * ma -> Height () * ma -> Up ());
+          if (sherm)
+            { i64 moid = ZeMonotonicID ();
+              sherm -> SendPlaySound (tam->asc_first_rise_audio, moid);
+            }
           break;
        }
 
@@ -210,25 +222,41 @@ void Orksur::EffectNextAscensionPhase ()
           asc_perf_bloat . SetHard (Vect (s));
           asc_perf_bloat . Set (s * 1.75);
           asc_perf_bloat . SetInterpTime
-            (Tamparams::Current ()->asc_enbloaten_time);
+            (tam->asc_enbloaten_time);
           asc_perf_bloat . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
           ascending_collage -> InstallScaleGrapplerZoft (asc_perf_bloat);
+          if (sherm)
+            { i64 moid = ZeMonotonicID ();
+              sherm -> SendPlaySound (tam->asc_enbloaten_audio, moid);
+            }
           break;
         }
 
       case ASCPH_BEFORE_PRESO:
         { asc_hold_zeit . ZeroTime ();
+          if (sherm)
+            { i64 moid = ZeMonotonicID ();
+              sherm -> SendPlaySound (tam->asc_before_preso_hold_audio, moid);
+            }
           break;
         }
 
       case ASCPH_PRESENTATION:
         { asc_perf_zeit . ZeroTime ();
           // and trigger whatever 'performance' bits there may be...
+          if (sherm)
+            { i64 moid = ZeMonotonicID ();
+              sherm -> SendPlaySound (tam->asc_presentation_audio, moid);
+            }
           break;
         }
 
       case ASCPH_AFTER_PRESO:
         { asc_hold_zeit . ZeroTime ();
+          if (sherm)
+            { i64 moid = ZeMonotonicID ();
+              sherm -> SendPlaySound (tam->asc_after_preso_hold_audio, moid);
+            }
           break;
         }
 
@@ -236,7 +264,11 @@ void Orksur::EffectNextAscensionPhase ()
         { Vect s = ascending_collage -> CurScale ();
           asc_perf_bloat . Set (s / 1.75);
           asc_perf_bloat . SetInterpTime
-            (Tamparams::Current ()->asc_ensvelten_time);
+            (tam->asc_ensvelten_time);
+          if (sherm)
+            { i64 moid = ZeMonotonicID ();
+              sherm -> SendPlaySound (tam->asc_ensvelten_audio, moid);
+            }
           break;
         }
 
@@ -245,7 +277,7 @@ void Orksur::EffectNextAscensionPhase ()
           Swath *sw = RetrieveValhalla () -> SwathFor (ma);
           asc_final_rise . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
           asc_final_rise . SetInterpTime
-            (Tamparams::Current ()->asc_second_rise_time);
+            (tam->asc_second_rise_time);
           asc_final_rise . SetHard (ascending_collage -> CurLoc ());
           Vect term = sw->plumb . Midpoint () +  0.5 * sw->prone . SpanVect ();
           asc_final_rise . Set (term);
@@ -253,16 +285,26 @@ void Orksur::EffectNextAscensionPhase ()
           asc_perf_bloat . SetInterpTime (6.06);
           asc_perf_bloat . Set (0.75 * s);
           ascending_collage -> InstallLocGrapplerZoft (asc_final_rise);
+          if (sherm)
+            { i64 moid = ZeMonotonicID ();
+              sherm -> SendPlaySound (tam->asc_second_rise_audio, moid);
+            }
           break;
         }
 
       case ASCPH_ENTER_HEAVEN:
-        { fprintf (stderr, "WHAMMO!\nWHAMMO!\nWHAMMO!\nWHAMMO!\n");
-            ConcludeAscension ();
+        { if (sherm)
+            { i64 moid = ZeMonotonicID ();
+              sherm -> SendPlaySound (tam->asc_enter_heaven_audio, moid);
+            }
+          ConcludeAscension ();
+          break;
         }
 
       default:
-        break;
+        { fprintf (stderr, "WHAMMO!\nWHAMMO!\nWHAMMO!\nWHAMMO!\n");
+          break;
+        }
     }
 }
 
