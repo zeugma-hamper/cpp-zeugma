@@ -126,7 +126,8 @@ void Orksur::EffectAscension ()
 
 
 void Orksur::ConcludeAscension ()
-{ RemoveChild (ascending_collage);
+{ if (Node *amok = RetrieveValhalla () -> AmokField ())
+    amok -> RemoveChild (ascending_collage);
   ascending_collage = NULL;
   ascension_phase = -1;
 }

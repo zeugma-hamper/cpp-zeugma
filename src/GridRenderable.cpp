@@ -77,6 +77,7 @@ void GridRenderable::Draw (u16 vyu_id)
   bgfx::setTransform (&(m_node -> GetAbsoluteTransformation ().model));
   bgfx::setVertexBuffer (0, vbuf, 0, 4);
   bgfx::setState (BGFX_STATE_WRITE_RGB
+                  |  BGFX_STATE_WRITE_A
                   |  BGFX_STATE_PT_TRISTRIP
                   |  BGFX_STATE_BLEND_FUNC (BGFX_STATE_BLEND_SRC_ALPHA,
                                             BGFX_STATE_BLEND_INV_SRC_ALPHA));

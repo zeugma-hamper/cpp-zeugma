@@ -628,6 +628,24 @@ int main (int ac, char **av)
       c -> LocZoft () = frnt -> Loc ();
     }
 
+GridRenderable *griddy = new GridRenderable;
+Node *gridno = new Node (griddy);
+griddy -> SetCenter (tabl -> Loc ());
+griddy -> SetOver (tabl -> Over ());
+griddy -> SetUp (tabl -> Up ());
+griddy -> SetWidth (/*0.5 * */tabl -> Width ());
+griddy -> SetHeight (/*0.5 * */tabl -> Height ());
+griddy -> SetWarp (0.025 * tabl -> Over ());
+griddy -> SetWeft (0.025 * tabl -> Up ());
+/*
+griddy -> SetDiscRadius (220.0);
+griddy -> SetDiscCenter (tabl -> Loc () + 150.0 * tabl -> Up ()
+                         + 50.0 * tabl -> Norm ());
+griddy -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
+*/
+griddy -> SetGridColor (ZeColor (1.0, 1.0, 1.0, 0.1));
+g_tablecloth -> AppendChild (gridno);
+
   Orksur *orkp = new Orksur (*tabl);
   tamp.orksu = ch_ptr <Orksur> (orkp);
   orkp->associated_wallmaes = frnt;
@@ -836,22 +854,6 @@ std::vector <std::string>  collanomer {
   AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
   AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
   AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
-
-GridRenderable *griddy = new GridRenderable;
-Node *gridno = new Node (griddy);
-griddy -> SetCenter (tabl -> Loc ());
-griddy -> SetOver (tabl -> Over ());
-griddy -> SetUp (tabl -> Up ());
-griddy -> SetWidth (0.5 * tabl -> Width ());
-griddy -> SetHeight (0.5 * tabl -> Height ());
-griddy -> SetWarp (0.05 * tabl -> Over ());
-griddy -> SetWeft (0.05 * tabl -> Up ());
-griddy -> SetDiscRadius (220.0);
-griddy -> SetDiscCenter (tabl -> Loc () + 150.0 * tabl -> Up ()
-                         + 50.0 * tabl -> Norm ());
-griddy -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
-griddy -> SetGridColor (ZeColor (1.0, 0.0, 1.0, 0.5));
-g_tablecloth -> AppendChild (gridno);
 
   tamp . Run ();
 
