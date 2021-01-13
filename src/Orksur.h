@@ -39,6 +39,17 @@ struct Splort  :  Node
 };
 
 
+#define ASCPH_TABLE_SLIDE  0
+#define ASCPH_FIRST_RISE   1
+#define ASCPH_ENBLOATEN    2
+#define ASCPH_BEFORE_PRESO 3
+#define ASCPH_PRESENTATION 4
+#define ASCPH_AFTER_PRESO  5
+#define ASCPH_ENSVELTEN    6
+#define ASCPH_SECOND_RISE  7
+#define ASCPH_ENTER_HEAVEN 8
+
+
 class Orksur  :  public PlatonicMaes, public Node,
                  public ZESpatialPhagy, public ZEYowlPhagy,
                  public ZEBulletinPhagy,
@@ -67,6 +78,7 @@ class Orksur  :  public PlatonicMaes, public Node,
   InterpVect asc_table_slide;
   InterpVect asc_first_rise;
   InterpVect asc_perf_bloat;
+  MotherTime asc_hold_zeit;
   MotherTime asc_perf_zeit;
   InterpVect asc_final_rise;
 

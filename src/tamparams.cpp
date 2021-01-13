@@ -17,6 +17,23 @@ Tamparams *Tamparams::Current ()
 }
 
 
+void Tamparams::PushCopy ()
+{ Tamparams *cur_tp = Current ();
+  Tamparams *novo_tp = new Tamparams;
+  *novo_tp = *cur_tp;
+  tampa_stack . push_back (novo_tp);
+}
+
+
+void Tamparams::Pop ()
+{ if (tampa_stack . size ()  >  0)
+    { Tamparams *moribund_tp = tampa_stack . back ();
+      tampa_stack . pop_back ();
+      delete moribund_tp;
+    }
+}
+
+
 //
 /// globals, don't you know
 //

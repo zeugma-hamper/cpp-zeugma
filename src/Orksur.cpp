@@ -135,18 +135,33 @@ void Orksur::ConcludeAscension ()
 
 bool Orksur::AscensionPhaseJustNowDone ()
 { switch (ascension_phase)
-    { case 0:
+    { case ASCPH_TABLE_SLIDE:
         return asc_table_slide . Replete ();
-      case 1:
+
+      case ASCPH_FIRST_RISE:
         return asc_first_rise . Replete ();
-      case 2:
+
+      case ASCPH_ENBLOATEN:
         return asc_perf_bloat . Replete ();
-      case 3:
-        return (asc_perf_zeit . CurTime ()  >  3.0);
-      case 4:
+
+      case ASCPH_BEFORE_PRESO:
+        return (asc_hold_zeit . CurTime ()
+                >  Tamparams::Current ()->asc_before_preso_hold_time);
+
+      case ASCPH_PRESENTATION:
+        return (asc_perf_zeit . CurTime ()
+                >  Tamparams::Current ()->asc_presentation_time);
+
+      case ASCPH_AFTER_PRESO:
+        return (asc_hold_zeit . CurTime ()
+                >  Tamparams::Current ()->asc_after_preso_hold_time);
+
+      case ASCPH_ENSVELTEN:
         return asc_perf_bloat . Replete ();
-      case 5:
+
+      case ASCPH_SECOND_RISE:
         return asc_final_rise . Replete ();
+
       default:
         break;
     }
@@ -158,10 +173,11 @@ bool Orksur::AscensionPhaseJustNowDone ()
 void Orksur::EffectNextAscensionPhase ()
 { ++ascension_phase;
   switch (ascension_phase)
-    { case 0:
+    { case ASCPH_TABLE_SLIDE:
         { asc_table_slide . SetHard (Loc ());
           asc_table_slide . Set (Loc () + Height () * Up ());
-          asc_table_slide . SetInterpTime (4.04);
+          asc_table_slide . SetInterpTime
+            (Tamparams::Current ()->asc_table_slide_time);
           asc_table_slide . SetInterpFunc (InterpFuncs::ASYMP_A);
           ascending_collage -> InstallLocGrapplerZoft (asc_table_slide);
           ascending_collage -> AlignToMaes (this);
@@ -169,7 +185,7 @@ void Orksur::EffectNextAscensionPhase ()
           break;
         }
 
-      case 1:
+      case ASCPH_FIRST_RISE:
         { const PlatonicMaes *ma = associated_wallmaes;
           ascending_collage -> AlignToMaes (ma);
           ascending_collage -> ScaleZoft ()
@@ -181,41 +197,55 @@ void Orksur::EffectNextAscensionPhase ()
           Vect wallstart
             = G::PointOntoPlaneProjection (tabtop, ma -> Loc (), ma -> Norm ());
           asc_first_rise . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
-          asc_first_rise . SetInterpTime (5.05);
+          asc_first_rise . SetInterpTime
+            (Tamparams::Current ()->asc_first_rise_time);
           asc_first_rise . SetHard (wallstart);
           asc_first_rise . Set (ma -> Loc ()
                                 +  0.5 * ma -> Height () * ma -> Up ());
           break;
        }
 
-      case 2:
+      case ASCPH_ENBLOATEN:
         { Vect s = ascending_collage -> CurScale ();
           asc_perf_bloat . SetHard (Vect (s));
           asc_perf_bloat . Set (s * 1.75);
-          asc_perf_bloat . SetInterpTime (2.0);
+          asc_perf_bloat . SetInterpTime
+            (Tamparams::Current ()->asc_enbloaten_time);
           asc_perf_bloat . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
           ascending_collage -> InstallScaleGrapplerZoft (asc_perf_bloat);
           break;
         }
 
-      case 3:
+      case ASCPH_BEFORE_PRESO:
+        { asc_hold_zeit . ZeroTime ();
+          break;
+        }
+
+      case ASCPH_PRESENTATION:
         { asc_perf_zeit . ZeroTime ();
           // and trigger whatever 'performance' bits there may be...
           break;
         }
 
-      case 4:
-        { Vect s = ascending_collage -> CurScale ();
-          asc_perf_bloat . Set (s / 1.75);
-          asc_perf_bloat . SetInterpTime (1.5);
+      case ASCPH_AFTER_PRESO:
+        { asc_hold_zeit . ZeroTime ();
           break;
         }
 
-      case 5:
+      case ASCPH_ENSVELTEN:
+        { Vect s = ascending_collage -> CurScale ();
+          asc_perf_bloat . Set (s / 1.75);
+          asc_perf_bloat . SetInterpTime
+            (Tamparams::Current ()->asc_ensvelten_time);
+          break;
+        }
+
+      case ASCPH_SECOND_RISE:
         { const PlatonicMaes *ma = associated_wallmaes;
           Swath *sw = RetrieveValhalla () -> SwathFor (ma);
           asc_final_rise . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
-          asc_final_rise . SetInterpTime (6.06);
+          asc_final_rise . SetInterpTime
+            (Tamparams::Current ()->asc_second_rise_time);
           asc_final_rise . SetHard (ascending_collage -> CurLoc ());
           Vect term = sw->plumb . Midpoint () +  0.5 * sw->prone . SpanVect ();
           asc_final_rise . Set (term);
@@ -226,7 +256,7 @@ void Orksur::EffectNextAscensionPhase ()
           break;
         }
 
-      case 6:
+      case ASCPH_ENTER_HEAVEN:
         { fprintf (stderr, "WHAMMO!\nWHAMMO!\nWHAMMO!\nWHAMMO!\n");
             ConcludeAscension ();
         }
