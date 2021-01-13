@@ -8,6 +8,20 @@
 namespace charm  {
 
 
+static std::map <std::string, toml::value> toml_by_filename;
+
+
+const toml::value &LoadOrRecallTOMLByFilename (const std::string &fname)
+{ auto it = toml_by_filename . find (fname);
+  if (it  ==  toml_by_filename . end ())
+    { const toml::value tom = toml::parse (fname);
+      toml_by_filename[fname] = tom;
+      it = toml_by_filename . find (fname);
+    }
+  return it -> second;
+}
+
+
 bool VectFromTOMLThingy (const toml::value &thingy, Vect &into_v)
 { f64 x, y, z;
   try
@@ -49,20 +63,6 @@ bool Matrix44FromTOMLThingy (const toml::value &thingy, Matrix44 &into_m)
       }
   into_m . Load (mat);
   return true;
-}
-
-
-static std::map <std::string, toml::value> toml_by_filename;
-
-
-static const toml::value &LoadOrRecallTOMLByFilename (const std::string &fname)
-{ auto it = toml_by_filename . find (fname);
-  if (it  ==  toml_by_filename . end ())
-    { const toml::value tom = toml::parse (fname);
-      toml_by_filename[fname] = tom;
-      it = toml_by_filename . find (fname);
-    }
-  return it -> second;
 }
 
 

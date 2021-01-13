@@ -13,6 +13,8 @@
 namespace charm  {
 
 
+const toml::value &LoadOrRecallTOMLByFilename (const std::string &fname);
+
 bool VectFromTOMLThingy (const toml::value &thingy, Vect &into_v);
 bool Matrix44FromTOMLThingy (const toml::value &thingy, Matrix44 &into_m);
 

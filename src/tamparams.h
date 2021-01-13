@@ -57,7 +57,7 @@ struct Tamparams
   f64 asc_table_slide_time = 4.04;
   f64 asc_first_rise_time = 5.05;
   f64 asc_enbloaten_time = 2.0;
-  f64 asc_before_preso_hold_time = 5.5;
+  f64 asc_before_preso_hold_time = 0.5;
   f64 asc_presentation_time = 3.0;
   f64 asc_after_preso_hold_time = 0.5;
   f64 asc_ensvelten_time = 1.5;
@@ -66,9 +66,12 @@ struct Tamparams
 
   static Tamparams ur_params;
   static std::vector <Tamparams *> tampa_stack;
+
   static Tamparams *Current ();
   static void PushCopy ();
   static void Pop ();
+
+  static bool UpdateViaTOMLFile (const std::string &fname);
 };
 
 
