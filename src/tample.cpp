@@ -469,6 +469,7 @@ int main (int ac, char **av)
 { // well, here we go.
   std::string aud_host ("sepsis.local");
   std::string aud_port ("57121");
+  std::string seasonings_filename ("../configs/seasonings.toml");
 
  po::options_description desc ("available options");
   desc . add_options ()
@@ -477,6 +478,8 @@ int main (int ac, char **av)
      "host, via ip or name, where audio server dwells")
     ("audserver-port", po::value <std::string> (&aud_port),
      "port on which audio server listens (default: 57121)")
+    ("seasonings", po::value <std::string> (&seasonings_filename),
+     "toml file (default: ../configs/seasonings.toml)")
     ("sane-json", "json slurped from liblo isn't wrapped in an array")
 /*    ("prison-break", "escaped elements only mode")
     ("clip-collages", "disallow collage elements outside rect-bounds")
@@ -514,7 +517,7 @@ int main (int ac, char **av)
   if (! tamp . StartUp ())
     return -1;
 
-  Tamparams::UpdateViaTOMLFile ("../configs/seasonings.toml");
+  Tamparams::UpdateViaTOMLFile (seasonings_filename);
 fprintf(stderr,"harumph: <%s>\n", Tamparams::Current ()->asc_table_slide_audio.c_str());
 
   AudioMessenger *a_mess = new AudioMessenger (aud_host, aud_port);

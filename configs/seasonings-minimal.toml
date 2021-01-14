@@ -1,0 +1,21 @@
+
+
+asc-table-slide-time = 4.04
+asc-first-rise-time = 5.05
+asc-enbloaten-time = 2.0
+asc-before-preso-hold-time = 0.5
+asc-presentation-time = 3.0
+asc-after-preso-hold-time = 0.5
+asc-ensvelten-time = 1.5
+asc-second-rise-time = 6.06
+asc-enter-heaven-time = 0.0
+
+asc-table-slide-audio = "Tamper_IndianDoorFrame1.wav"
+asc-first-rise-audio = "Tamper_MagnifyingFrame2.wav"
+asc-enbloaten-audio = "Tamper_Boop101.wav"
+asc-before-preso-hold-audio = "Tamper_Boop102.wav"
+asc-presentation-audio = "Tamper_Boop103.wav"
+asc-after-preso-hold-audio = "Tamper_Boop101.wav"
+asc-ensvelten-audio = "nihil6"
+asc-second-rise-audio = "nihil7"
+asc-enter-heaven-audio = "nihil8"
