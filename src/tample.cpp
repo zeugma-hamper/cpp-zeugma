@@ -646,7 +646,7 @@ griddy -> SetDiscCenter (tabl -> Loc () + 150.0 * tabl -> Up ()
                          + 50.0 * tabl -> Norm ());
 griddy -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
 */
-griddy -> SetGridColor (ZeColor (1.0, 1.0, 1.0, 0.1));
+griddy -> SetGridColor (ZeColor (1.0, 1.0, 1.0, 0.075));
 g_tablecloth -> AppendChild (gridno);
 
   Orksur *orkp = new Orksur (*tabl);

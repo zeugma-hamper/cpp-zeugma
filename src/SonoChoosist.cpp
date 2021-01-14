@@ -32,16 +32,17 @@ Choizl::Choizl ()  :  Node (), index (-1)
 #define ERPTI (Tamparams::Current ()->sono_choosist_furl_time)
 
 
-SonoChoosist::SonoChoosist (const PlatonicMaes *maes)  :  Alignifer (),
-                                                          behalf_of (NULL)
-{ if (! maes)
-    { wid = 200.0;  hei = 40.0;  brd_thc = 5.0; }
-  else
-    { wid = 0.9 * maes -> Width ();
-      hei = 0.075 * wid;
-      brd_thc = 0.5 * (maes -> Width ()  -  wid);
-      AlignToMaes (maes);
-    }
+SonoChoosist::SonoChoosist (const PlatonicMaes *maes,
+                            f64 ref_dim, const Vect &maj_ax,
+                            const Vect &min_ax)  :  Alignifer (),
+                                                    behalf_of (NULL),
+                                                    span_ax (maj_ax),
+                                                    thck_ax (min_ax)
+{ span = 0.9 * ref_dim;
+  thck = 0.075 * span;
+  brd_thc = 0.5 * (ref_dim  -  span);
+  if (maes)
+    AlignToMaes (maes);
 
   AppendRenderable (brdr_re = new PolygonRenderable);
   brdr_re -> SetShouldFill (false);
@@ -52,14 +53,14 @@ SonoChoosist::SonoChoosist (const PlatonicMaes *maes)  :  Alignifer (),
   brdr_re -> AppendVertex (crn_ul);
   brdr_re -> AppendVertex (crn_ll);
 
-  Vect hrz = 0.5 * wid * Vect::xaxis;
-  Vect vrt = 0.5 * hei * Vect::yaxis;
-  frl_lr = unf_lr = hrz - vrt;
-  frl_ur = unf_ur = hrz + vrt;
-  unf_ll = -hrz - vrt;
-  unf_ul = -hrz + vrt;
-  frl_ll = frl_lr - hei * Vect::xaxis;
-  frl_ul = frl_ur - hei * Vect::xaxis;
+  Vect hrz = 0.5 * span * span_ax;
+  Vect vrt = 0.5 * thck * thck_ax;
+  unf_lr = hrz - vrt;
+  unf_ur = hrz + vrt;
+  frl_ll = unf_ll = -hrz - vrt;
+  frl_ul = unf_ul = -hrz + vrt;
+  frl_lr = frl_ll + thck * span_ax;
+  frl_ur = frl_ul + thck * span_ax;
 
   crn_lr . SetHard (frl_lr);
   crn_ur . SetHard (frl_ur);
@@ -74,7 +75,7 @@ SonoChoosist::SonoChoosist (const PlatonicMaes *maes)  :  Alignifer (),
   active . SetInterpTime (ERPTI);
   active . SetHard (0.0);
 
-  chz_dia = 0.9 * hei;
+  chz_dia = 0.9 * thck;
 
   AppendChild (chz_node = new Node);
 
@@ -214,16 +215,16 @@ void SonoChoosist::Unfurl ()
   if (nc  <  1)
     return;
 
-  f64 spcng = wid - (f64)nc * chz_dia;
+  f64 spcng = span - (f64)nc * chz_dia;
   spcng /= (f64)(nc + 1);
-  Vect p = (0.5 * wid - spcng - 0.5 * chz_dia) * Vect::xaxis;
+  Vect p = -(0.5 * span - spcng - 0.5 * chz_dia) * span_ax;
   spcng += chz_dia;
   for (i64 q = 0  ;  q < nc  ;  ++q)
     { // if (q > 0)
         choizls[q]->perky_loc . Set (p);
       // else
       //   o_loc . Set (p);
-      p -= spcng * Vect::xaxis;
+      p += spcng * span_ax;
     }
   o_iro . Set (ZeColor (1.0, 1.0));
 
@@ -242,19 +243,23 @@ bool SonoChoosist::PointInAirspaceOver (const Vect &p,
   // f64 w = (crn_ur.val - crn_ul.val) . Dot (CurOver ());
   // f64 h = (crn_ur.val - crn_lr.val) . Dot (CurUp ());
 // some sort of lesson. in the above, the crn are in local coords; ovr & upp not.
-  f64 w = (crn_ur.val - crn_ul.val) . Dot (Vect::xaxis);
-  f64 h = (crn_ur.val - crn_lr.val) . Dot (Vect::yaxis);
-  w += h;
-  h += h;
+  f64 sp = (crn_ur.val - crn_ul.val) . Dot (span_ax);
+  f64 th = (crn_ur.val - crn_lr.val) . Dot (thck_ax);
+  sp += th;
+  th += th;
 
   Vect c = Centerdom ();
-  Matrix44 m = from_glm (GetAbsoluteTransformation ().model);
-  m . TransformVectInPlace (c);
+  Matrix44 mmat = from_glm (GetAbsoluteTransformation ().model);
+  mmat . TransformVectInPlace (c);
+  Matrix44 nmat = from_glm (GetAbsoluteTransformation ().normal);
+  // Vect ov = nmat . TransformVect (span_ax);
+  // Vect up = nmat . TransformVect (thck_ax);
+  Vect ov = mmat . TransformVect (span_ax) - mmat . TransformVect (Vect::zerov);
+  Vect up = mmat . TransformVect (thck_ax) - mmat . TransformVect (Vect::zerov);
   Vect hit;
-  if (! G::RayRectIntersection (p, -CurNorm (),
-                                c, CurOver (), CurUp (), w, h, &hit))
+  if (! G::RayRectIntersection (p, -CurNorm (), c, ov, up, sp, th, &hit))
     return false;
-fprintf(stderr,"SMACKED old pal SONOCHOOSIST... with w/h = %.2lf/%2lf\n",w,h);
+fprintf(stderr,"SMACKED old pal SONOCHOOSIST... with w/h = %.2lf/%2lf\n",sp,th);
 
   if (! G::RayPlaneIntersection (p, -CurNorm (), c, CurNorm (), &hit))
     return false;  // not actually possible, but we are thorough, yes. yes yes.
@@ -262,7 +267,7 @@ fprintf(stderr,"SMACKED old pal SONOCHOOSIST... with w/h = %.2lf/%2lf\n",w,h);
   if (hit_out)
     *hit_out = hit;
   if (mat_out)
-    *mat_out = m;
+    *mat_out = mmat;
   return true;
 }
 

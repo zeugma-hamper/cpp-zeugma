@@ -35,8 +35,6 @@ class SonoChoosist  :  public Alignifer,
                        public ZEBulletinPhagy
 { public:
 
-  SonoChoosist (const PlatonicMaes *maes);
-
   PolygonRenderable *brdr_re;
   Node *chz_node;
   Node *oclo_no;
@@ -51,12 +49,17 @@ class SonoChoosist  :  public Alignifer,
   f64 contact_dist;
   std::unordered_map <std::string, Choizl *> hover;
   std::unordered_map <std::string, Choizl *> smack;
-  f64 wid, hei;
+  Vect span_ax, thck_ax;
+  f64 span, thck;
   f64 brd_thc;
   f64 chz_dia;
   InterpVect crn_lr, crn_ur, crn_ul, crn_ll;
   Vect frl_lr, frl_ur, frl_ul, frl_ll;
   Vect unf_lr, unf_ur, unf_ul, unf_ll;
+
+  SonoChoosist (const PlatonicMaes *maes, f64 ref_dim = 200.0,
+                const Vect &maj_ax = -Vect::xaxis,
+                const Vect &min_ax = Vect::yaxis);
 
   i64 NumChoizls ()  const
     { return choizls . size (); }

@@ -23,7 +23,7 @@ std::vector <Jigglegon *> Orksur::fallow_jigs;
 Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
                                             underlying_maes (&ma),
                                             assembly (new Node),
-                                            soncho (new SonoChoosist (&ma)),
+                                            // soncho (new SonoChoosist (&ma)),
                                             associated_wallmaes (NULL),
                                             ascension_phase (-1),
                                             ascending_collage (NULL),
@@ -31,10 +31,13 @@ Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
                                             sentient_dist (200.0),
                                             contact_dist (25.0)
 { AppendChild (assembly);
+  soncho = new SonoChoosist (&ma, ma . Height (), Vect::yaxis, -Vect::xaxis);
   AppendChild (soncho);
   soncho -> PopulateChoizls (5);
-  soncho->loc . Set (Loc ()  +  0.5 * (soncho->hei + 2.0 * soncho->brd_thc
-                                       - ma . Height ()) * ma . Up ());
+  // soncho->loc . Set (Loc ()  +  0.5 * (soncho->thck + 2.0 * soncho->brd_thc
+  //                                      - ma . Height ()) * ma . Up ());
+  soncho->loc . Set (Loc ()  +  0.5 * (ma . Width () - soncho->thck
+                                       - 2.0 * soncho->brd_thc) * ma . Over ());
   soncho -> Furl ();
   soncho->contact_dist = this->contact_dist;
 
