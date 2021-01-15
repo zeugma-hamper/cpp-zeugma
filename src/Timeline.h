@@ -40,9 +40,11 @@ class Timeline  :  public Zeubject, public Node,
   Node *play_nub;
   Node *hover_nub;
   LinePileRenderable *hover_ren;
+  InterpColor hover_adjc;
   PolygonRenderable *track_rend;
 
   SilverScreen *cine_symbiote;
+  std::string hovverer;
   std::string scrubber;
   MotherTime scrub_timer;
   f64 uncoerced_update_interval;

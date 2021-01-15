@@ -33,6 +33,10 @@ texre->SetAdjColor(ZeColor(1.0,0.0,0.0));
   hover_ren = new LinePileRenderable;
   hover_nub -> AppendRenderable (hover_ren);
   hover_nub -> Translate (hnub_pos);
+  hover_adjc . SetInterpTime (0.4);
+  hover_adjc . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
+  hover_adjc . SetHard (ZeColor (1.0, 1.0));
+  hover_ren -> AdjColorZoft () . BecomeLike (hover_adjc);
 
   AppendRenderable (track_rend = new PolygonRenderable);
   track_rend -> AppendVertex (SumVect (lft_end, dwn_hlf));
@@ -171,13 +175,13 @@ i64 Timeline::ZESpatialMove (ZESpatialMoveEvent *e)
 { if (! e)
     return -1;
 
+  const std::string &prv = e -> Provenance ();
+  if ((! hovverer . empty ()  &&  hovverer != prv)
+      ||  (! scrubber . empty ()  &&  scrubber != prv))
+    return 0;  // somebody's working here, but it's not us
+
   f64 t;
-  if (scrubber . empty ())
-    { if (TimeFromSpatialPointing (e, t))
-        SetHoverTime (t);
-      return 0;
-    }
-  else if (scrubber  ==  e -> Provenance ())
+  if (scrubber  ==  prv)
     { if (scrub_timer . CurTimeGlance ()  >=  0.0)  // wait for initial t-detent
         { TimeFromSpatialPointing (e, t, true);
           SetPlayTime (t);
@@ -188,8 +192,25 @@ i64 Timeline::ZESpatialMove (ZESpatialMoveEvent *e)
                 scrub_timer . ZeroTime ();
               }
         }
+      return 1;
     }
-  return 0;
+
+  if (! TimeFromSpatialPointing (e, t))
+    { if (hovverer  ==  prv)
+        { hovverer . clear ();
+          hover_adjc . Set (ZeColor (1.0, 0.0));
+        }
+      return 0;
+    }
+
+  if (hovverer . empty ())
+    { hovverer = prv;
+      hover_adjc . Set (ZeColor (1.0, 1.0));
+    }
+
+  SetHoverTime (t);
+
+  return 1;
 }
 
 i64 Timeline::ZESpatialHarden (ZESpatialHardenEvent *e)
