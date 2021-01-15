@@ -115,7 +115,7 @@ SonoChoosist::SonoChoosist (const PlatonicMaes *maes,
 //  o_loc . SetInterpTime ();
   o_loc . SetHard (0.25 * (frl_ll + frl_ul + frl_ur + frl_lr));
   oclo_no -> Translate (o_loc);
-  o_iro . SetHard (ZeColor (1.0, 0.0));
+  o_iro . SetHard (ZeColor (1.0, 1.0));  //0.0));
   oclo_re -> AdjColorZoft () . BecomeLike (o_iro);
 
   oclo_re -> SetShouldEdge (true);
@@ -157,6 +157,7 @@ else if (curn == 5) chz->texre->SetAdjColor(ZeColor(1.0,1.0,0.0,0.2));
           ++curn;
         }
     }
+  MakeChildLast (oclo_no);
 }
 
 
@@ -200,7 +201,7 @@ void SonoChoosist::Furl ()
   for (i64 q = 0  ;  q < nc  ;  ++q)
     { choizls[q]->perky_loc . Set (p); }
   o_loc . Set (p);
-  o_iro . Set (ZeColor (1.0, 0.0));
+//  o_iro . Set (ZeColor (1.0, 0.0));
 
   hexajig -> RenderablesSetShouldNotDraw ();
   active . Set (0.0);
