@@ -1,8 +1,7 @@
 [[windows]]
 name = "lone"
 position = [0, 0]
-#size = [9600, 2160]
-size = [11520, 2160]
+size = [3840, 2160]
 color-size = [8, 8, 8, 8]
 ds-size = [24, 8]
 decorated = false
@@ -12,17 +11,16 @@ decorated = false
 name = "left"
 maes = "left"
 offset = [0, 0]
-size = [3840, 2160]
+size = [1920, 1080]
 
 [[trefoils]]
 name = "front"
 maes = "front"
-offset = [3840, 0]
-size = [3840, 2160]
+offset = [1920, 0]
+size = [1920, 1080]
 
 [[trefoils]]
 name = "table"
 maes = "table"
-offset = [7680, 0]
-#size = [1920, 1080]
-size = [3840, 2160]
+offset = [1920, 1080]
+size = [1920, 1080]

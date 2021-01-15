@@ -20,6 +20,8 @@
 
 #include "tamparams.h"
 
+#include "bgfx_utils.hpp"
+
 #include <map>
 #include <unordered_map>
 
@@ -83,11 +85,8 @@ class Orksur  :  public PlatonicMaes, public Node,
   InterpVect asc_final_rise;
 
   static std::vector <Jigglegon *> fallow_jigs;
-//  static std::vector <Jigglegon *> active_jigs;
 
   Orksur (const PlatonicMaes &ma);
-
-//  Splort *NewSplort (f64 rad, i64 num_verts = 6)  const;
 
   OeuvreAfterlife *RetrieveValhalla ()
     { if (! valhalla)

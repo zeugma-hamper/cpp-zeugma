@@ -74,6 +74,10 @@ struct Tamparams
   std::string asc_second_rise_audio = "";
   std::string asc_enter_heaven_audio = "";
 
+// additional ascension-related timings
+
+  f64 asc_collage_background_appear_time = 0.1;
+
 
   static Tamparams ur_params;
   static std::vector <Tamparams *> tampa_stack;

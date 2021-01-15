@@ -63,7 +63,8 @@ bool Tamparams::UpdateViaTOMLFile (const std::string &fname)
       SLURPARAM (asc_after_preso_hold_time, f64);
       SLURPARAM (asc_ensvelten_time, f64);
       SLURPARAM (asc_second_rise_time, f64);
-      //SLURPARAM (asc-enter-heaven-time, f64);
+      SLURPARAM (asc_enter_heaven_time, f64);
+      // un-uncommented the foregoing, since it don't hurt nuthin'...
 
       SLURPARAM (asc_table_slide_audio, std::string);
       SLURPARAM (asc_first_rise_audio, std::string);
@@ -73,7 +74,10 @@ bool Tamparams::UpdateViaTOMLFile (const std::string &fname)
       SLURPARAM (asc_after_preso_hold_audio, std::string);
       SLURPARAM (asc_ensvelten_audio, std::string);
       SLURPARAM (asc_second_rise_audio, std::string);
-      //SLURPARAM (asc-enter-heaven-audio, std::string);
+      SLURPARAM (asc_enter_heaven_audio, std::string);
+      // ditto on the un-uncommentationizings
+
+      SLURPARAM (asc_collage_background_appear_time, f64);
 
     }
   catch (...)

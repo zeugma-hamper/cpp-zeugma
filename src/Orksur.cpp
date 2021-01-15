@@ -3,6 +3,8 @@
 
 #include "OeuvreAfterlife.h"
 
+#include "TexturedRenderable.hpp"
+
 #include "SinuZoft.h"
 
 #include "ZeUUID.h"
@@ -40,6 +42,11 @@ Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
                                        - 2.0 * soncho->brd_thc) * ma . Over ());
   soncho -> Furl ();
   soncho->contact_dist = this->contact_dist;
+
+  // hoping that this absorbs the disk-access burp...
+  TextureParticulars ellipse_tepa
+    = CreateTexture2D ("../ui-visuals/ellipse-99px-blur.png",
+                       DefaultTextureFlags);
 
   RetrieveValhalla ();
 }
@@ -89,6 +96,18 @@ Alignifer *Orksur::PermaFixCollage ()
   // and ah yes: reset the state of soncho...
   soncho -> InitiateAtomicContact (NULL);
   soncho -> Furl ();
+
+  // a luxurious background-bed for the beatified atoms:
+  TextureParticulars ellipse_tepa
+    = CreateTexture2D ("../ui-visuals/ellipse-75px-blur.png",
+                       DefaultTextureFlags);
+  TexturedRenderable *texre = new TexturedRenderable (ellipse_tepa);
+  Node *texno = new Node (texre);
+  collage -> AppendChild (texno);
+  InterpColor fader (ZeColor (1.0, 0.0), ZeColor (1.0, 1.0),
+                     Tamparams::Current ()->asc_collage_background_appear_time);
+  texre -> AdjColorZoft () . BecomeLike (fader);
+  texno -> Scale (Width ());
 
   std::vector <Node *> ticlist = assembly -> ChildListCopy ();
   for (Node *no  :  ticlist)

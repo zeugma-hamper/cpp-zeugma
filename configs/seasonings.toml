@@ -19,3 +19,8 @@ asc-after-preso-hold-audio = "Tamper_Boop101.wav"
 asc-ensvelten-audio = "nihil6"
 asc-second-rise-audio = "nihil7"
 asc-enter-heaven-audio = "nihil8"
+
+
+#secondary effect timings:
+
+asc-collage-background-appear-time = 3.5
