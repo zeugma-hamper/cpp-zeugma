@@ -108,6 +108,8 @@ class Ticato  :  public Alignifer
   void BBoxSetColor (const ZoftColor &zc);
 
   void OutfitWithAura (Jigglegon *jig = NULL);
+  void TurnAuraOn ();
+  void TurnAuraOff ();
   void FlashAura ();
 
   bool SonoPlay ();

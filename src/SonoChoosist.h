@@ -16,6 +16,8 @@
 #include "Ticato.h"
 #include "Jigglegon.h"
 
+#include <unordered_set>
+
 
 using namespace charm;
 
@@ -47,6 +49,7 @@ class SonoChoosist  :  public Alignifer,
   Ticato *behalf_of;
   InterpFloat active;
   f64 contact_dist;
+  std::unordered_set <std::string> overall_ui_hover;
   std::unordered_map <std::string, Choizl *> hover;
   std::unordered_map <std::string, Choizl *> smack;
   Vect span_ax, thck_ax;

@@ -287,7 +287,21 @@ i64 SonoChoosist::ZESpatialMove (ZESpatialMoveEvent *e)
   Vect hit (INITLESS);
   Matrix44 m (INITLESS);
   if (! PointInAirspaceOver (p, &hit, &m))
-    return 0;
+    { auto it = overall_ui_hover . find (prv);
+      if (it  !=  overall_ui_hover . end ())
+        { overall_ui_hover . erase (it);
+          if (behalf_of)
+            behalf_of -> TurnAuraOff ();
+        }
+      return 0;
+    }
+  else
+    { if (overall_ui_hover . find (prv)  ==  overall_ui_hover . end ())
+        { overall_ui_hover . insert (prv);
+          if (behalf_of)
+            behalf_of -> TurnAuraOn ();
+        }
+    }
 
   f64 rsq = 0.25 * chz_dia * chz_dia;
   i64 ind = -1;
@@ -315,7 +329,7 @@ i64 SonoChoosist::ZESpatialMove (ZESpatialMoveEvent *e)
       return 1;
     }
 
-  return 0;
+  return 1;  // rather than zero -- we don't want to inadvertently grab an atom
 }
 
 
@@ -336,7 +350,7 @@ i64 SonoChoosist::ZESpatialHarden (ZESpatialHardenEvent *e)
   if (it  !=  hover . end ())
     hover . erase (it);
   else  // weren't hovering over a choizl prior to contact
-    return 0;
+    return 1;  //0;  again, don't want to grab an atom
 
   Choizl *chz = it->second;
   auto cit = std::find (choizls . begin (), choizls . end (), chz);
@@ -355,7 +369,9 @@ i64 SonoChoosist::ZESpatialHarden (ZESpatialHardenEvent *e)
         behalf_of -> SonoSilence ();
       else
         behalf_of -> EnunciateNthSonoOption (ind - 2);
-      behalf_of -> FlashAura ();
+      // behalf_of -> FlashAura ();
+      behalf_of->interp_adjc . SetHard (ZeColor (4.0, 1.0));
+      behalf_of->interp_adjc . Set (ZeColor (1.0, 1.0));
     }
 
   return 1;

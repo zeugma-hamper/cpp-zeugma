@@ -44,7 +44,7 @@ void Ticato::WellAndTrulyConstruct (const FilmInfo &finf, const ClipInfo &clinf)
   gropoff . SetInterpTime (0.2);
   gropoff . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
 
-  interp_adjc . SetInterpTime (0.25);
+  interp_adjc . SetInterpTime (0.75);
 //  interp_adjc . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
   interp_adjc . SetHard (ZeColor (1.0, 1.0));
   re -> AdjColorZoft () . BecomeLike (interp_adjc);
@@ -195,6 +195,16 @@ void Ticato::OutfitWithAura (Jigglegon *jig)
   jig->fadist . SetHard (ZeColor (1.0, 0.0));
 
   AppendChild (aura = jig);
+}
+
+void Ticato::TurnAuraOn ()
+{ if (aura)
+    aura->fadist . Set (ZeColor (1.0, 1.0));
+}
+
+void Ticato::TurnAuraOff ()
+{ if (aura)
+    aura->fadist . Set (ZeColor (1.0, 0.0));
 }
 
 void Ticato::FlashAura ()
