@@ -56,6 +56,9 @@ class AudioMessenger
                            const std::string &new_atom,
                            f64 duration, u64 disc_id);
 
+  void SendStatus (std::string_view);
+
+
  protected:
   lo::Address *m_audio_address;
   i64 m_message_id;

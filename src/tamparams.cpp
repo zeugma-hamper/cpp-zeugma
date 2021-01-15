@@ -63,8 +63,18 @@ bool Tamparams::UpdateViaTOMLFile (const std::string &fname)
       SLURPARAM (asc_after_preso_hold_time, f64);
       SLURPARAM (asc_ensvelten_time, f64);
       SLURPARAM (asc_second_rise_time, f64);
+      //SLURPARAM (asc-enter-heaven-time, f64);
 
       SLURPARAM (asc_table_slide_audio, std::string);
+      SLURPARAM (asc_first_rise_audio, std::string);
+      SLURPARAM (asc_enbloaten_audio, std::string);
+      SLURPARAM (asc_before_preso_hold_audio, std::string);
+      SLURPARAM (asc_presentation_audio, std::string);
+      SLURPARAM (asc_after_preso_hold_audio, std::string);
+      SLURPARAM (asc_ensvelten_audio, std::string);
+      SLURPARAM (asc_second_rise_audio, std::string);
+      //SLURPARAM (asc-enter-heaven-audio, std::string);
+
     }
   catch (...)
     { fprintf (stderr, "from Tamparams::UpdateViaTOMLFile: well, no.\n");

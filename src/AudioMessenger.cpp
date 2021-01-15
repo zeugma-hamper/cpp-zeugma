@@ -43,7 +43,8 @@ void AudioMessenger::Connect (std::string_view _host, std::string_view _port)
     delete m_audio_address;
 
   m_audio_address = new lo::Address (_host.data (), _port.data ());
-  SendUnmute();
+  SendUnmute ();
+  SendStatus ("Tample booting");
 }
 
 void AudioMessenger::SendMessage (std::string_view _path)
@@ -119,6 +120,15 @@ void AudioMessenger::SendGetSuggestions (stringy_list &extant_atoms,
   j["discussion_id"] = disc_id;
   SendMessage("/ta/get_suggestions", j.dump ());
 }
+
+void AudioMessenger::SendStatus(std::string_view _status_string)
+{
+  assert (m_audio_address);
+  nl::json j;
+  j["status"] = _status_string;
+  SendMessage ("/ta/tample_status", j.dump ());
+}
+
 
 //TASReceiver
 TASReceiver::TASReceiver ()

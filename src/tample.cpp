@@ -825,6 +825,10 @@ g_tablecloth -> AppendChild (gridno);
       lpr -> AppendLine ({r - v, l - v});
     }
 
+AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes;
+sherm -> SendStatus ("Running");
+
+
 std::vector <std::string>  collanomer {
 "Collage01-Half-GryRnd.mp4",
 "Collage08-Half-GryRnd.mp4",    // door-bachelors
