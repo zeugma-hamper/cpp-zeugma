@@ -389,6 +389,7 @@ i64 SonoChoosist::ZESpatialSoften (ZESpatialSoftenEvent *e)
 
   smack . erase (it);
   Choizl *chz = it->second;
+  hover[prv] = chz;
   // Lowlight (chz);
   return 1;
 }

@@ -240,8 +240,9 @@ bool Ticato::SonoSilence ()
 
 
 bool Ticato::EnunciateNthSonoOption (i64 ind)
-{ if (ind  ==  playing_sono)
-    return true;
+{ // if (ind  ==  playing_sono)
+  //   return true;
+// going to allow an audio choice to be re-selected, which'll change phase...
   if (ind  <  0)
     return SonoSilence ();
   if (ind  >=  sono_options . size ())
