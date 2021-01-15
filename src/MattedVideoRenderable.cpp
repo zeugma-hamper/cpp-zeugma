@@ -239,7 +239,7 @@ void MattedVideoRenderable::Draw (u16 vyu_id)
   bgfx::setUniform (m_video_texture->GetUpUniform(), &up);
   bgfx::setUniform (m_video_texture->GetAdjColorUniform(), glm::value_ptr (ac));
 
-  bgfx::submit(vyu_id, m_video_texture->GetProgram());
+  bgfx::submit(vyu_id, m_video_texture -> GetProgram (), m_graph_id);
 }
 
 
