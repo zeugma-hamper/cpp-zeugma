@@ -45,7 +45,7 @@ Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
 
   // hoping that this absorbs the disk-access burp...
   TextureParticulars ellipse_tepa
-    = CreateTexture2D ("../ui-visuals/ellipse-99px-blur.png",
+    = CreateTexture2D ("../ui-visuals/ellipse-blanc-99px-blur.png",
                        DefaultTextureFlags);
 
   RetrieveValhalla ();
@@ -99,12 +99,13 @@ Alignifer *Orksur::PermaFixCollage ()
 
   // a luxurious background-bed for the beatified atoms:
   TextureParticulars ellipse_tepa
-    = CreateTexture2D ("../ui-visuals/ellipse-75px-blur.png",
+    = CreateTexture2D ("../ui-visuals/ellipse-blanc-99px-blur.png",
                        DefaultTextureFlags);
   TexturedRenderable *texre = new TexturedRenderable (ellipse_tepa);
   Node *texno = new Node (texre);
   collage -> AppendChild (texno);
-  InterpColor fader (ZeColor (1.0, 0.0), ZeColor (1.0, 1.0),
+  f64 grayness = Tamparams::Current ()->asc_collage_background_grey_val;
+  InterpColor fader (ZeColor (grayness, 0.0), ZeColor (grayness, 1.0),
                      Tamparams::Current ()->asc_collage_background_appear_time);
   texre -> AdjColorZoft () . BecomeLike (fader);
   texno -> Scale (Width ());

@@ -77,7 +77,7 @@ struct Tamparams
 // additional ascension-related timings
 
   f64 asc_collage_background_appear_time = 0.1;
-
+  f64 asc_collage_background_grey_val = 0.15;
 
   static Tamparams ur_params;
   static std::vector <Tamparams *> tampa_stack;

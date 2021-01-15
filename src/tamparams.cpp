@@ -78,7 +78,7 @@ bool Tamparams::UpdateViaTOMLFile (const std::string &fname)
       // ditto on the un-uncommentationizings
 
       SLURPARAM (asc_collage_background_appear_time, f64);
-
+      SLURPARAM (asc_collage_background_grey_val, f64);
     }
   catch (...)
     { fprintf (stderr, "from Tamparams::UpdateViaTOMLFile: well, no.\n");

@@ -830,17 +830,25 @@ sherm -> SendStatus ("Running");
 
 
 std::vector <std::string>  collanomer {
+// "Collage01-Half-GryRnd.mp4",
+// "Collage08-Half-GryRnd.mp4",    // door-bachelors
+// "Collage5a-Half-GryRnd.mp4",     // turtle
+// "collage06_Half-GryRndv2.mp4",  // cake-milk-tony
+// "collage03-Half-GryRnd.mp4",    // bronson-dentures-mancandy
+// "Collage02b_Half-GryRndv2.mp4", // zombie-vu
+// "collage07b-Half-GryRnd.mp4"   // ufo
 "Collage01-Half-GryRnd.mp4",
-"Collage08-Half-GryRnd.mp4",    // door-bachelors
-"Collage5a-Half-GryRnd.mp4",     // turtle
-"collage06_Half-GryRndv2.mp4",  // cake-milk-tony
-"collage03-Half-GryRnd.mp4",    // bronson-dentures-mancandy
-"Collage02b_Half-GryRndv2.mp4", // zombie-vu
-"collage07b-Half-GryRnd.mp4"   // ufo
+"Collage08-Blur-25.mp4",    // door-bachelors
+"collage05-Blur25.mp4",     // turtle
+"collage06-Blur25.mp4",  // cake-milk-tony
+"collage03-Blur25.mp4",    // bronson-dentures-mancandy
+"Collage02b-Blur25.mp4", // zombie-vu
+"collage07b-Blur25.mp4",   // ufo
 };
 
  for (std::string &nm  :  collanomer)
-   { std::string path = "/opt/trelopro/tamper/demo-temp/fin-col/" + nm;
+   { //std::string path = "/opt/trelopro/tamper/demo-temp/fin-col/" + nm;
+     std::string path = "/opt/trelopro/tamper/demo-temp/Blurred-Ellipse/" + nm;
      ova -> AppendCollage (new Ollag (path));
    }
   ova -> DistributeCollagesEquitably ();
