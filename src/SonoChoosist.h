@@ -26,7 +26,7 @@ struct Choizl  :  public Node
   InterpVect mopey_sca;
   i64 index;
 
-  Choizl ();
+  Choizl (bool empty = false);
 };
 
 

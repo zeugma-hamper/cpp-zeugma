@@ -13,10 +13,12 @@
 using namespace charm;
 
 
-Choizl::Choizl ()  :  Node (), index (-1)
-{ TextureParticulars tepa
-    = CreateTexture2D ("../ui-visuals/bordered-circle-tridot-256-alpha.png",
-                       DefaultTextureFlags);
+Choizl::Choizl (bool empty)  :  Node (), index (-1)
+{ TextureParticulars tepa = CreateTexture2D
+    (empty
+     ?  "../ui-visuals/bordered-empty-circle-tridot-256-alpha.png"
+     :  "../ui-visuals/bordered-circle-tridot-256-alpha.png",
+     DefaultTextureFlags);
   texre = new TexturedRenderable (tepa);
   AppendRenderable (texre);
 //  texre -> AdjColorZoft () . BecomeLike (InterpColor ());
@@ -138,16 +140,16 @@ void SonoChoosist::PopulateChoizls (i64 nc)
 
   if (nc  >  curn)
     { while (curn  <  nc)
-        { Choizl *chz = new Choizl;
+        { Choizl *chz = new Choizl (curn < 2);
           choizls . push_back (chz);
           chz->mopey_sca . SetHard (Vect (chz_dia));
           chz_node -> AppendChild (chz);
 if      (curn == 0) chz->texre->SetAdjColor(ZeColor(1.0,0.0));
-else if (curn == 1) chz->texre->SetAdjColor(ZeColor(1.0,0.0,0.0,0.2));
-else if (curn == 2) chz->texre->SetAdjColor(ZeColor(0.0,1.0,0.0,0.2));
-else if (curn == 3) chz->texre->SetAdjColor(ZeColor(0.0,0.0,1.0,0.2));
-else if (curn == 4) chz->texre->SetAdjColor(ZeColor(1.0,0.0,1.0,0.2));
-else if (curn == 5) chz->texre->SetAdjColor(ZeColor(1.0,1.0,0.0,0.2));
+else if (curn == 1) chz->texre->SetAdjColor(ZeColor(1.0,1.0,1.0,0.3));
+else if (curn == 2) chz->texre->SetAdjColor(ZeColor(1.0,0.0,0.0,0.3));
+else if (curn == 3) chz->texre->SetAdjColor(ZeColor(0.0,1.0,0.0,0.3));
+else if (curn == 4) chz->texre->SetAdjColor(ZeColor(0.0,0.0,1.0,0.3));
+else if (curn == 5) chz->texre->SetAdjColor(ZeColor(1.0,1.0,0.0,0.3));
 
           if (! zeroch)
             { zeroch = chz;
