@@ -82,11 +82,11 @@ vire->SetAdjColor(ZeColor(1.0,1.0,0.1,1.0));
       sisc -> Translate ((f64)q * flick_spacing * Over ());
     }
   if (cnt  >  0)
-    JumpToFlick (0);
+    JumpToFlick (0, true);
 }
 
 
-void GraumanPalace::JumpToFlick (i64 which_flick)
+void GraumanPalace::JumpToFlick (i64 which_flick, bool effect_fading)
 { i64 flick_cnt = screens . size ();
   if (flick_cnt  <  1)
     return;
@@ -96,35 +96,33 @@ void GraumanPalace::JumpToFlick (i64 which_flick)
   else if (which_flick  >=  screens . size ())
     which_flick = screens . size () - 1;
 
-  if (which_flick  ==  now_showing)
-    return;
-
-  if (SilverScreen *ss = NthSilverScreen (now_showing))
-    { ss -> Pause ();
-      ss -> FadeDown ();
-//      ss -> DetachTimeline (sole_tline);
-    }
-
-  if (SilverScreen *ss = NthSilverScreen (which_flick))
-    { ss -> Play ();
-      ss -> FadeUp ();
-//      ss -> AttachTimeline (sole_tline);
-      if (sole_tline)
-        { sole_tline -> EstablishCineSymbiote (ss);
-          sole_tline->shift . Set ((-0.5 * ss -> AspectRatio () * flick_wid
-                                    - 6.0 * sole_tline->thickth) * upp);
+  if (which_flick  !=  now_showing)
+    { if (SilverScreen *ss = NthSilverScreen (now_showing))
+        { ss -> Pause ();
+          if (effect_fading)
+            ss -> FadeDown ();
         }
+
+      if (SilverScreen *ss = NthSilverScreen (which_flick))
+        { ss -> Play ();
+          if (effect_fading)
+            ss -> FadeUp ();
+          if (sole_tline)
+            { sole_tline -> EstablishCineSymbiote (ss);
+              sole_tline->shift . Set ((-0.5 * ss -> AspectRatio () * flick_wid
+                                        - 6.0 * sole_tline->thickth) * upp);
+            }
+        }
+      now_showing = which_flick;
     }
 
-  now_showing = which_flick;
   ltrl_slide . ProceedTo (-now_showing * flick_spacing * Over ());
   ltrl_slide . Commence ();
 }
 
 
 void GraumanPalace::TogglePlayPause ()
-{ //VideoRenderable *vire = CurFlick ();
-  MattedVideoRenderable *vire = CurFlick ();
+{ MattedVideoRenderable *vire = CurFlick ();
   if (! vire)
     return;
 
@@ -151,7 +149,7 @@ void GraumanPalace::ReleasePushback ()
   i64 closest_flick = i64 (0.5 - ovr . Dot (ltrl_slide.val) / flick_spacing);
   JumpToFlick (closest_flick);
   push_depth . ProceedTo (Vect::zerov);
-  push_depth .  Commence ();
+  push_depth . Commence ();
 
   SilverScreen *curss = CurSilverScreen ();
   for (SilverScreen *ss  :  screens)

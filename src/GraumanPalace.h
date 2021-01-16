@@ -92,12 +92,10 @@ Node *elpy_no;
     { return NumSilverScreens (); }
 
   SilverScreen *NthSilverScreen (i64 ind);
-  //VideoRenderable *NthFlick (i64 ind);
   MattedVideoRenderable *NthFlick (i64 ind);
 
   SilverScreen *CurSilverScreen ()
     { return NthSilverScreen (now_showing); }
-  //VideoRenderable *CurFlick ()
   MattedVideoRenderable *CurFlick ()
     { return NthFlick (now_showing); }
 
@@ -114,13 +112,13 @@ Node *elpy_no;
 
   void ImportExhibitionRoster (const std::vector <FilmInfo> &fimmz);
 
-  void JumpToFlick (i64 which_flick);
+  void JumpToFlick (i64 which_flick, bool effect_fading = false);
   void JumpToNextFlick ()
-    { JumpToFlick (now_showing + 1); }
+    { JumpToFlick (now_showing + 1, true); }
   void JumpToPrevFlick ()
-    { JumpToFlick (now_showing - 1); }
+    { JumpToFlick (now_showing - 1, true); }
   void JumpToRandomFlick ()
-    { JumpToFlick (i64( (f64(screens . size ()) - 0.0001) * drand48 ())); }
+    { JumpToFlick (i64( (f64(screens . size ()) - 0.0001) * drand48 ()), true); }
 
   void TogglePlayPause ();
 
