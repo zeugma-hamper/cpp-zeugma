@@ -526,13 +526,15 @@ fprintf(stderr,"harumph: <%s>\n", Tamparams::Current ()->asc_table_slide_audio.c
   TASReceiver *audio_rejoinder_catcher = new TASReceiver ("57122");
   tamp . AppendWaterWorks (audio_rejoinder_catcher);
 
-  Layer *omni_layer = tamp . GetSceneLayer();
+//  Layer *omni_layer = tamp . GetSceneLayer();
   Layer *front_layer = new Layer ();
   tamp . AppendSceneLayer (front_layer);
   Layer *left_layer = new Layer ();
   tamp . AppendSceneLayer (left_layer);
   Layer *walls_layer = new Layer ();
   tamp . AppendSceneLayer (walls_layer);
+  Layer *omni_layer = new Layer ();
+  tamp . AppendSceneLayer (omni_layer);
   Layer *table_layer = new Layer ();
   tamp . AppendSceneLayer (table_layer);
 
