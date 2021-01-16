@@ -29,6 +29,9 @@
 using namespace charm;
 
 
+class GraumanPalace;
+
+
 struct Splort  :  Node
 { ZoftVect loc;
   LinePileRenderable *re;
@@ -64,6 +67,7 @@ class Orksur  :  public PlatonicMaes, public Node,
   Node *assembly;
   SonoChoosist *soncho;
   PlatonicMaes *associated_wallmaes;
+  GraumanPalace *associated_cinelib;
   i64 ascension_phase;
   Alignifer *ascending_collage;
   OeuvreAfterlife *valhalla;
@@ -93,6 +97,11 @@ class Orksur  :  public PlatonicMaes, public Node,
         valhalla = Tamglobals::Only ()->valhalla;
       return valhalla;
     }
+
+  GraumanPalace *AssociatedCinelib ()
+    { return associated_cinelib; }
+  void SetAssociatedCinelib (GraumanPalace *gp)
+    { associated_cinelib = gp; }
 
   stringy_list CollageAtomsNameList ();
 

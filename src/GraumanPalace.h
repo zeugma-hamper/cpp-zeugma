@@ -42,6 +42,7 @@ class GraumanPalace  :  public Zeubject, public Node,
   std::vector <SilverScreen *> screens;
   f64 flick_wid, flick_spacing;
   Vect ovr, upp, nrm;
+  InterpColor fader;
   Node *slider;
   InterpVect push_depth;
   InterpVect ltrl_slide;

@@ -32,6 +32,10 @@ GraumanPalace::GraumanPalace ()  :  Zeubject (), Node (),
   AppendChild (sole_tline);
   sole_tline -> SetWidthAndThickth (1.1 * flick_wid, 25.0);
 
+  fader . SetInterpFunc (InterpFuncs::LINEAR);
+  fader . Set (ZeColor (1.0, 1.0));
+  AdjColorZoft () . BecomeLike (fader);
+
 elpy_no = new Node (elpyar = new LinePileRenderable);
 Tamglobals::Only ()->wallpaper -> AppendChild (elpy_no);
 }

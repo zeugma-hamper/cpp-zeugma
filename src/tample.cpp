@@ -690,6 +690,7 @@ g_tablecloth -> AppendChild (gridno);
   (grau_egyp -> Translate (cine_cnt)) -> SetName ("transly");
   g_front_wall -> AppendChild (grau_egyp);
 
+  orkp -> SetAssociatedCinelib (grau_egyp);
   tamp.gegyp = ch_ptr <GraumanPalace> (grau_egyp);
 
   cine_cnt = auth_left_cntr;
@@ -843,12 +844,12 @@ std::vector <std::string>  collanomer {
 // "Collage02b_Half-GryRndv2.mp4", // zombie-vu
 // "collage07b-Half-GryRnd.mp4"   // ufo
 "Collage01-Half-GryRnd.mp4",
-"Collage08-Blur-25.mp4",    // door-bachelors
-"collage05-Blur25.mp4",     // turtle
-"collage06-Blur25.mp4",  // cake-milk-tony
-"collage03-Blur25.mp4",    // bronson-dentures-mancandy
-"Collage02b-Blur25.mp4", // zombie-vu
-"collage07b-Blur25.mp4",   // ufo
+"Collage08-35.mp4",    // door-bachelors
+"collage06-35.mp4",  // cake-milk-tony
+"collage05a-35.mp4",     // turtle
+"collage03-35.mp4",    // bronson-dentures-mancandy
+"Collage02b-35.mp4", // zombie-vu
+"collage07b-35.mp4",   // ufo
 };
 
  for (std::string &nm  :  collanomer)

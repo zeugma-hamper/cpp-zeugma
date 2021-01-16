@@ -1,6 +1,7 @@
 
 #include "Orksur.h"
 
+#include "GraumanPalace.h"
 #include "OeuvreAfterlife.h"
 
 #include "TexturedRenderable.hpp"
@@ -27,6 +28,7 @@ Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
                                             assembly (new Node),
                                             // soncho (new SonoChoosist (&ma)),
                                             associated_wallmaes (NULL),
+                                            associated_cinelib (NULL),
                                             ascension_phase (-1),
                                             ascending_collage (NULL),
                                             valhalla (NULL),
@@ -209,6 +211,11 @@ void Orksur::EffectNextAscensionPhase ()
           ascending_collage -> InstallLocGrapplerZoft (asc_table_slide);
           ascending_collage -> AlignToMaes (this);
           AppendChild (ascending_collage);
+          if (associated_cinelib)
+            { associated_cinelib->fader
+                . SetInterpTime (tam->asc_table_slide_time);
+              associated_cinelib->fader . Set (ZeColor (1.0, 0.1));
+            }
           if (sherm)
             { i64 moid = ZeMonotonicID ();
               sherm -> SendPlaySound (tam->asc_table_slide_audio, moid);
@@ -270,7 +277,7 @@ void Orksur::EffectNextAscensionPhase ()
           // and trigger whatever 'performance' bits there may be...
           if (sherm)
             { i64 moid = ZeMonotonicID ();
-              sherm -> SendFadeIn ();              
+              sherm -> SendFadeIn ();
               sherm -> SendPlaySound (tam->asc_presentation_audio, moid);
             }
           break;
@@ -311,6 +318,11 @@ void Orksur::EffectNextAscensionPhase ()
           asc_perf_bloat . SetInterpTime (6.06);
           asc_perf_bloat . Set (0.75 * s);
           ascending_collage -> InstallLocGrapplerZoft (asc_final_rise);
+          if (associated_cinelib)
+            { associated_cinelib->fader
+                . SetInterpTime (0.895 * tam->asc_second_rise_time);
+              associated_cinelib->fader . Set (ZeColor (1.0, 1.0));
+            }
           if (sherm)
             { i64 moid = ZeMonotonicID ();
               sherm -> SendPlaySound (tam->asc_second_rise_audio, moid);
