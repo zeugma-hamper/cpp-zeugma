@@ -44,6 +44,7 @@ void AudioMessenger::Connect (std::string_view _host, std::string_view _port)
 
   m_audio_address = new lo::Address (_host.data (), _port.data ());
   SendUnmute ();
+  SendFadeIn (); // just in case the audioserver was left in a faded out state
   SendStatus ("Tample booting");
 }
 
@@ -88,13 +89,14 @@ void AudioMessenger::SendPlayBoop (i32 _index)
 }
 
 
-void AudioMessenger::SendPlaySound (std::string_view _file, i64 perf_id)
+void AudioMessenger::SendPlaySound (std::string_view _file, i64 perf_id, i64 coll_id)
 {
   assert (m_audio_address);
 
   nl::json j;
   j["filename"] = _file;
   j["performance_id"] = perf_id;
+  j["collage_id"] = coll_id;
   SendMessage ("/ta/play_sound", j.dump ());
 }
 
@@ -129,6 +131,27 @@ void AudioMessenger::SendStatus(std::string_view _status_string)
   SendMessage ("/ta/tample_status", j.dump ());
 }
 
+void AudioMessenger::SendFadeIn(f64 fade_time)
+{
+  assert (m_audio_address);
+  nl::json j;
+  j["fade_time"] = fade_time;
+  SendMessage ("/ta/fade_in", j.dump ());
+}
+
+void AudioMessenger::SendFadeOut(f64 fade_time)
+{
+  assert (m_audio_address);
+  nl::json j;
+  j["fade_time"] = fade_time;
+  SendMessage ("/ta/fade_out", j.dump ());
+}
+
+void AudioMessenger::SendCleanSlate()
+{
+  assert (m_audio_address);
+  SendMessage ("/ta/clean_slate");
+}
 
 //TASReceiver
 TASReceiver::TASReceiver ()

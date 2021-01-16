@@ -49,7 +49,7 @@ class AudioMessenger
   // 0-4 are valid boops
   void SendPlayBoop (i32 _index);
 
-  void SendPlaySound (std::string_view _file, i64 perf_id = -1);
+  void SendPlaySound (std::string_view _file, i64 perf_id = -1, i64 coll_id = 0);
   void SendStopSound (i64 perf_id);
 
   void SendGetSuggestions (stringy_list &extant_atoms,
@@ -58,6 +58,10 @@ class AudioMessenger
 
   void SendStatus (std::string_view);
 
+  void SendFadeIn(f64 fade_time = 0.2);
+  void SendFadeOut(f64 fade_time = 6.5);
+
+  void SendCleanSlate();
 
  protected:
   lo::Address *m_audio_address;
