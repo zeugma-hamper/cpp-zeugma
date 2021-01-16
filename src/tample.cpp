@@ -786,6 +786,7 @@ g_tablecloth -> AppendChild (gridno);
       fprintf (stderr, "phailed privileging atom [%s]...\n", s . c_str ());
   afz -> SetPrivlegedAtomProbability (0.05);
   AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.freezo);
+  Tamglobals::Only ()->sterngerlach = afz;
 
   OeuvreAfterlife *ova = new OeuvreAfterlife;
   tamp.vreaft = ch_ptr <OeuvreAfterlife> (ova);
@@ -856,7 +857,8 @@ std::vector <std::string>  collanomer {
   g_wallpaper -> AppendChild (wframe_node);
   Tamglobals::Only ()->construction_marks . push_back (wframe_node);
 
-//  afz -> PopulateFromScratch ();
+  afz -> PopulateFromScratch ();
+
   AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.freezo);
   AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.freezo);
 

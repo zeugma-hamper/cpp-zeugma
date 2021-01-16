@@ -61,6 +61,12 @@ struct Ray
 Vect PointOntoPlaneProjection (const Vect &pnt,
                                const Vect &cnt, const Vect &nrm);
 
+Vect PointOntoLineProjection (const Vect &pnt,
+                              const Vect &lnpt, const Vect &dir);
+
+Vect PointOntoLineProjection (const Vect &pnt, const Line &lin);
+//{ return G::PointOntoLineProjection (pnt, lin.pnt, lin.dir); }
+
 bool RayPlaneIntersection (const Vect &frm, const Vect &aim,
                            const Vect &pnt, const Vect &nrm,
                            Vect *hit_pnt);

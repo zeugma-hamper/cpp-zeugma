@@ -93,6 +93,8 @@ struct Tamparams
 namespace charm
 { class AudioMessenger; }
 
+class AtomicFreezone;
+
 
 struct Tamglobals
 { f64 frame_tm = 0.0;
@@ -105,6 +107,7 @@ struct Tamglobals
   Node *conveyor = NULL;
   Node *windshield = NULL;
 
+  AtomicFreezone *sterngerlach = NULL;
   OeuvreAfterlife *valhalla = NULL;
 
   std::vector <Node *> construction_marks;

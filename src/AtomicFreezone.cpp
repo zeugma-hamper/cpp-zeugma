@@ -196,6 +196,31 @@ assert (curth != NULL);
 }
 
 
+void AtomicFreezone::UndertakeLongRangeDimming ()
+{ if (dim_rad.val  <  0.0)
+    { for (Ticato *tic  :  atoms)
+        if (tic)
+          if (tic->dim_adj . PointB ().val  !=  1.0)
+            tic->dim_adj . Set (1.0);
+      return;
+    }
+
+  f64 rsq = dim_rad.val * dim_rad.val;
+  for (Ticato *tic  :  atoms)
+    if (tic)
+      { Vect ax_prj = G::PointOntoLineProjection (tic->loc.val, dim_axis);
+        if ((tic->loc.val - ax_prj) . AutoDot ()  <  rsq)
+          { if (tic->dim_adj . PointB ().val  !=  0.0)
+              tic->dim_adj . Set (0.0);
+          }
+        else
+          { if (tic->dim_adj . PointB ().val  !=  1.0)
+              tic->dim_adj . Set (1.0);
+          }
+      }
+}
+
+
 i64 AtomicFreezone::ZESpatialMove (ZESpatialMoveEvent *e)
 { if (! e)
     return -1;
@@ -366,6 +391,9 @@ i64 AtomicFreezone::Inhale (i64, f64 thyme)
   if (atoms . size ()  <  atom_count_goal)
     if (drand48 ()  <  dt / inter_arrival_t)
       SpontaneouslyGenerateAtomAtBoundary ();
+
+  if (dim_rad.val  !=  0.0)
+    UndertakeLongRangeDimming ();
 
   prev_time = thyme;
   return 0;

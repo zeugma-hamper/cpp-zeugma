@@ -34,6 +34,9 @@ class AtomicFreezone  :  public SpectacleCauseway
   f64 meander_len;
   G::Plane over_lid, undr_lid;
 
+  G::Line dim_axis;
+  InterpFloat dim_rad;
+
   AtomicFreezone ();
 
   AtomInfoPair ClipFromUniqueAtomName (const std::string &uq_nm);
@@ -65,6 +68,8 @@ class AtomicFreezone  :  public SpectacleCauseway
   void PopulateFromScratch ();
 
   void PerambulizeAtoms (f64 dt);
+
+  void UndertakeLongRangeDimming ();
 
   i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
   i64 ZESpatialHarden (ZESpatialHardenEvent *e)  override;

@@ -13,6 +13,17 @@ Vect G::PointOntoPlaneProjection (const Vect &pnt,
 }
 
 
+Vect G::PointOntoLineProjection (const Vect &pnt,
+                                 const Vect &lnpt, const Vect &dir)
+{ Vect n = dir . Norm ();
+  Vect prj = lnpt  +  (pnt - lnpt) . Dot (n) * n;
+  return prj;
+}
+
+Vect G::PointOntoLineProjection (const Vect &pnt, const G::Line &lin)
+{ return PointOntoLineProjection (pnt, lin.pnt, lin.dir); }
+
+
 bool G::RayPlaneIntersection (const Vect &frm, const Vect &aim,
                               const Vect &pnt, const Vect &nrm,
                               Vect *hit_pnt)

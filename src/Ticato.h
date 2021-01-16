@@ -40,6 +40,7 @@ class Ticato  :  public Alignifer
   Alignifer *bbox_subno;
   Jigglegon *aura;
   InterpColor interp_adjc;
+  InterpFloat dim_adj;
   bool born_from_flick;  // else spontaneously generated
 
   ZoftVect wander_vel;

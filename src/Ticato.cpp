@@ -9,6 +9,8 @@
 
 #include "AudioMessenger.hpp"
 
+#include "ScaleZoft.h"
+
 #include "ZeUUID.h"
 
 
@@ -44,10 +46,17 @@ void Ticato::WellAndTrulyConstruct (const FilmInfo &finf, const ClipInfo &clinf)
   gropoff . SetInterpTime (0.2);
   gropoff . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
 
+  dim_adj . SetInterpTime (0.75);
+  dim_adj . SetInterpFunc (InterpFuncs::LINEAR);
+  dim_adj . SetHard (1.0);
+
   interp_adjc . SetInterpTime (0.75);
 //  interp_adjc . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
   interp_adjc . SetHard (ZeColor (1.0, 1.0));
-  re -> AdjColorZoft () . BecomeLike (interp_adjc);
+
+  ScaleColor sc (interp_adjc, dim_adj);
+//  re -> AdjColorZoft () . BecomeLike (interp_adjc);
+    re -> AdjColorZoft () . BecomeLike (sc);
 }
 
 

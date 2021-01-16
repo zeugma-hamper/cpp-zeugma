@@ -3,6 +3,7 @@
 
 #include "GraumanPalace.h"
 #include "OeuvreAfterlife.h"
+#include "AtomicFreezone.h"
 
 #include "TexturedRenderable.hpp"
 
@@ -112,10 +113,15 @@ Alignifer *Orksur::PermaFixCollage ()
   texre -> AdjColorZoft () . BecomeLike (fader);
   texno -> Scale (Width ());
 
+  Alignifer *molecule = new Alignifer;
+  molecule -> SetName ("participating-atoms");
+  collage -> AppendChild (molecule);
+
   std::vector <Node *> ticlist = assembly -> ChildListCopy ();
   for (Node *no  :  ticlist)
     if (Ticato *tic = dynamic_cast <Ticato *> (no))
-      { collage -> AppendChild (tic);  // implicit excision from assembly
+      { // collage -> AppendChild (tic);  // implicit excision from assembly
+        molecule -> AppendChild (tic);  // implicit excision from assembly
 
         auto it = std::find (players . begin (), players . end (), tic);
         if (it  !=  players . end ())
@@ -215,6 +221,17 @@ void Orksur::EffectNextAscensionPhase ()
             { associated_cinelib->fader
                 . SetInterpTime (tam->asc_table_slide_time);
               associated_cinelib->fader . Set (ZeColor (1.0, 0.1));
+
+              if (AtomicFreezone *afz = Tamglobals::Only ()->sterngerlach)
+                { afz->dim_axis.pnt = associated_wallmaes -> Loc ();
+                  afz->dim_axis.dir = associated_wallmaes -> Up ();
+                  afz->dim_rad . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
+                  afz->dim_rad
+                    . SetInterpTime (tam->asc_table_slide_time
+                                     +  0.9 * tam->asc_first_rise_time);
+                  afz->dim_rad . SetHard (0.0);
+                  afz->dim_rad . Set (0.4 * associated_wallmaes -> Width ());
+                }
             }
           if (sherm)
             { i64 moid = ZeMonotonicID ();
@@ -327,6 +344,11 @@ void Orksur::EffectNextAscensionPhase ()
             { associated_cinelib->fader
                 . SetInterpTime (0.895 * tam->asc_second_rise_time);
               associated_cinelib->fader . Set (ZeColor (1.0, 1.0));
+
+              if (AtomicFreezone *afz = Tamglobals::Only ()->sterngerlach)
+                { afz->dim_rad . SetInterpTime (1.1 * tam->asc_second_rise_time);
+                  afz->dim_rad . Set (-0.1);
+                }
             }
           if (sherm)
             { i64 moid = ZeMonotonicID ();
@@ -339,7 +361,7 @@ void Orksur::EffectNextAscensionPhase ()
         { if (sherm)
             { i64 moid = ZeMonotonicID ();
               sherm -> SendPlaySound (tam->asc_enter_heaven_audio, moid);
-              sherm -> SendCleanSlate ();              
+              sherm -> SendCleanSlate ();
             }
           ConcludeAscension ();
           break;
