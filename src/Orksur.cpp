@@ -232,6 +232,11 @@ void Orksur::EffectNextAscensionPhase ()
           Node *amok = RetrieveValhalla () -> AmokField ();
           amok -> AppendChild (ascending_collage);
           ascending_collage -> InstallLocGrapplerZoft (asc_first_rise);
+          Vect s = ascending_collage -> CurScale ();
+          ascending_collage -> InstallScaleGrapplerZoft (asc_jump_scale);
+          asc_jump_scale . SetInterpTime (0.15 * tam->asc_first_rise_time);
+          asc_jump_scale . SetHard (0.005 * s);
+          asc_jump_scale . Set (s);
           Vect tabtop = Loc () + 0.5 * Height () * Up ();
           Vect wallstart
             = G::PointOntoPlaneProjection (tabtop, ma -> Loc (), ma -> Norm ());

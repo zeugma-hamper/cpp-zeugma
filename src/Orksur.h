@@ -83,6 +83,7 @@ class Orksur  :  public PlatonicMaes, public Node,
 
   InterpVect asc_table_slide;
   InterpVect asc_first_rise;
+  InterpVect asc_jump_scale;
   InterpVect asc_perf_bloat;
   MotherTime asc_hold_zeit;
   MotherTime asc_perf_zeit;
