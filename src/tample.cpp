@@ -533,10 +533,10 @@ fprintf(stderr,"harumph: <%s>\n", Tamparams::Current ()->asc_table_slide_audio.c
   tamp . AppendSceneLayer (left_layer);
   Layer *walls_layer = new Layer ();
   tamp . AppendSceneLayer (walls_layer);
-  Layer *omni_layer = new Layer ();
-  tamp . AppendSceneLayer (omni_layer);
   Layer *table_layer = new Layer ();
   tamp . AppendSceneLayer (table_layer);
+  Layer *omni_layer = new Layer ();
+  tamp . AppendSceneLayer (omni_layer);
 
   i32 const leaf_count = tamp . NumRenderLeaves();
   for (i32 i = 0; i < leaf_count; ++i)
@@ -834,15 +834,7 @@ g_tablecloth -> AppendChild (gridno);
 AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes;
 sherm -> SendStatus ("Running");
 
-
 std::vector <std::string>  collanomer {
-// "Collage01-Half-GryRnd.mp4",
-// "Collage08-Half-GryRnd.mp4",    // door-bachelors
-// "Collage5a-Half-GryRnd.mp4",     // turtle
-// "collage06_Half-GryRndv2.mp4",  // cake-milk-tony
-// "collage03-Half-GryRnd.mp4",    // bronson-dentures-mancandy
-// "Collage02b_Half-GryRndv2.mp4", // zombie-vu
-// "collage07b-Half-GryRnd.mp4"   // ufo
 "Collage01-Half-GryRnd.mp4",
 "Collage08-35.mp4",    // door-bachelors
 "collage06-35.mp4",  // cake-milk-tony

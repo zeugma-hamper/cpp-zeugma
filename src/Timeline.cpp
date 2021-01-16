@@ -35,7 +35,7 @@ texre->SetAdjColor(ZeColor(1.0,0.0,0.0));
   hover_nub -> Translate (hnub_pos);
   hover_adjc . SetInterpTime (0.4);
   hover_adjc . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
-  hover_adjc . SetHard (ZeColor (1.0, 1.0));
+  hover_adjc . SetHard (ZeColor (1.0, 0.0));
   hover_ren -> AdjColorZoft () . BecomeLike (hover_adjc);
 
   AppendRenderable (track_rend = new PolygonRenderable);
