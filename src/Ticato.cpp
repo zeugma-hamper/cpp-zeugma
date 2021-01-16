@@ -219,7 +219,7 @@ bool Ticato::SonoPlay ()
 { if (playing_sono >= 0  &&  playing_sono < sono_options . size ())
     if (AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes)
       { playing_prfm_id = ZeMonotonicID ();
-        sherm -> SendPlaySound (sono_options[playing_sono], playing_prfm_id);
+        sherm -> SendPlaySound (sono_options[playing_sono], playing_prfm_id, 103); // 103 is non-zero collage_id -- for now we only have 1 table / collage to worry about
         shabby_loop_minder . Restart ();
         return true;
       }

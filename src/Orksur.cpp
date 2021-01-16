@@ -212,6 +212,7 @@ void Orksur::EffectNextAscensionPhase ()
           if (sherm)
             { i64 moid = ZeMonotonicID ();
               sherm -> SendPlaySound (tam->asc_table_slide_audio, moid);
+              sherm -> SendFadeOut ();
             }
           break;
         }
@@ -269,6 +270,7 @@ void Orksur::EffectNextAscensionPhase ()
           // and trigger whatever 'performance' bits there may be...
           if (sherm)
             { i64 moid = ZeMonotonicID ();
+              sherm -> SendFadeIn ();              
               sherm -> SendPlaySound (tam->asc_presentation_audio, moid);
             }
           break;
@@ -291,6 +293,7 @@ void Orksur::EffectNextAscensionPhase ()
           if (sherm)
             { i64 moid = ZeMonotonicID ();
               sherm -> SendPlaySound (tam->asc_ensvelten_audio, moid);
+              sherm -> SendFadeOut ();
             }
           break;
         }
@@ -319,6 +322,7 @@ void Orksur::EffectNextAscensionPhase ()
         { if (sherm)
             { i64 moid = ZeMonotonicID ();
               sherm -> SendPlaySound (tam->asc_enter_heaven_audio, moid);
+              sherm -> SendCleanSlate ();              
             }
           ConcludeAscension ();
           break;
