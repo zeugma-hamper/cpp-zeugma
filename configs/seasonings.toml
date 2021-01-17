@@ -1,23 +1,23 @@
 
 
-asc-table-slide-time = 6.04
-asc-first-rise-time = 5.05
-asc-enbloaten-time = 3.5
-asc-before-preso-hold-time = 1.5
+asc-table-slide-time = 4.04
+asc-first-rise-time = 8.05
+asc-enbloaten-time = 3.9
+asc-before-preso-hold-time = 4.9
 asc-presentation-time = 9.0
 asc-after-preso-hold-time = 0.5
-asc-ensvelten-time = 2.8
-asc-second-rise-time = 17.06
+asc-ensvelten-time = 1.8
+asc-second-rise-time = 20.06
 asc-enter-heaven-time = 3.0
 
-asc-table-slide-audio = "Tamper_table-slide-1.wav"
-asc-first-rise-audio = "Tamper_first-rise-3.wav"
-asc-enbloaten-audio = "Tamper_enbloaten-5.wav"
+asc-table-slide-audio = "Tamper_table-slide-6.wav"
+asc-first-rise-audio = "Tamper_first-rise-4.wav"
+asc-enbloaten-audio = "Tamper_enbloaten-4.wav"
 asc-before-preso-hold-audio = "nihil3"
 asc-presentation-audio = "nihil4"
 asc-after-preso-hold-audio = "nihil5"
-asc-ensvelten-audio = "Tamper_ensvelten-1.wav"
-asc-second-rise-audio = "Tamper_second-rise-2.wav"
+asc-ensvelten-audio = "Tamper_ensvelten-3.wav"
+asc-second-rise-audio = "Tamper_second-rise-3.wav"
 asc-enter-heaven-audio = "nihil8"
 
 

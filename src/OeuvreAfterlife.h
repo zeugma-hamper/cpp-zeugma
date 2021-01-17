@@ -13,6 +13,7 @@
 #include "SumZoft.h"
 #include "ScaleZoft.h"
 #include "SinuZoft.h"
+#include "InterpZoft.h"
 
 #include <vector>
 
@@ -32,11 +33,18 @@ class Ollag  :  public Alignifer
   ZoftVect own_private_idahover;
   ZoftVect own_private_idahup;
   ZoftVect central_loc;
+  InterpFloat conga_pos;
+  i64 conga_ordinal;
+  i64 conga_directn;
+  MotherTime conga_timer;
 
   Ollag (const std::string &fname);
 
   void AlignOverUp (const Vect &ov, const Vect &up)  override;
   void AlignToMaes (const PlatonicMaes *maes)  override;
+
+  bool PresentlyCongaing ()
+    { return ! conga_pos . Replete (); }
 
   void SetCentralLoc (const Vect &l);
 };
@@ -50,6 +58,12 @@ class OeuvreAfterlife  :  public SpectacleCauseway
 
   void AppendCollage (Ollag *ol);
   void DistributeCollagesEquitably ();
+
+  Ollag *CollageFromOrdinal (i64 ord);
+
+  void IntroduceNewCollage (Ollag *nol);
+
+  void OverseeCongaAction (Ollag *ag);
 
   i64 Inhale (i64 ratch, f64 thyme)  override;
 };

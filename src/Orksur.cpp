@@ -326,12 +326,6 @@ void Orksur::EffectNextAscensionPhase ()
 
       case ASCPH_PRESENTATION:
         { asc_perf_zeit . ZeroTime ();
-          // asc_coll_fader . SetInterpFunc (InterpFuncs::LINEAR);
-          // asc_covr_fader . SetInterpFunc (InterpFuncs::LINEAR);
-          // asc_coll_fader . SetInterpTime (0.2);
-          // asc_covr_fader . SetInterpTime (0.2);
-          // asc_coll_fader . Set (ZeColor (1.0, 1.0));
-          // asc_covr_fader . Set (ZeColor (1.0, 0.0));
           // and trigger whatever 'performance' bits there may be...
           if (sherm)
             { i64 moid = ZeMonotonicID ();
@@ -395,7 +389,11 @@ void Orksur::EffectNextAscensionPhase ()
         }
 
       case ASCPH_ENTER_HEAVEN:
-        { if (sherm)
+        { if (OeuvreAfterlife *valhalla = RetrieveValhalla ())
+            { Ollag *new_coll = new Ollag ("");
+              valhalla -> IntroduceNewCollage (new_coll);
+            }
+          if (sherm)
             { i64 moid = ZeMonotonicID ();
               sherm -> SendPlaySound (tam->asc_enter_heaven_audio, moid);
               sherm -> SendCleanSlate ();

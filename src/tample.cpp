@@ -845,10 +845,14 @@ std::vector <std::string>  collanomer {
 "collage07b-35.mp4",   // ufo
 };
 
+ i64 ordnl = -5;
  for (std::string &nm  :  collanomer)
    { //std::string path = "/opt/trelopro/tamper/demo-temp/fin-col/" + nm;
      std::string path = "/opt/trelopro/tamper/demo-temp/Blurred-Ellipse/" + nm;
-     ova -> AppendCollage (new Ollag (path));
+     Ollag *ag = new Ollag (path);
+     ag->conga_directn = -1;
+     ag->conga_ordinal = ordnl++;
+     ova -> AppendCollage (ag);
    }
   ova -> DistributeCollagesEquitably ();
 

@@ -37,11 +37,12 @@ Ollag::Ollag (const std::string &fname)  :  Alignifer (), re (NULL),
   aggregate_local_motion . SummandA () . BecomeLike (vrt_bobbl);
   aggregate_local_motion . SummandB () . BecomeLike (lat_slosh);
   SumVect totality (central_loc, aggregate_local_motion);
-  LocZoft () . BecomeLike (totality);
 
-  if (TrGrappler *trg
-      = dynamic_cast <TrGrappler *> (FindGrappler ("loc")))
-    trg -> TranslationZoft () . BecomeLike (LocZoft ());
+  InstallLocGrapplerZoft (totality);
+
+  conga_pos . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
+  conga_timer . SetTimeFlowRate (-1.0);
+  conga_timer . SetTime (-10.0);
 }
 
 
@@ -105,13 +106,83 @@ void OeuvreAfterlife::DistributeCollagesEquitably ()
         { auto maesandpos = MaesAndPosFromMeanderDist (l);
           ag -> AlignToMaes (maesandpos.first);
           ag -> SetCentralLoc (maesandpos.second);
+          ag->conga_pos . SetHard (l);
         }
       l -= spcng;
     }
 }
 
 
+
+Ollag *OeuvreAfterlife::CollageFromOrdinal (i64 ord)
+{ for (Ollag *ag  :  llages)
+    if (ag)
+      if (ag->conga_ordinal  ==  ord)
+        return ag;
+  return NULL;
+}
+
+
+void OeuvreAfterlife::IntroduceNewCollage (Ollag *nol)
+{ if (! nol)
+    return;
+
+  nol->conga_ordinal = 0;
+
+  if (Ollag *zerollage = CollageFromOrdinal (0))
+    { i64 dir = zerollage->conga_directn;
+      nol->conga_directn = -dir;
+      for (Ollag *ag  :  llages)
+        if (ag)
+          if (dir * ag->conga_ordinal  >=  0)
+            ag->conga_ordinal += dir;
+      f64 sp = zerollage->conga_pos . PointB () . Val ();
+      sp += (f64)dir * Tamparams::Current ()->coll_spacing;
+      f64 slosht = Tamparams::Current ()->coll_slosh_time;
+      zerollage->conga_pos . SetInterpTime (slosht);
+      zerollage->conga_pos . Set (sp);
+      zerollage->conga_timer . SetTime (-0.225 * slosht);
+      zerollage->conga_timer . SetTimeFlowRate (1.0);
+    }
+  else
+    nol->conga_directn = 1;
+
+  llages . push_back (nol);
+  if (amok_field)
+    amok_field -> AppendChild (nol);
+}
+
+
+void OeuvreAfterlife::OverseeCongaAction (Ollag *ag)
+{ if (! ag)
+    return;
+
+  f64 linpos = ag->conga_pos.val;
+  auto maesandpos = MaesAndPosFromMeanderDist (linpos);
+  ag -> AlignToMaes (maesandpos.first);
+  ag -> SetCentralLoc (maesandpos.second);
+
+  i64 dir = ag->conga_directn;
+  if (ag->conga_timer . CurTimeGlance ()  >=  0)
+    { f64 slosht = Tamparams::Current ()->coll_slosh_time;
+      if (Ollag *nxtag = CollageFromOrdinal (ag->conga_ordinal + dir))
+        { f64 sp = nxtag->conga_pos . PointB () . Val ();
+          sp += (f64)dir * Tamparams::Current ()->coll_spacing;
+          nxtag->conga_pos . SetInterpTime (slosht);
+          nxtag->conga_pos . Set (sp);
+          nxtag->conga_timer . SetTime (-0.225 * slosht);
+          nxtag->conga_timer . SetTimeFlowRate (1.0);
+        }
+      ag->conga_timer . SetTime (-10.0 * slosht);
+      ag->conga_timer . SetTimeFlowRate (-1.0);
+    }
+}
+
+
 i64 OeuvreAfterlife::Inhale (i64 ratch, f64 thyme)
-{
+{ for (Ollag *ag  :  llages)
+    if (ag  &&  ag -> PresentlyCongaing ())
+      OverseeCongaAction (ag);
+
   return 0;
 }
