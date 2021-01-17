@@ -328,6 +328,7 @@ Node *Node::ExciseChild (Node *_node)
   Node *n = *it;
   m_children.erase (it);
   n -> SetLayer (nullptr);
+  n->m_parent = NULL;
   return n;
 }
 
