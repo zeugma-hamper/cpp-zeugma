@@ -117,6 +117,7 @@ class Orksur  :  public PlatonicMaes, public Node,
     { return (ascension_phase  >=  0); }
   void ConcludeAscension ();
   bool AscensionPhaseJustNowDone ();
+  void IndulgeAscensionInterstitials ();
   void EffectNextAscensionPhase ();
 
   Jigglegon *FurnishFreeJiggler ();

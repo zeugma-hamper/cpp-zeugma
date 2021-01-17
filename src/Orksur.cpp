@@ -222,6 +222,39 @@ bool Orksur::AscensionPhaseJustNowDone ()
 }
 
 
+void Orksur::IndulgeAscensionInterstitials ()
+{ Tamparams *tam = Tamparams::Current ();
+  switch (ascension_phase)
+    { case ASCPH_TABLE_SLIDE:
+        break;
+
+      case ASCPH_FIRST_RISE:
+        break;
+
+      case ASCPH_ENBLOATEN:
+        break;
+
+      case ASCPH_BEFORE_PRESO:
+        break;
+
+      case ASCPH_PRESENTATION:
+        break;
+
+      case ASCPH_AFTER_PRESO:
+        break;
+
+      case ASCPH_ENSVELTEN:
+        break;
+
+      case ASCPH_SECOND_RISE:
+        break;
+
+      default:
+        break;
+    }
+}
+
+
 void Orksur::EffectNextAscensionPhase ()
 { Tamparams *tam = Tamparams::Current ();
   AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes;
@@ -962,7 +995,8 @@ i64 Orksur::TASSuggestion (TASSuggestionEvent *e)
 
 i64 Orksur::Inhale (i64 ratch, f64 thyme)
 { if (CurrentlyAscending ())
-    { if (AscensionPhaseJustNowDone ())
+    { IndulgeAscensionInterstitials ();
+      if (AscensionPhaseJustNowDone ())
         EffectNextAscensionPhase ();
     }
 

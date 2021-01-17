@@ -103,3 +103,8 @@ bld-asan
 bld-clang
 bld-release
 bld-msgs
+
+
+# yeah, well, thanks for all that. and now files specific to this project:
+
+configs/window-config.toml
