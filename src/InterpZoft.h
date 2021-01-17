@@ -193,7 +193,12 @@ class InterpZoft  :  public ZoftThing <T>
     { return ProceedTo (p)  &&  Commence (); }
 
   bool SetHard (const T &p)
-    { return ProceedTo (p)  &&  Finish (); }
+    { if (ProceedTo (p)  &&  Finish ())
+        { GutsIfOrigType () -> PuppeteerHosts (p);
+          return true;
+        }
+      return false;
+    }
 
   ZoftThing <T> &PointA ()
     { if (GutsTyp *g = GutsIfOrigType ())

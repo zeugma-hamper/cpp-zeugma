@@ -162,7 +162,8 @@ class ZoftThing
     { if (! guts)
         val = v;
       else if (LatchGuts <T> *lg = dynamic_cast <LatchGuts <T> *> (guts))
-        val = lg->latchval = v;
+        lg -> PuppeteerHosts (lg->latchval = v);
+        // val = lg->latchval = v;
       else
         return *this;
       just_changed = true;
@@ -256,6 +257,7 @@ class ZoftThing
 using ZoftFloat = ZoftThing <f64>;
 using ZoftVect = ZoftThing <Vect>;
 using ZoftColor = ZoftThing <ZeColor>;
+
 
 extern const ZoftFloat ZoftFloat_zero;
 extern const ZoftVect ZoftVect_zero;
