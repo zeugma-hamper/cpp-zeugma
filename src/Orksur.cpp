@@ -51,6 +51,24 @@ Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
     = CreateTexture2D ("../ui-visuals/ellipse-blanc-99px-blur.png",
                        DefaultTextureFlags);
 
+  asc_slipcover = new Alignifer;
+
+  TextureParticulars slip_base_tp
+    = CreateTexture2D ("../ui-visuals/slipcover-base.png", DefaultTextureFlags);
+  TexturedRenderable *slip_base_re = new TexturedRenderable (slip_base_tp);
+  slip_base_re -> AdjColorZoft () . Set (ZeColor (0.7, 0.65, 0.15, 1.0));
+  Node *slip_base_no = new Node (slip_base_re);
+  asc_slipcover -> AppendChild (slip_base_no);
+
+  TextureParticulars slip_iris_tp
+    = CreateTexture2D ("../ui-visuals/slipcover-iris.png", DefaultTextureFlags);
+  TexturedRenderable *slip_iris_re = new TexturedRenderable (slip_iris_tp);
+  Node *slip_iris_no = new Node (slip_iris_re);
+  slip_iris_no -> Rotate (ZoftVect (Vect::zaxis),
+                          LoopFloat (0.0, 2.0 * M_PI / 8.5, 8.5));
+  asc_slipcover -> AdjColorZoft () . BecomeLike (asc_covr_fader);
+  asc_slipcover -> AppendChild (slip_iris_no);
+
   RetrieveValhalla ();
 }
 
@@ -115,6 +133,8 @@ Alignifer *Orksur::PermaFixCollage ()
 
   Alignifer *molecule = new Alignifer;
   molecule -> SetName ("participating-atoms");
+  molecule -> AdjColorZoft () . BecomeLike (asc_coll_fader);
+  asc_coll_fader . SetHard (ZeColor (1.0, 1.0));
   collage -> AppendChild (molecule);
 
   std::vector <Node *> ticlist = assembly -> ChildListCopy ();
@@ -263,6 +283,10 @@ void Orksur::EffectNextAscensionPhase ()
           asc_first_rise . SetHard (wallstart);
           asc_first_rise . Set (ma -> Loc ()
                                 +  0.5 * ma -> Height () * ma -> Up ());
+          asc_slipcover -> ScaleZoft () . Set (Vect (Width ()));
+          ascending_collage -> AppendChild (asc_slipcover);
+          asc_coll_fader . SetHard (ZeColor (1.0, 0.0));
+          asc_covr_fader . SetHard (ZeColor (1.0, 1.0));
           if (sherm)
             { i64 moid = ZeMonotonicID ();
               sherm -> SendPlaySound (tam->asc_first_rise_audio, moid);
@@ -287,6 +311,12 @@ void Orksur::EffectNextAscensionPhase ()
 
       case ASCPH_BEFORE_PRESO:
         { asc_hold_zeit . ZeroTime ();
+          asc_coll_fader . SetInterpFunc (InterpFuncs::LINEAR);
+          asc_covr_fader . SetInterpFunc (InterpFuncs::LINEAR);
+          asc_coll_fader . SetInterpTime (0.9 * tam->asc_before_preso_hold_time);
+          asc_covr_fader . SetInterpTime (0.6 * tam->asc_before_preso_hold_time);
+          asc_coll_fader . Set (ZeColor (1.0, 1.0));
+          asc_covr_fader . Set (ZeColor (1.0, 0.0));
           if (sherm)
             { i64 moid = ZeMonotonicID ();
               sherm -> SendPlaySound (tam->asc_before_preso_hold_audio, moid);
@@ -296,6 +326,12 @@ void Orksur::EffectNextAscensionPhase ()
 
       case ASCPH_PRESENTATION:
         { asc_perf_zeit . ZeroTime ();
+          // asc_coll_fader . SetInterpFunc (InterpFuncs::LINEAR);
+          // asc_covr_fader . SetInterpFunc (InterpFuncs::LINEAR);
+          // asc_coll_fader . SetInterpTime (0.2);
+          // asc_covr_fader . SetInterpTime (0.2);
+          // asc_coll_fader . Set (ZeColor (1.0, 1.0));
+          // asc_covr_fader . Set (ZeColor (1.0, 0.0));
           // and trigger whatever 'performance' bits there may be...
           if (sherm)
             { i64 moid = ZeMonotonicID ();
@@ -307,6 +343,7 @@ void Orksur::EffectNextAscensionPhase ()
 
       case ASCPH_AFTER_PRESO:
         { asc_hold_zeit . ZeroTime ();
+          ascending_collage -> ExciseChild (asc_slipcover); // save; reuse
           if (sherm)
             { i64 moid = ZeMonotonicID ();
               sherm -> SendPlaySound (tam->asc_after_preso_hold_audio, moid);

@@ -88,6 +88,10 @@ class Orksur  :  public PlatonicMaes, public Node,
   MotherTime asc_hold_zeit;
   MotherTime asc_perf_zeit;
   InterpVect asc_final_rise;
+  InterpColor asc_coll_fader;
+  InterpColor asc_covr_fader;
+
+  Alignifer *asc_slipcover;
 
   static std::vector <Jigglegon *> fallow_jigs;
 

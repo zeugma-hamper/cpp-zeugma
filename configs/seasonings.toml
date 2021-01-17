@@ -3,7 +3,7 @@
 asc-table-slide-time = 4.04
 asc-first-rise-time = 5.05
 asc-enbloaten-time = 3.5
-asc-before-preso-hold-time = 2.5
+asc-before-preso-hold-time = 1.5
 asc-presentation-time = 9.0
 asc-after-preso-hold-time = 0.5
 asc-ensvelten-time = 2.8
