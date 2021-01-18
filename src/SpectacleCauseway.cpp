@@ -37,25 +37,36 @@ f64 SpectacleCauseway::MeanderLength ()
 
 
 std::pair <PlatonicMaes *, Vect>
- SpectacleCauseway::MaesAndPosFromMeanderDist (f64 d)
+ SpectacleCauseway::MaesAndPosFromMeanderDist (f64 d, bool clamp_to_ends)
 { if (meander . size ()  ==  0)
     assert (&"blue"  ==  &"cyan");
   f64 len = MeanderLength ();
+  f64 orig_d = d;
 
   if (d  <  0.0)
     d = 0.0;
   else if (d  >  len)
     d = len;
 
-  for (Swath *sw  :  meander)
-    { G::Segment &s = sw->prone;
+  bool lop = false;
+  Swath *sw = NULL;
+  G::Segment s;
+  for (Swath *swth  :  meander)
+    { sw = swth;
+      if (lop)
+        { d -= len;
+          orig_d -= len;
+        }
+      s = sw->prone;
       len = s . Length ();
       if (d  <=  len)
-        { Vect p = s.pt1  +  (d / len) * (s.pt2 - s.pt1);
-          return { sw->supporting_maes, p };
-        }
-      d -= len;
+        break;
+      lop = true;
     }
 
-  assert (&"hello"  ==  &"adios");
+  Vect p = clamp_to_ends
+    ?  s.pt1  +  (d / len) * (s.pt2 - s.pt1)
+    :  s.pt1  +  (orig_d / len) * (s.pt2 - s.pt1);
+
+  return { sw->supporting_maes, p };
 }

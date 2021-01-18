@@ -51,7 +51,8 @@ class SpectacleCauseway  :  public Zeubject,
     { amok_field = af; }
 
   f64 MeanderLength ();
-  std::pair <PlatonicMaes *, Vect> MaesAndPosFromMeanderDist (f64 d);
+  std::pair <PlatonicMaes *, Vect>
+    MaesAndPosFromMeanderDist (f64 d, bool clamp_to_ends = true);
 };
 
 

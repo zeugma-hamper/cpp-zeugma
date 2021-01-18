@@ -158,7 +158,7 @@ void OeuvreAfterlife::OverseeCongaAction (Ollag *ag)
     return;
 
   f64 linpos = ag->conga_pos.val;
-  auto maesandpos = MaesAndPosFromMeanderDist (linpos);
+  auto maesandpos = MaesAndPosFromMeanderDist (linpos, false);
   ag -> AlignToMaes (maesandpos.first);
   ag -> SetCentralLoc (maesandpos.second);
 
