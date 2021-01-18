@@ -90,6 +90,7 @@ class Orksur  :  public PlatonicMaes, public Node,
   InterpVect asc_final_rise;
   InterpColor asc_coll_fader;
   InterpColor asc_covr_fader;
+  MotherTime asc_hvn_incrsn_zeit;
 
   Alignifer *asc_slipcover;
 
