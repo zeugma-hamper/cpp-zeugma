@@ -123,6 +123,17 @@ void AudioMessenger::SendGetSuggestions (stringy_list &extant_atoms,
   SendMessage("/ta/get_suggestions", j.dump ());
 }
 
+void AudioMessenger::SendStoreSuggestion (const std::string &atom_name,
+                                         const std::string &suggested_sound_name)
+{
+  assert (m_audio_address);
+
+  nlohmann::json j;
+  j["atom"] = new_atom;
+  j["suggestion"] = duration;
+  SendMessage("/ta/store_suggestion", j.dump ());
+}
+
 void AudioMessenger::SendStatus(std::string_view _status_string)
 {
   assert (m_audio_address);
