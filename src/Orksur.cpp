@@ -140,11 +140,14 @@ Alignifer *Orksur::PermaFixCollage ()
   asc_coll_fader . SetHard (ZeColor (1.0, 1.0));
   collage -> AppendChild (molecule);
 
+  ascendees . clear ();
+
   std::vector <Node *> ticlist = assembly -> ChildListCopy ();
   for (Node *no  :  ticlist)
     if (Ticato *tic = dynamic_cast <Ticato *> (no))
       { // collage -> AppendChild (tic);  // implicit excision from assembly
         molecule -> AppendChild (tic);  // implicit excision from assembly
+        ascendees . push_back (tic);
 
         auto it = std::find (players . begin (), players . end (), tic);
         if (it  !=  players . end ())
@@ -189,6 +192,11 @@ void Orksur::ConcludeAscension ()
         sc /= Width ();
         ZoftVect neutral_sc ((Vect (sc)));  // delightful, o great vexcrap
         ascending_collage -> InstallScaleGrapplerZoft (neutral_sc);
+
+        for (Ticato *tic  :  ascendees)
+          if (tic)
+            tic -> SonoSilence ();
+        ascendees . clear ();
       }
   ascension_phase = -1;
 }
