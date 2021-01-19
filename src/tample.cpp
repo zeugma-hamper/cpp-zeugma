@@ -339,6 +339,14 @@ i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
       Tamglobals::Only ()->construction_marks_color . Reverse ();
       Tamglobals::Only ()->construction_marks_color . Commence ();
     }
+  else if (utt  ==  "c")
+    { Tamglobals::Only ()->clapper_visuals -> AdjColorZoft ()
+        . SetHard (ZeColor (1.0, 1.0));
+      Tamglobals::Only ()->clapper_cnt
+        = Tamparams::Current ()->clapper_vis_frame_cnt;
+      if (AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes)
+        sherm -> SendPlayBoop (3);
+    }
   return 0;
 }
 
@@ -399,6 +407,15 @@ bool Tampo::DoWhatThouWilt (i64 ratch, f64 thyme)
 
   if (vreaft)
     vreaft -> Inhale (ratch, thyme);
+
+  i64 &clac = Tamglobals::Only ()->clapper_cnt;
+  if (clac  >  0)
+    --clac;
+  else if (clac  ==  0)
+    { Tamglobals::Only ()->clapper_visuals -> AdjColorZoft ()
+        . SetHard (ZeColor (1.0, 0.0));
+      clac = -1;
+    }
 
   return true;
 }
@@ -597,6 +614,10 @@ fprintf(stderr,"harumph: <%s>\n", Tamparams::Current ()->asc_table_slide_audio.c
   Node *g_conveyor = new Node;
   omni_layer -> GetRootNode () -> AppendChild (g_conveyor);
   Tamglobals::Only ()->conveyor = g_conveyor;
+
+  Node *g_fiducials = new Node;
+  omni_layer -> GetRootNode () -> AppendChild (g_fiducials);
+  Tamglobals::Only ()->fiducials = g_fiducials;
 
   Node *g_windshield = new Node;
   omni_layer -> GetRootNode () -> AppendChild (g_windshield);
@@ -832,18 +853,18 @@ g_tablecloth -> AppendChild (gridno);
       lpr -> AppendLine ({r - v, l - v});
     }
 
-AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes;
-sherm -> SendStatus ("Running");
+  AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes;
+  sherm -> SendStatus ("Running");
 
-std::vector <std::string>  collanomer {
-"Collage01-Half-GryRnd.mp4",
-"Collage08-35.mp4",    // door-bachelors
-"collage06-35.mp4",  // cake-milk-tony
-"collage05a-35.mp4",     // turtle
-"collage03-35.mp4",    // bronson-dentures-mancandy
-"Collage02b-35.mp4", // zombie-vu
-"collage07b-35.mp4",   // ufo
-};
+  std::vector <std::string>  collanomer {
+    "Collage01-Half-GryRnd.mp4",
+    "Collage08-35.mp4",    // door-bachelors
+    "collage06-35.mp4",  // cake-milk-tony
+    "collage05a-35.mp4",     // turtle
+    "collage03-35.mp4",    // bronson-dentures-mancandy
+    "Collage02b-35.mp4", // zombie-vu
+    "collage07b-35.mp4",   // ufo
+  };
 
  i64 ordnl = -5;
  for (std::string &nm  :  collanomer)
@@ -862,6 +883,31 @@ std::vector <std::string>  collanomer {
   Tamglobals::Only ()->construction_marks . push_back (wframe_node);
 
   afz -> PopulateFromScratch ();
+
+  std::vector <PlatonicMaes *> every_maes
+    { frnt, left, tabl };
+  Node *clavi = new Node;
+  for (PlatonicMaes *ma  :  every_maes)
+    if (ma)
+      { PolygonRenderable *pre = new PolygonRenderable;
+        Vect vv = 0.5 * (Vect::xaxis - Vect::yaxis);
+        pre -> AppendVertex (ZoftVect (vv));
+        vv += Vect::yaxis;
+        pre -> AppendVertex (ZoftVect (vv));
+        vv -= Vect::xaxis;
+        pre -> AppendVertex (ZoftVect (vv));
+        vv -= Vect::yaxis;
+        pre -> AppendVertex (ZoftVect (vv));
+
+        Alignifer *square = new Alignifer (pre);
+        square -> AlignToMaes (ma);
+        square -> ScaleZoft () . Set (Vect (0.5 * ma -> Height ()));
+        square -> LocZoft () . Set (ma -> Loc ());
+        clavi -> AppendChild (square);
+      }
+  g_fiducials -> AppendChild (clavi);
+  clavi -> AdjColorZoft () . SetHard (ZeColor (1.0, 0.0));
+  Tamglobals::Only ()->clapper_visuals = clavi;
 
   AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.freezo);
   AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.freezo);
