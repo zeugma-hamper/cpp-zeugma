@@ -405,6 +405,9 @@ bool Tampo::DoWhatThouWilt (i64 ratch, f64 thyme)
   if (gegyp)
     gegyp -> Inhale (ratch, thyme);
 
+  if (gchin)
+    gchin -> Inhale (ratch, thyme);
+
   if (freezo)
     freezo -> Inhale (ratch, thyme);
 
@@ -509,17 +512,7 @@ int main (int ac, char **av)
     ("seasonings", po::value <std::string> (&seasonings_filename),
      "toml file (default: ../configs/seasonings.toml)")
     ("sane-json", "json slurped from liblo isn't wrapped in an array")
-/*    ("prison-break", "escaped elements only mode")
-    ("clip-collages", "disallow collage elements outside rect-bounds")
-    ("background-gray", po::value<f64>(&global_param_background_gray),
-     "gray value (range 0.0-1.0) for screen background; default is 0.0")
-    ("ee-scale", po::value<f64>(&global_param_ee_scale),
-     "median scale for escaped elements; default is 0.5")
-    ("ee-scale-delta", po::value<f64>(&global_param_ee_scale_delta),
-     "+/- scale range for escaped elements (around median); default is 0.0")
-    ("ee-count-per-wall", po::value<i32>(&global_param_ee_count_per_wall),
-     "how many escaped elements per wall; default 10")*/
-    ;
+   ;
 
   po::variables_map arg_map;
   po::store (po::parse_command_line (ac, av, desc), arg_map);
@@ -533,12 +526,7 @@ int main (int ac, char **av)
 
   if (arg_map . count ("sane-json"))
     json_is_not_insanely_wrapped = true;
-/*
-  if (arg_map.count ("prison-break"))
-    global_params_prison_break_mode = true;
-  if (arg_map . count ("clip-collages"))
-    global_param_should_clip_collages = true;
-*/
+
   Tampo tamp;
   solo_tamp = &tamp;
 
@@ -718,7 +706,7 @@ gridre -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
 
   GraumanPalace *grau_egyp = new GraumanPalace;
   grau_egyp -> ImportExhibitionRoster (film_infos);
-  grau_egyp -> JumpToFlick (0);
+  grau_egyp -> JumpToFlick (0, false);
   grau_egyp -> SetBackingMaes (frnt);
   (grau_egyp -> Translate (cine_cnt)) -> SetName ("transly");
   g_front_wall -> AppendChild (grau_egyp);
@@ -737,67 +725,12 @@ gridre -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
   drand48 ();
   grau_chin -> ReleasePushback ();
 //  grau_chin -> JumpToRandomFlick ();
-  grau_chin -> JumpToFlick (11);
+  grau_chin -> JumpToFlick (11, true);
   grau_chin -> SetBackingMaes (left);
   g_left_wall -> AppendChild (grau_chin);
 
   tamp.gchin = ch_ptr <GraumanPalace> (grau_chin);
 
-/*
-  Node *splat = new Node;
-  PolygonRenderable *polysplat = new PolygonRenderable;
-  i64 nv = 14;
-  SinuVect centz (1000.0 * frnt -> Over (), 0.05, frnt -> Loc ());
-  for (i64 q = 0  ;  q < nv  ;  ++q)
-    { f64 r = 0.3 * frnt -> Height ();
-      f64 theeeta = 2.0 * M_PI / (f64)nv * (f64)q;
-      Vect radv = cos (theeeta) * Vect::xaxis  +  sin (theeeta) * Vect::yaxis;
-      SinuVect arm (0.3 * r * radv, 0.166 + 0.05 * drand48 (),
-                    0.5 * (1.0 + q%2) * r * radv);
-      SumVect voit (arm, centz);
-      polysplat -> AppendVertex (voit);
-    }
-  polysplat -> SetFillColor (SinuZoft (ZeColor (0.0, 0.0, 0.5, 0.3), 0.16,
-                                       ZeColor (1.0, 1.0, 0.0, 0.3)));
-  splat -> AppendRenderable (polysplat);
-  polysplat -> SetShouldEdge (true);
-//  polysplat -> SetShouldFill (false);
-//  polysplat -> SetShouldClose (false);
-  g_windshield -> AppendChild (splat);
-*/
-
-/*
-  splat = new Node (polysplat = new PolygonRenderable);
-  f64 jiglet = 0.025 * frnt -> Height ();
-  SinuVect jigamp (Vect (jiglet, jiglet, 0.0), 0.2975);
-  for (i64 q = 0  ;  q < 12  ;  ++q)
-    { f64 r = 0.3 * frnt -> Height ();
-      f64 theeeta = 0.5 * M_PI * (f64)q;
-      ZoftVect crnr (frnt -> Loc ()
-                     +  r * cos (theeeta) * Vect::xaxis
-                     +  r * sin (theeeta) * Vect::yaxis);
-      RandVect jigv (jigamp, ZoftVect ());
-      SumVect voitex (crnr, jigv);
-      polysplat -> AppendVertex (voitex);
-    }
-  splat -> AppendRenderable (polysplat);
-  polysplat -> SetShouldEdge (true);
-  polysplat -> SetEdgeColor (ZeColor (1.0, 0.25));
-  polysplat -> SetShouldFill (false);
-//  g_windshield -> AppendChild (splat);
-*/
-
-/*
-  TextureParticulars tipi
-    = CreateTexture2D ("/tmp/SIGN.jpg", DefaultTextureFlags);
-  TexturedRenderable *texre = new TexturedRenderable (tipi);
-  texre -> AdjColorZoft ()
-    . BecomeLike (SinuColor (ZeColor (0.0, 0.5), 1.0, ZeColor (1.0, 0.5)));
-  Node *texno = (tamp.texxyno = new Node (texre));
-  texno -> Scale (1300.0);
-  texno -> Translate (frnt -> Loc ());
-//  g_wallpaper -> AppendChild (texno);
-*/
 
   InterpColor atmbb_wall_col (ZeColor (0.0, 0.0), ZeColor (0.5, 0.5), 0.4);
   InterpColor atmbb_tabl_col (ZeColor (0.0, 0.0), ZeColor (0.5, 0.5), 0.4);
@@ -936,9 +869,6 @@ gridre -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
         gridre -> SetWarp (0.00525 * ma -> Over ());
         gridre -> SetWeft (0.00525 * ma -> Up ());
 
-// gridre -> SetDiscRadius (220.0);
-// gridre -> SetDiscCenter (tabl -> Loc () + 150.0 * tabl -> Up ()
-//                          + 50.0 * tabl -> Norm ());
         gridre -> SpanFractionZoft () . Set (0.4);
 
         gridre -> SetGridColor (ZeColor (1.0, 1.0, 1.0, 0.35));
@@ -953,6 +883,7 @@ gridre -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
   Tamglobals::Only ()->wall_grids = walgr;
   Tamglobals::Only ()->wall_grid_fader = wal_iro;
   Tamglobals::Only ()->wall_grid_fader . BecomeLike (wal_iro);
+
 
   AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.freezo);
   AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.freezo);
