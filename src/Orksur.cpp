@@ -188,7 +188,7 @@ void Orksur::ConcludeAscension ()
       { ZoftVect nullpos (Vect (0.0, 0.0, 0.0));
         ascending_collage -> InstallLocGrapplerZoft (nullpos);
         Vect sc = ascending_collage -> CurScale ();
-        sc /= (1.8 * Width ());
+        sc /= cntr_coll -> CurScale (); // /= (1.8 * Width ());
         ZoftVect neutral_sc ((Vect (sc)));  // delightful, o great vexcrap
         ascending_collage -> InstallScaleGrapplerZoft (neutral_sc);
 
