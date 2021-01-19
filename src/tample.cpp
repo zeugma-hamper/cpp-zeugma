@@ -327,7 +327,10 @@ i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
       if (nes  !=  Tamglobals::Only ()->cur_elev_stop)
         { Tamglobals::Only ()->cur_elev_stop = -nes;
           if (oto)
-            solo_tamp->elev_transl . Set (Vect (0.0, -nes, 0.0));
+            { solo_tamp->elev_transl . Set (Vect (0.0, -nes, 0.0));
+              Tamglobals::Only ()->wall_grid_fader . Set (ZeColor (1.0, 0.5));
+              Tamglobals::Only ()->wall_grid_active = true;
+            }
         }
     }
   else if (utt  ==  "t")
@@ -415,6 +418,14 @@ bool Tampo::DoWhatThouWilt (i64 ratch, f64 thyme)
     { Tamglobals::Only ()->clapper_visuals -> AdjColorZoft ()
         . SetHard (ZeColor (1.0, 0.0));
       clac = -1;
+    }
+
+  if (bool &acty = Tamglobals::Only ()->wall_grid_active)
+    { InterpColor &ic = Tamglobals::Only ()->wall_grid_fader;
+      if (ic . Replete ())
+        { ic . Set (ZeColor (1.0, 0.0));
+          acty = false;
+        }
     }
 
   return true;
@@ -909,6 +920,39 @@ g_tablecloth -> AppendChild (gridno);
   g_fiducials -> AppendChild (clavi);
   clavi -> AdjColorZoft () . SetHard (ZeColor (1.0, 0.0));
   Tamglobals::Only ()->clapper_visuals = clavi;
+
+  std::vector <PlatonicMaes *> wall_maeses
+    { frnt, left };
+  Node *walgr = new Node;
+  for (PlatonicMaes *ma  :  wall_maeses)
+    if (ma)
+      { GridRenderable *griddy = new GridRenderable;
+        Node *gridno = new Node (griddy);
+        griddy -> SetCenter (ma -> Loc ());
+        griddy -> SetOver (ma -> Over ());
+        griddy -> SetUp (ma -> Up ());
+        griddy -> SetWidth (ma -> Width ());
+        griddy -> SetHeight (ma -> Height ());
+        griddy -> SetWarp (0.00525 * ma -> Over ());
+        griddy -> SetWeft (0.00525 * ma -> Up ());
+
+// griddy -> SetDiscRadius (220.0);
+// griddy -> SetDiscCenter (tabl -> Loc () + 150.0 * tabl -> Up ()
+//                          + 50.0 * tabl -> Norm ());
+        griddy -> SpanFractionZoft () . Set (0.4);
+
+        griddy -> SetGridColor (ZeColor (1.0, 1.0, 1.0, 0.35));
+        walgr -> AppendChild (gridno);
+      }
+  g_wallpaper -> AppendChild (walgr);
+  InterpColor wal_iro;
+  wal_iro . SetInterpFunc (InterpFuncs::LINEAR);
+  wal_iro . SetInterpTime (0.2);
+  wal_iro . SetHard (ZeColor (1.0, 0.0));
+  walgr -> AdjColorZoft () . BecomeLike (wal_iro);
+  Tamglobals::Only ()->wall_grids = walgr;
+  Tamglobals::Only ()->wall_grid_fader = wal_iro;
+  Tamglobals::Only ()->wall_grid_fader . BecomeLike (wal_iro);
 
   AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.freezo);
   AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.freezo);

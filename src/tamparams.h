@@ -44,7 +44,7 @@ struct Tamparams
   f64 table_escatom_scale_factor = 0.5;
   f64 table_flmatom_scale_factor = 0.2;
 
-  f64 table_grid_opacity = 0.095;
+  f64 table_grid_opacity = 0.075;
 
   f64 pb_snapback_interp_time = 0.4;
   f64 lateral_slide_interp_time = 0.3;
@@ -117,6 +117,10 @@ struct Tamglobals
 
   Node *clapper_visuals = NULL;
   i64 clapper_cnt = -1;
+
+  Node *wall_grids = NULL;
+  InterpColor wall_grid_fader;
+  bool wall_grid_active = false;
 
   AtomicFreezone *sterngerlach = NULL;
   OeuvreAfterlife *valhalla = NULL;
