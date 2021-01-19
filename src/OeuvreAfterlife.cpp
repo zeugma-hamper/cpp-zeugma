@@ -171,7 +171,7 @@ void OeuvreAfterlife::OverseeCongaAction (Ollag *ag)
   ag -> SetCentralLoc (maesandpos.second);
 
   i64 dir = ag->conga_directn;
-  if (ag->conga_timer . CurTimeGlance ()  >=  0)
+  if (ag->conga_timer . CurTimeGlance ()  >=  0.0)
     { f64 slosht = Tamparams::Current ()->coll_slosh_time;
       if (Ollag *nxtag = CollageFromOrdinal (ag->conga_ordinal + dir))
         { f64 sp = nxtag->conga_pos . PointB () . Val ();

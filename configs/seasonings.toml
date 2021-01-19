@@ -10,6 +10,18 @@ asc-ensvelten-time = 1.8
 asc-second-rise-time = 20.06
 asc-enter-heaven-time = 3.0
 
+# comment the above and un- the following to run the show debug-fast...
+
+# asc-table-slide-time = 4.04
+# asc-first-rise-time = 2.05
+# asc-enbloaten-time = 1.9
+# asc-before-preso-hold-time = 0.9
+# asc-presentation-time = 2.0
+# asc-after-preso-hold-time = 0.5
+# asc-ensvelten-time = 1.8
+# asc-second-rise-time = 4.06
+# asc-enter-heaven-time = 3.0
+
 asc-table-slide-audio = "Tamper_table-slide-6.wav"
 asc-first-rise-audio = "Tamper_first-rise-4.wav"
 asc-enbloaten-audio = "Tamper_enbloaten-4.wav"
