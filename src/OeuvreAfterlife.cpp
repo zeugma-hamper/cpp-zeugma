@@ -14,20 +14,22 @@ Ollag::Ollag (const std::string &fname)  :  Alignifer (), re (NULL),
                                             fr (NULL), cur_maes (NULL),
                                             own_private_idahover (Vect::xaxis),
                                             own_private_idahup (Vect::yaxis)
-{ VideoSystem *vsys = VideoSystem::GetSystem ();
+{ if (! fname . empty ())
+    { VideoSystem *vsys = VideoSystem::GetSystem ();
 
-  const VideoBrace br = vsys -> OpenVideoFile (fname);
-  re = new MattedVideoRenderable (br.video_texture);
+      const VideoBrace br = vsys -> OpenVideoFile (fname);
+      re = new MattedVideoRenderable (br.video_texture);
 
-  re -> SetEnableMatte (false);
-  re -> SetSizeReferent (SizeReferent::Video);
-  AppendRenderable (re);
+      re -> SetEnableMatte (false);
+      re -> SetSizeReferent (SizeReferent::Video);
+      AppendRenderable (re);
 
-  pi = br.control_pipeline;
-  if (pi)
-    { f64 dur = pi -> Duration ();
-      pi -> Loop (0.0, pi -> Duration () - 0.04 * dur * drand48 ());
-//      pi -> Seek (dur * drand48 ());
+      pi = br.control_pipeline;
+      if (pi)
+        { f64 dur = pi -> Duration ();
+          pi -> Loop (0.0, pi -> Duration () - 0.04 * dur * drand48 ());
+          //      pi -> Seek (dur * drand48 ());
+        }
     }
 
   central_loc . MakeBecomeLikable ();
@@ -132,10 +134,14 @@ void OeuvreAfterlife::IntroduceNewCollage (Ollag *nol)
   if (Ollag *zerollage = CollageFromOrdinal (0))
     { i64 dir = zerollage->conga_directn;
       nol->conga_directn = -dir;
+      nol -> AlignToOther (zerollage);
+      nol -> SetCentralLoc (zerollage->central_loc.val);
+
       for (Ollag *ag  :  llages)
         if (ag)
           if (dir * ag->conga_ordinal  >=  0)
             ag->conga_ordinal += dir;
+
       f64 sp = zerollage->conga_pos . PointB () . Val ();
       sp += (f64)dir * Tamparams::Current ()->coll_spacing;
       f64 slosht = Tamparams::Current ()->coll_slosh_time;
@@ -147,9 +153,10 @@ void OeuvreAfterlife::IntroduceNewCollage (Ollag *nol)
   else
     nol->conga_directn = 1;
 
-  llages . push_back (nol);
-  if (amok_field)
-    amok_field -> AppendChild (nol);
+  AppendCollage (nol);
+  // llages . push_back (nol);
+  // if (amok_field)
+  //   amok_field -> AppendChild (nol);
 }
 
 
@@ -170,7 +177,7 @@ void OeuvreAfterlife::OverseeCongaAction (Ollag *ag)
           sp += (f64)dir * Tamparams::Current ()->coll_spacing;
           nxtag->conga_pos . SetInterpTime (slosht);
           nxtag->conga_pos . Set (sp);
-          nxtag->conga_timer . SetTime (-0.225 * slosht);
+          nxtag->conga_timer . SetTime (-(0.205 + 0.05 * drand48 ()) * slosht);
           nxtag->conga_timer . SetTimeFlowRate (1.0);
         }
       ag->conga_timer . SetTime (-10.0 * slosht);

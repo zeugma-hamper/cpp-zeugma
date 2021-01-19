@@ -73,6 +73,7 @@ class Orksur  :  public PlatonicMaes, public Node,
   OeuvreAfterlife *valhalla;
   std::vector <Ticato *> players;
   std::vector <Ticato *> inchoates;
+  std::vector <Ticato *> ascendees;
   std::unordered_map <std::string, Splort *> splorts;
   std::unordered_map <std::string, Fondlish> hoverees;
   std::unordered_map <std::string, Fondlish> graspees;
@@ -90,6 +91,7 @@ class Orksur  :  public PlatonicMaes, public Node,
   InterpVect asc_final_rise;
   InterpColor asc_coll_fader;
   InterpColor asc_covr_fader;
+  MotherTime asc_hvn_incrsn_zeit;
 
   Alignifer *asc_slipcover;
 

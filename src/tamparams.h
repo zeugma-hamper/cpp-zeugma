@@ -55,6 +55,9 @@ struct Tamparams
   f64 disposal_speed_threshold = 900.0;  // mm per sec, is the thing.
 
 
+  i64 clapper_vis_frame_cnt = 2;  // note that one frame is sometimes too fast
+
+
   f64 asc_table_slide_time = 4.04;
   f64 asc_first_rise_time = 5.05;
   f64 asc_enbloaten_time = 2.0;
@@ -79,6 +82,7 @@ struct Tamparams
 
   f64 asc_collage_background_appear_time = 0.1;
   f64 asc_collage_background_grey_val = 0.15;
+
 
   static Tamparams ur_params;
   static std::vector <Tamparams *> tampa_stack;
@@ -106,7 +110,11 @@ struct Tamglobals
   Node *wallpaper = NULL;
   Node *tablecloth = NULL;
   Node *conveyor = NULL;
+  Node *fiducials = NULL;
   Node *windshield = NULL;
+
+  Node *clapper_visuals = NULL;
+  i64 clapper_cnt = -1;
 
   AtomicFreezone *sterngerlach = NULL;
   OeuvreAfterlife *valhalla = NULL;

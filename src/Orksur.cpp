@@ -69,6 +69,9 @@ Orksur::Orksur (const PlatonicMaes &ma)  :  PlatonicMaes (ma, false),
   asc_slipcover -> AdjColorZoft () . BecomeLike (asc_covr_fader);
   asc_slipcover -> AppendChild (slip_iris_no);
 
+  asc_hvn_incrsn_zeit . SetTimeFlowRate (-1.0);
+  asc_hvn_incrsn_zeit . SetTime (-1.0);
+
   RetrieveValhalla ();
 }
 
@@ -137,11 +140,14 @@ Alignifer *Orksur::PermaFixCollage ()
   asc_coll_fader . SetHard (ZeColor (1.0, 1.0));
   collage -> AppendChild (molecule);
 
+  ascendees . clear ();
+
   std::vector <Node *> ticlist = assembly -> ChildListCopy ();
   for (Node *no  :  ticlist)
     if (Ticato *tic = dynamic_cast <Ticato *> (no))
       { // collage -> AppendChild (tic);  // implicit excision from assembly
         molecule -> AppendChild (tic);  // implicit excision from assembly
+        ascendees . push_back (tic);
 
         auto it = std::find (players . begin (), players . end (), tic);
         if (it  !=  players . end ())
@@ -177,9 +183,21 @@ void Orksur::EffectAscension ()
 
 
 void Orksur::ConcludeAscension ()
-{ if (Node *amok = RetrieveValhalla () -> AmokField ())
-    amok -> RemoveChild (ascending_collage);
-  ascending_collage = NULL;
+{ if (OeuvreAfterlife *valhalla = RetrieveValhalla ())
+    if (Ollag *cntr_coll = valhalla -> CollageFromOrdinal (0))
+      { cntr_coll -> AppendChild (ascending_collage);
+        ZoftVect nullpos (Vect (0.0, 0.0, 0.0));
+        ascending_collage -> InstallLocGrapplerZoft (nullpos);
+        Vect sc = ascending_collage -> CurScale ();
+        sc /= Width ();
+        ZoftVect neutral_sc ((Vect (sc)));  // delightful, o great vexcrap
+        ascending_collage -> InstallScaleGrapplerZoft (neutral_sc);
+
+        for (Ticato *tic  :  ascendees)
+          if (tic)
+            tic -> SonoSilence ();
+        ascendees . clear ();
+      }
   ascension_phase = -1;
 }
 
@@ -247,6 +265,14 @@ void Orksur::IndulgeAscensionInterstitials ()
         break;
 
       case ASCPH_SECOND_RISE:
+        if (asc_hvn_incrsn_zeit . CurTimeGlance ()  >=  0.0)
+          { if (OeuvreAfterlife *valhalla = RetrieveValhalla ())
+              { Ollag *new_coll = new Ollag ("");
+                valhalla -> IntroduceNewCollage (new_coll);
+              }
+            asc_hvn_incrsn_zeit . SetTimeFlowRate (-1.0);
+            asc_hvn_incrsn_zeit . SetTime (-1.0);
+          }
         break;
 
       default:
@@ -401,9 +427,11 @@ void Orksur::EffectNextAscensionPhase ()
           Vect term = sw->plumb . Midpoint () +  0.5 * sw->prone . SpanVect ();
           asc_final_rise . Set (term);
           Vect s = ascending_collage -> CurScale ();
-          asc_perf_bloat . SetInterpTime (6.06);
-          asc_perf_bloat . Set (0.75 * s);
+          asc_perf_bloat . SetInterpTime (0.9 * tam->asc_second_rise_time);
+          asc_perf_bloat . Set (0.85 * s);
           ascending_collage -> InstallLocGrapplerZoft (asc_final_rise);
+          asc_hvn_incrsn_zeit . SetTimeFlowRate (1.0);
+          asc_hvn_incrsn_zeit . SetTime (-0.50 * tam->asc_second_rise_time);
           if (associated_cinelib)
             { associated_cinelib->fader
                 . SetInterpTime (0.895 * tam->asc_second_rise_time);
@@ -422,11 +450,7 @@ void Orksur::EffectNextAscensionPhase ()
         }
 
       case ASCPH_ENTER_HEAVEN:
-        { if (OeuvreAfterlife *valhalla = RetrieveValhalla ())
-            { Ollag *new_coll = new Ollag ("");
-              valhalla -> IntroduceNewCollage (new_coll);
-            }
-          if (sherm)
+        { if (sherm)
             { i64 moid = ZeMonotonicID ();
               sherm -> SendPlaySound (tam->asc_enter_heaven_audio, moid);
               sherm -> SendCleanSlate ();
