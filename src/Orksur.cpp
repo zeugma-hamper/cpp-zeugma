@@ -270,6 +270,15 @@ void Orksur::IndulgeAscensionInterstitials ()
           { if (OeuvreAfterlife *valhalla = RetrieveValhalla ())
               { Ollag *new_coll = new Ollag ("");
                 valhalla -> IntroduceNewCollage (new_coll);
+
+                if (ZoftVect *zv_a = ascending_collage -> LocGrapplerZoftVect ())
+                  { ZoftVect *zv_b = new_coll -> LocGrapplerZoftVect ();
+                    InterpVect smooven (*zv_a, *zv_b);
+                    smooven . SetInterpFunc (InterpFuncs::LINEAR);
+                    smooven . SetInterpTime
+                      (0.49 * Tamparams::Current ()->asc_second_rise_time);
+                    ascending_collage -> InstallLocGrapplerZoft (smooven);
+                  }
               }
             asc_hvn_incrsn_zeit . SetTimeFlowRate (-1.0);
             asc_hvn_incrsn_zeit . SetTime (-1.0);
