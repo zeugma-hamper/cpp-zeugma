@@ -668,24 +668,24 @@ fprintf(stderr,"harumph: <%s>\n", Tamparams::Current ()->asc_table_slide_audio.c
       c -> LocZoft () = frnt -> Loc ();
     }
 
-GridRenderable *griddy = new GridRenderable;
-Node *gridno = new Node (griddy);
-griddy -> SetCenter (tabl -> Loc ());
-griddy -> SetOver (tabl -> Over ());
-griddy -> SetUp (tabl -> Up ());
-griddy -> SetWidth (/*0.5 * */tabl -> Width ());
-griddy -> SetHeight (/*0.5 * */tabl -> Height ());
-griddy -> SetWarp (0.025 * tabl -> Over ());
-griddy -> SetWeft (0.025 * tabl -> Up ());
+  GridRenderable *gridre = new GridRenderable;
+  Node *gridno = new Node (gridre);
+  gridre -> SetCenter (tabl -> Loc ());
+  gridre -> SetOver (tabl -> Over ());
+  gridre -> SetUp (tabl -> Up ());
+  gridre -> SetWidth (/*0.5 * */tabl -> Width ());
+  gridre -> SetHeight (/*0.5 * */tabl -> Height ());
+  gridre -> SetWarp (0.025 * tabl -> Over ());
+  gridre -> SetWeft (0.025 * tabl -> Up ());
 /*
-griddy -> SetDiscRadius (220.0);
-griddy -> SetDiscCenter (tabl -> Loc () + 150.0 * tabl -> Up ()
+gridre -> SetDiscRadius (220.0);
+gridre -> SetDiscCenter (tabl -> Loc () + 150.0 * tabl -> Up ()
                          + 50.0 * tabl -> Norm ());
-griddy -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
+gridre -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
 */
-griddy -> SetGridColor (ZeColor (1.0, 1.0, 1.0,  //0.075));
-                                 Tamparams::Current ()->table_grid_opacity));
-g_tablecloth -> AppendChild (gridno);
+  gridre -> SetGridColor (ZeColor (1.0, 1.0, 1.0,  //0.075));
+                                   Tamparams::Current ()->table_grid_opacity));
+  g_tablecloth -> AppendChild (gridno);
 
   Orksur *orkp = new Orksur (*tabl);
   tamp.orksu = ch_ptr <Orksur> (orkp);
@@ -926,25 +926,25 @@ g_tablecloth -> AppendChild (gridno);
   Node *walgr = new Node;
   for (PlatonicMaes *ma  :  wall_maeses)
     if (ma)
-      { GridRenderable *griddy = new GridRenderable;
-        Node *gridno = new Node (griddy);
-        griddy -> SetCenter (ma -> Loc ());
-        griddy -> SetOver (ma -> Over ());
-        griddy -> SetUp (ma -> Up ());
-        griddy -> SetWidth (ma -> Width ());
-        griddy -> SetHeight (ma -> Height ());
-        griddy -> SetWarp (0.00525 * ma -> Over ());
-        griddy -> SetWeft (0.00525 * ma -> Up ());
+      { GridRenderable *gridre = new GridRenderable;
+        Node *gridno = new Node (gridre);
+        gridre -> SetCenter (ma -> Loc ());
+        gridre -> SetOver (ma -> Over ());
+        gridre -> SetUp (ma -> Up ());
+        gridre -> SetWidth (ma -> Width ());
+        gridre -> SetHeight (ma -> Height ());
+        gridre -> SetWarp (0.00525 * ma -> Over ());
+        gridre -> SetWeft (0.00525 * ma -> Up ());
 
-// griddy -> SetDiscRadius (220.0);
-// griddy -> SetDiscCenter (tabl -> Loc () + 150.0 * tabl -> Up ()
+// gridre -> SetDiscRadius (220.0);
+// gridre -> SetDiscCenter (tabl -> Loc () + 150.0 * tabl -> Up ()
 //                          + 50.0 * tabl -> Norm ());
-        griddy -> SpanFractionZoft () . Set (0.4);
+        gridre -> SpanFractionZoft () . Set (0.4);
 
-        griddy -> SetGridColor (ZeColor (1.0, 1.0, 1.0, 0.35));
+        gridre -> SetGridColor (ZeColor (1.0, 1.0, 1.0, 0.35));
         walgr -> AppendChild (gridno);
       }
-  g_wallpaper -> AppendChild (walgr);
+//  g_wallpaper -> AppendChild (walgr);
   InterpColor wal_iro;
   wal_iro . SetInterpFunc (InterpFuncs::LINEAR);
   wal_iro . SetInterpTime (0.2);

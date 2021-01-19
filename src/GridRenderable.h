@@ -31,6 +31,7 @@ class GridRenderable  :  public Renderable
   bgfx::UniformHandle unif_weft;
   bgfx::UniformHandle unif_dsc_cntrad;
   bgfx::UniformHandle unif_span_frc;
+  bgfx::UniformHandle unif_fullmod_mat;
 
   GridRenderable ();
   ~GridRenderable ();

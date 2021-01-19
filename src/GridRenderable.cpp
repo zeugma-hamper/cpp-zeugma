@@ -16,6 +16,7 @@ static const char *warp_unif_s = "u_warp";
 static const char *weft_unif_s = "u_weft";
 static const char *cntrad_unif_s = "u_cntrad";
 static const char *span_frac_unif_s = "u_span_frac";
+static const char *full_model_mat_s = "u_full_model_mat";
 
 
 GridRenderable::GridRenderable ()  :  Renderable (), wid (10.0), hei (10.0),
@@ -29,6 +30,8 @@ GridRenderable::GridRenderable ()  :  Renderable (), wid (10.0), hei (10.0),
   unif_dsc_cntrad = bgfx::createUniform (cntrad_unif_s, bgfx::UniformType::Vec4);
   unif_span_frc
     = bgfx::createUniform (span_frac_unif_s, bgfx::UniformType::Vec4);
+  unif_fullmod_mat
+    = bgfx::createUniform (full_model_mat_s, bgfx::UniformType::Mat4);
 
   bx::FilePath shader_path = "grid_vs.bin";
   bgfx::ShaderHandle vs = CreateShader (shader_path);
@@ -74,7 +77,8 @@ void GridRenderable::Draw (u16 vyu_id)
                                       waystation . size () * sizeof (glm::vec3));
   bgfx::update (vbuf, 0, m);
 
-  bgfx::setTransform (&(m_node -> GetAbsoluteTransformation ().model));
+  const glm::mat4 &abs_model_mat = m_node -> GetAbsoluteTransformation ().model;
+  bgfx::setTransform (&abs_model_mat);
   bgfx::setVertexBuffer (0, vbuf, 0, 4);
   bgfx::setState (BGFX_STATE_WRITE_RGB
                   |  BGFX_STATE_WRITE_A
@@ -94,6 +98,8 @@ void GridRenderable::Draw (u16 vyu_id)
 
   glm::vec4 frc = {span_frc.val, 0.0, 0.0, 0.0};
   bgfx::setUniform (unif_span_frc, glm::value_ptr (frc));
+
+  bgfx::setUniform (unif_fullmod_mat, glm::value_ptr (abs_model_mat));
 
   bgfx::submit (vyu_id, shad_prog, m_graph_id);
 }
