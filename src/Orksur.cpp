@@ -185,13 +185,14 @@ void Orksur::EffectAscension ()
 void Orksur::ConcludeAscension ()
 { if (OeuvreAfterlife *valhalla = RetrieveValhalla ())
     if (Ollag *cntr_coll = valhalla -> CollageFromOrdinal (0))
-      { cntr_coll -> AppendChild (ascending_collage);
-        ZoftVect nullpos (Vect (0.0, 0.0, 0.0));
+      { ZoftVect nullpos (Vect (0.0, 0.0, 0.0));
         ascending_collage -> InstallLocGrapplerZoft (nullpos);
         Vect sc = ascending_collage -> CurScale ();
-        sc /= Width ();
+        sc /= (1.8 * Width ());
         ZoftVect neutral_sc ((Vect (sc)));  // delightful, o great vexcrap
         ascending_collage -> InstallScaleGrapplerZoft (neutral_sc);
+
+        cntr_coll -> AppendChild (ascending_collage);
 
         for (Ticato *tic  :  ascendees)
           if (tic)

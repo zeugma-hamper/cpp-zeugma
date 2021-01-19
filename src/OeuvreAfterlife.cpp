@@ -136,6 +136,7 @@ void OeuvreAfterlife::IntroduceNewCollage (Ollag *nol)
       nol->conga_directn = -dir;
       nol -> AlignToOther (zerollage);
       nol -> SetCentralLoc (zerollage->central_loc.val);
+      nol->conga_pos . SetHard (zerollage->conga_pos.val);
 
       for (Ollag *ag  :  llages)
         if (ag)
