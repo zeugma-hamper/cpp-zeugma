@@ -329,7 +329,7 @@ i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
         { Tamglobals::Only ()->cur_elev_stop = -nes;
           if (oto)
             { solo_tamp->elev_transl . Set (Vect (0.0, -nes, 0.0));
-              Tamglobals::Only ()->wall_grid_fader . Set (ZeColor (1.0, 0.5));
+              Tamglobals::Only ()->wall_grid_fader . Set (ZeColor (1.0, 0.75));
               Tamglobals::Only ()->wall_grid_active = true;
             }
         }
@@ -426,7 +426,7 @@ bool Tampo::DoWhatThouWilt (i64 ratch, f64 thyme)
 
   if (bool &acty = Tamglobals::Only ()->wall_grid_active)
     { InterpColor &ic = Tamglobals::Only ()->wall_grid_fader;
-      if (ic . Replete ())
+      if (solo_tamp->elev_transl . Replete ())
         { ic . Set (ZeColor (1.0, 0.0));
           acty = false;
         }
@@ -726,7 +726,7 @@ gridre -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
   drand48 ();
   grau_chin -> ReleasePushback ();
 //  grau_chin -> JumpToRandomFlick ();
-  grau_chin -> JumpToFlick (11, true);
+  grau_chin -> JumpToFlick (1, true);
   grau_chin -> SetBackingMaes (left);
   g_left_wall -> AppendChild (grau_chin);
 
@@ -875,7 +875,7 @@ gridre -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
         // gridre -> SetGridColor (ZeColor (1.0, 1.0, 1.0, 0.35));
         Alignifer *gridno = PlusTimeWonderBundt (ma -> Width (),
                                                  2.0 * ma -> Height (),
-                                                 350.0, 0.35);
+                                                 550.0, 0.45);
         gridno -> AlignToMaes (ma);
         gridno -> LocZoft ()
           . Set (ma -> Loc () + 0.5 * ma -> Height () * ma -> Up ());

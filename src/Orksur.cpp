@@ -650,6 +650,7 @@ void Orksur::DisposeOfCollage ()
   Vect u = Up ();
   f64 halfang;
   Vect hit;
+  SilenceAllAtoms ();
   if (associated_wallmaes
       &&  G::RayPlaneIntersection (Loc (), u, associated_wallmaes -> Loc (),
                                    associated_wallmaes -> Norm (), &hit))
