@@ -9,6 +9,8 @@
 
 #include "InterpZoft.h"
 
+#include <stdexcept>
+
 
 using namespace charm;
 
