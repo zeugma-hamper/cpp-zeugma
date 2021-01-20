@@ -39,7 +39,7 @@ class LinePileRenderable  :  public Renderable
   const G::Segment &NthLine (i64 ind)  const
     { return lines . at (ind); }
   G::Segment &NthLineModifiable (i64 ind)
-    { needs_refreshment = true; }
+    { needs_refreshment = true;  return lines . at (ind); }
 
   void AppendLine (const G::Segment &l)
     { lines . push_back (l);  needs_refreshment = true; }

@@ -419,6 +419,7 @@ tample_exec = executable ('tample',
                                       'src/SpectacleCauseway.cpp',
                                       'src/Ticato.cpp',
                                       'src/Timeline.cpp',
+                                      'src/gallimaufry.cpp',
                                       'src/tamparams.cpp',
                                       'src/tample.cpp'
                                      ],

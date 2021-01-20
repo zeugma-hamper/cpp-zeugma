@@ -78,6 +78,7 @@
 #include "AtomicFreezone.h"
 #include "OeuvreAfterlife.h"
 #include "GraumanPalace.h"
+#include "gallimaufry.h"
 #include "tamparams.h"
 
 
@@ -859,22 +860,28 @@ gridre -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
   Node *walgr = new Node;
   for (PlatonicMaes *ma  :  wall_maeses)
     if (ma)
-      { GridRenderable *gridre = new GridRenderable;
-        Node *gridno = new Node (gridre);
-        gridre -> SetCenter (ma -> Loc ());
-        gridre -> SetOver (ma -> Over ());
-        gridre -> SetUp (ma -> Up ());
-        gridre -> SetWidth (ma -> Width ());
-        gridre -> SetHeight (ma -> Height ());
-        gridre -> SetWarp (0.00525 * ma -> Over ());
-        gridre -> SetWeft (0.00525 * ma -> Up ());
+      { // GridRenderable *gridre = new GridRenderable;
+        // Node *gridno = new Node (gridre);
+        // gridre -> SetCenter (ma -> Loc ());
+        // gridre -> SetOver (ma -> Over ());
+        // gridre -> SetUp (ma -> Up ());
+        // gridre -> SetWidth (ma -> Width ());
+        // gridre -> SetHeight (ma -> Height ());
+        // gridre -> SetWarp (0.00525 * ma -> Over ());
+        // gridre -> SetWeft (0.00525 * ma -> Up ());
 
-        gridre -> SpanFractionZoft () . Set (0.4);
+        // gridre -> SpanFractionZoft () . Set (0.4);
 
-        gridre -> SetGridColor (ZeColor (1.0, 1.0, 1.0, 0.35));
+        // gridre -> SetGridColor (ZeColor (1.0, 1.0, 1.0, 0.35));
+        Alignifer *gridno = PlusTimeWonderBundt (ma -> Width (),
+                                                 2.0 * ma -> Height (),
+                                                 350.0, 0.35);
+        gridno -> AlignToMaes (ma);
+        gridno -> LocZoft ()
+          . Set (ma -> Loc () + 0.5 * ma -> Height () * ma -> Up ());
         walgr -> AppendChild (gridno);
       }
-//  g_wallpaper -> AppendChild (walgr);
+  g_wallpaper -> AppendChild (walgr);
   InterpColor wal_iro;
   wal_iro . SetInterpFunc (InterpFuncs::LINEAR);
   wal_iro . SetInterpTime (0.2);
