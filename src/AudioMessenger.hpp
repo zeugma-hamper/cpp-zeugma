@@ -55,6 +55,9 @@ class AudioMessenger
   void SendGetSuggestions (stringy_list &extant_atoms,
                            const std::string &new_atom,
                            f64 duration, u64 disc_id);
+  
+  void SendStoreSuggestion (const std::string &atom_name,
+                          const std::string &suggested_sound_name);
 
   void SendStatus (std::string_view);
 

@@ -44,7 +44,6 @@ void AudioMessenger::Connect (std::string_view _host, std::string_view _port)
 
   m_audio_address = new lo::Address (_host.data (), _port.data ());
   SendUnmute ();
-  SendFadeIn (); // just in case the audioserver was left in a faded out state
   SendStatus ("Tample booting");
 }
 
@@ -121,6 +120,17 @@ void AudioMessenger::SendGetSuggestions (stringy_list &extant_atoms,
   j["duration"] = duration;
   j["discussion_id"] = disc_id;
   SendMessage("/ta/get_suggestions", j.dump ());
+}
+
+void AudioMessenger::SendStoreSuggestion (const std::string &atom_name,
+                                         const std::string &suggested_sound_name)
+{
+  assert (m_audio_address);
+
+  nlohmann::json j;
+  j["atom"] = atom_name;
+  j["suggestion"] = suggested_sound_name;
+  SendMessage("/ta/store_suggestion", j.dump ());
 }
 
 void AudioMessenger::SendStatus(std::string_view _status_string)
