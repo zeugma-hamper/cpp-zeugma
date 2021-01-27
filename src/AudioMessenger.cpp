@@ -190,16 +190,24 @@ TASReceiver::~TASReceiver ()
 
 void TASReceiver::Connect (std::string_view _port)
 {
-  m_audio_server = new lo::Server (_port.data (),
-                                   [this] (i32 _num, const char *_msg, const char *_where)
-                                   { this->LoErrorHandler(_num, _msg, _where); });
+  m_audio_server
+    = new lo::Server (_port.data (),
+                      [this] (i32 _num, const char *_msg, const char *_where)
+                      { this->LoErrorHandler(_num, _msg, _where); });
 
   auto handle_sugg = [this] (const char *path, lo::Message const &_msg)
   { this->HandleSuggestions(path, _msg); };
 
-  m_audio_server->add_method ("/taclient/suggestions", "s", std::move (handle_sugg));
+  m_audio_server -> add_method ("/taclient/suggestions", "s",
+                                std::move (handle_sugg));
 
+  auto handle_ctrl = [this] (const char *path, lo::Message const &_msg)
+    { this -> HandleControlMessage (path, _msg); };
+
+  m_audio_server -> add_method ("/taclient/control", "s",
+                                std::move (handle_ctrl));
 }
+
 
 void TASReceiver::Disconnect ()
 {
@@ -207,10 +215,12 @@ void TASReceiver::Disconnect ()
   m_audio_server = nullptr;
 }
 
+
 bool TASReceiver::IsValid ()
 {
   return m_audio_server && m_audio_server->is_valid();
 }
+
 
 void TASReceiver::Drain (MultiSprinkler *_sprinkler)
 {
@@ -229,6 +239,25 @@ i32 TASReceiver::LoErrorHandler (i32 _num, const char *_msg, const char *_where)
   return 0;
 }
 
+void TASReceiver::HandleControlMessage (const char *_path,
+                                        lo::Message const &_msg)
+{ nl::json j;
+  try {
+    j = nl::json::parse ((const char *)&(_msg.argv()[0]->s));
+  } catch (std::exception &e) {
+    fprintf (stderr, "error parsing %s\n", e . what ());
+    return;
+  }
+
+  TASMessageEvent evt { _path, std::move (j) };
+
+  fprintf(stderr,"####\n####\n####\nthis, inbound: \n%s\n####\n",
+          evt.Message().dump(1).c_str());
+
+  m_sprinkler -> Spray (&evt);
+}
+
+
 void TASReceiver::HandleSuggestions (const char *_path, lo::Message const &_msg)
 {
   nl::json j;
@@ -242,26 +271,31 @@ void TASReceiver::HandleSuggestions (const char *_path, lo::Message const &_msg)
   TASSuggestionEvent evt {_path, std::move (j)};
 
   fprintf(stderr,"####\n####\n####\nthis, inbound: \n%s\n####\n",
-          evt.GetMessage().dump(1).c_str());
+          evt.Message().dump(1).c_str());
 
   m_sprinkler->Spray(&evt);
 }
 
-TASMessageEvent::TASMessageEvent (std::string_view _path, nl::json const &_message)
+
+
+//
+/// TASMessageEvent items...
+//
+
+TASMessageEvent::TASMessageEvent (std::string_view _path,
+                                  nl::json const &_message)
   : ZeEvent (),
     m_path {_path},
     m_message {_message}
-{
-}
+{ }
 
 TASMessageEvent::TASMessageEvent (std::string_view _path, nl::json &&_message)
   : ZeEvent (),
     m_path {_path},
     m_message (std::move (_message))
-{
-}
+{ }
 
-i64 TASMessageEvent::GetMessageID (bool _spit_error) const
+i64 TASMessageEvent::MessageID (bool _spit_error)  const
 { auto unwrapped = m_message;
   // if (! json_is_not_insanely_wrapped)
   //   unwrapped = m_message . at (0);
@@ -276,18 +310,18 @@ i64 TASMessageEvent::GetMessageID (bool _spit_error) const
   return -1;
 }
 
-i64 TASMessageEvent::GetDiscussionID (bool _spit_error) const
+i64 TASMessageEvent::DiscussionID (bool _spit_error)  const
 {
 
-fprintf(stderr,"$$$$\n$$$$\n$$$$\nthis, inbound: -- %s --\n$$$$\n$$$$\n$$$$\n",
-m_message.dump().c_str());
+//fprintf(stderr,"$$$$\n$$$$\n$$$$\nthis, inbound: -- %s --\n$$$$\n$$$$\n$$$$\n",
+//m_message.dump().c_str());
 
   auto unwrapped = m_message;
   // if (! json_is_not_insanely_wrapped)
   //   unwrapped = m_message . at (0);
 
-fprintf(stderr,"****\n****\n****\nTHEN STRIPPED ONE LEVEL: -- %s --\n****\n****\n****\n",
-unwrapped.dump().c_str());
+//fprintf(stderr,"****\n****\n****\nTHEN STRIPPED ONE LEVEL: -- %s --\n****\n****\n****\n",
+//unwrapped.dump().c_str());
 
  // auto it = m_message.find ("discussion_id");
  //  if (it != m_message . end ()  &&  it.value () . is_number ())
@@ -302,27 +336,32 @@ unwrapped.dump().c_str());
   return -1;
 }
 
-std::string const &TASMessageEvent::GetPath () const
+std::string const &TASMessageEvent::Path ()  const
 {
   return m_path;
 }
 
-nl::json const &TASMessageEvent::GetMessage () const
+nl::json const &TASMessageEvent::Message ()  const
 {
   return m_message;
 }
 
-TASSuggestionEvent::TASSuggestionEvent (std::string_view _path, nl::json const &_message)
+
+//
+/// TASSuggestionEvent stuff...
+//
+
+TASSuggestionEvent::TASSuggestionEvent (std::string_view _path,
+                                        nl::json const &_message)
   : TASMessageEvent (_path, _message)
-{
-}
+{ }
 
-TASSuggestionEvent::TASSuggestionEvent (std::string_view _path, nl::json &&_message)
+TASSuggestionEvent::TASSuggestionEvent (std::string_view _path,
+                                        nl::json &&_message)
   : TASMessageEvent (_path, std::move (_message))
-{
-}
+{ }
 
-i64 TASSuggestionEvent::GetSuggestionCount () const
+i64 TASSuggestionEvent::SuggestionCount ()  const
 { auto unwrapped = m_message;
   // if (! json_is_not_insanely_wrapped)
   //   unwrapped = m_message . at (0);
@@ -332,10 +371,10 @@ i64 TASSuggestionEvent::GetSuggestionCount () const
   return 0;
 }
 
-std::vector<std::string> TASSuggestionEvent::GetSuggestionNames () const
+std::vector<std::string> TASSuggestionEvent::SuggestionNames ()  const
 {
   std::vector<std::string> ret;
-  ret.reserve (GetSuggestionCount());
+  ret.reserve (SuggestionCount ());
 
   try
     { auto unwrapped = m_message;
@@ -348,7 +387,7 @@ std::vector<std::string> TASSuggestionEvent::GetSuggestionNames () const
         }
       else
         { fprintf (stderr, "more brutal json-v.-liblo-v.-iterator crap here "
-                   "in TASSuggestionEvent::GetSuggestionNames() ...\n");
+                   "in TASSuggestionEvent::SuggestionNames() ...\n");
           return {};
         }
     }

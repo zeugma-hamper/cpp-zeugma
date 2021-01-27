@@ -55,7 +55,7 @@ class AudioMessenger
   void SendGetSuggestions (stringy_list &extant_atoms,
                            const std::string &new_atom,
                            f64 duration, u64 disc_id);
-  
+
   void SendStoreSuggestion (const std::string &atom_name,
                           const std::string &suggested_sound_name);
 
@@ -92,6 +92,7 @@ class TASReceiver : public ZePublicWaterWorks
  protected:
 
   void HandleSuggestions (const char *_path, lo::Message const &_msg);
+  void HandleControlMessage (const char *_path, lo::Message const &_msg);
 
   lo::Server *m_audio_server;
   MultiSprinkler *m_sprinkler;
@@ -106,12 +107,12 @@ class TASMessageEvent : public ZeEvent
   TASMessageEvent (std::string_view _path, nl::json const &_message);
   TASMessageEvent (std::string_view _path, nl::json &&_message);
 
-  i64 GetMessageID (bool _spit_error = false) const;
-  i64 GetDiscussionID (bool _spit_error = false)  const;
+  i64 MessageID (bool _spit_error = false) const;
+  i64 DiscussionID (bool _spit_error = false)  const;
 
-  std::string const &GetPath () const;
+  std::string const &Path () const;
 
-  nl::json const &GetMessage () const;
+  nl::json const &Message () const;
 
 
  protected:
@@ -128,8 +129,8 @@ class TASSuggestionEvent : public TASMessageEvent
   TASSuggestionEvent (std::string_view _path, nl::json const &_message);
   TASSuggestionEvent (std::string_view _path, nl::json &&_message);
 
-  i64 GetSuggestionCount () const;
-  std::vector<std::string> GetSuggestionNames () const;
+  i64 SuggestionCount () const;
+  std::vector<std::string> SuggestionNames () const;
 };
 
 

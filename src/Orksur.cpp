@@ -997,22 +997,53 @@ i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
 }
 
 
+i64 Orksur::TASMessage (TASMessageEvent *e)
+{ if (! e)
+    return -1;
+
+  const std::string &pth = e -> Path ();
+  if (pth  ==  "/taclient/control")
+    { const nl::json &mess = e -> Message ();
+      auto blort1 = mess . find ("target");
+      auto blort2 = mess . find ("action");
+      if (blort1 == mess . end ()  ||  blort2 == mess . end ())
+        { fprintf (stderr, "HELL. MANGLED MESSAGE IN Orksur::TASMessage()\n");
+          return 0;
+        }
+      const std::string &trgt = blort1 -> get <std::string> ();
+      if (trgt  !=  TableName ())
+        return 0;
+      const std::string &actn = blort2 -> get <std::string> ();
+      if (actn  ==  "trigger_ascension")
+        { fprintf (stderr, "HEY! HEY THERE! JUST GOT AN ASCENSION MESSAGE FOR "
+                   "<$s>...\n", trgt . c_str ());
+          return 1;
+        }
+    }
+  else
+    { fprintf (stderr, "Orksur::TASMessage() -- unknown OSC 'path': <%s>\n",
+               pth);
+    }
+  return 0;
+}
+
+
 i64 Orksur::TASSuggestion (TASSuggestionEvent *e)
 { if (! e)
     return -1;
 
-  i64 disc_id = e -> GetDiscussionID ();
+  i64 disc_id = e -> DiscussionID ();
   auto awaiter = awaiting_audio_sooth . find (disc_id);
   if (awaiter  ==  awaiting_audio_sooth . end ())
     return 0;
   Ticato *tic = awaiter->second;
   awaiting_audio_sooth . erase (awaiter);
 
-  stringy_list suggs = e -> GetSuggestionNames ();
-  fprintf (stderr, "WEEEEELLLLLP. Just got %d audio suggestions:\n",suggs.size());
+  stringy_list suggs = e -> SuggestionNames ();
+  fprintf (stderr,"WEEEEELLLLLP. Just got %d audio suggestions:\n",suggs.size());
   for (auto &ess  :  suggs)
-    fprintf(stderr,"\"%s\", ", ess.c_str ());
-  fprintf(stderr,"\n");
+    fprintf (stderr,"\"%s\", ",ess.c_str());
+  fprintf (stderr,"\n");
   if (! tic)
     return -1;
   tic->sono_options = suggs;

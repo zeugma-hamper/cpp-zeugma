@@ -58,12 +58,14 @@ struct Splort  :  Node
 class Orksur  :  public PlatonicMaes, public Node,
                  public ZESpatialPhagy, public ZEYowlPhagy,
                  public ZEBulletinPhagy,
+                 public TASMessageEvent::TASMessagePhage,
                  public TASSuggestionEvent::TASSuggestionPhage
 { public:
 
   struct Fondlish { Ticato *tic;  Vect gropoff; };
 
   const PlatonicMaes *underlying_maes;
+  std::string table_name;
   Node *assembly;
   SonoChoosist *soncho;
   PlatonicMaes *associated_wallmaes;
@@ -98,6 +100,11 @@ class Orksur  :  public PlatonicMaes, public Node,
   static std::vector <Jigglegon *> fallow_jigs;
 
   Orksur (const PlatonicMaes &ma);
+
+  const std::string TableName ()
+    { return table_name; }
+  void SetTableName (const std::string tn)
+    { table_name = tn; }
 
   OeuvreAfterlife *RetrieveValhalla ()
     { if (! valhalla)
@@ -163,6 +170,8 @@ class Orksur  :  public PlatonicMaes, public Node,
 
   i64 ZEYowlAppear (ZEYowlAppearEvent *e)  override;
   i64 ZEBulletin (ZEBulletinEvent *e)  override;
+
+  i64 TASMessage (TASMessageEvent *e)  override;
   i64 TASSuggestion (TASSuggestionEvent *e)  override;
 
   i64 Inhale (i64 ratch, f64 thyme)  override;

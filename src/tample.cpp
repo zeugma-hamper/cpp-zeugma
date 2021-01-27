@@ -679,8 +679,11 @@ gridre -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
   Orksur *orkp = new Orksur (*tabl);
   tamp.orksu = ch_ptr <Orksur> (orkp);
   orkp->associated_wallmaes = frnt;
+  orkp -> SetTableName ("table-2");
   g_tablecloth -> AppendChild (orkp);
+
   tamp . GetSprinkler () . AppendPhage <TASSuggestionEvent> (tamp.orksu);
+  tamp . GetSprinkler () . AppendPhage <TASMessageEvent> (tamp.orksu);
 
   for (i64 q = 0  ;  q < tamp . NumWaterWorkses ()  ;  ++q)
     if (GLFWWaterWorks *ww
