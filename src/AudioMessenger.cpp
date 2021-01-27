@@ -249,7 +249,7 @@ void TASReceiver::HandleControlMessage (const char *_path,
     return;
   }
 
-  TASMessageEvent evt { _path, std::move (j) };
+  TMPControlEvent evt { _path, std::move (j) };
 
   fprintf(stderr,"####\n####\n####\nthis, inbound: \n%s\n####\n",
           evt.Message().dump(1).c_str());
@@ -279,23 +279,23 @@ void TASReceiver::HandleSuggestions (const char *_path, lo::Message const &_msg)
 
 
 //
-/// TASMessageEvent items...
+/// TURMessageEvent items...
 //
 
-TASMessageEvent::TASMessageEvent (std::string_view _path,
+TURMessageEvent::TURMessageEvent (std::string_view _path,
                                   nl::json const &_message)
   : ZeEvent (),
     m_path {_path},
     m_message {_message}
 { }
 
-TASMessageEvent::TASMessageEvent (std::string_view _path, nl::json &&_message)
+TURMessageEvent::TURMessageEvent (std::string_view _path, nl::json &&_message)
   : ZeEvent (),
     m_path {_path},
     m_message (std::move (_message))
 { }
 
-i64 TASMessageEvent::MessageID (bool _spit_error)  const
+i64 TURMessageEvent::MessageID (bool _spit_error)  const
 { auto unwrapped = m_message;
   // if (! json_is_not_insanely_wrapped)
   //   unwrapped = m_message . at (0);
@@ -310,7 +310,7 @@ i64 TASMessageEvent::MessageID (bool _spit_error)  const
   return -1;
 }
 
-i64 TASMessageEvent::DiscussionID (bool _spit_error)  const
+i64 TURMessageEvent::DiscussionID (bool _spit_error)  const
 {
 
 //fprintf(stderr,"$$$$\n$$$$\n$$$$\nthis, inbound: -- %s --\n$$$$\n$$$$\n$$$$\n",
@@ -336,12 +336,12 @@ i64 TASMessageEvent::DiscussionID (bool _spit_error)  const
   return -1;
 }
 
-std::string const &TASMessageEvent::Path ()  const
+std::string const &TURMessageEvent::Path ()  const
 {
   return m_path;
 }
 
-nl::json const &TASMessageEvent::Message ()  const
+nl::json const &TURMessageEvent::Message ()  const
 {
   return m_message;
 }
@@ -353,12 +353,12 @@ nl::json const &TASMessageEvent::Message ()  const
 
 TASSuggestionEvent::TASSuggestionEvent (std::string_view _path,
                                         nl::json const &_message)
-  : TASMessageEvent (_path, _message)
+  : TURMessageEvent (_path, _message)
 { }
 
 TASSuggestionEvent::TASSuggestionEvent (std::string_view _path,
                                         nl::json &&_message)
-  : TASMessageEvent (_path, std::move (_message))
+  : TURMessageEvent (_path, std::move (_message))
 { }
 
 i64 TASSuggestionEvent::SuggestionCount ()  const

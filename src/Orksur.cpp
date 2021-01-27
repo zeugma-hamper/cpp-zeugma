@@ -997,7 +997,7 @@ i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
 }
 
 
-i64 Orksur::TASMessage (TASMessageEvent *e)
+i64 Orksur::TMPControl (TMPControlEvent *e)
 { if (! e)
     return -1;
 
@@ -1016,13 +1016,15 @@ i64 Orksur::TASMessage (TASMessageEvent *e)
       const std::string &actn = blort2 -> get <std::string> ();
       if (actn  ==  "trigger_ascension")
         { fprintf (stderr, "HEY! HEY THERE! JUST GOT AN ASCENSION MESSAGE FOR "
-                   "<$s>...\n", trgt . c_str ());
+                   "<%s>...\n", trgt . c_str ());
+          if (! CurrentlyAscending ())
+            EffectAscension ();
           return 1;
         }
     }
   else
     { fprintf (stderr, "Orksur::TASMessage() -- unknown OSC 'path': <%s>\n",
-               pth);
+               pth . c_str ());
     }
   return 0;
 }

@@ -682,8 +682,14 @@ gridre -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
   orkp -> SetTableName ("table-2");
   g_tablecloth -> AppendChild (orkp);
 
+TMPControlEvent::TMPControlPhage *tasmaph
+  = dynamic_cast <TMPControlEvent::TMPControlPhage *> (orkp);
+
+TASSuggestionEvent::TASSuggestionPhage *tassuph
+  = dynamic_cast <TASSuggestionEvent::TASSuggestionPhage *> (orkp);
+
   tamp . GetSprinkler () . AppendPhage <TASSuggestionEvent> (tamp.orksu);
-  tamp . GetSprinkler () . AppendPhage <TASMessageEvent> (tamp.orksu);
+  tamp . GetSprinkler () . AppendPhage <TMPControlEvent> (tamp.orksu);
 
   for (i64 q = 0  ;  q < tamp . NumWaterWorkses ()  ;  ++q)
     if (GLFWWaterWorks *ww

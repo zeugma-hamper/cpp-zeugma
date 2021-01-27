@@ -58,7 +58,7 @@ struct Splort  :  Node
 class Orksur  :  public PlatonicMaes, public Node,
                  public ZESpatialPhagy, public ZEYowlPhagy,
                  public ZEBulletinPhagy,
-                 public TASMessageEvent::TASMessagePhage,
+                 public TMPControlEvent::TMPControlPhage,
                  public TASSuggestionEvent::TASSuggestionPhage
 { public:
 
@@ -171,7 +171,7 @@ class Orksur  :  public PlatonicMaes, public Node,
   i64 ZEYowlAppear (ZEYowlAppearEvent *e)  override;
   i64 ZEBulletin (ZEBulletinEvent *e)  override;
 
-  i64 TASMessage (TASMessageEvent *e)  override;
+  i64 TMPControl (TMPControlEvent *e)  override;
   i64 TASSuggestion (TASSuggestionEvent *e)  override;
 
   i64 Inhale (i64 ratch, f64 thyme)  override;

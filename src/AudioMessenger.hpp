@@ -99,13 +99,13 @@ class TASReceiver : public ZePublicWaterWorks
 };
 
 
-class TASMessageEvent : public ZeEvent
+class TURMessageEvent  :  public ZeEvent
 {
  public:
- ZE_EVT_TUMESCE (TASMessage, Ze);
+ ZE_EVT_TUMESCE (TURMessage, Ze);
 
-  TASMessageEvent (std::string_view _path, nl::json const &_message);
-  TASMessageEvent (std::string_view _path, nl::json &&_message);
+  TURMessageEvent (std::string_view _path, nl::json const &_message);
+  TURMessageEvent (std::string_view _path, nl::json &&_message);
 
   i64 MessageID (bool _spit_error = false) const;
   i64 DiscussionID (bool _spit_error = false)  const;
@@ -114,17 +114,26 @@ class TASMessageEvent : public ZeEvent
 
   nl::json const &Message () const;
 
-
  protected:
   std::string m_path;
   nlohmann::json m_message;
 };
 
 
-class TASSuggestionEvent : public TASMessageEvent
+class TMPControlEvent  :  public TURMessageEvent
+{ public:
+  ZE_EVT_TUMESCE (TMPControl, TURMessage);
+  TMPControlEvent (std::string_view _path, nl::json const &_message)
+    :  TURMessageEvent (_path, _message)  { }
+  TMPControlEvent (std::string_view _path, nl::json &&_message)
+    :  TURMessageEvent (_path, _message)  { }
+};
+
+
+class TASSuggestionEvent  :  public TURMessageEvent
 {
  public:
-  ZE_EVT_TUMESCE (TASSuggestion, TASMessage);
+  ZE_EVT_TUMESCE (TASSuggestion, TURMessage);
 
   TASSuggestionEvent (std::string_view _path, nl::json const &_message);
   TASSuggestionEvent (std::string_view _path, nl::json &&_message);
