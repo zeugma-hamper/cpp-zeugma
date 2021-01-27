@@ -113,7 +113,7 @@ class EventSprinklerGroup  :  public Zeubject
     { public:                                                           \
       virtual i64 EV_ILK (EV_ILK##Event *e)                             \
         { if (PassTheBuckUpPhageHierarchy ())                           \
-            EV_SUPERILK (e);                                            \
+            return EV_SUPERILK (e);                                     \
           return -1;                                                    \
         }                                                               \
     };                                                                  \
@@ -132,10 +132,10 @@ class EventSprinklerGroup  :  public Zeubject
   i64 ProfferAsSnackTo (OmNihil *om)  override                          \
     { if (EV_ILK##Phage *ph = dynamic_cast <EV_ILK##Phage *> (om))      \
         { i64 sult = ph -> EV_ILK (this);                               \
-          if (sult >= 0)                                                \
+          if (sult >= -1)                                               \
             return sult;                                                \
         }                                                               \
-      return -1;                                                        \
+      return -2;                                                        \
     }                                                                   \
   class Sprinkler  :  public ZeEvent::ProtoSprinkler                    \
     { public:                                                           \
