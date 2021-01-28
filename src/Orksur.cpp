@@ -1003,11 +1003,13 @@ i64 Orksur::TMPControl (TMPControlEvent *e)
 
   const std::string &pth = e -> Path ();
   if (pth  ==  "/taclient/control")
-    { const nl::json &mess = e -> Message ();
+    { const nl::json &wrapped_mess = e -> Message ();
+const nl::json &mess = wrapped_mess . at (0);
       auto blort1 = mess . find ("target");
       auto blort2 = mess . find ("action");
       if (blort1 == mess . end ()  ||  blort2 == mess . end ())
-        { fprintf (stderr, "HELL. MANGLED MESSAGE IN Orksur::TASMessage()\n");
+        { fprintf (stderr, "HELL. MANGLED MESSAGE IN Orksur::TASMessage()\n"
+                   "... like this: \n%s\n", mess . dump (1) . c_str ());
           return 0;
         }
       const std::string &trgt = blort1 -> get <std::string> ();
