@@ -43,6 +43,7 @@
 
 //events
 #include <GLFWWaterWorks.hpp>
+#include <OSCWandWaterWorks.hpp>
 #include <ZEBulletinEvent.h>
 #include <ZESpatialEvent.h>
 #include <ZEYowlEvent.h>
@@ -120,7 +121,6 @@ class Cursoresque  :  public Alignifer
 
 
 std::vector <Cursoresque *> cursoresques;
-
 
 class Sensorium  :  public Zeubject, public ZESpatialPhagy, public ZEYowlPhagy
 { public:
@@ -320,7 +320,7 @@ i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
           . Set (Vect (0.0, Tamglobals::Only ()->cur_elev_stop, 0.0));
       oto = ! oto;
     }
-  else if (utt == "w"  |  utt == "e"  |  utt == "r")
+  else if (utt == "w"  ||  utt == "e"  ||  utt == "r")
     { bool &oto = Tamglobals::Only ()->room_is_scaled_oto;
       f64 nes = (utt == "w"  ?  Tamparams::Current ()->workband_elevstop
                  :  (utt == "e"  ?  Tamparams::Current ()->escband_elevstop
@@ -350,6 +350,38 @@ i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
         = Tamparams::Current ()->clapper_vis_frame_cnt;
       if (AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes)
         sherm -> SendPlayBoop (3);
+    }
+  else if (utt == "o" || utt == "O")
+    {
+      std::string const default_wand = "wand-0";
+      auto it = recentest_pos.find(default_wand);
+      if (it == recentest_pos.end ())
+        return 0;
+
+      Vect pos = it->second;
+      PlatonicMaes *maes
+        = GraphicsApplication::GetApplication()->FindMaesByName("table");
+      if (! maes)
+        return 0;
+
+      auto *ga = GraphicsApplication::GetApplication ();
+      OSCWandWaterWorks *osc_www = nullptr;
+      szt const num_ww = ga->NumWaterWorkses ();
+      for (szt i = 0; i < num_ww; ++i)
+        if (osc_www = dynamic_cast<OSCWandWaterWorks *> (ga->NthWaterWorks (i)); osc_www)
+          break;
+
+      if (osc_www == nullptr)
+        return 0;
+
+      Matrix44 delta;
+      delta.LoadTranslation (-pos + maes->Loc ());
+      fprintf (stderr, "zero calibration delta is ");
+      (pos - maes->Loc ()).SpewToStderr ();
+      fprintf (stderr, "\n");
+
+      if (utt == "O")
+        osc_www->theirs_to_ours_pm *= delta;
     }
   return 0;
 }

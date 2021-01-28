@@ -271,6 +271,7 @@ OSCWandWaterWorks::OSCWandWaterWorks ()
 
 OSCWandWaterWorks::~OSCWandWaterWorks ()
 {
+  calibration_hookup.disconnect();
   delete osc_srv;
   osc_srv = nullptr;
   temp_sprinkler = nullptr;
