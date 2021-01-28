@@ -50,6 +50,9 @@
 #include <RawEventParsing.h>
 #include <GeomFumble.h>
 
+// event-adjacent(s)
+#include <nlohmann/json.hpp>
+
 // audio
 #include "AudioMessenger.hpp"
 
@@ -535,8 +538,8 @@ int main (int ac, char **av)
   std::string aud_port ("57121");
   std::string seasonings_filename ("../configs/seasonings.toml");
 
- po::options_description desc ("available options");
-  desc . add_options ()
+ po::options_description opts_desc ("available options");
+  opts_desc . add_options ()
     ("help", "hm. what do you think?")
     ("audserver-host", po::value <std::string> (&aud_host),
      "host, via ip or name, where audio server dwells")
@@ -548,17 +551,27 @@ int main (int ac, char **av)
    ;
 
   po::variables_map arg_map;
-  po::store (po::parse_command_line (ac, av, desc), arg_map);
+  po::store (po::parse_command_line (ac, av, opts_desc), arg_map);
   po::notify (arg_map);
 
 
   if (arg_map . count ("help"))
-    { std::cout << desc << "\n";
+    { std::cout << opts_desc << "\n";
       return 0;
     }
 
   if (arg_map . count ("sane-json"))
     json_is_not_insanely_wrapped = true;
+
+  // (further to the point foregoing...)
+  nlohmann::json jay_one ( nlohmann::json::object () );
+  nlohmann::json jay_two { nlohmann::json::object () };
+  fprintf (stderr,
+           "HEAR YE: [json ( json::object () ) . is_array ()] gives %s.\n",
+           jay_one . is_array ()  ?  "TRUE"  :  "FALSE");
+  fprintf (stderr,
+           "WHEREAS: [json { json::object () } . is_array ()] gives %s.\n",
+           jay_two . is_array ()  ?  "TRUE"  :  "FALSE");
 
   Tampo tamp;
   solo_tamp = &tamp;
@@ -713,12 +726,6 @@ gridre -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
   orkp->associated_wallmaes = frnt;
   orkp -> SetTableName ("table-2");
   g_tablecloth -> AppendChild (orkp);
-
-TMPControlEvent::TMPControlPhage *tasmaph
-  = dynamic_cast <TMPControlEvent::TMPControlPhage *> (orkp);
-
-TASSuggestionEvent::TASSuggestionPhage *tassuph
-  = dynamic_cast <TASSuggestionEvent::TASSuggestionPhage *> (orkp);
 
   tamp . GetSprinkler () . AppendPhage <TASSuggestionEvent> (tamp.orksu);
   tamp . GetSprinkler () . AppendPhage <TMPControlEvent> (tamp.orksu);

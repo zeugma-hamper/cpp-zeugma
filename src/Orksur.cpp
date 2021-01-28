@@ -1003,8 +1003,9 @@ i64 Orksur::TMPControl (TMPControlEvent *e)
 
   const std::string &pth = e -> Path ();
   if (pth  ==  "/taclient/control")
-    { const nl::json &wrapped_mess = e -> Message ();
-const nl::json &mess = wrapped_mess . at (0);
+    { const nl::json &emm = e -> Message ();
+      const nl::json &mess
+        = (emm . is_array ())  ?  emm . at (0)  :  emm;
       auto blort1 = mess . find ("target");
       auto blort2 = mess . find ("action");
       if (blort1 == mess . end ()  ||  blort2 == mess . end ())
