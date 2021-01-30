@@ -78,6 +78,9 @@ ReadFilmInfo (std::filesystem::path const &_path)
 
           fc.duration = value.at("duration").as_floating();
 
+          if (value.contains("title_timestamp"))
+            fc.title_timestamp = value.at("title_timestamp").as_floating ();
+
           fs::path tmp {toml::get<std::string> (value.at("path"))};
           if (tmp.is_relative ())
             fc.film_path = root / tmp;
