@@ -70,7 +70,6 @@ class Orksur  :  public PlatonicMaes, public Node,
   SonoChoosist *soncho;
   PlatonicMaes *associated_wallmaes;
   GraumanPalace *associated_cinelib;
-  i64 ascension_phase;
   Alignifer *ascending_collage;
   OeuvreAfterlife *valhalla;
   std::vector <Ticato *> players;
@@ -84,6 +83,10 @@ class Orksur  :  public PlatonicMaes, public Node,
   std::map <u64, Ticato *> awaiting_audio_sooth;
   Ticato *sel_atom;
 
+  i64 ascension_phase;
+  f64 asc_phase_dur;
+  MotherTime asc_phase_stopwatch;
+
   InterpVect asc_table_slide;
   InterpVect asc_first_rise;
   InterpVect asc_jump_scale;
@@ -94,6 +97,7 @@ class Orksur  :  public PlatonicMaes, public Node,
   InterpColor asc_coll_fader;
   InterpColor asc_covr_fader;
   MotherTime asc_hvn_incrsn_zeit;
+  bool asc_autofollow_triggered;
 
   Alignifer *asc_slipcover;
 
@@ -127,6 +131,7 @@ class Orksur  :  public PlatonicMaes, public Node,
   void ConcludeAscension ();
   bool AscensionPhaseJustNowDone ();
   void IndulgeAscensionInterstitials ();
+  f64 DurationFromAscensionPhase (i64 asc_phas);
   void EffectNextAscensionPhase ();
 
   Jigglegon *FurnishFreeJiggler ();

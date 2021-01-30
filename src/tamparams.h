@@ -59,6 +59,7 @@ struct Tamparams
 
   i64 clapper_vis_frame_cnt = 2;  // note that one frame is sometimes too fast
 
+  bool ascension_auto_follow = true;
 
   f64 asc_table_slide_time = 4.04;
   f64 asc_first_rise_time = 5.05;
@@ -102,6 +103,8 @@ namespace charm
 
 class AtomicFreezone;
 
+class Tampo;
+
 
 struct Tamglobals
 { f64 frame_tm = 0.0;
@@ -124,6 +127,8 @@ struct Tamglobals
 
   AtomicFreezone *sterngerlach = NULL;
   OeuvreAfterlife *valhalla = NULL;
+
+  Tampo *solo_tamp = NULL;
 
   std::vector <Node *> construction_marks;
   InterpColor construction_marks_color;

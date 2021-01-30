@@ -1,4 +1,7 @@
 
+#include "tamparams.h"
+#include "TampoChief.h"
+
 #include "Orksur.h"
 
 #include "GraumanPalace.h"
@@ -12,8 +15,6 @@
 #include "ZeUUID.h"
 
 #include "vector_utils.hpp"
-
-#include "tamparams.h"
 
 #include "GraphicsApplication.hpp"
 
@@ -243,11 +244,19 @@ bool Orksur::AscensionPhaseJustNowDone ()
 
 void Orksur::IndulgeAscensionInterstitials ()
 { Tamparams *tam = Tamparams::Current ();
+  Tampo *tampy = Tamglobals::Only ()->solo_tamp;
+
   switch (ascension_phase)
     { case ASCPH_TABLE_SLIDE:
         break;
 
       case ASCPH_FIRST_RISE:
+        if (Tamparams::Current ()->ascension_auto_follow
+            &&  ! asc_autofollow_triggered
+            &&  asc_phase_stopwatch . CurTimeGlance ()  >  0.70 * asc_phase_dur)
+          { tampy -> PressSpaceElevatorButton ("second");
+            asc_autofollow_triggered = true;
+          }
         break;
 
       case ASCPH_ENBLOATEN:
@@ -266,6 +275,12 @@ void Orksur::IndulgeAscensionInterstitials ()
         break;
 
       case ASCPH_SECOND_RISE:
+        if (Tamparams::Current ()->ascension_auto_follow
+            &&  ! asc_autofollow_triggered
+            &&  asc_phase_stopwatch . CurTimeGlance ()  >  0.45 * asc_phase_dur)
+          { tampy -> PressSpaceElevatorButton ("third");
+            asc_autofollow_triggered = true;
+          }
         if (asc_hvn_incrsn_zeit . CurTimeGlance ()  >=  0.0)
           { if (OeuvreAfterlife *valhalla = RetrieveValhalla ())
               { Ollag *new_coll = new Ollag ("");
@@ -291,24 +306,57 @@ void Orksur::IndulgeAscensionInterstitials ()
 }
 
 
+f64 Orksur::DurationFromAscensionPhase (i64 asc_phas)
+{ Tamparams *tam = Tamparams::Current ();
+  switch (asc_phas)
+    { case ASCPH_TABLE_SLIDE:
+        return tam->asc_table_slide_time;
+      case ASCPH_FIRST_RISE:
+        return tam->asc_first_rise_time;
+      case ASCPH_ENBLOATEN:
+        return tam->asc_enbloaten_time;
+      case ASCPH_BEFORE_PRESO:
+        return tam->asc_before_preso_hold_time;
+      case ASCPH_PRESENTATION:
+        return tam->asc_presentation_time;
+      case ASCPH_AFTER_PRESO:
+        return tam->asc_after_preso_hold_time;
+      case ASCPH_ENSVELTEN:
+        return tam->asc_ensvelten_time;
+      case ASCPH_SECOND_RISE:
+        return tam->asc_second_rise_time;
+      case ASCPH_ENTER_HEAVEN:
+        return tam->asc_enter_heaven_time;
+      default:
+        break;
+    }
+  return -1.0;
+}
+
+
 void Orksur::EffectNextAscensionPhase ()
 { Tamparams *tam = Tamparams::Current ();
   AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes;
 
   ++ascension_phase;
+  f64 asc_prev_phase_dur = asc_phase_dur;
+  asc_phase_dur = DurationFromAscensionPhase (ascension_phase);
+  asc_phase_stopwatch . ZeroTime ();
+  asc_autofollow_triggered = false;
+
   switch (ascension_phase)
     { case ASCPH_TABLE_SLIDE:
         { asc_table_slide . SetHard (Loc ());
           asc_table_slide . Set (Loc () + Height () * Up ());
           asc_table_slide . SetInterpTime
-            (tam->asc_table_slide_time);
+            (asc_phase_dur);
           asc_table_slide . SetInterpFunc (InterpFuncs::ASYMP_A);
           ascending_collage -> InstallLocGrapplerZoft (asc_table_slide);
           ascending_collage -> AlignToMaes (this);
           AppendChild (ascending_collage);
           if (associated_cinelib)
             { associated_cinelib->fader
-                . SetInterpTime (tam->asc_table_slide_time);
+                . SetInterpTime (asc_phase_dur);
               associated_cinelib->fader . Set (ZeColor (1.0, 0.1));
 
               if (AtomicFreezone *afz = Tamglobals::Only ()->sterngerlach)
@@ -340,15 +388,14 @@ void Orksur::EffectNextAscensionPhase ()
           ascending_collage -> InstallLocGrapplerZoft (asc_first_rise);
           Vect s = ascending_collage -> CurScale ();
           ascending_collage -> InstallScaleGrapplerZoft (asc_jump_scale);
-          asc_jump_scale . SetInterpTime (0.15 * tam->asc_first_rise_time);
+          asc_jump_scale . SetInterpTime (0.15 * asc_phase_dur);
           asc_jump_scale . SetHard (0.005 * s);
           asc_jump_scale . Set (s);
           Vect tabtop = Loc () + 0.5 * Height () * Up ();
           Vect wallstart
             = G::PointOntoPlaneProjection (tabtop, ma -> Loc (), ma -> Norm ());
           asc_first_rise . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
-          asc_first_rise . SetInterpTime
-            (tam->asc_first_rise_time);
+          asc_first_rise . SetInterpTime (asc_phase_dur);
           asc_first_rise . SetHard (wallstart);
           asc_first_rise . Set (ma -> Loc ()
                                 +  0.5 * ma -> Height () * ma -> Up ());
@@ -367,8 +414,7 @@ void Orksur::EffectNextAscensionPhase ()
         { Vect s = ascending_collage -> CurScale ();
           asc_perf_bloat . SetHard (Vect (s));
           asc_perf_bloat . Set (s * 1.75);
-          asc_perf_bloat . SetInterpTime
-            (tam->asc_enbloaten_time);
+          asc_perf_bloat . SetInterpTime (asc_phase_dur);
           asc_perf_bloat . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
           ascending_collage -> InstallScaleGrapplerZoft (asc_perf_bloat);
           if (sherm)
@@ -382,8 +428,8 @@ void Orksur::EffectNextAscensionPhase ()
         { asc_hold_zeit . ZeroTime ();
           asc_coll_fader . SetInterpFunc (InterpFuncs::LINEAR);
           asc_covr_fader . SetInterpFunc (InterpFuncs::LINEAR);
-          asc_coll_fader . SetInterpTime (0.9 * tam->asc_before_preso_hold_time);
-          asc_covr_fader . SetInterpTime (0.6 * tam->asc_before_preso_hold_time);
+          asc_coll_fader . SetInterpTime (0.9 * asc_phase_dur);
+          asc_covr_fader . SetInterpTime (0.6 * asc_phase_dur);
           asc_coll_fader . Set (ZeColor (1.0, 1.0));
           asc_covr_fader . Set (ZeColor (1.0, 0.0));
           if (sherm)
@@ -417,8 +463,7 @@ void Orksur::EffectNextAscensionPhase ()
       case ASCPH_ENSVELTEN:
         { Vect s = ascending_collage -> CurScale ();
           asc_perf_bloat . Set (s / 1.75);
-          asc_perf_bloat . SetInterpTime
-            (tam->asc_ensvelten_time);
+          asc_perf_bloat . SetInterpTime (asc_phase_dur);
           if (sherm)
             { i64 moid = ZeMonotonicID ();
               sherm -> SendPlaySound (tam->asc_ensvelten_audio, moid);
@@ -431,24 +476,22 @@ void Orksur::EffectNextAscensionPhase ()
         { const PlatonicMaes *ma = associated_wallmaes;
           Swath *sw = RetrieveValhalla () -> SwathFor (ma);
           asc_final_rise . SetInterpFunc (InterpFuncs::QUADRATIC_AB);
-          asc_final_rise . SetInterpTime
-            (tam->asc_second_rise_time);
+          asc_final_rise . SetInterpTime (asc_phase_dur);
           asc_final_rise . SetHard (ascending_collage -> CurLoc ());
           Vect term = sw->plumb . Midpoint () +  0.5 * sw->prone . SpanVect ();
           asc_final_rise . Set (term);
           Vect s = ascending_collage -> CurScale ();
-          asc_perf_bloat . SetInterpTime (0.9 * tam->asc_second_rise_time);
+          asc_perf_bloat . SetInterpTime (0.9 * asc_phase_dur);
           asc_perf_bloat . Set (0.85 * s);
           ascending_collage -> InstallLocGrapplerZoft (asc_final_rise);
           asc_hvn_incrsn_zeit . SetTimeFlowRate (1.0);
-          asc_hvn_incrsn_zeit . SetTime (-0.50 * tam->asc_second_rise_time);
+          asc_hvn_incrsn_zeit . SetTime (-0.50 * asc_phase_dur);
           if (associated_cinelib)
-            { associated_cinelib->fader
-                . SetInterpTime (0.895 * tam->asc_second_rise_time);
+            { associated_cinelib->fader . SetInterpTime (0.895 * asc_phase_dur);
               associated_cinelib->fader . Set (ZeColor (1.0, 1.0));
 
               if (AtomicFreezone *afz = Tamglobals::Only ()->sterngerlach)
-                { afz->dim_rad . SetInterpTime (1.1 * tam->asc_second_rise_time);
+                { afz->dim_rad . SetInterpTime (1.1 * asc_phase_dur);
                   afz->dim_rad . Set (-0.1);
                 }
             }

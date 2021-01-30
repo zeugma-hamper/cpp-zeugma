@@ -82,6 +82,7 @@
 #include "AtomicFreezone.h"
 #include "OeuvreAfterlife.h"
 #include "GraumanPalace.h"
+#include "TampoChief.h"
 #include "gallimaufry.h"
 #include "tamparams.h"
 
@@ -125,88 +126,8 @@ class Cursoresque  :  public Alignifer
 
 std::vector <Cursoresque *> cursoresques;
 
-class Sensorium  :  public Zeubject, public ZESpatialPhagy, public ZEYowlPhagy
-{ public:
-  i32 trig_butt_simulcount;
-  u64 trig_butt_ident;
-  std::unordered_set <std::string> trig_partic;
-  std::unordered_set <std::string> elev_partic;
-  bool calibrating;
-  bool elevating;
-  Vect elev_prevpos;
-  std::map <std::string, Vect> recentest_pos;
-  ZESpatialPhagy *cally;
 
-  Sensorium ()  :  Zeubject (), ZESpatialPhagy (),
-                   trig_butt_simulcount (2), trig_butt_ident (8),
-                   calibrating (false), elevating (false),
-                   cally (nullptr)
-    { }
-  ~Sensorium () override { }
-
-
-  u64 TriggerButtonIdentifier ()  const
-    { return trig_butt_ident; }
-  void SetTriggerButtonIdentifier (u64 tr_butt)
-    { trig_butt_ident = tr_butt; }
-
-  i32 TiggerButtonSimulcount ()  const
-    { return trig_butt_simulcount; }
-  void SetTriggerButtonSimulcount (i32 cnt)
-    { trig_butt_simulcount = cnt; }
-
-  Vect AveragePos ()  const
-    { Vect avg;
-      i32 cnt = 0;
-      for (auto &poo  :  recentest_pos)
-        { avg += poo.second;  ++cnt; }
-      if (cnt)  avg /= (f64)cnt;
-      return avg;
-    }
-
-  ZESpatialPhagy *Calibrista ()  const
-    { return cally; }
-  void SetCalibrista (ZESpatialPhagy *cal)
-    { cally = cal; }
-
-  i64 ZESpatialMove (ZESpatialMoveEvent *e)  override;
-  // see below for the above... can't define inline because uses Tampo...
-  i64 ZESpatialHarden (ZESpatialHardenEvent *e)  override;
-  i64 ZESpatialSoften (ZESpatialSoftenEvent *e)  override;
-
-  i64 ZEYowlAppear (ZEYowlAppearEvent *e)  override;
-};
-
-
-class Tampo final : public GraphicsApplication
-{ public:
-  Tampo ();
-  ~Tampo () override final;
-
-  bool DoWhatThouWilt (i64 ratch, f64 thyme)  override;
-
-  Frontier *IntersectedFrontier (const Vect &frm, const Vect &aim,
-                                 Vect *hit_point = NULL);
-  void FlatulateCursor (ZESpatialMoveEvent *e);
-
-  void AccrueElevatorOffset (const Vect &off);
-
- public:
-  InterpVect elev_transl;
-  f64 elev_trans_mult;
-  VideoRenderable *steenbeck;
-  ch_ptr <AtomicFreezone> freezo;
-  ch_ptr <OeuvreAfterlife> vreaft;
-  ch_ptr <Orksur> orksu;
-  ch_ptr<Sensorium> sensy;
-  ch_ptr<GraumanPalace> gegyp;
-  ch_ptr<GraumanPalace> gchin;
-  Node *texxyno;
-};
-
-
-static Tampo *solo_tamp = NULL;
-
+//static Tampo *solo_tamp = NULL;
 
 
 i64 Sensorium::ZESpatialMove (ZESpatialMoveEvent *e)
@@ -317,26 +238,14 @@ i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
       rs . Commence ();
       bool &oto = Tamglobals::Only ()->room_is_scaled_oto;
       if (oto)
-        solo_tamp->elev_transl . Set (Vect::zerov);
+        Tamglobals::Only ()->solo_tamp->elev_transl . Set (Vect::zerov);
       else
-        solo_tamp->elev_transl
+        Tamglobals::Only ()->solo_tamp->elev_transl
           . Set (Vect (0.0, Tamglobals::Only ()->cur_elev_stop, 0.0));
       oto = ! oto;
     }
   else if (utt == "w"  ||  utt == "e"  ||  utt == "r")
-    { bool &oto = Tamglobals::Only ()->room_is_scaled_oto;
-      f64 nes = (utt == "w"  ?  Tamparams::Current ()->workband_elevstop
-                 :  (utt == "e"  ?  Tamparams::Current ()->escband_elevstop
-                     :  Tamparams::Current ()->collabband_elevstop));
-      if (nes  !=  Tamglobals::Only ()->cur_elev_stop)
-        { Tamglobals::Only ()->cur_elev_stop = -nes;
-          if (oto)
-            { solo_tamp->elev_transl . Set (Vect (0.0, -nes, 0.0));
-              Tamglobals::Only ()->wall_grid_fader . Set (ZeColor (1.0, 0.75));
-              Tamglobals::Only ()->wall_grid_active = true;
-            }
-        }
-    }
+    { Tamglobals::Only ()->solo_tamp -> PressSpaceElevatorButton (utt); }
   else if (utt  ==  "t")
     { static bool cur_vis = false;
       cur_vis = ! cur_vis;
@@ -461,7 +370,7 @@ bool Tampo::DoWhatThouWilt (i64 ratch, f64 thyme)
 
   if (bool &acty = Tamglobals::Only ()->wall_grid_active)
     { InterpColor &ic = Tamglobals::Only ()->wall_grid_fader;
-      if (solo_tamp->elev_transl . Replete ())
+      if (Tamglobals::Only ()->solo_tamp->elev_transl . Replete ())
         { ic . Set (ZeColor (1.0, 0.0));
           acty = false;
         }
@@ -483,6 +392,28 @@ Frontier *Tampo::IntersectedFrontier (const Vect &frm, const Vect &aim,
         }
     }
   return NULL;
+}
+
+
+void Tampo::PressSpaceElevatorButton (const std::string floor)
+{ bool &oto = Tamglobals::Only ()->room_is_scaled_oto;
+  i64 fl = ((floor == "w" || floor == "first")  ?  1
+            :  ((floor == "e" || floor == "second")  ?  2
+                :  ((floor == "r" || floor == "third")  ?  3  :  0)));
+  if (fl  <  1)
+    fl = 1;
+  f64 nes = (fl == 1  ?  Tamparams::Current ()->workband_elevstop
+             :  (fl == 2  ?  Tamparams::Current ()->escband_elevstop
+                 :  Tamparams::Current ()->collabband_elevstop));
+  if (nes  !=  Tamglobals::Only ()->cur_elev_stop)
+    { Tamglobals::Only ()->cur_elev_stop = -nes;
+      if (oto)
+        { Tamglobals::Only ()->solo_tamp->elev_transl
+            . Set (Vect (0.0, -nes, 0.0));
+          Tamglobals::Only ()->wall_grid_fader . Set (ZeColor (1.0, 0.75));
+          Tamglobals::Only ()->wall_grid_active = true;
+        }
+    }
 }
 
 
@@ -574,7 +505,7 @@ int main (int ac, char **av)
            jay_two . is_array ()  ?  "TRUE"  :  "FALSE");
 
   Tampo tamp;
-  solo_tamp = &tamp;
+  Tamglobals::Only ()->solo_tamp = &tamp;
 
   if (! tamp . StartUp ())
     return -1;
