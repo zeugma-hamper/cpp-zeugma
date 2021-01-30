@@ -1067,6 +1067,10 @@ i64 Orksur::TMPControl (TMPControlEvent *e)
             EffectAscension ();
           return 1;
         }
+      else if (actn  ==  "trigger_descension")
+        { Tamglobals::Only ()->solo_tamp -> PressSpaceElevatorButton ("first");
+          return 1;
+        }
     }
   else
     { fprintf (stderr, "Orksur::TASMessage() -- unknown OSC 'path': <%s>\n",
