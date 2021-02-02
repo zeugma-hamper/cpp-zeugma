@@ -127,10 +127,7 @@ class Cursoresque  :  public Alignifer
 std::vector <Cursoresque *> cursoresques;
 
 
-//static Tampo *solo_tamp = NULL;
-
-
-i64 Sensorium::ZESpatialMove (ZESpatialMoveEvent *e)
+i64 Tampo::ZESpatialMove (ZESpatialMoveEvent *e)
 { if (calibrating  &&  trig_partic . size () == 0)
     { // forward!
       if (cally)
@@ -138,24 +135,11 @@ i64 Sensorium::ZESpatialMove (ZESpatialMoveEvent *e)
       return 0;
     }
 
-  Tampo *tam = (Tampo *)GraphicsApplication::GetApplication ();
-  tam -> FlatulateCursor (e);
+  FlatulateCursor (e);
 
   recentest_pos[e -> Provenance ()] = e -> Loc ();
 
-/*   // not permitting the ui-driven elevator thing for now
-  if (elevating)
-    { Vect newpos = AveragePos ();
-      Vect offset = newpos - elev_prevpos;
-      offset = offset . Dot (Vect::yaxis) * Vect::yaxis;
-      if (tam)
-        tam -> AccrueElevatorOffset (offset);
-      elev_prevpos = newpos;
-    }
-  else
-    { }
-*/
-  if (PlatonicMaes *emm = tam -> FindMaesByName ("table"))
+  if (PlatonicMaes *emm = FindMaesByName ("table"))
     { Vect p = e -> Loc ();
       p -= emm -> Loc ();
       f64 wid = emm -> Width (), hei = emm -> Height ();
@@ -171,7 +155,7 @@ i64 Sensorium::ZESpatialMove (ZESpatialMoveEvent *e)
   return 0;
 }
 
-i64 Sensorium::ZESpatialHarden (ZESpatialHardenEvent *e)
+i64 Tampo::ZESpatialHarden (ZESpatialHardenEvent *e)
 { if (calibrating)
     { // avanti!
       if (cally)
@@ -185,7 +169,6 @@ i64 Sensorium::ZESpatialHarden (ZESpatialHardenEvent *e)
       return 0;
     }
 
-  Tampo *instance = (Tampo *)GraphicsApplication::GetApplication();
   Vect hit;
   if (e -> Aim () . Dot (Vect::yaxis)  > 0.75)
     { if (! elevating)
@@ -199,7 +182,7 @@ i64 Sensorium::ZESpatialHarden (ZESpatialHardenEvent *e)
   return 0;
 }
 
-i64 Sensorium::ZESpatialSoften (ZESpatialSoftenEvent *e)
+i64 Tampo::ZESpatialSoften (ZESpatialSoftenEvent *e)
 { if (calibrating  &&  trig_partic . size () == 0)
     { // ymlaen!
       if (cally)
@@ -218,19 +201,11 @@ i64 Sensorium::ZESpatialSoften (ZESpatialSoftenEvent *e)
         }
       return 0;
     }
-/*  // no ui-driven elevation for the nonce...
-  auto it = elev_partic . find (e -> Provenance ());
-  if (it  !=  elev_partic . end ())
-    { elev_partic . erase (it);
-      if (elevating)
-        {  elevating = false; }
-    }
-*/
   return 0;
 }
 
 
-i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
+i64 Tampo::ZEYowlAppear (ZEYowlAppearEvent *e)
 { const std::string &utt = e -> Utterance ();
   if (utt == "q")
     { InterpVect &rs = Tamglobals::Only ()->room_scaler;
@@ -238,14 +213,13 @@ i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
       rs . Commence ();
       bool &oto = Tamglobals::Only ()->room_is_scaled_oto;
       if (oto)
-        Tamglobals::Only ()->solo_tamp->elev_transl . Set (Vect::zerov);
+        elev_transl . Set (Vect::zerov);
       else
-        Tamglobals::Only ()->solo_tamp->elev_transl
-          . Set (Vect (0.0, Tamglobals::Only ()->cur_elev_stop, 0.0));
+        elev_transl . Set (Vect (0.0, Tamglobals::Only ()->cur_elev_stop, 0.0));
       oto = ! oto;
     }
   else if (utt == "w"  ||  utt == "e"  ||  utt == "r")
-    { Tamglobals::Only ()->solo_tamp -> PressSpaceElevatorButton (utt); }
+    { PressSpaceElevatorButton (utt); }
   else if (utt  ==  "t")
     { static bool cur_vis = false;
       cur_vis = ! cur_vis;
@@ -310,14 +284,16 @@ i64 Sensorium::ZEYowlAppear (ZEYowlAppearEvent *e)
 
 
 Tampo::Tampo ()  :  GraphicsApplication (),
-                    sensy (new Sensorium),
+                    Zeubject (),
                     elev_trans_mult (77.0),
                     steenbeck (NULL),
-                    texxyno (NULL)
-{ AppendSpatialPhage (&m_event_sprinkler, sensy);
-  AppendYowlPhage (&m_event_sprinkler, sensy);
+                    texxyno (NULL),
+                    trig_butt_simulcount (2), trig_butt_ident (8),
+                    calibrating (false), elevating (false),
+                    cally (nullptr)
+{ // AppendSpatialPhage (&m_event_sprinkler, this);
+  // AppendYowlPhage (&m_event_sprinkler, this);
   elev_transl . SetInterpFunc (InterpFuncs::CUBIC_AB);
-
 }
 
 
@@ -506,6 +482,10 @@ int main (int ac, char **av)
 
   Tampo tamp;
   Tamglobals::Only ()->solo_tamp = &tamp;
+  ch_ptr <Tampo> tampogrip (&tamp);
+
+  AppendSpatialPhage (&(tamp . GetSprinkler ()), tampogrip);
+  AppendYowlPhage (&(tamp . GetSprinkler ()), tampogrip);
 
   if (! tamp . StartUp ())
     return -1;

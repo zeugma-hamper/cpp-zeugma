@@ -13,8 +13,23 @@
 #include <unordered_set>
 
 
-class Sensorium  :  public Zeubject, public ZESpatialPhagy, public ZEYowlPhagy
+
+class Tampo final  :  public GraphicsApplication,
+                      public Zeubject,
+                      public ZESpatialPhagy, public ZEYowlPhagy
 { public:
+
+  InterpVect elev_transl;
+  f64 elev_trans_mult;
+  VideoRenderable *steenbeck;
+  ch_ptr <AtomicFreezone> freezo;
+  ch_ptr <OeuvreAfterlife> vreaft;
+  ch_ptr <Orksur> orksu;
+  ch_ptr<GraumanPalace> gegyp;
+  ch_ptr<GraumanPalace> gchin;
+  Node *texxyno;
+
+  // and then: former Sensorium members:
   i32 trig_butt_simulcount;
   u64 trig_butt_ident;
   std::unordered_set <std::string> trig_partic;
@@ -25,20 +40,28 @@ class Sensorium  :  public Zeubject, public ZESpatialPhagy, public ZEYowlPhagy
   std::map <std::string, Vect> recentest_pos;
   ZESpatialPhagy *cally;
 
-  Sensorium ()  :  Zeubject (), ZESpatialPhagy (),
-                   trig_butt_simulcount (2), trig_butt_ident (8),
-                   calibrating (false), elevating (false),
-                   cally (nullptr)
-    { }
-  ~Sensorium () override { }
+
+  Tampo ();
+  ~Tampo ()  override final;
+
+  bool DoWhatThouWilt (i64 ratch, f64 thyme)  override;
+
+  Frontier *IntersectedFrontier (const Vect &frm, const Vect &aim,
+                                 Vect *hit_point = NULL);
+  void FlatulateCursor (ZESpatialMoveEvent *e);
+
+  void PressSpaceElevatorButton (const std::string floor);
+
+  void AccrueElevatorOffset (const Vect &off);
 
 
+  // herewith the erstwhile denizens of Sensorium...
   u64 TriggerButtonIdentifier ()  const
     { return trig_butt_ident; }
   void SetTriggerButtonIdentifier (u64 tr_butt)
     { trig_butt_ident = tr_butt; }
 
-  i32 TiggerButtonSimulcount ()  const
+  i32 TriggerButtonSimulcount ()  const
     { return trig_butt_simulcount; }
   void SetTriggerButtonSimulcount (i32 cnt)
     { trig_butt_simulcount = cnt; }
@@ -63,33 +86,4 @@ class Sensorium  :  public Zeubject, public ZESpatialPhagy, public ZEYowlPhagy
   i64 ZESpatialSoften (ZESpatialSoftenEvent *e)  override;
 
   i64 ZEYowlAppear (ZEYowlAppearEvent *e)  override;
-};
-
-
-class Tampo final  :  public GraphicsApplication
-{ public:
-  Tampo ();
-  ~Tampo () override final;
-
-  bool DoWhatThouWilt (i64 ratch, f64 thyme)  override;
-
-  Frontier *IntersectedFrontier (const Vect &frm, const Vect &aim,
-                                 Vect *hit_point = NULL);
-  void FlatulateCursor (ZESpatialMoveEvent *e);
-
-  void PressSpaceElevatorButton (const std::string floor);
-
-  void AccrueElevatorOffset (const Vect &off);
-
- public:
-  InterpVect elev_transl;
-  f64 elev_trans_mult;
-  VideoRenderable *steenbeck;
-  ch_ptr <AtomicFreezone> freezo;
-  ch_ptr <OeuvreAfterlife> vreaft;
-  ch_ptr <Orksur> orksu;
-  ch_ptr<Sensorium> sensy;
-  ch_ptr<GraumanPalace> gegyp;
-  ch_ptr<GraumanPalace> gchin;
-  Node *texxyno;
 };
