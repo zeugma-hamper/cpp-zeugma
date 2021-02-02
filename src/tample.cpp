@@ -127,151 +127,6 @@ class Cursoresque  :  public Alignifer
 std::vector <Cursoresque *> cursoresques;
 
 
-i64 Tampo::ZESpatialMove (ZESpatialMoveEvent *e)
-{ if (calibrating  &&  trig_partic . size () == 0)
-    { // forward!
-      if (cally)
-        cally -> ZESpatialMove (e);
-      return 0;
-    }
-
-  FlatulateCursor (e);
-
-  recentest_pos[e -> Provenance ()] = e -> Loc ();
-
-  if (PlatonicMaes *emm = FindMaesByName ("table"))
-    { Vect p = e -> Loc ();
-      p -= emm -> Loc ();
-      f64 wid = emm -> Width (), hei = emm -> Height ();
-      f64 d0 = 2.0 * p . Dot (emm -> Over ());
-      f64 d1 = 2.0 * p . Dot (emm -> Up ());
-      if (d0 < wid  &&  d0 > -wid  &&  d1 < hei  &&  d1 > -hei)
-        { f64 d2 = p . Dot (emm -> Norm ());
-          // fprintf (stderr,
-          //          "YEAUH! In bounds, <%.1lf %.1lf %.1lf> surface-relative.\n",
-          //          d0, d1, d2);
-        }
-    }
-  return 0;
-}
-
-i64 Tampo::ZESpatialHarden (ZESpatialHardenEvent *e)
-{ if (calibrating)
-    { // avanti!
-      if (cally)
-        cally -> ZESpatialHarden (e);
-      return 0;
-    }
-  if (e -> WhichPressor ()  ==  trig_butt_ident)
-    { trig_partic . insert (e -> Provenance ());
-      if (i64(trig_partic . size ())  >=  trig_butt_simulcount)
-        calibrating = true;
-      return 0;
-    }
-
-  Vect hit;
-  if (e -> Aim () . Dot (Vect::yaxis)  > 0.75)
-    { if (! elevating)
-        { elev_partic . insert (e -> Provenance ());
-          if (elev_partic . size ()  >  1)
-            { elevating = true;
-              elev_prevpos = AveragePos ();
-            }
-        }
-    }
-  return 0;
-}
-
-i64 Tampo::ZESpatialSoften (ZESpatialSoftenEvent *e)
-{ if (calibrating  &&  trig_partic . size () == 0)
-    { // ymlaen!
-      if (cally)
-        { if (cally -> ZESpatialSoften (e)  ==  -666)
-            calibrating = false;
-        }
-      return 0;
-    }
-  if (e -> WhichPressor ()  ==  trig_butt_ident)
-    { if (trig_partic . size ()  >  0)
-        { auto it = trig_partic . find (e -> Provenance ());
-          if (it  !=  trig_partic . end ())
-            trig_partic . erase (it);  // three verbose lines to remove...
-          if (calibrating  &&  trig_partic . size () == 0)
-            fprintf (stderr, "S T A R T I N G  CALIBRATION\n");
-        }
-      return 0;
-    }
-  return 0;
-}
-
-
-i64 Tampo::ZEYowlAppear (ZEYowlAppearEvent *e)
-{ const std::string &utt = e -> Utterance ();
-  if (utt == "q")
-    { InterpVect &rs = Tamglobals::Only ()->room_scaler;
-      rs . Reverse ();
-      rs . Commence ();
-      bool &oto = Tamglobals::Only ()->room_is_scaled_oto;
-      if (oto)
-        elev_transl . Set (Vect::zerov);
-      else
-        elev_transl . Set (Vect (0.0, Tamglobals::Only ()->cur_elev_stop, 0.0));
-      oto = ! oto;
-    }
-  else if (utt == "w"  ||  utt == "e"  ||  utt == "r")
-    { PressSpaceElevatorButton (utt); }
-  else if (utt  ==  "t")
-    { static bool cur_vis = false;
-      cur_vis = ! cur_vis;
-      // for (Node *no  :  Tamglobals::Only ()->construction_marks)
-      //   if (no)
-      //     no -> SetVisibilityForAllLocalRenderables (cur_vis);
-      Tamglobals::Only ()->construction_marks_color . Reverse ();
-      Tamglobals::Only ()->construction_marks_color . Commence ();
-    }
-  else if (utt  ==  "c")
-    { Tamglobals::Only ()->clapper_visuals -> AdjColorZoft ()
-        . SetHard (ZeColor (1.0, 1.0));
-      Tamglobals::Only ()->clapper_cnt
-        = Tamparams::Current ()->clapper_vis_frame_cnt;
-      if (AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes)
-        sherm -> SendPlayBoop (3);
-    }
-  else if (utt == "o" || utt == "O")
-    {
-      std::string const default_wand = "wand-0";
-      auto it = recentest_pos.find(default_wand);
-      if (it == recentest_pos.end ())
-        return 0;
-
-      Vect pos = it->second;
-      PlatonicMaes *maes
-        = GraphicsApplication::GetApplication()->FindMaesByName("table");
-      if (! maes)
-        return 0;
-
-      auto *ga = GraphicsApplication::GetApplication ();
-      OSCWandWaterWorks *osc_www = nullptr;
-      szt const num_ww = ga->NumWaterWorkses ();
-      for (szt i = 0; i < num_ww; ++i)
-        if (osc_www = dynamic_cast<OSCWandWaterWorks *> (ga->NthWaterWorks (i)); osc_www)
-          break;
-
-      if (osc_www == nullptr)
-        return 0;
-
-      Matrix44 delta;
-      delta.LoadTranslation (-pos + maes->Loc ());
-      fprintf (stderr, "zero calibration delta is ");
-      (pos - maes->Loc ()).SpewToStderr ();
-      fprintf (stderr, "\n");
-
-      if (utt == "O")
-        osc_www->theirs_to_ours_pm *= delta;
-    }
-  return 0;
-}
-
 #define ERROR_RETURN_VAL(MSG, VAL)                 \
   { fprintf (stderr, "%s\n", MSG);                 \
     return VAL;                                    \
@@ -430,6 +285,152 @@ void Tampo::FlatulateCursor (ZESpatialMoveEvent *e)
 void Tampo::AccrueElevatorOffset (const Vect &off)
 { Vect hither = elev_transl.val + elev_trans_mult * off;
   elev_transl = hither;
+}
+
+
+i64 Tampo::ZESpatialMove (ZESpatialMoveEvent *e)
+{ if (calibrating  &&  trig_partic . size () == 0)
+    { // forward!
+      if (cally)
+        cally -> ZESpatialMove (e);
+      return 0;
+    }
+
+  FlatulateCursor (e);
+
+  recentest_pos[e -> Provenance ()] = e -> Loc ();
+
+  if (PlatonicMaes *emm = FindMaesByName ("table"))
+    { Vect p = e -> Loc ();
+      p -= emm -> Loc ();
+      f64 wid = emm -> Width (), hei = emm -> Height ();
+      f64 d0 = 2.0 * p . Dot (emm -> Over ());
+      f64 d1 = 2.0 * p . Dot (emm -> Up ());
+      if (d0 < wid  &&  d0 > -wid  &&  d1 < hei  &&  d1 > -hei)
+        { f64 d2 = p . Dot (emm -> Norm ());
+          // fprintf (stderr,
+          //          "YEAUH! In bounds, <%.1lf %.1lf %.1lf> surface-relative.\n",
+          //          d0, d1, d2);
+        }
+    }
+  return 0;
+}
+
+i64 Tampo::ZESpatialHarden (ZESpatialHardenEvent *e)
+{ if (calibrating)
+    { // avanti!
+      if (cally)
+        cally -> ZESpatialHarden (e);
+      return 0;
+    }
+  if (e -> WhichPressor ()  ==  trig_butt_ident)
+    { trig_partic . insert (e -> Provenance ());
+      if (i64(trig_partic . size ())  >=  trig_butt_simulcount)
+        calibrating = true;
+      return 0;
+    }
+
+  Vect hit;
+  if (e -> Aim () . Dot (Vect::yaxis)  > 0.75)
+    { if (! elevating)
+        { elev_partic . insert (e -> Provenance ());
+          if (elev_partic . size ()  >  1)
+            { elevating = true;
+              elev_prevpos = AveragePos ();
+            }
+        }
+    }
+  return 0;
+}
+
+i64 Tampo::ZESpatialSoften (ZESpatialSoftenEvent *e)
+{ if (calibrating  &&  trig_partic . size () == 0)
+    { // ymlaen!
+      if (cally)
+        { if (cally -> ZESpatialSoften (e)  ==  -666)
+            calibrating = false;
+        }
+      return 0;
+    }
+  if (e -> WhichPressor ()  ==  trig_butt_ident)
+    { if (trig_partic . size ()  >  0)
+        { auto it = trig_partic . find (e -> Provenance ());
+          if (it  !=  trig_partic . end ())
+            trig_partic . erase (it);  // three verbose lines to remove...
+          if (calibrating  &&  trig_partic . size () == 0)
+            fprintf (stderr, "S T A R T I N G  CALIBRATION\n");
+        }
+      return 0;
+    }
+  return 0;
+}
+
+
+i64 Tampo::ZEYowlAppear (ZEYowlAppearEvent *e)
+{ const std::string &utt = e -> Utterance ();
+  if (utt == "q")
+    { InterpVect &rs = Tamglobals::Only ()->room_scaler;
+      rs . Reverse ();
+      rs . Commence ();
+      bool &oto = Tamglobals::Only ()->room_is_scaled_oto;
+      if (oto)
+        elev_transl . Set (Vect::zerov);
+      else
+        elev_transl . Set (Vect (0.0, Tamglobals::Only ()->cur_elev_stop, 0.0));
+      oto = ! oto;
+    }
+  else if (utt == "w"  ||  utt == "e"  ||  utt == "r")
+    { PressSpaceElevatorButton (utt); }
+  else if (utt  ==  "t")
+    { static bool cur_vis = false;
+      cur_vis = ! cur_vis;
+      // for (Node *no  :  Tamglobals::Only ()->construction_marks)
+      //   if (no)
+      //     no -> SetVisibilityForAllLocalRenderables (cur_vis);
+      Tamglobals::Only ()->construction_marks_color . Reverse ();
+      Tamglobals::Only ()->construction_marks_color . Commence ();
+    }
+  else if (utt  ==  "c")
+    { Tamglobals::Only ()->clapper_visuals -> AdjColorZoft ()
+        . SetHard (ZeColor (1.0, 1.0));
+      Tamglobals::Only ()->clapper_cnt
+        = Tamparams::Current ()->clapper_vis_frame_cnt;
+      if (AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes)
+        sherm -> SendPlayBoop (3);
+    }
+  else if (utt == "o" || utt == "O")
+    {
+      std::string const default_wand = "wand-0";
+      auto it = recentest_pos.find(default_wand);
+      if (it == recentest_pos.end ())
+        return 0;
+
+      Vect pos = it->second;
+      PlatonicMaes *maes
+        = GraphicsApplication::GetApplication()->FindMaesByName("table");
+      if (! maes)
+        return 0;
+
+      auto *ga = GraphicsApplication::GetApplication ();
+      OSCWandWaterWorks *osc_www = nullptr;
+      szt const num_ww = ga->NumWaterWorkses ();
+      for (szt i = 0; i < num_ww; ++i)
+        if (osc_www = dynamic_cast<OSCWandWaterWorks *> (ga->NthWaterWorks (i)); osc_www)
+          break;
+
+      if (osc_www == nullptr)
+        return 0;
+
+      Matrix44 delta;
+      delta.LoadTranslation (-pos + maes->Loc ());
+      fprintf (stderr, "zero calibration delta is ");
+      (pos - maes->Loc ()).SpewToStderr ();
+      fprintf (stderr, "\n");
+
+      if (utt == "O")
+        osc_www->theirs_to_ours_pm *= delta;
+    }
+  return 0;
 }
 
 
