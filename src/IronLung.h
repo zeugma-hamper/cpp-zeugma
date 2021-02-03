@@ -6,6 +6,7 @@
 #include "Zeubject.h"
 
 #include <vector>
+#include <algorithm>
 
 
 namespace charm  {
@@ -14,6 +15,8 @@ namespace charm  {
 class IronLung  :  public Zeubject
 { public:
   std::vector <Zeubject *> breathees;
+  std::vector <Zeubject *> aspirants;
+  std::vector <Zeubject *> expirees;
 
   IronLung ()  :  Zeubject ()
     { }
@@ -39,5 +42,25 @@ class IronLung  :  public Zeubject
 
 }  // namespace charm: generations of theatrical expertise snuffed out in the...
 
+
+#define IRON_LUNG_TIDY_AROUND_ACTUAL_INHALATION()                       \
+  if (expirees . size ()  >  0)                                         \
+    { auto romega = expirees . rend ();                                 \
+      for (auto it = expirees . rbegin ()  ;  it != romega  ;  ++it)    \
+        { auto brend = breathees . end ();                              \
+          auto dit = std::find (breathees . begin (), brend, *it);      \
+          if (dit  !=  brend)                                           \
+            breathees . erase (dit);                                    \
+        }                                                               \
+      expirees . clear ();                                              \
+    }                                                                   \
+                                                                        \
+  if (aspirants . size ()  >  0)                                        \
+    { auto omega = aspirants . end ();                                  \
+      for (auto it = aspirants . begin ()  ;  it != omega  ;  ++it)     \
+        breathees . push_back (*it);                                    \
+      aspirants . clear ();                                             \
+fprintf(stderr,"ADDED BREATHEE(S) --- now at %ld\n",breathees.size());  \
+    }
 
 #endif

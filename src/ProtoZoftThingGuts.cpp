@@ -50,10 +50,14 @@ i64 VelvetLung::Inhale (i64 ratch, f64 thyme)
 { if (ratch  <  0)
     return IronLung::Inhale (ratch, thyme);
 
+  IRON_LUNG_TIDY_AROUND_ACTUAL_INHALATION ();
+
   for (Zeubject *z  :  breathees)
     if (ProtoZoftThingGuts *pzg = static_cast <ProtoZoftThingGuts *> (z))
       if (pzg->rat_fresh  <  ratch)
         pzg -> Inhale (ratch, thyme);
+
+  IRON_LUNG_TIDY_AROUND_ACTUAL_INHALATION ();
 
   return 0;
 }

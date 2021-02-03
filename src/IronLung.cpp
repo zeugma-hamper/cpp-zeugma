@@ -1,8 +1,6 @@
 
 #include "IronLung.h"
 
-#include <algorithm>
-
 
 namespace charm  {
 
@@ -11,10 +9,10 @@ bool IronLung::AppendBreathee (Zeubject *z)
 { if (! z)
     return false;
   auto erminus = breathees . end ();
-  if (std::find (breathees . begin (), erminus, z)  !=  breathees . end ())
+  if (std::find (breathees . begin (), erminus, z)  !=  erminus)
     return false;
-  breathees . push_back (z);
-//fprintf(stderr,"ADDING BREATHEE --- now at %ld\n",breathees.size());
+
+  aspirants . push_back (z);
   return true;
 }
 
@@ -22,21 +20,37 @@ bool IronLung::AppendBreathee (Zeubject *z)
 bool IronLung::RemoveBreathee (Zeubject *z)
 { if (! z)
     return false;
+  // first: if it's in aspirants, take it out.
+  auto omega = aspirants . end ();
+  auto spit = std::find (aspirants . begin (), omega, z);
+  if (spit  !=  omega)
+    { aspirants . erase (spit);
+   // return true;
+      // actually it's possible (?) that the removee is
+      // both in aspirants but also already in breathees...
+    }
+
+  // and but so then now we'll look in the breathees proper:
   auto erminus = breathees . end ();
   auto it = std::find (breathees . begin (), erminus, z);
   if (it ==  erminus)
     return false;
-  breathees . erase (it);
-//fprintf(stderr,"and then DITCHING BREATHEE; thus at %ld\n",breathees.size());
+
+  expirees . push_back (z);  // actually schedule for deletion
+fprintf(stderr,"and then DITCHING BREATHEE; thus at %ld\n",breathees.size());
   return true;
 }
 
 
 i64 IronLung::Inhale (i64 ratch, f64 thyme)
-{ for (Zeubject *z  :  breathees)
+{ IRON_LUNG_TIDY_AROUND_ACTUAL_INHALATION ();
+
+  for (Zeubject *z  :  breathees)
     if (z)
       z -> Inhale (ratch, thyme);
   return 0;
+
+  IRON_LUNG_TIDY_AROUND_ACTUAL_INHALATION ();
 }
 
 
