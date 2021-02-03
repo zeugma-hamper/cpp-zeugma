@@ -261,8 +261,6 @@ bool GraphicsApplication::RunOneCycle ()
   for (ZePublicWaterWorks *ww : m_event_drainage)
     ww->Drain (&m_event_sprinkler);
 
-  DoWhatThouWilt (m_global_ratchet, global_frame_thyme);
-
   if (ProtoZoftThingGuts::IsMassBreathing ())
     ProtoZoftThingGuts::MassBreather ()
       -> Inhale (m_global_ratchet, global_frame_thyme);
@@ -270,6 +268,8 @@ bool GraphicsApplication::RunOneCycle ()
   for (IronLung *irlu  :  IronLung::GlobalLungs ())
     if (irlu)
       irlu -> Inhale (m_global_ratchet, global_frame_thyme);
+
+  DoWhatThouWilt (m_global_ratchet, global_frame_thyme);
 
   VideoSystem *vs = VideoSystem::GetSystem();
   assert (vs);
