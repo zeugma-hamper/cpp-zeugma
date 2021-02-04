@@ -175,21 +175,6 @@ bool Tampo::DoWhatThouWilt (i64 ratch, f64 thyme)
         }
     }
 
-  if (orksu)
-    orksu -> Inhale (ratch, thyme);
-
-  if (gegyp)
-    gegyp -> Inhale (ratch, thyme);
-
-  if (gchin)
-    gchin -> Inhale (ratch, thyme);
-
-  if (freezo)
-    freezo -> Inhale (ratch, thyme);
-
-  if (vreaft)
-    vreaft -> Inhale (ratch, thyme);
-
   i64 &clac = Tamglobals::Only ()->clapper_cnt;
   if (clac  >  0)
     --clac;
@@ -471,10 +456,6 @@ int main (int ac, char **av)
   if (arg_map . count ("sane-json"))
     json_is_not_insanely_wrapped = true;
 
-
-  Zeubject zoy;
-  zoy . SetName ("poober");
-
   // (further to the point foregoing...)
   nlohmann::json jay_one ( nlohmann::json::object () );
   nlohmann::json jay_two { nlohmann::json::object () };
@@ -491,6 +472,10 @@ int main (int ac, char **av)
 
   AppendSpatialPhage (&(tamp . GetSprinkler ()), tampogrip);
   AppendYowlPhage (&(tamp . GetSprinkler ()), tampogrip);
+
+  IronLung *top_lung = new IronLung;
+  top_lung -> SetName ("top-level-objects");
+  IronLung::AppendGlobal (top_lung);
 
   if (! tamp . StartUp ())
     return -1;
@@ -866,6 +851,12 @@ gridre -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
   AppendSpatialPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
   AppendYowlPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
   AppendBulletinPhage (&(tamp . GetSprinkler ()), tamp.gegyp);
+
+  top_lung -> AppendBreathee (tamp.orksu . get ());
+  top_lung -> AppendBreathee (tamp.gegyp . get ());
+  top_lung -> AppendBreathee (tamp.gchin . get ());
+  top_lung -> AppendBreathee (tamp.freezo . get ());
+  top_lung -> AppendBreathee (tamp.vreaft . get ());
 
   tamp . Run ();
 
