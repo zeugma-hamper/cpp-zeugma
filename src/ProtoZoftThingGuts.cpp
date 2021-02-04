@@ -9,10 +9,10 @@ VelvetLung *ProtoZoftThingGuts::mass_breather = NULL;
 VelvetLung *ProtoZoftThingGuts::sole_mass_breather = NULL;
 
 
-bool VelvetLung::AppendBreathee (Zeubject *z)
+bool VelvetLung::AppendBreathee (Zeubject *z, bool record_self_in_breathee)
 { if (NULL  ==  dynamic_cast <ProtoZoftThingGuts *> (z))
     return false;
-  return IronLung::AppendBreathee (z);
+  return IronLung::AppendBreathee (z, record_self_in_breathee);
 }
 
 bool VelvetLung::RemoveBreathee (Zeubject *z)

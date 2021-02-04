@@ -5,7 +5,7 @@
 namespace charm  {
 
 
-bool IronLung::AppendBreathee (Zeubject *z)
+bool IronLung::AppendBreathee (Zeubject *z, bool record_self_in_breathee)
 { if (! z)
     return false;
   auto erminus = breathees . end ();
@@ -13,6 +13,8 @@ bool IronLung::AppendBreathee (Zeubject *z)
     return false;
 
   aspirants . push_back (z);
+  if (record_self_in_breathee)
+    z -> SetBreather (this);
   return true;
 }
 
@@ -21,11 +23,13 @@ bool IronLung::RemoveBreathee (Zeubject *z)
 { if (! z)
     return false;
   // first: if it's in aspirants, take it out.
+
+  bool urn = false;
   auto omega = aspirants . end ();
   auto spit = std::find (aspirants . begin (), omega, z);
   if (spit  !=  omega)
     { aspirants . erase (spit);
-   // return true;
+      urn = true;
       // actually it's possible (?) that the removee is
       // both in aspirants but also already in breathees...
     }
@@ -34,11 +38,15 @@ bool IronLung::RemoveBreathee (Zeubject *z)
   auto erminus = breathees . end ();
   auto it = std::find (breathees . begin (), erminus, z);
   if (it ==  erminus)
-    return false;
+    return urn;
+  else
+    urn = true;
 
-  expirees . push_back (z);  // actually schedule for deletion
+  expirees . push_back (z);  // actually schedule for removal
 fprintf(stderr,"and then DITCHING BREATHEE; thus at %ld\n",breathees.size());
-  return true;
+  if (z -> UnsecuredSac ())
+    z -> SetBreather (NULL);
+  return urn;
 }
 
 

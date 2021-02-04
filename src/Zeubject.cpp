@@ -1,5 +1,7 @@
 
-#include <Zeubject.h>
+#include "Zeubject.h"
+
+#include "IronLung.h"
 
 
 namespace charm {
@@ -12,7 +14,9 @@ Zeubject::Zeubject (const std::string &nm)  :  OmNihil (), sac (NULL)
 { SetName (nm); }
 
 Zeubject::~Zeubject ()
-{ if (sac)
+{ if (IronLung *br = Breather ())
+    br -> RemoveBreathee (this);
+  if (sac)
     delete sac;
 }
 

@@ -23,7 +23,7 @@ class IronLung  :  public Zeubject
 
   i64 NumBreathees ()  const
     { return breathees . size (); }
-  virtual bool AppendBreathee (Zeubject *z);
+  virtual bool AppendBreathee (Zeubject *z, bool record_self_in_breathee = true);
   virtual bool RemoveBreathee (Zeubject *z);
 
   i64 Inhale (i64 ratch, f64 thyme)  override;

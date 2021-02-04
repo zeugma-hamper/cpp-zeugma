@@ -15,7 +15,8 @@ class ProtoZoftThingGuts;
 class VelvetLung  :  public IronLung
 { public:
 
-  bool AppendBreathee (Zeubject *z)  override;
+  bool AppendBreathee (Zeubject *z,
+                       bool record_self_in_breathee = false)  override;
   bool RemoveBreathee (Zeubject *z)  override;
 
   i64 Inhale (i64 ratch, f64 thyme)  override;

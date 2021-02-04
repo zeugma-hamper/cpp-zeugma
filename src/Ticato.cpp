@@ -89,8 +89,10 @@ Ticato::Ticato (std::vector <FilmInfo> &fimmz, i64 which_fimm, i64 which_clip)
 
 
 Ticato::~Ticato ()
-{ if (IronLung *irlu = IronLung::GlobalByName ("omni-lung"))
-    irlu -> RemoveBreathee (this);
+{ //if (IronLung *irlu = IronLung::GlobalByName ("omni-lung"))
+  //  irlu -> RemoveBreathee (this);
+
+  // the foregoing now happens automatically, via Zeubject's destructor.
 }
 
 
