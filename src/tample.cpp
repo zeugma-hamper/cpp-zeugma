@@ -471,6 +471,10 @@ int main (int ac, char **av)
   if (arg_map . count ("sane-json"))
     json_is_not_insanely_wrapped = true;
 
+
+  Zeubject zoy;
+  zoy . SetName ("poober");
+
   // (further to the point foregoing...)
   nlohmann::json jay_one ( nlohmann::json::object () );
   nlohmann::json jay_two { nlohmann::json::object () };

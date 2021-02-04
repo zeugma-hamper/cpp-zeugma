@@ -5,30 +5,52 @@
 namespace charm {
 
 
-Zeubject::Zeubject ()  :  OmNihil (), name (NULL)
+Zeubject::Zeubject ()  :  OmNihil (), sac (NULL)
 { }
 
-Zeubject::Zeubject (const std::string &nm)  :  OmNihil (),
-                                               name (new std::string (nm))
-{ }
+Zeubject::Zeubject (const std::string &nm)  :  OmNihil (), sac (NULL)
+{ SetName (nm); }
+
+Zeubject::~Zeubject ()
+{ if (sac)
+    delete sac;
+}
 
 
-static std::string bereft_str ("");
+ZeSac *Zeubject::UnsecuredSac ()
+{ return sac; }
+
+ZeSac *Zeubject::AssuredSac ()
+{ return sac  ?  sac  :  (sac = new ZeSac); }
 
 
-const std::string &Zeubject::Name ()  const
-{ return name  ?  *name  :  bereft_str; }
+
+
+const std::string &Zeubject::Name ()
+{ if (ZeSac *ess = UnsecuredSac ())
+    return ess -> Name ();
+  return ZeSac::bereft_str;
+}
 
 void Zeubject::SetName (const std::string &n)
-{ if (! name)
-    name = new std::string (n);
-  else
-    *name = n;
+{ AssuredSac () -> SetName (n); }
+
+
+IronLung *Zeubject::Breather ()
+{ ZeSac *ess = UnsecuredSac ();
+  return ess  ?  ess -> Breather ()  :  NULL;
 }
+
+void Zeubject::SetBreather (IronLung *br)
+{ AssuredSac () -> SetBreather (br); }
 
 
 i64 Zeubject::Inhale (i64 /*ratch*/, f64 /*thyme*/)
 { return 0; }
+
+
+
+std::string ZeSac::bereft_str ("");
 
 
 }
