@@ -11,14 +11,22 @@
 
 GraumanPalace::GraumanPalace ()  :  Zeubject (), Node (),
                                     backing_maes (NULL),
-                                    flick_wid (3600.0), flick_spacing (3840.0),
+//                                  flick_wid (3600.0), flick_spacing (3840.0),
                                     ovr (Vect::xaxis), upp (Vect::yaxis),
                                     nrm (Vect::zaxis), slider (new Node),
                                     now_showing (-1),
-                                    pb_depth_scale (30.0), pb_slide_scale (20.0),
-                                    pb_max_push (-50000.0), pb_max_pull (5000.0),
+//                                  pb_depth_scale (30.0), pb_slide_scale (20.0),
+//                                  pb_max_push (-50000.0), pb_max_pull (5000.0),
                                     sole_tline (NULL)
 { AppendChild (slider);
+
+  flick_wid = Tamparams::Current ()->grauman_flick_wid;
+  flick_spacing = Tamparams::Current ()->grauman_flick_spacing;
+
+  pb_depth_scale = Tamparams::Current ()->pushback_depth_scale;
+  pb_slide_scale = Tamparams::Current ()->pushback_slide_scale;
+  pb_max_push = Tamparams::Current ()->pushback_max_push;
+  pb_max_pull = Tamparams::Current ()->pushback_max_pull;
 
   push_depth . SetInterpTime (Tamparams::Current ()->pb_snapback_interp_time);
   ltrl_slide . SetInterpTime (Tamparams::Current ()->lateral_slide_interp_time);

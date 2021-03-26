@@ -23,6 +23,11 @@ using stringy_list = std::vector <std::string>;
 struct Tamparams
 { bool allow_anisotropic_pixelviews = false;
 
+  f64 pushback_depth_scale = 30.0;
+  f64 pushback_slide_scale = 20.0;
+  f64 pushback_max_push = -50000.0;  // in adapted space, not 'arm space'
+  f64 pushback_max_pull = 5000.0;    // ditto
+
 //  f64 workband_mid = 2000.0;
   f64 workband_mid = 1700.0;
   f64 workband_hei = 2000.0;
@@ -36,6 +41,9 @@ struct Tamparams
   f64 collband_mid = 7950.0;
   f64 collband_hei = 2400.0;
   f64 collabband_elevstop = 5500.0;
+
+  f64 grauman_flick_wid = 3600.0;
+  f64 grauman_flick_spacing = 3840.0;
 
   f64 coll_scale = 2266.6;
   f64 coll_spacing = 2600.0;
