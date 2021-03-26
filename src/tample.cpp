@@ -429,6 +429,7 @@ int main (int ac, char **av)
 { // well, here we go.
   std::string aud_host ("sepsis.local");
   std::string aud_port ("57121");
+  std::string params_mod_filename ("");
   std::string seasonings_filename ("../configs/seasonings.toml");
 
  po::options_description opts_desc ("available options");
@@ -440,6 +441,8 @@ int main (int ac, char **av)
      "port on which audio server listens (default: 57121)")
     ("seasonings", po::value <std::string> (&seasonings_filename),
      "toml file (default: ../configs/seasonings.toml)")
+    ("params-mod", po::value <std::string> (&params_mod_filename),
+     "toml file with general tamparam mods")
     ("sane-json", "json slurped from liblo isn't wrapped in an array")
    ;
 
@@ -455,6 +458,9 @@ int main (int ac, char **av)
 
   if (arg_map . count ("sane-json"))
     json_is_not_insanely_wrapped = true;
+
+  if (! params_mod_filename . empty ())
+    Tamparams::UpdateViaTOMLFile (params_mod_filename);
 
   // (further to the point foregoing...)
   nlohmann::json jay_one ( nlohmann::json::object () );

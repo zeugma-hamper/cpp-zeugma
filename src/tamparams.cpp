@@ -55,6 +55,46 @@ bool Tamparams::UpdateViaTOMLFile (const std::string &fname)
       Tamparams::PushCopy ();
       Tamparams *tam = Tamparams::Current ();
       std::string key;
+
+      SLURPARAM (pushback_depth_scale, f64);
+      SLURPARAM (pushback_slide_scale, f64);
+      SLURPARAM (pushback_max_push, f64);
+      SLURPARAM (pushback_max_pull, f64);
+
+      SLURPARAM (workband_mid, f64);
+      SLURPARAM (workband_hei, f64);
+      SLURPARAM (workband_elevstop, f64);
+
+      SLURPARAM (escaband_mid, f64);
+      SLURPARAM (escaband_hei, f64);
+      SLURPARAM (escband_elevstop, f64);
+
+      SLURPARAM (collband_mid, f64);
+      SLURPARAM (collband_hei, f64);
+      SLURPARAM (collabband_elevstop, f64);
+
+      SLURPARAM (grauman_flick_wid, f64);
+      SLURPARAM (grauman_flick_spacing, f64);
+
+      SLURPARAM (coll_scale, f64);
+      SLURPARAM (coll_spacing, f64);
+      SLURPARAM (coll_slosh_time, f64);
+
+      SLURPARAM (table_escatom_scale_factor, f64);
+      SLURPARAM (table_flmatom_scale_factor, f64);
+
+      SLURPARAM (table_grid_opacity, f64);
+
+      SLURPARAM (pb_snapback_interp_time, f64);
+      SLURPARAM (lateral_slide_interp_time, f64);
+      SLURPARAM (pb_snapback_fade_time, f64);
+
+      SLURPARAM (sono_choosist_furl_time, f64);
+
+      SLURPARAM (room_minify_factor, f64);
+
+      SLURPARAM (disposal_speed_threshold, f64);
+
       SLURPARAM (asc_table_slide_time, f64);
       SLURPARAM (asc_first_rise_time, f64);
       SLURPARAM (asc_enbloaten_time, f64);
