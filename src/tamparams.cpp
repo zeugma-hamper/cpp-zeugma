@@ -95,6 +95,8 @@ bool Tamparams::UpdateViaTOMLFile (const std::string &fname)
 
       SLURPARAM (disposal_speed_threshold, f64);
 
+      SLURPARAM (ascension_auto_follow, bool);
+
       SLURPARAM (asc_table_slide_time, f64);
       SLURPARAM (asc_first_rise_time, f64);
       SLURPARAM (asc_enbloaten_time, f64);
