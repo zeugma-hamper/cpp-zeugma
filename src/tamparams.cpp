@@ -99,6 +99,7 @@ bool Tamparams::UpdateViaTOMLFile (const std::string &fname)
 
       SLURPARAM (asc_table_slide_time, f64);
       SLURPARAM (asc_first_rise_time, f64);
+      SLURPARAM (asc_preso_vert_pos, f64);
       SLURPARAM (asc_enbloaten_time, f64);
       SLURPARAM (asc_before_preso_hold_time, f64);
       SLURPARAM (asc_presentation_time, f64);

@@ -36,3 +36,5 @@ coll-spacing = 2000.0
 coll-slosh-time = 4.75
 
 ascension-auto-follow = false
+
+asc-preso-vert-pos = 0.5

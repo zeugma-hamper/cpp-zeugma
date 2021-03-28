@@ -398,7 +398,8 @@ void Orksur::EffectNextAscensionPhase ()
           asc_first_rise . SetInterpTime (asc_phase_dur);
           asc_first_rise . SetHard (wallstart);
           asc_first_rise . Set (ma -> Loc ()
-                                +  0.5 * ma -> Height () * ma -> Up ());
+                                +  (Tamparams::Current ()->asc_preso_vert_pos
+                                    - 0.5) * ma -> Height () * ma -> Up ());
           asc_slipcover -> ScaleZoft () . Set (Vect (Width ()));
           ascending_collage -> AppendChild (asc_slipcover);
           asc_coll_fader . SetHard (ZeColor (1.0, 0.0));
