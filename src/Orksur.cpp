@@ -613,10 +613,14 @@ bool Orksur::AppendAtomToCollage (Ticato *tic)
 
   assembly -> AppendChild (tic);  // excises from former parent, see?
   players . push_back (tic);
+  Tamparams *tam = Tamparams::Current ();
   tic->accom_sca
     . Set (tic -> BornViaFlickPluck ()
-           ?  Vect (Tamparams::Current ()->table_flmatom_scale_factor)
-           :  Vect (Tamparams::Current ()->table_escatom_scale_factor));
+           ?  Vect (tam->grauman_flick_reference_wid
+                    / tam->grauman_flick_wid
+                    * tam->table_flmatom_scale_factor)
+           :  Vect (tam->table_escatom_scale_factor
+                    / tam->escatom_wall_scale));
 
   if (AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes)
     { sherm -> SendPlayBoop (5);
@@ -1009,10 +1013,14 @@ i64 Orksur::ZEBulletin (ZEBulletinEvent *e)
           { auto it = std::find (inchoates . begin (), inchoates . end (), tic);
             if (it  ==  inchoates . end ())
               { inchoates . push_back (tic);
+                Tamparams *tam = Tamparams::Current ();
                 tic->accom_sca . Set
                   (tic -> BornViaFlickPluck ()
-                   ?  Vect (Tamparams::Current ()->table_flmatom_scale_factor)
-                   :  Vect (Tamparams::Current ()->table_escatom_scale_factor));
+                   ?  Vect (tam->grauman_flick_reference_wid
+                            / tam->grauman_flick_wid
+                            * tam->table_flmatom_scale_factor)
+                   :  Vect (tam->table_escatom_scale_factor
+                            / tam->escatom_wall_scale));
               }
           }
         else if (e -> ObjByTag ("from-maes")  ==  underlying_maes)

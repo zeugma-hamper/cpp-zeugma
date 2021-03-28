@@ -3,35 +3,41 @@
 #grauman-flick-wid = 1200.0
 
 #workband-mid = 1700.0
-workband-mid = 1360.0
+#workband-mid = 1360.0
+workband-mid = 1260.0
 #workband-hei = 2000.0
 workband-hei = 2000.0
 #workband-elevstop = 0.0
 workband-elevstop = 0.0
 
 #escaband-mid = 4875.0
-escaband-mid = 2500.0
+escaband-mid = 2650.0
 #escaband-hei = 4350.0
-escaband-hei = 1500.0
+escaband-hei = 1000.0
 #escband-elevstop = 1950.0
 escband-elevstop = 1950.0
 
+escatom-wall-scale = 0.675
+escatom-wall-count = 20
+
 #collband-mid = 7950.0
-collband-mid = 3800.0
+collband-mid = 3950.0
 #collband-hei = 2400.0
 collband-hei = 2400.0
 #collabband-elevstop = 5500.0
 collabband-elevstop = 5500.0
 
 #grauman-flick-wid = 3600.0
-grauman-flick-wid = 2400.0
+#grauman-flick-wid = 2400.0
+grauman-flick-wid = 2700.0
 #grauman-flick-spacing = 3840.0
-grauman-flick-spacing = 2540.0
+#grauman-flick-spacing = 2540.0
+grauman-flick-spacing = 2880.0
 
 #coll-scale = 2266.6
-coll-scale = 1800.0
+coll-scale = 1620.0
 #coll-spacing = 2600.0
-coll-spacing = 2000.0
+coll-spacing = 1800.0
 #coll-slosh-time = 4.75
 coll-slosh-time = 4.75
 

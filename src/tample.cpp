@@ -697,6 +697,7 @@ gridre -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
 
   AtomicFreezone *afz = new AtomicFreezone;
   tamp.freezo = ch_ptr <AtomicFreezone> (afz);
+  afz->atom_count_goal = Tamparams::Current ()->escatom_wall_count;
   afz->cineganz = &film_infos;
   afz -> SetAmokField (g_wallpaper);
   afz->underlying_maeses . push_back (frnt);

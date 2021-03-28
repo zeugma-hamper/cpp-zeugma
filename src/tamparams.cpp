@@ -69,6 +69,9 @@ bool Tamparams::UpdateViaTOMLFile (const std::string &fname)
       SLURPARAM (escaband_hei, f64);
       SLURPARAM (escband_elevstop, f64);
 
+      SLURPARAM (escatom_wall_scale, f64);
+      SLURPARAM (escatom_wall_count, i64);
+
       SLURPARAM (collband_mid, f64);
       SLURPARAM (collband_hei, f64);
       SLURPARAM (collabband_elevstop, f64);

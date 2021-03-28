@@ -38,10 +38,14 @@ struct Tamparams
   f64 escaband_hei = 4350.0;
   f64 escband_elevstop = 1950.0;
 
+  f64 escatom_wall_scale = 1.0;
+  i64 escatom_wall_count = 45;
+
   f64 collband_mid = 7950.0;
   f64 collband_hei = 2400.0;
   f64 collabband_elevstop = 5500.0;
 
+  f64 grauman_flick_reference_wid = 3600.0;
   f64 grauman_flick_wid = 3600.0;
   f64 grauman_flick_spacing = 3840.0;
 
