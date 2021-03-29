@@ -28,13 +28,11 @@ struct Tamparams
   f64 pushback_max_push = -50000.0;  // in adapted space, not 'arm space'
   f64 pushback_max_pull = 5000.0;    // ditto
 
-//  f64 workband_mid = 2000.0;
   f64 workband_mid = 1700.0;
   f64 workband_hei = 2000.0;
   f64 workband_elevstop = 0.0;
 
   f64 escaband_mid = 4875.0;
-//  f64 escaband_hei = 3750.0;
   f64 escaband_hei = 4350.0;
   f64 escband_elevstop = 1950.0;
 
@@ -42,6 +40,7 @@ struct Tamparams
   i64 escatom_wall_count = 45;
 
   f64 collband_mid = 7950.0;
+  f64 collband_reference_hei = 2400.0;
   f64 collband_hei = 2400.0;
   f64 collabband_elevstop = 5500.0;
 
@@ -75,7 +74,7 @@ struct Tamparams
 
   f64 asc_table_slide_time = 4.04;
   f64 asc_first_rise_time = 5.05;
-  f64 asc_preso_vert_pos = 0.5;  // where the maes's y-axis goes 0.0 -> 1.0
+  f64 asc_preso_vert_pos = 1.0;  // where the maes's y-axis goes 0.0 -> 1.0
   f64 asc_enbloaten_time = 2.0;
   f64 asc_before_preso_hold_time = 0.5;
   f64 asc_presentation_time = 3.0;
