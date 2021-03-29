@@ -83,6 +83,8 @@ bool Tamparams::UpdateViaTOMLFile (const std::string &fname)
       SLURPARAM (coll_spacing, f64);
       SLURPARAM (coll_slosh_time, f64);
 
+      SLURPARAM (coll_leftmost_ordinal, i64);
+
       SLURPARAM (table_escatom_scale_factor, f64);
       SLURPARAM (table_flmatom_scale_factor, f64);
 

@@ -53,6 +53,8 @@ struct Tamparams
   f64 coll_spacing = 2600.0;
   f64 coll_slosh_time = 4.75;
 
+  i64 coll_leftmost_ordinal = -5;
+
   f64 table_escatom_scale_factor = 0.5;
   f64 table_flmatom_scale_factor = 0.2;
 

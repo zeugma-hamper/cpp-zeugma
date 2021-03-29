@@ -41,6 +41,9 @@ coll-spacing = 1800.0
 #coll-slosh-time = 4.75
 coll-slosh-time = 4.75
 
+#coll_leftmost_ordinal = -5
+coll-leftmost-ordinal = -4
+
 ascension-auto-follow = false
 
 asc-preso-vert-pos = 0.5

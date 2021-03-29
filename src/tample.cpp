@@ -768,15 +768,16 @@ gridre -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
     "collage07b-35.mp4",   // ufo
   };
 
- i64 ordnl = -5;
- for (std::string &nm  :  collanomer)
-   { //std::string path = "/opt/trelopro/tamper/demo-temp/fin-col/" + nm;
-     std::string path = "/opt/trelopro/tamper/demo-temp/Blurred-Ellipse/" + nm;
-     Ollag *ag = new Ollag (path);
-     ag->conga_directn = ordnl > 0  ?  1  :  -1;
-     ag->conga_ordinal = ordnl++;
-     ova -> AppendCollage (ag);
-   }
+// i64 ordnl = -5;
+  i64 ordnl = Tamparams::Current ()->coll_leftmost_ordinal;
+  for (std::string &nm  :  collanomer)
+    { //std::string path = "/opt/trelopro/tamper/demo-temp/fin-col/" + nm;
+      std::string path = "/opt/trelopro/tamper/demo-temp/Blurred-Ellipse/" + nm;
+      Ollag *ag = new Ollag (path);
+      ag->conga_directn = ordnl > 0  ?  1  :  -1;
+      ag->conga_ordinal = ordnl++;
+      ova -> AppendCollage (ag);
+    }
   ova -> DistributeCollagesEquitably ();
 
   Node *wframe_node = new Node (lpr);
