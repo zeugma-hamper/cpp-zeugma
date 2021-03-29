@@ -48,6 +48,7 @@ struct Tamparams
   f64 grauman_flick_wid = 3600.0;
   f64 grauman_flick_spacing = 3840.0;
 
+  f64 coll_reference_scale = 2266.6;
   f64 coll_scale = 2266.6;
   f64 coll_spacing = 2600.0;
   f64 coll_slosh_time = 4.75;

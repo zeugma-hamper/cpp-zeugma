@@ -481,7 +481,8 @@ void Orksur::EffectNextAscensionPhase ()
           asc_final_rise . SetHard (ascending_collage -> CurLoc ());
           Vect term = sw->plumb . Midpoint () +  0.5 * sw->prone . SpanVect ();
           asc_final_rise . Set (term);
-          Vect s = ascending_collage -> CurScale ();
+          Vect s = ascending_collage -> CurScale ()
+            * tam->coll_scale / tam->coll_reference_scale;
           asc_perf_bloat . SetInterpTime (0.9 * asc_phase_dur);
           asc_perf_bloat . Set (0.85 * s);
           ascending_collage -> InstallLocGrapplerZoft (asc_final_rise);

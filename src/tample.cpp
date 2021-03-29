@@ -758,7 +758,7 @@ gridre -> SpanFractionZoft () . BecomeLike (SinuFloat (0.2, 0.4, 0.5));
   AudioMessenger *sherm = Tamglobals::Only ()->sono_hermes;
   sherm -> SendStatus ("Running");
 
-  std::vector <std::string>  collanomer {
+  std::vector <std::string> collanomer {
     "Collage01-Half-GryRnd.mp4",
     "Collage08-35.mp4",    // door-bachelors
     "collage06-35.mp4",  // cake-milk-tony
