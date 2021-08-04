@@ -1,7 +1,24 @@
-# NOTE: jump to bottom for charm library and executable definitions
-# NOTE: run `install_bgfx_tools.sh <BIN_DIR>` running meson, see README.md
+#
+# (c) treadle & loam, provisioners llc
+#
 
-project ('charm', ['cpp', 'c'],
+# NOTE: run `install_bgfx_tools.sh <BIN_DIR>` before running meson;
+# see also README.md
+# note upon note: that <BIN_DIR> should be /opt/trelopro/bin in the
+# new milieu here...
+
+# so far, either
+#
+# meson setup --buildtype=debug --prefix=/opt/trelopro --libdir=lib dbg
+#
+# or
+#
+# meson setup --buildtype=debug dbg
+# cd dbg
+# meson configure --prefix=/opt/trelopro --libdir=lib
+#
+
+project ('zeugma', ['cpp', 'c'],
          default_options : ['cpp_std=c++17',
                             'warning_level=2'])
 
@@ -22,6 +39,14 @@ lo_dep = dependency ('liblo')
 #### libGLU: sure, it's deprecated; but then: aren't we all?
 glu_dep = cpp.find_library ('libGLU')
 
+#### toml : mkay; it's header-only, which is swell. but.
+install_subdir ('toml11', install_dir : 'include')
+
+#### nlohmann : header-only json. crisp and clean and psychotic.
+install_subdir ('nlohmann', install_dir : 'include')
+
+#### here comes, then, all the bgfx gubbish
+
 bgfx_build_args = []
 if (get_option('bgfx-msgs').enabled ())
   bgfx_build_args = bgfx_build_args + ['-DBX_CONFIG_DEBUG=1', '-DBGFX_CONFIG_DEBUG=1']
@@ -34,7 +59,13 @@ bx_sources = ['bx/src/amalgamated.cpp']
 bx_lib = static_library ('bx', bx_sources,
                          cpp_args : bgfx_build_args,
                          include_directories : bx_include_dirs,
-                         dependencies : [dl_dep, threads_dep])
+                         dependencies : [dl_dep, threads_dep],
+                         install : true)
+
+install_subdir ('bx/include/bx', install_dir : 'include/bx')
+install_subdir ('bx/include/compat', install_dir : 'include/bx')
+install_subdir ('bx/include/tinystl', install_dir : 'include/bx')
+install_subdir ('bx/3rdparty', install_dir : 'include/bx')
 
 bx_dep = declare_dependency (dependencies : [dl_dep, threads_dep],
                              include_directories : bx_include_dirs,
@@ -136,7 +167,11 @@ bimg_third_party_sources = ['bimg/3rdparty/astc/astc_averages_and_directions.cpp
 bimg_lib = static_library ('bimg', bimg_third_party_sources + bimg_sources,
                            cpp_args : bgfx_build_args,
                            include_directories : bimg_include_dirs,
-                           dependencies : [bx_dep])
+                           dependencies : [bx_dep],
+                           install : true)
+
+install_subdir ('bimg/include/bimg', install_dir : 'include/bimg')
+install_subdir ('bimg/3rdparty', install_dir : 'include/bimg')
 
 bimg_dep = declare_dependency (dependencies : [bx_dep],
                                include_directories : bimg_include_dirs,
@@ -159,7 +194,16 @@ bgfx_lib_cpp_args = bgfx_build_args + ['-DBGFX_CONFIG_RENDERER_OPENGL=46', '-DBG
 bgfx_lib = static_library ('bgfx', bgfx_sources,
                            cpp_args : bgfx_lib_cpp_args,
                            include_directories : bgfx_include_dirs,
-                           dependencies : [bx_dep, bimg_dep, x11_dep, opengl_dep, vulkan_dep])
+                           dependencies : [bx_dep, bimg_dep, x11_dep, opengl_dep, vulkan_dep],
+                           install : true)
+
+# some shaders include the following, so it's gots to gits installed:
+# (and, yes, it's not really a 'header', but...)
+
+install_headers ('bgfx/src/bgfx_shader.sh', subdir: 'bgfx')
+
+install_subdir ('bgfx/include/bgfx', install_dir : 'include/bgfx')
+install_subdir ('bgfx/3rdparty', install_dir : 'include/bgfx')
 
 bgfx_dep = declare_dependency (include_directories : bgfx_include_dirs,
                                dependencies : [bx_dep, bimg_dep, x11_dep, opengl_dep, vulkan_dep],
@@ -175,10 +219,16 @@ gst_dep       = dependency ('gstreamer-1.0')
 gst_app_dep   = dependency ('gstreamer-app-1.0')
 gst_video_dep = dependency ('gstreamer-video-1.0')
 
-##### CHARM #####
+##### ZEUGMA #####
 
-# be sure to run `./install_bgfx_tools.sh <BIN_DIR>` before building charm
-shaderc_prog = find_program ('shaderc', dirs : [get_option ('shaderc-path')])
+#
+# more horror. more horror.
+#
+
+shader_prog_gulag = '/opt/trelopro/bin'
+
+# be sure to run `./install_bgfx_tools.sh <BIN_DIR>` before building zeugma
+shaderc_prog = find_program ('shaderc', dirs : shader_prog_gulag)
 
 # NOTE: this is only for shaders that turn into headers, most go below
 header_shaders = [
@@ -292,23 +342,103 @@ font_sources = ['font/cube_atlas.cpp',
                 'font/text_metrics.cpp',
                 'font/utf8.cpp']
 
-charm_inc = include_directories ('src')
+zeugma_inc = include_directories ('src')
 toml_inc = include_directories ('toml11')
 font_inc = include_directories ('font')
 
-charm_definition_deps = [bx_dep, bimg_dep, bgfx_dep, glfw_dep,
-                         gst_dep, gst_app_dep, gst_video_dep,
-                         oiio_dep, boost_dep, lo_dep]
+zeugma_deps = [bx_dep, bimg_dep, bgfx_dep, glfw_dep,
+               gst_dep, gst_app_dep, gst_video_dep,
+               oiio_dep, boost_dep, lo_dep]
 
-charm_lib = static_library ('charm', lib_sources + font_sources + header_shader_files,
-                            include_directories : [charm_inc, toml_inc, font_inc],
-                            dependencies : charm_definition_deps,
+zeugma_lib = static_library ('Zeugma', lib_sources + font_sources + header_shader_files,
+                            include_directories : [zeugma_inc, toml_inc, font_inc],
+                            dependencies : zeugma_deps,
                             cpp_args : bgfx_build_args,
                             install : true)
 
-charm_dep = declare_dependency (include_directories : [charm_inc, toml_inc, font_inc],
-                                link_with : [charm_lib],
-                                dependencies : charm_definition_deps)
+zeugma_dep = declare_dependency (include_directories : [zeugma_inc, toml_inc, font_inc],
+                                link_with : [zeugma_lib],
+                                dependencies : zeugma_deps)
+
+zeugma_headers = ['src/Alignifer.h',
+                  'src/application.hpp',
+                  'src/base_types.hpp',
+                  'src/bgfx_utils.hpp',
+                  'src/BlockTimer.hpp',
+                  'src/Bolex.h',
+                  'src/charm_glm.hpp',
+                  'src/ch_ptr.hpp',
+                  'src/class_utils.hpp',
+                  'src/CMVTrefoil.h',
+                  'src/CoGrappler.h',
+                  'src/Collage.hpp',
+                  'src/conjure-from-toml.h',
+                  'src/DecodePipeline.hpp',
+                  'src/FlatRenderable.hpp',
+                  'src/FrameTime.hpp',
+                  'src/Frontier.hpp',
+                  'src/GeomFumble.h',
+                  'src/GLFWWaterWorks.hpp',
+                  'src/GraphicsApplication.hpp',
+                  'src/Grappler.h',
+                  'src/GrapplerPile.h',
+                  'src/GridRenderable.h',
+                  'src/gst_ptr.hpp',
+                  'src/interp-funcs.h',
+                  'src/InterpZoft.h',
+                  'src/IronLung.h',
+                  'src/LatchZoft.h',
+                  'src/Layer.hpp',
+                  'src/LinePileRenderable.h',
+                  'src/LoopZoft.h',
+                  'src/Matrix44.h',
+                  'src/MattedVideoRenderable.hpp',
+                  'src/Matte.hpp',
+                  'src/MatteLoader.hpp',
+                  'src/MatteLoaderPool.hpp',
+                  'src/MotherTime.h',
+                  'src/MultiSprinkler.hpp',
+                  'src/Node.hpp',
+                  'src/OmNihil.h',
+                  'src/OSCWandWaterWorks.hpp',
+                  'src/OverlayInstancing.hpp',
+                  'src/OverlayTest.hpp',
+                  'src/PipelineTerminus.hpp',
+                  'src/PlatonicMaes.h',
+                  'src/PolygonRenderable.h',
+                  'src/ProtoZoftThingGuts.h',
+                  'src/RandZoft.h',
+                  'src/RawEventParsing.h',
+                  'src/RectangleRenderable.hpp',
+                  'src/Renderable.hpp',
+                  'src/RoGrappler.h',
+                  'src/ScaleZoft.h',
+                  'src/ScGrappler.h',
+                  'src/SinuZoft.h',
+                  'src/SpaceThing.h',
+                  'src/SumZoft.h',
+                  'src/TampVideoTerminus.hpp',
+                  'src/TextRenderable.hpp',
+                  'src/TextSystem.hpp',
+                  'src/TexturedRenderable.hpp',
+                  'src/TrGrappler.h',
+                  'src/type_int.hpp',
+                  'src/Vect.h',
+                  'src/vector_interop.hpp',
+                  'src/vector_utils.hpp',
+                  'src/VideoRenderable.hpp',
+                  'src/VideoSystem.hpp',
+                  'src/ZEBulletinEvent.h',
+                  'src/ZeColor.h',
+                  'src/ZeEvent.h',
+                  'src/ZePublicWaterWorks.hpp',
+                  'src/ZESpatialEvent.h',
+                  'src/Zeubject.h',
+                  'src/ZeUUID.h',
+                  'src/ZEYowlEvent.h',
+                  'src/ZoftThing.h']
+
+install_headers (zeugma_headers, subdir : 'zeugma')
 
 
 ##### SHADERS #####
@@ -380,33 +510,33 @@ endforeach
 ##### EXECUTABLES #####
 bgfx_test_exec = executable ('bgfx_test',
                              sources : ['src/bgfx_test.cpp'],
-                             dependencies : [charm_dep])
+                             dependencies : [zeugma_dep])
 
 dead_zone_exec = executable ('dead_zone',
                              sources : ['src/dead_zone.cpp'],
-                             dependencies : [charm_dep])
+                             dependencies : [zeugma_dep])
 
 text_zone_exec = executable ('text_zone',
                              sources : ['src/text_zone.cpp'],
-                             dependencies : [charm_dep])
+                             dependencies : [zeugma_dep])
 
 overlay_zone_exec = executable ('overlay_zone',
                                 sources : ['src/overlay_zone.cpp'],
-                                dependencies : [charm_dep])
+                                dependencies : [zeugma_dep])
 
 config_parser_exec = executable ('config_parser',
                                  sources : ['src/config_parser.cpp'],
-                                 dependencies : [charm_dep])
+                                 dependencies : [zeugma_dep])
 
 chud_zone_exec = executable ('chud-zone',
                              sources : ['src/chud-zone.cpp'],
-                             dependencies : [charm_dep])
+                             dependencies : [zeugma_dep])
 
 tri_demo_exec = executable ('tri_demo',
                             sources : ['src/tri_demo.cpp',
                                        'src/Collage.cpp',
                                        'src/TriBand.cpp'],
-                            dependencies : [charm_dep, glu_dep])
+                            dependencies : [zeugma_dep, glu_dep])
 
 tample_exec = executable ('tample',
                            sources : ['src/AtomicFreezone.cpp',
@@ -423,12 +553,12 @@ tample_exec = executable ('tample',
                                       'src/tamparams.cpp',
                                       'src/tample.cpp'
                                      ],
-                           dependencies : [charm_dep, glu_dep])
+                           dependencies : [zeugma_dep, glu_dep])
 
 scan_mattes_exec = executable ('scan_mattes',
                                sources : ['src/scan_mattes.cpp'],
-                               dependencies : [charm_dep])
+                               dependencies : [zeugma_dep])
 
 audio_runthrough_exec = executable ('audio_runthrough',
                                     sources : ['src/audio_runthrough.cpp'],
-                                    dependencies : [charm_dep])
+                                    dependencies : [zeugma_dep])
