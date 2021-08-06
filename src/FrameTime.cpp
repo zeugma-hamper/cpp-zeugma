@@ -1,9 +1,11 @@
+
 #include "FrameTime.hpp"
 
 #include <chrono>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 static u64 now_in_nanos ()
 {
@@ -64,5 +66,6 @@ u64 FrameTime::ResetTimeNS () const
 {
   return m_reset_time;
 }
+
 
 }

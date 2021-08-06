@@ -2,7 +2,7 @@
 #include "Matrix44.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 const Matrix44 Matrix44::mIdent (INITLESS);
@@ -330,4 +330,4 @@ Vect &Matrix44::TransformVectInPlace (Vect &v)  const
 }
 
 
-}  // a time to live, a time to... well, you know the rest, namespace charm
+}  // a time to live, a time to... well, you know the rest, namespace zeugma

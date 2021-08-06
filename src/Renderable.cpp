@@ -2,7 +2,7 @@
 #include "Renderable.hpp"
 
 
-namespace charm {
+namespace zeugma  {
 
 
 Renderable::Renderable ()

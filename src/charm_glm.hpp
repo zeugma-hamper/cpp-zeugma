@@ -1,3 +1,4 @@
+
 #ifndef THE_GEOMETRY_FOR_NOW
 #define THE_GEOMETRY_FOR_NOW
 
@@ -14,6 +15,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/transform.hpp>
+
 
 
 #endif //THE_GEOMETRY_FOR_NOW

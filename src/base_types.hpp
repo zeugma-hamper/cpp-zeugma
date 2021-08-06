@@ -9,8 +9,7 @@
 #include <limits>
 
 
-namespace charm
-{
+namespace zeugma  {
 
 
 //basic numerics

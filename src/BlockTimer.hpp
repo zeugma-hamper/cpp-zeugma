@@ -1,3 +1,4 @@
+
 #ifndef THYME_IS_ON_MY_SIDE
 #define THYME_IS_ON_MY_SIDE
 
@@ -9,8 +10,8 @@
 
 #include <stdio.h>
 
-namespace charm
-{
+
+namespace zeugma  {
 
 /*
   BlockTimer can give you a quick measurement about how long a block
@@ -75,6 +76,8 @@ struct BlockTimer
 
 #endif
 
+
 }
 
-#endif //THYME_IS_ON_MY_SIDE
+
+#endif  //THYME_IS_ON_MY_SIDE

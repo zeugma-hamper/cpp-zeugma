@@ -26,8 +26,7 @@
   }
 
 
-namespace charm
-{
+namespace zeugma  {
 
 
 static void glfw_error_callback (int, const char *_msg)
@@ -460,5 +459,6 @@ i32 GraphicsApplication::NumSceneLayers () const
 {
   return i32 (m_scene_graph_layers.size ());
 }
+
 
 }

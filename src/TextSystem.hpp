@@ -1,5 +1,7 @@
+
 #ifndef DISTURBING_YOUR_DRIVING
 #define DISTURBING_YOUR_DRIVING
+
 
 #include <class_utils.hpp>
 
@@ -10,8 +12,9 @@
 #include <string_view>
 #include <unordered_map>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 class TextSystem
 {
@@ -19,7 +22,7 @@ class TextSystem
 
   ~TextSystem ();
 
-  CHARM_DELETE_MOVE_COPY(TextSystem);
+  ZEUGMA_DELETE_MOVE_COPY(TextSystem);
 
   static bool Initialize ();
   static void ShutDown ();
@@ -65,7 +68,8 @@ class TextSystem
   std::unordered_map<std::string, FontHandle> m_fonts;
 };
 
+
 }
 
 
-#endif // DISTURBING_YOUR_DRIVING
+#endif  // DISTURBING_YOUR_DRIVING

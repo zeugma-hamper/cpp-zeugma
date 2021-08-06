@@ -1,3 +1,4 @@
+
 #include <Frontier.hpp>
 
 #include <Node.hpp>
@@ -5,8 +6,9 @@
 
 #include <vector_interop.hpp>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 Frontier::Frontier ()
   : Frontier {nullptr}
@@ -170,5 +172,6 @@ bool RectRenderableFrontier::CheckHit (G::Ray const &_ray, Vect *_hit_pt) const
   //                               0.5 * (t_tr + t_bl), over, up,
   //                               diag.Dot (over), diag.Dot (up), _hit_pt);
 }
+
 
 }

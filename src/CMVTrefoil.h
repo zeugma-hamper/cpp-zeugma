@@ -9,7 +9,7 @@
 #include <Zeubject.h>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class Bolex;

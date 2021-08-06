@@ -4,7 +4,7 @@
 #include "Node.hpp"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 void *PolygonRenderable::tessy_obj = NULL;
@@ -240,4 +240,4 @@ spanking_time = true;
 }
 
 
-}  // namespace charm sails into the west with the elves
+}  // namespace zeugma sails into the west with the elves

@@ -2,7 +2,7 @@
 #include <MultiSprinkler.hpp>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 MultiSprinkler::MultiSprinkler ()
@@ -14,4 +14,4 @@ MultiSprinkler::~MultiSprinkler ()
 }
 
 
-}  // a royal crochet hook pulling namespace charm's brain out through its nose
+}  // a royal crochet hook pulling namespace zeugma's brain out through its nose

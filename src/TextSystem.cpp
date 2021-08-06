@@ -1,3 +1,4 @@
+
 #include <TextSystem.hpp>
 
 #include <font_manager.h>
@@ -5,8 +6,10 @@
 
 #include <bgfx_utils.hpp>
 
-namespace charm
-{
+
+namespace zeugma  {
+
+
 static TextSystem *s_text_system = nullptr;
 
 TextSystem::TextSystem ()

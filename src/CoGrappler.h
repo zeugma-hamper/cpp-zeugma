@@ -6,7 +6,7 @@
 #include "Grappler.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class CoGrappler  :  public Grappler

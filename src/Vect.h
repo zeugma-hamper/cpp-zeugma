@@ -9,8 +9,7 @@
 #include <stdio.h>
 
 
-namespace charm
-{
+namespace zeugma  {
 
 
 class Vect  :  public v3f64
@@ -175,7 +174,7 @@ class Vect  :  public v3f64
 #define PVEX2(pv) (pv)->x, (pv)->y
 
 
-}  // even though its ascii is dead, namespace charm's spirit lives on
+}  // even though its ascii is dead, namespace zeugma's spirit lives on
 
 
 #endif

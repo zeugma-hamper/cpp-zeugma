@@ -7,7 +7,7 @@
 #include <Node.hpp>
 
 
-namespace charm {
+namespace zeugma  {
 
 
 Layer::Layer ()

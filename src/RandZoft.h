@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 template <typename T> T UnifMultiRand ();
@@ -110,7 +110,7 @@ using RandVect = RandZoft <Vect>;
 using RandColor = RandZoft <ZeColor>;
 
 
-}  //  so long; farewell; auf wiedersehen; goodbye... namespace charm
+}  //  so long; farewell; auf wiedersehen; goodbye... namespace zeugma
 
 
 #endif

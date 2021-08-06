@@ -6,7 +6,7 @@
 #include <vector_interop.hpp>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 TexturedRenderable::TexturedRenderable ()

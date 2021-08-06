@@ -1,5 +1,7 @@
+
 #ifndef BGFX_IS_AWFULLY_CLOSE_TO_BUGFIX
 #define BGFX_IS_AWFULLY_CLOSE_TO_BUGFIX
+
 
 #include <base_types.hpp>
 #include <class_utils.hpp>
@@ -14,8 +16,9 @@
 #include <string_view>
 #include <vector>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 // Shader/Program utility functions
 struct ProgramResiduals
@@ -69,7 +72,7 @@ struct MappedFile
   MappedFile (std::string_view _path);
   ~MappedFile ();
 
-  CHARM_DELETE_MOVE_COPY(MappedFile);
+  ZEUGMA_DELETE_MOVE_COPY(MappedFile);
 
   int fd;
   off_t size;
@@ -136,6 +139,8 @@ struct DebugOutputCallbacks final : public bgfx::CallbackI
 	void captureFrame(const void*, uint32_t) override { }
 };
 
+
 }
 
-#endif //BGFX_IS_AWFULLY_CLOSE_TO_BUGFIX
+
+#endif  //BGFX_IS_AWFULLY_CLOSE_TO_BUGFIX

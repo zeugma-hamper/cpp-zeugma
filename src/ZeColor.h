@@ -6,7 +6,7 @@
 #include "base_types.hpp"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class ZeColor

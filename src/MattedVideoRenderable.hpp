@@ -1,5 +1,7 @@
+
 #ifndef MATTED_VIDEO_RENDERABLE
 #define MATTED_VIDEO_RENDERABLE
+
 
 #include <Renderable.hpp>
 #include <VideoSystem.hpp>
@@ -11,8 +13,9 @@
 
 #include <filesystem>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 struct FilmInfo;
 struct ClipInfo;
@@ -77,4 +80,5 @@ class MattedVideoRenderable final : public Renderable
 
 }
 
-#endif //MATTED_VIDEO_RENDERABLE
+
+#endif  //MATTED_VIDEO_RENDERABLE

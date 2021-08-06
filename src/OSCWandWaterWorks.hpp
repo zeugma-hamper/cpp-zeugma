@@ -1,5 +1,7 @@
+
 #ifndef THE_MIGHTY_OSC_RIVER
 #define THE_MIGHTY_OSC_RIVER
+
 
 #include <ZePublicWaterWorks.hpp>
 
@@ -7,14 +9,16 @@
 
 #include <Matrix44.h>
 
+
 namespace lo
 {
   class Server;
   class Message;
 }
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 class ZERoomCalibrationEvent : public ZeEvent
 {
@@ -134,6 +138,8 @@ class OSCWandWaterWorks : public ZePublicWaterWorks
                                   ZERoomCalibrationEvent *_event);
 };
 
+
 }
 
-#endif //THE_MIGHTY_OSC_RIVER
+
+#endif  //THE_MIGHTY_OSC_RIVER

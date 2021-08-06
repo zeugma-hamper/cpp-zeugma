@@ -1,12 +1,15 @@
+
 #ifndef RECTANGLE_RENDERABLE
 #define RECTANGLE_RENDERABLE
+
 
 #include <Renderable.hpp>
 
 #include <bgfx_utils.hpp>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 class RectangleRenderable final : public Renderable
 {
@@ -21,6 +24,8 @@ class RectangleRenderable final : public Renderable
   bgfx::VertexBufferHandle vbh;
 };
 
+
 }
 
-#endif //RECTANGLE_RENDERABLE
+
+#endif  //RECTANGLE_RENDERABLE

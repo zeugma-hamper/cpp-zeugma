@@ -7,7 +7,7 @@
 #include "base_types.hpp"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class MotherTime
@@ -53,7 +53,7 @@ class MotherTime
 };
 
 
-}  // quoth namespace charm: we who are about to die sa...
+}  // quoth namespace zeugma: we who are about to die sa...
 
 
 #endif

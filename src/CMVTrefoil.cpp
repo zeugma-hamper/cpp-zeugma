@@ -5,7 +5,7 @@
 #include <PlatonicMaes.h>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 Bolex *CameraFromMaes (const PlatonicMaes &m)

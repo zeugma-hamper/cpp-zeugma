@@ -4,7 +4,7 @@
 #include <MultiSprinkler.hpp>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 u32 ZEBulletinEvent::NumObjPhrases ()  const

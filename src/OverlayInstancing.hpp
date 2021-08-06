@@ -1,13 +1,16 @@
+
 #ifndef YEP_LETS_SEE
 #define YEP_LETS_SEE
+
 
 #include <Renderable.hpp>
 #include <Vect.h>
 
 #include <bgfx_utils.hpp>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 class Node;
 
@@ -36,6 +39,8 @@ class OverlayInstancing : public Renderable
   glm::vec4 m_flags;
 };
 
+
 }
 
-#endif //YEP_LETS_SEE
+
+#endif  //YEP_LETS_SEE

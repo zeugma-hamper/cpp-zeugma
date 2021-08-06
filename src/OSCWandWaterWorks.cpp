@@ -1,3 +1,4 @@
+
 #include <OSCWandWaterWorks.hpp>
 
 #include <GraphicsApplication.hpp>
@@ -9,8 +10,9 @@
 
 #include <filesystem>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 namespace fs = std::filesystem;
 

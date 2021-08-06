@@ -1,10 +1,13 @@
+
 #ifndef THIS_IS_INTERESTING
 #define THIS_IS_INTERESTING
 
+
 #include <base_types.hpp>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 //this is safe with clang and g++, would need to test with MSVC
 //references of references:
@@ -32,6 +35,8 @@ struct ch_index
   }
 };
 
+
 }
 
-#endif // THIS_IS_INTERESTING
+
+#endif  // THIS_IS_INTERESTING

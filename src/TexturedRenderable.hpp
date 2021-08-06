@@ -1,12 +1,15 @@
+
 #ifndef A_BIT_OF_FLAVOR
 #define A_BIT_OF_FLAVOR
+
 
 #include <Renderable.hpp>
 
 #include <bgfx_utils.hpp>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 class TexturedRenderable final : public Renderable
 {
@@ -35,6 +38,8 @@ class TexturedRenderable final : public Renderable
 
 };
 
+
 }
 
-#endif // A_BIT_OF_FLAVOR
+
+#endif  // A_BIT_OF_FLAVOR

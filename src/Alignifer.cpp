@@ -6,7 +6,7 @@
 #include "TrGrappler.h"
 
 
-using namespace charm;
+using namespace zeugma;
 
 
 void Alignifer::WellAndTrulyConstruct ()

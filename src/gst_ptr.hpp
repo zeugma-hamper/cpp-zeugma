@@ -1,10 +1,14 @@
+
 #ifndef SORRY_SEA_SIDE
 #define SORRY_SEA_SIDE
+
 
 #include <gst/gst.h>
 #include <utility>
 
-namespace charm {
+
+namespace zeugma  {
+
 
 //for use with unique_ptr and glib allocated memory
 template<typename T>
@@ -259,6 +263,8 @@ class gst_ptr
   gst_ptr_type object;
 };
 
+
 }
 
-#endif //SORRY_SEA_SIDE
+
+#endif  //SORRY_SEA_SIDE

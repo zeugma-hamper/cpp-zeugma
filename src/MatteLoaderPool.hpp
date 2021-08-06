@@ -1,5 +1,7 @@
+
 #ifndef MATTE_LOADER_POOL_HAS_A_SHALLOW_END
 #define MATTE_LOADER_POOL_HAS_A_SHALLOW_END
+
 
 #include <base_types.hpp>
 #include <bgfx_utils.hpp>
@@ -13,8 +15,9 @@
 #include <mutex>
 #include <thread>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 template<typename T>
 struct default_free
@@ -62,7 +65,7 @@ class MatteLoaderWorker : public CharmBase<MatteLoaderWorker, MTReferenceCounter
   MatteLoaderWorker (f32 _start_time, u32 _frame_count,
                      std::filesystem::path const &_matte_dir);
 
-  CHARM_DELETE_MOVE_COPY(MatteLoaderWorker);
+  ZEUGMA_DELETE_MOVE_COPY (MatteLoaderWorker);
 
   ~MatteLoaderWorker ();
 
@@ -94,7 +97,7 @@ class MatteLoaderPool
   MatteLoaderPool ();
   ~MatteLoaderPool ();
 
-  CHARM_DELETE_MOVE_COPY(MatteLoaderPool);
+  ZEUGMA_DELETE_MOVE_COPY (MatteLoaderPool);
 
   void ShutDown ();
 
@@ -113,6 +116,8 @@ class MatteLoaderPool
   std::vector<ch_weak_ptr<MatteLoaderWorker>> m_workers;
 };
 
+
 }
+
 
 #endif

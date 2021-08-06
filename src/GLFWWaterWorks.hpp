@@ -15,8 +15,7 @@ extern "C"
 }
 
 
-namespace charm
-{
+namespace zeugma  {
 
 
 class Bolex;
@@ -63,6 +62,8 @@ class GLFWWaterWorks : public ZePublicWaterWorks
   bool m_mouse_to_spatial_ortho_style;
 };
 
+
 }
+
 
 #endif

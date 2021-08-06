@@ -1,3 +1,4 @@
+
 #ifndef GLYPH_GLYPH_GLYPH
 #define GLYPH_GLYPH_GLYPH
 
@@ -7,12 +8,13 @@
 
 #include <string_view>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 class Node;
 
-//TextRenderable adapts the bgfx text rendering example to charm's
+//TextRenderable adapts the bgfx text rendering example to zeugma's
 //codebase. The most important thing to note is the API below is kinda
 //like immediate mode. For example, setting the text color to white,
 //appending text, setting the text color to red, then appending more
@@ -29,7 +31,7 @@ class TextRenderable : public Renderable
 
   ~TextRenderable () override;
 
-  CHARM_DELETE_MOVE_COPY(TextRenderable);
+  ZEUGMA_DELETE_MOVE_COPY(TextRenderable);
 
   void Draw (u16 _view_id) override;
 
@@ -91,4 +93,5 @@ class TextRenderable : public Renderable
 
 }
 
-#endif //GLYPH_GLYPH_GLYPH
+
+#endif  //GLYPH_GLYPH_GLYPH

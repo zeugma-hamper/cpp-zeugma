@@ -18,7 +18,7 @@
 // #define ZOFT_MAYBINHALE(ratch, thyme)
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 namespace Zoft
@@ -263,7 +263,7 @@ extern const ZoftFloat ZoftFloat_zero;
 extern const ZoftVect ZoftVect_zero;
 
 
-}  // no ashes; just dust for namespace charm
+}  // no ashes; just dust for namespace zeugma
 
 
 #endif

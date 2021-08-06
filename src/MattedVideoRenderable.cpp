@@ -10,7 +10,7 @@
 #include <algorithm>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 namespace fs = std::filesystem;

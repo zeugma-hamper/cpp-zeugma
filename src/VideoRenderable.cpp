@@ -14,8 +14,7 @@
 #include <string_view>
 
 
-
-namespace charm  {
+namespace zeugma  {
 
 
 VideoRenderable::VideoRenderable (std::string_view _path)

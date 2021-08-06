@@ -6,7 +6,7 @@
 #include "SpaceThing.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class PlatonicMaes  :  public SpaceThing
@@ -110,6 +110,6 @@ class PlatonicMaes  :  public SpaceThing
 };
 
 
-}  // namespace charm went down to the basement to check out that weird noise
+}  // namespace zeugma went down to the basement to check out that weird noise
 
 #endif

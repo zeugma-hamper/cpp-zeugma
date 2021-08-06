@@ -6,7 +6,7 @@
 #include "ZoftThing.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 template <typename T>
@@ -88,7 +88,7 @@ using ScaleVect = ScaleZoft <Vect>;
 using ScaleColor = ScaleZoft <ZeColor>;
 
 
-}  // that'd be about all she wrote for namespace charm (thanks, 'her')
+}  // that'd be about all she wrote for namespace zeugma (thanks, 'her')
 
 
 #endif

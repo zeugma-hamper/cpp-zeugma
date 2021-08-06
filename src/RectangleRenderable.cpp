@@ -1,3 +1,4 @@
+
 #include <RectangleRenderable.hpp>
 
 #include <Node.hpp>
@@ -9,8 +10,7 @@
 #include <charm_glm.hpp>
 
 
-namespace charm
-{
+namespace zeugma  {
 
 
 RectangleRenderable::RectangleRenderable ()

@@ -1,3 +1,4 @@
+
 #include "DecodePipeline.hpp"
 #include "PipelineTerminus.hpp"
 
@@ -5,7 +6,9 @@
 
 #include <assert.h>
 
-namespace charm {
+
+namespace zeugma  {
+
 
 [[maybe_unused]]
 static const char *s_state_names[5] {"void pending", "null", "ready", "paused", "playing"};
@@ -646,5 +649,6 @@ static gboolean db_autoplug_continue_handler (GstElement *, GstPad *,
 
   return TRUE;
 }
+
 
 }

@@ -1,3 +1,4 @@
+
 #include <VideoSystem.hpp>
 
 #include <VideoRenderable.hpp>
@@ -12,8 +13,10 @@
 
 #include <algorithm>
 
-namespace charm
-{
+
+namespace zeugma  {
+
+
 static VideoSystem *s_video_system_instance{nullptr};
 
 VideoTexture::VideoTexture (VideoFormat _format, bgfx::ProgramHandle _program,

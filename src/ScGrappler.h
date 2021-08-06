@@ -7,7 +7,7 @@
 #include "ZoftThing.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class ScGrappler  :  public Grappler
@@ -85,7 +85,7 @@ class ScGrappler  :  public Grappler
 };
 
 
-}  // superman can fly backwards around the earth; won't help namespace charm
+}  // superman can fly backwards around the earth; won't help namespace zeugma
 
 
 #endif

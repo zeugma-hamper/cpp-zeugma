@@ -1,5 +1,7 @@
+
 #ifndef MATTE_Y_MATT
 #define MATTE_Y_MATT
+
 
 //#include <bgfx_utils.hpp>
 #include <base_types.hpp>
@@ -10,8 +12,9 @@
 #include <filesystem>
 #include <vector>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 /*
   structure of film config file:
 
@@ -169,8 +172,8 @@ class FilmCatalog
  public:
   FilmCatalog ();
 
-  CHARM_DEFAULT_MOVE(FilmCatalog);
-  CHARM_DELETE_COPY(FilmCatalog);
+  ZEUGMA_DEFAULT_MOVE(FilmCatalog);
+  ZEUGMA_DELETE_COPY(FilmCatalog);
 
   bool LoadFilmInfo (std::filesystem::path const &_path);
   bool LoadFilmGeometry (std::filesystem::path const &_path);
@@ -202,4 +205,5 @@ void MergeFilmInfoGeometry (std::vector<FilmInfo> &_info,
 
 }
 
-#endif //MATTE_Y_MATT
+
+#endif  //MATTE_Y_MATT

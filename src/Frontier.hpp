@@ -1,5 +1,7 @@
-#ifndef VAST_TRACKS_OF_LAND
-#define VAST_TRACKS_OF_LAND
+
+#ifndef VAST_TRACTS_OF_LAND
+#define VAST_TRACTS_OF_LAND
+
 
 #include <GeomFumble.h>
 #include <Vect.h>
@@ -7,11 +9,13 @@
 #include <base_types.hpp>
 #include <class_utils.hpp>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 class Node;
 class Renderable;
+
 
 class Frontier
 {
@@ -22,7 +26,7 @@ class Frontier
   Frontier (Node *_node);
   virtual ~Frontier ();
 
-  CHARM_DELETE_MOVE_COPY(Frontier);
+  ZEUGMA_DELETE_MOVE_COPY(Frontier);
 
   Node *ItsNode () const;
 
@@ -73,7 +77,8 @@ class RectRenderableFrontier : public Frontier
   f64 m_wid, m_hei;
 };
 
+
 }
 
 
-#endif //VAST_TRACKS_OF_LAND
+#endif  //VAST_TRACTS_OF_LAND

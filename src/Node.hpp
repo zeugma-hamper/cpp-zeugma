@@ -14,7 +14,7 @@
 #include "GrapplerPile.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class Layer;
@@ -37,8 +37,8 @@ class Node
   explicit Node (Renderable *_renderable);
   virtual ~Node ();
 
-  CHARM_DELETE_COPY (Node);
-  CHARM_DELETE_MOVE (Node);
+  ZEUGMA_DELETE_COPY (Node);
+  ZEUGMA_DELETE_MOVE (Node);
 
   std::array<graph_id, 2> EnumerateGraph (graph_id _base_id = 0,
                                           graph_id _base_rend_id = 0);
@@ -186,7 +186,7 @@ void Node::VisitDepthFirst (Functor &&_func)
 }
 
 
-}  // unto namespace charm as to veronica cartwright in alien, witches of e'wick
+}  // unto namespace zeugma as to v. cartwright in alien, witches of eastwick
 
 
-#endif //NODULAR_BITS
+#endif  //NODULAR_BITS

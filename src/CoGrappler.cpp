@@ -2,7 +2,7 @@
 #include "CoGrappler.h"
 
 
-using namespace charm;
+using namespace zeugma;
 
 
 void CoGrappler::SetViaNormalizedBasisVectors (const Vect &e0, const Vect &e1,

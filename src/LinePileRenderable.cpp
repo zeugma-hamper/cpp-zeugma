@@ -6,7 +6,7 @@
 #include "vector_interop.hpp"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 static const char *color_unif_s = "u_color";

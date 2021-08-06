@@ -1,13 +1,16 @@
+
 #ifndef VECTOR_CAN_BE_TERRIBLY_ANNOYING
 #define VECTOR_CAN_BE_TERRIBLY_ANNOYING
+
 
 #include <base_types.hpp>
 
 #include <algorithm>
 #include <vector>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 //Searches for element _t
 //Returns the first index, -1 if not found
@@ -116,7 +119,8 @@ i64 RemoveIfErase (std::vector<T> &_vector, Pred _p)
   return ret;
 }
 
+
 }
 
 
-#endif //VECTOR_CAN_BE_TERRIBLY_ANNOYING
+#endif  //VECTOR_CAN_BE_TERRIBLY_ANNOYING

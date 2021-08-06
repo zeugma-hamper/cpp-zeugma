@@ -6,7 +6,7 @@
 #include <ch_ptr.hpp>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class OmNihil  :  public CharmBase <OmNihil>

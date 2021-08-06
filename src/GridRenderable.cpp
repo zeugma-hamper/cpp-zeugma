@@ -8,7 +8,7 @@
 #include <vector>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 static const char *color_unif_s = "u_color";

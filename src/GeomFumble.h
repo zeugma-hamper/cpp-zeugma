@@ -8,7 +8,7 @@
 #include <class_utils.hpp>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 namespace G
@@ -51,7 +51,7 @@ struct Ray
        dir {_dir}
     { }
 
-  CHARM_DEFAULT_MOVE_COPY(Ray);
+  ZEUGMA_DEFAULT_MOVE_COPY(Ray);
 
   bool IsValid () const
     { return (dir . AutoDot ()  >  0.0005); }
@@ -104,7 +104,7 @@ struct AABB
     :  blf {_blf}, trb {_trb}
   { }
 
-  CHARM_DEFAULT_MOVE_COPY(AABB);
+  ZEUGMA_DEFAULT_MOVE_COPY(AABB);
 
   bool IsValid () const
   {
@@ -116,7 +116,7 @@ struct AABB
 
 
 
-}  // alas, poor namespace charm! i knew it, horatio, a fellow of infinite jest,
+}  // alas, poor namespace zeugma! i knew it, horatio, a fellow of inf't jest,
 
 
 #endif

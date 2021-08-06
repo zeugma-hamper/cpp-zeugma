@@ -6,7 +6,7 @@
 #include "ZoftThing.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 template <typename T>
@@ -39,7 +39,7 @@ using LatchVect = LatchZoft <Vect>;
 using LatchColor = LatchZoft <ZeColor>;
 
 
-}  // the bliss of permanent oblivion for namespace charm
+}  // the bliss of permanent oblivion for namespace zeugma
 
 
 #endif

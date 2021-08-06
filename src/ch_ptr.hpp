@@ -1,3 +1,4 @@
+
 #ifndef YOUR_FINGER_IS_IN_MY_EYE
 #define YOUR_FINGER_IS_IN_MY_EYE
 
@@ -6,8 +7,9 @@
 #include <atomic>
 #include <type_traits>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 class ReferenceCounter
 {
@@ -618,5 +620,8 @@ inline bool operator!= (T *_left, ch_ptr<U> const &_right)
   return !(_left == _right);
 }
 
+
 }
-#endif //YOUR_FINGER_IS_IN_MY_EYE
+
+
+#endif  //YOUR_FINGER_IS_IN_MY_EYE

@@ -8,7 +8,7 @@
 #include "ZoftThing.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class Grappler  :  public Zeubject
@@ -30,7 +30,7 @@ class Grappler  :  public Zeubject
 };
 
 
-}  // toes up wit' ye, namespace charm
+}  // toes up wit' ye, namespace zeugma
 
 
 #endif

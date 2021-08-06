@@ -10,7 +10,7 @@
 #include "bgfx_utils.hpp"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class GridRenderable  :  public Renderable

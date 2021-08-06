@@ -17,7 +17,7 @@
 #include <GLFW/glfw3native.h>
 
 
-namespace charm {
+namespace zeugma  {
 
 
 class GraphicsApplication  :  public Application
@@ -26,7 +26,7 @@ class GraphicsApplication  :  public Application
   GraphicsApplication ();
   ~GraphicsApplication () override;
 
-  CHARM_DELETE_MOVE_COPY(GraphicsApplication);
+  ZEUGMA_DELETE_MOVE_COPY(GraphicsApplication);
 
   bool StartUp     () override;
   bool RunOneCycle () override;

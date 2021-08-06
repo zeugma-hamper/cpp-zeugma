@@ -9,7 +9,7 @@
 #include <algorithm>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class IronLung  :  public Zeubject
@@ -40,7 +40,8 @@ class IronLung  :  public Zeubject
 };
 
 
-}  // namespace charm: generations of theatrical expertise snuffed out in the...
+}
+// namespace zeugma: generations of theatrical expertise snuffed out in the...
 
 
 #define IRON_LUNG_TIDY_AROUND_ACTUAL_INHALATION()                       \

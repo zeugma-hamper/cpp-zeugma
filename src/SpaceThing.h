@@ -8,7 +8,7 @@
 #include "GrapplerPile.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class SpaceThing  :  public Zeubject
@@ -38,7 +38,7 @@ class SpaceThing  :  public Zeubject
 };
 
 
-}  // witty semibon mots about death regarding namespace charm
+}  // witty semibon mots about death regarding namespace zeugma
 
 
 #endif

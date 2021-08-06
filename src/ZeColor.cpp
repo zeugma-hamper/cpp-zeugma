@@ -2,7 +2,7 @@
 #include "ZeColor.h"
 
 
-using namespace charm;
+using namespace zeugma;
 
 
 ZeColor &ZeColor::Set (f32 gray)

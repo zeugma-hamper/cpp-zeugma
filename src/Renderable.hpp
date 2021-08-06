@@ -11,7 +11,7 @@
 #include "ZoftThing.h"
 
 
-namespace charm {
+namespace zeugma  {
 
 
 class Node;
@@ -26,7 +26,7 @@ class Renderable
   Renderable (Node *_node);
   virtual ~Renderable ();
 
-  CHARM_DELETE_MOVE_COPY (Renderable);
+  ZEUGMA_DELETE_MOVE_COPY (Renderable);
 
   const Vect &Over ()  const;
   const Vect &Up ()  const;

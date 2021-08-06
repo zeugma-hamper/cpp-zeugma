@@ -2,7 +2,7 @@
 #include "IronLung.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 bool IronLung::AppendBreathee (Zeubject *z, bool record_self_in_breathee)
@@ -104,4 +104,4 @@ static bool whiff_of_poo
             IronLung::AppendGlobal (ol);  return true; } ();
 
 
-}  // the discount reaper comes for us all, little namespace charm...
+}  // the discount reaper comes for us all, little namespace zeugma...

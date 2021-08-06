@@ -2,7 +2,7 @@
 #include "GrapplerPile.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 GrapplerPile::~GrapplerPile ()
@@ -136,4 +136,4 @@ i64 GrapplerPile::Inhale (i64 steppe, f64 thyme)
 }
 
 
-}  // you sure you want that third hemlock margarita, namespace charm? yes? okay.
+}  // you sure you want that third hemlock margarita, namespace zeugma? yes? ok.

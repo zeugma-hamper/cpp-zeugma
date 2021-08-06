@@ -8,7 +8,7 @@
 #include "ZoftThing.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class Bolex  :  public SpaceThing
@@ -140,7 +140,7 @@ class Bolex  :  public SpaceThing
 };
 
 
-}  // requiem aeternum dona eis, Domine, since it's your pal namespace charm
+}  // requiem aeternum dona eis, Domine, since it's your pal namespace zeugma
 
 
 #endif

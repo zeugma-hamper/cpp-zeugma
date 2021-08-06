@@ -6,7 +6,7 @@
 #include <ZeEvent.h>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class ZEYowlEvent  :  public ZeEvent
@@ -98,7 +98,7 @@ template <typename T>
 { RemoveYowlPhage (_ms, static_ch_cast<OmNihil> (_phage)); }
 
 
-}  // namespace charm having a lovely chat with jimmy hoffa
+}  // namespace zeugma having a lovely chat with jimmy hoffa
 
 
-#endif //ZE_YOWL_EVENT_CAN_BE_HEARD_ALL_THE_WAY_IN_THE_RESTROOMS_OF_ATLANTIS
+#endif  //ZE_YOWL_EVENT_CAN_BE_HEARD_ALL_THE_WAY_IN_THE_RESTROOMS_OF_ATLANTIS

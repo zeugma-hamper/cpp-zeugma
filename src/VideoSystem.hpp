@@ -1,5 +1,7 @@
+
 #ifndef BUFFERS_SAMPLES_WIKY_WIKY_WAAAAHHHHH
 #define BUFFERS_SAMPLES_WIKY_WIKY_WAAAAHHHHH
+
 
 #include <bgfx_utils.hpp>
 #include <class_utils.hpp>
@@ -18,8 +20,9 @@
 #include <gst/gst.h>
 #include <gst/video/video-info.h>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 class VideoRenderable;
 class MattedVideoRenderable;
@@ -174,7 +177,7 @@ class VideoPipeline : public CharmBase<VideoPipeline>
   VideoPipeline ();
   ~VideoPipeline ();
 
-  CHARM_DELETE_MOVE_COPY(VideoPipeline);
+  ZEUGMA_DELETE_MOVE_COPY(VideoPipeline);
 
   ch_ptr<VideoTexture> OpenFile (std::string_view _path);
   bool AddMatte (f64 _loop_start_ts, f64 _loop_end_ts,
@@ -284,7 +287,7 @@ class VideoSystem
     bgfx::TextureHandle white_texture;
   };
 
-  CHARM_DELETE_MOVE_COPY(VideoSystem);
+  ZEUGMA_DELETE_MOVE_COPY(VideoSystem);
 
   static bool Initialize ();
   static void ShutDown ();
@@ -342,6 +345,8 @@ class VideoSystem
   szt m_upload_position;
 };
 
+
 }
+
 
 #endif  //BUFFERS_SAMPLES_WIKY_WIKY_WAAAAHHHHH

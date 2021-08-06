@@ -2,7 +2,7 @@
 #include "RandZoft.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 template <> f64 UnifMultiRand <f64> ()

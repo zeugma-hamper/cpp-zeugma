@@ -1,3 +1,4 @@
+
 #include <MatteLoader.hpp>
 
 #include <algorithm>
@@ -5,8 +6,8 @@
 
 #include <OpenImageIO/imageio.h>
 
-namespace charm
-{
+
+namespace zeugma  {
 
 static u32 max_loaded_frames = 3;
 
@@ -295,5 +296,6 @@ void MatteLoaderBimg::LoadFrames (MatteLoaderBimg *_loader)
       _loader->StoreMatte(MatteFrameBimg {next, std::move (img)});
     }
 }
+
 
 }

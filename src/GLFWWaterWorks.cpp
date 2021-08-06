@@ -14,8 +14,7 @@
 #include <unordered_map>
 
 
-namespace charm
-{
+namespace zeugma  {
 
 
 static GLFWWaterWorks *s_rmww_instance {nullptr};

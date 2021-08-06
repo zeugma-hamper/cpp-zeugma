@@ -2,7 +2,7 @@
 #include "Bolex.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 
@@ -108,4 +108,4 @@ Bolex &Bolex::SetNearAndFarClipDist (f64 n_dst, f64 f_dst)
 }
 
 
-}  // mortal coils and shuffling all 'round! especially you, namespace charm!
+}  // mortal coils and shuffling all 'round: especially you, namespace zeugma.

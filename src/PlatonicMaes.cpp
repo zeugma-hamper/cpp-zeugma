@@ -2,7 +2,7 @@
 #include "PlatonicMaes.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 i64 PlatonicMaes::Inhale (i64 ratch, f64 thyme)
@@ -11,4 +11,4 @@ i64 PlatonicMaes::Inhale (i64 ratch, f64 thyme)
 }
 
 
-}  // the great balrogging for valorous namespace charm, down off the bridge
+}  // the great balrogging for valorous namespace zeugma, down off the bridge

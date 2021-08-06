@@ -1,5 +1,7 @@
+
 #ifndef GIMME_THE_RAW_BITS_TIMELY
 #define GIMME_THE_RAW_BITS_TIMELY
+
 
 #include <base_types.hpp>
 #include <class_utils.hpp>
@@ -15,7 +17,9 @@
 #include <mutex>
 #include <string_view>
 
-namespace charm {
+
+namespace zeugma  {
+
 
 class PipelineTerminus;
 
@@ -63,7 +67,7 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   DecodePipeline ();
   ~DecodePipeline ();
 
-  CHARM_DELETE_MOVE_COPY(DecodePipeline);
+  ZEUGMA_DELETE_MOVE_COPY(DecodePipeline);
 
   void PollMessages ();
 
@@ -158,6 +162,8 @@ struct DecodePipeline : public CharmBase<DecodePipeline>
   AsyncDoneSignal m_async_done_signal;
 };
 
+
 }
 
-#endif //GIMME_THE_RAW_BITS_TIMELY
+
+#endif  //GIMME_THE_RAW_BITS_TIMELY

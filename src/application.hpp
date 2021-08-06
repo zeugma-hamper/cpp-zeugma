@@ -6,8 +6,7 @@
 #include <MultiSprinkler.hpp>
 
 
-namespace charm
-{
+namespace zeugma  {
 
 
 class Application
@@ -16,7 +15,7 @@ class Application
   Application () = default;
   virtual ~Application () = default;
 
-  CHARM_DELETE_MOVE_COPY(Application);
+  ZEUGMA_DELETE_MOVE_COPY(Application);
 
   bool InstallDefaultSignalHandlers ();
 

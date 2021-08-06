@@ -6,7 +6,7 @@
 #include "ZoftThing.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 template <typename T>
@@ -94,7 +94,7 @@ using SumVect = SumZoft <Vect>;
 using SumColor = SumZoft <ZeColor>;
 
 
-}  // end o' the line for namespace charm
+}  // end o' the line for namespace zeugma
 
 
 #endif

@@ -1,12 +1,15 @@
-#ifndef TAMP_HAS_NEED_YA_KNOW
-#define TAMP_HAS_NEED_YA_KNOW
+
+#ifndef TAMP_HAS_NEEDS_YA_KNOW
+#define TAMP_HAS_NEEDS_YA_KNOW
+
 
 #include <PipelineTerminus.hpp>
 
 #include <boost/signals2/signal.hpp>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 //buffer, video info, pts, frame number
 using BufferSignal = boost::signals2::signal<void (GstBuffer *, GstVideoInfo *, i64, i64)>;
@@ -71,5 +74,8 @@ class NullTerminus : public BasicPipelineTerminus
   void FlushNotify () override;
 };
 
+
 }
-#endif //TAMP_HAS_NEED_YA_KNOW
+
+
+#endif  //TAMP_HAS_NEEDS_YA_KNOW

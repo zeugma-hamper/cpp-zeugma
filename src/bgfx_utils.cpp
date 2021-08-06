@@ -1,3 +1,4 @@
+
 #include <bgfx_utils.hpp>
 
 #include <base_types.hpp>
@@ -22,8 +23,9 @@
 #include <unistd.h>
 #include <errno.h>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 bx::DefaultAllocator *GetBxDefaultAllocator ()
 {

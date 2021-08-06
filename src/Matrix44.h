@@ -8,7 +8,7 @@
 #include "Vect.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class Matrix44
@@ -113,7 +113,7 @@ class Matrix44
 };
 
 
-}  // don't you do it! don't you die on me, namespace charm! oh well.
+}  // don't you do it! don't you die on me, namespace zeugma! oh well.
 
 
 #endif

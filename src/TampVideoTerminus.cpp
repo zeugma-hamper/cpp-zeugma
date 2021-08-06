@@ -1,3 +1,4 @@
+
 #include <TampVideoTerminus.hpp>
 
 #include <DecodePipeline.hpp>
@@ -11,8 +12,9 @@
 
 #include <assert.h>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 TampVideoTerminus::TampVideoTerminus ()
   : BasicPipelineTerminus("video/x-raw,format=I420"),
@@ -301,5 +303,6 @@ exit:
 void NullTerminus::FlushNotify ()
 {
 }
+
 
 }

@@ -9,7 +9,7 @@
 #include <map>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class ZESpatialEvent  :  public ZeEvent
@@ -201,7 +201,7 @@ void RemoveSpatialPhage (MultiSprinkler *_ms, ch_ptr<T> const &_phage)
 }
 
 
-}  // snuffed it, did namespace charm, o me droogs...
+}  // snuffed it, did namespace zeugma, o me droogs...
 
 
-#endif //ZE_SPATIAL_EVENT_WITH_THREE_NITRO_BURNING_DIMENSIONS_AT_ZE_CENTRUM
+#endif  //ZE_SPATIAL_EVENT_WITH_THREE_NITRO_BURNING_DIMENSIONS_AT_ZE_CENTRUM

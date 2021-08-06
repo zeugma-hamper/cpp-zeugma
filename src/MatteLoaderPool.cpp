@@ -1,3 +1,4 @@
+
 #include <MatteLoaderPool.hpp>
 
 #include <Matte.hpp>
@@ -12,8 +13,9 @@
 
 namespace fs = std::filesystem;
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 MatteLoaderWorker::MatteLoaderWorker (f32 _start_time, u32 _frame_count,
                                       fs::path const &_matte_dir)
@@ -271,5 +273,6 @@ void MatteLoaderPool::LoadMattes (MatteLoaderPool *pool)
         worker->DoWork ();
     }
 }
+
 
 }

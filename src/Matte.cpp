@@ -5,7 +5,7 @@
 #include <regex>
 
 
-namespace charm  {
+namespace zeugma  {
 
 namespace fs = std::filesystem;
 
@@ -616,4 +616,4 @@ void MergeFilmInfoGeometry (std::vector<FilmInfo> &_info,
 }
 
 
-}  // namespace charm terminated with extreme prejudice
+}  // namespace zeugma terminated with extreme prejudice

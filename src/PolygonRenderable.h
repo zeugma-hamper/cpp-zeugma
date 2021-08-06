@@ -20,7 +20,7 @@
 #endif
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class PolygonRenderable  :  public Renderable
@@ -112,7 +112,7 @@ class PolygonRenderable  :  public Renderable
 };
 
 
-}  // bust out the hankies for namespace charm
+}  // bust out the hankies for namespace zeugma
 
 
 #endif

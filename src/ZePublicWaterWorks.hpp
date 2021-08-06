@@ -8,8 +8,7 @@
 #include <class_utils.hpp>
 
 
-namespace charm
-{
+namespace zeugma  {
 
 
 class MultiSprinkler;
@@ -39,7 +38,7 @@ class ZePublicWaterWorks : public Zeubject
 
   ZePublicWaterWorks ();
 
-  CHARM_DELETE_MOVE_COPY(ZePublicWaterWorks);
+  ZEUGMA_DELETE_MOVE_COPY(ZePublicWaterWorks);
 
   virtual ~ZePublicWaterWorks () { }
 
@@ -50,4 +49,4 @@ class ZePublicWaterWorks : public Zeubject
 }
 
 
-#endif //DRAINING_THE_DESERT
+#endif  //DRAINING_THE_DESERT

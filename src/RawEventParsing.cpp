@@ -19,7 +19,7 @@
 #include <filesystem>
 
 
-using namespace charm;
+using namespace zeugma;
 
 namespace fs = std::filesystem;
 
@@ -235,7 +235,7 @@ void RawOSCWandParser::Parse (const std::string &path, const lo::Message &m,
 
 
 
-using namespace charm::RawEventSupportHose;
+using namespace zeugma::RawEventSupportHose;
 
 
 void RoomCaliban::Reset ()

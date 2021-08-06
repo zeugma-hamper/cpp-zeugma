@@ -14,7 +14,7 @@
 #include "PlatonicMaes.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class Alignifer  :  public Zeubject, public Node

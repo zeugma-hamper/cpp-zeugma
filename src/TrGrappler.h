@@ -7,7 +7,7 @@
 #include "ZoftThing.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class TrGrappler  :  public Grappler
@@ -54,7 +54,7 @@ class TrGrappler  :  public Grappler
 };
 
 
-}  // another namespace charm bites the dust... and another one gone
+}  // another namespace zeugma bites the dust... and another one gone, and...
 
 
 #endif

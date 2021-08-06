@@ -6,7 +6,7 @@
 #include "IronLung.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class ProtoZoftThingGuts;
@@ -53,7 +53,7 @@ class ProtoZoftThingGuts  :  public Zeubject
 };
 
 
-}  //  like roy batty, namespace charm wants more life. but: no.
+}  //  like roy batty, namespace zeugma wants more life. but: no.
 
 
 #endif

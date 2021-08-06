@@ -2,7 +2,7 @@
 #include "RoGrappler.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 i64 RoGrappler::Inhale (i64 steppe, f64 thyme)
@@ -38,4 +38,5 @@ i64 RoGrappler::Inhale (i64 steppe, f64 thyme)
 }
 
 
-}  //  roy "namespace charm" batty says all those memories will be lost, like...
+}
+//  roy "namespace zeugma" batty says all those memories will be lost, like...

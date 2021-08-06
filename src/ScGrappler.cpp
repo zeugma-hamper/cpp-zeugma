@@ -2,7 +2,7 @@
 #include "ScGrappler.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 i64 ScGrappler::Inhale (i64 steppe, f64 thyme)
@@ -28,4 +28,4 @@ i64 ScGrappler::Inhale (i64 steppe, f64 thyme)
 }
 
 
-}  // and i guess that was your accomplice namespace charm in the woodchipper
+}  // and i guess that was your accomplice namespace zeugma in the woodchipper

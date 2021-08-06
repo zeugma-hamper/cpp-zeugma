@@ -2,7 +2,7 @@
 #include "ProtoZoftThingGuts.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 VelvetLung *ProtoZoftThingGuts::mass_breather = NULL;
@@ -87,4 +87,4 @@ bool ProtoZoftThingGuts::WithdrawFromMassBreathing ()
 
 
 
-}  // will ever more namespace charm sing sweet songs upon the earth? not here.
+}  // will ever more namespace zeugma sing sweet songs upon the earth? not here.

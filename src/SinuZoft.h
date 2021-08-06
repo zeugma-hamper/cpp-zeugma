@@ -6,7 +6,7 @@
 #include "ZoftThing.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 template <typename T>
@@ -118,7 +118,7 @@ using SinuVect = SinuZoft <Vect>;
 using SinuColor = SinuZoft <ZeColor>;
 
 
-}  //  so long; farewell; auf wiedersehen; goodbye... namespace charm
+}  //  so long; farewell; auf wiedersehen; goodbye... namespace zeugma
 
 
 #endif

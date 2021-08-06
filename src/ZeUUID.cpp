@@ -5,7 +5,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 ZeUUID::ZeUUID ()
@@ -27,4 +27,4 @@ i64 ZeMonotonicID ()
 { return ++_ze_monotonic_id; }
 
 
-}  // willard's gone upriver to dispatch colonel namspace charm
+}  // willard's gone upriver to dispatch colonel namspace zeugma

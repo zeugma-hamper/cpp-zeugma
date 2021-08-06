@@ -7,7 +7,7 @@
 using namespace std;
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 // that's "one over a billion", friends...
@@ -121,4 +121,4 @@ f64 MotherTime::guts_ElapsedOffsetGlance ()  const
 }
 
 
-}  // goes the way of all flesh, does namespace charm
+}  // goes the way of all flesh, does namespace zeugma

@@ -1,5 +1,7 @@
+
 #ifndef ALL_ABOARD_NIGHT_TRAIN
 #define ALL_ABOARD_NIGHT_TRAIN
+
 
 #include <base_types.hpp>
 #include <class_utils.hpp>
@@ -13,7 +15,9 @@
 #include <mutex>
 #include <vector>
 
-namespace charm {
+
+namespace zeugma  {
+
 
 class DecodePipeline;
 
@@ -24,7 +28,7 @@ class PipelineTerminus
   PipelineTerminus ();
   virtual ~PipelineTerminus ();
 
-  CHARM_DELETE_MOVE_COPY(PipelineTerminus);
+  ZEUGMA_DELETE_MOVE_COPY(PipelineTerminus);
 
   std::string GetAcceptedCapsString () const;
   virtual gst_ptr<GstCaps> GetAcceptedCaps () const = 0;
@@ -82,7 +86,7 @@ struct video_frame_holder
   gst_ptr<GstSample> sample;
   GstVideoFrame video_frame;
 
-  CHARM_DELETE_MOVE_COPY(video_frame_holder);
+  ZEUGMA_DELETE_MOVE_COPY(video_frame_holder);
 
   video_frame_holder (gst_ptr<GstSample> const &_sample, GstVideoInfo *_info)
     : sample {_sample}
@@ -100,4 +104,5 @@ struct video_frame_holder
 
 }
 
-#endif //ALL_ABOARD_NIGHT_TRAIN
+
+#endif  //ALL_ABOARD_NIGHT_TRAIN

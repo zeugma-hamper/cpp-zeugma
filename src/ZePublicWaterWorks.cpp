@@ -2,7 +2,7 @@
 #include <ZePublicWaterWorks.hpp>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 ZePublicWaterWorks::ZePublicWaterWorks ()  :  Zeubject {}

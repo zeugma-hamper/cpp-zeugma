@@ -6,8 +6,7 @@
 #include <type_int.hpp>
 
 
-namespace charm
-{
+namespace zeugma  {
 
 
 ZeEvent::ZeEvent ()  :  Zeubject (),
@@ -90,4 +89,4 @@ u32 ZeEvent::EventSuperTypeIndex ()  const
 { return u32 (-1); }
 
 
-}  // namespace charm off to see what dante and virgil saw
+}  // namespace zeugma off to see what dante and virgil saw

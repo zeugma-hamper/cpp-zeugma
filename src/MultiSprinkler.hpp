@@ -11,7 +11,7 @@
 #include <unordered_map>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 template <typename T>
@@ -52,8 +52,8 @@ class MultiSprinkler
   MultiSprinkler ();
   ~MultiSprinkler ();
 
-  CHARM_DELETE_COPY  (MultiSprinkler);
-  CHARM_DEFAULT_MOVE (MultiSprinkler);
+  ZEUGMA_DELETE_COPY  (MultiSprinkler);
+  ZEUGMA_DEFAULT_MOVE (MultiSprinkler);
 
   template <typename T>
    void Spray (T *_event);
@@ -265,7 +265,7 @@ ch_ptr<OmNihil> MultiSprinkler::ExcisePhage (ch_ptr<OmNihil> const &_phage)
 }
 
 
-}  // namespace charm and marie antoinette -- just some heads bouncing around
+}  // namespace zeugma and marie antoinette -- just some heads bouncing around
 
 
 #endif  //WATERING_YOUR_FARMLAND_NOT_JUST_YOUR_YARD

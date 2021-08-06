@@ -443,4 +443,12 @@ zeugma_headers = ['src/Alignifer.h',
                   'src/ZEYowlEvent.h',
                   'src/ZoftThing.h']
 
+font_headers = ['font/cube_atlas.h',
+                'font/font_manager.h',
+                'font/fs_font_basic.sc.bin.h',
+                'font/text_buffer_manager.h',
+                'font/text_metrics.h',
+                'font/utf8.h']
+
 install_headers (zeugma_headers, subdir : 'zeugma')
+install_headers (font_headers, subdir : 'font')

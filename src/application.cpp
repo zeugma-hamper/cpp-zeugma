@@ -6,8 +6,7 @@
 #include <string.h>
 
 
-namespace charm
-{
+namespace zeugma  {
 
 
 static bool s_keep_running = true;

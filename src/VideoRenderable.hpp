@@ -2,6 +2,7 @@
 #ifndef VIDEO_RENDERABLE
 #define VIDEO_RENDERABLE
 
+
 #include <Renderable.hpp>
 
 #include <DecodePipeline.hpp>
@@ -11,7 +12,7 @@
 #include <ch_ptr.hpp>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 struct VideoTexture;
@@ -40,4 +41,4 @@ class VideoRenderable final : public Renderable
 }
 
 
-#endif //VIDEO_RENDERABLE
+#endif  //VIDEO_RENDERABLE

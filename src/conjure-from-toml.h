@@ -10,7 +10,7 @@
 #include <toml.hpp>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 const toml::value &LoadOrRecallTOMLByFilename (const std::string &fname);
@@ -50,7 +50,7 @@ bool ReadWindowTOMLFile (std::string_view _file, WindowTOML &_window,
                          std::vector<TrefoilTOML> &_views);
 
 
-}  // like prospero, namespace charm's every third though... well, every thought
+}  // like prospero, namespace zeugma's every third thought... well, every...
 
 
 #endif

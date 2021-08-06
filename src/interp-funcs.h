@@ -7,7 +7,7 @@
 #include "base_types.hpp"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 namespace InterpFuncs
@@ -28,7 +28,7 @@ namespace InterpFuncs
 }
 
 
-}  // it's the big sleep for namespace charm
+}  // it's the big sleep for namespace zeugma
 
 
 #endif

@@ -6,7 +6,7 @@
 #include "ZeEvent.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class ZEBulletinEvent  :  public ZeEvent

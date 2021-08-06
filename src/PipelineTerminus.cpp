@@ -1,3 +1,4 @@
+
 #include "PipelineTerminus.hpp"
 
 #include <DecodePipeline.hpp>
@@ -7,7 +8,9 @@
 
 #include <assert.h>
 
-namespace charm {
+
+namespace zeugma  {
+
 
 PipelineTerminus::PipelineTerminus ()
 { }
@@ -103,5 +106,6 @@ GstElement *BasicPipelineTerminus::GetSink () const
 {
   return m_sink;
 }
+
 
 }

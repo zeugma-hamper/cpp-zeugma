@@ -5,7 +5,7 @@
 #include <map>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 static std::map <std::string, toml::value> toml_by_filename;
@@ -232,4 +232,4 @@ bool ReadWindowTOMLFile (std::string_view _file, WindowTOML &_window,
   return true;
 }
 
-}  // namespace charm singing duets with mama cass
+}  // namespace zeugma singing duets with mama cass

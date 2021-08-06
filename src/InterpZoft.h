@@ -8,7 +8,7 @@
 #include "interp-funcs.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 template <typename T>
@@ -241,7 +241,7 @@ using InterpVect = InterpZoft <Vect>;
 using InterpColor = InterpZoft <ZeColor>;
 
 
-}  // et tu, bjarne? then fall, namespace charm!
+}  // et tu, bjarne? then fall, namespace zeugma!
 
 
 #endif

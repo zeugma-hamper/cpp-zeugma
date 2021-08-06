@@ -2,8 +2,7 @@
 #include "Vect.h"
 
 
-namespace charm
-{
+namespace zeugma  {
 
 
 const Vect Vect::xaxis (1.0, 0.0, 0.0);
@@ -48,4 +47,4 @@ Vect &Vect::RotateSelfPreNormed (const Vect &axis, f64 rad_ang)
 }
 
 
-}  // who sleeps with the fishes? why, namespace charm does!
+}  // who sleeps with the fishes? why, namespace zeugma does!

@@ -3,7 +3,8 @@
 
 #include <MultiSprinkler.hpp>
 
-namespace charm  {
+
+namespace zeugma  {
 
 
 ZEYowlEvent::ZEYowlEvent ()  :  ZeEvent (), rept_ord (0)

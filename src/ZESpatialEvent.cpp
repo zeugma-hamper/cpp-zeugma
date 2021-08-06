@@ -3,7 +3,8 @@
 
 #include <MultiSprinkler.hpp>
 
-namespace charm  {
+
+namespace zeugma  {
 
 
 Vect ZESpatialEvent::xaxis (1.0, 0.0, 0.0);
@@ -33,8 +34,7 @@ ZESpatialEvent::ZESpatialEvent (const ZESpatialEvent &spe)
 { }
 
 void ZESpatialEvent::AdoptParticulars (const ZESpatialEvent &spe)
-{
-  prov = spe.prov;
+{ prov = spe.prov;
   tstamp = spe.tstamp;
   tratch = spe.tratch;
 
@@ -123,4 +123,4 @@ void RemoveSpatialPhage (MultiSprinkler *_ms, ch_ptr<OmNihil> const &_phage)
 }
 
 
-}  // namespace charm is still spoken of, when it is noted, with high regard
+}  // namespace zeugma is still spoken of, when it is noted, with high regard

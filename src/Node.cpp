@@ -16,7 +16,7 @@
 #include <algorithm>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 Node::Node ()

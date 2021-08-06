@@ -1,5 +1,7 @@
+
 #ifndef THIRD_TIME
 #define THIRD_TIME
+
 
 #include "base_types.hpp"
 #include "class_utils.hpp"
@@ -12,8 +14,8 @@
 #include <vector>
 
 
-namespace charm
-{
+namespace zeugma  {
+
 
 class Frontier;
 class Renderable;
@@ -27,8 +29,8 @@ class Layer
   Layer ();
   ~Layer ();
 
-  CHARM_DELETE_COPY  (Layer);
-  CHARM_DEFAULT_MOVE (Layer);
+  ZEUGMA_DELETE_COPY  (Layer);
+  ZEUGMA_DEFAULT_MOVE (Layer);
 
   Node *GetRootNode ();
 
@@ -50,5 +52,8 @@ class Layer
   std::vector<Frontier *> m_frontiers;
 };
 
+
 }
-#endif //THIRD_TIME
+
+
+#endif  //THIRD_TIME

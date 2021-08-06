@@ -2,7 +2,7 @@
 #include "SpaceThing.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 i64 SpaceThing::Inhale (i64 steppe, f64 thyme)
@@ -12,4 +12,4 @@ i64 SpaceThing::Inhale (i64 steppe, f64 thyme)
 }
 
 
-}  // iocaine powder by the bucketful for namespace charm
+}  // iocaine powder by the bucketful for namespace zeugma

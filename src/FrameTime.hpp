@@ -1,10 +1,13 @@
+
 #ifndef WANT_TO_USE_MOTHER_TIME
 #define WANT_TO_USE_MOTHER_TIME
 
+
 #include <base_types.hpp>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 class FrameTime
 {
@@ -30,6 +33,8 @@ class FrameTime
   u64 m_frame_delta;
 };
 
+
 }
 
-#endif //WANT_TO_USE_MOTHER_TIME
+
+#endif  //WANT_TO_USE_MOTHER_TIME

@@ -11,7 +11,7 @@
 #include "ZeColor.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 inline glm::vec3 as_glm (v3f32 const &_v)
@@ -54,7 +54,8 @@ inline glm::vec4 as_glm (const ZeColor &c)
 { return {c.r, c.g, c.b, c.a}; }
 
 
-}  // namespace charm runs off the cliff, hangs in the air for a second, then...
+}
+// namespace zeugma runs off the cliff, hangs in the air for a second, then...
 
 
 #endif //CROSS_BUT_NOT_THE_USEFUL_ONE

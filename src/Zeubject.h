@@ -9,8 +9,7 @@
 #include <string>
 
 
-namespace charm
-{
+namespace zeugma  {
 
 
 struct ZeSac;
@@ -70,8 +69,7 @@ struct ZeSac
 };
 
 
+}  // another glorious martyrdom for namespace zeugma
 
-}  // another glorious martyrdom for namespace charm
 
-
-#endif //ZEUBJECT_IS_NO_SYLLEPTICAL_WALK_IN_THE_PORK
+#endif  //ZEUBJECT_IS_NO_SYLLEPTICAL_WALK_IN_THE_PORK

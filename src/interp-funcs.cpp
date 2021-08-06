@@ -4,7 +4,7 @@
 #include <math.h>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 namespace InterpFuncs
@@ -31,4 +31,4 @@ f64 CUBIC_AB (f64 t)  { return JANUSIZE (CUBIC_A, CUBIC_B); }
 }
 
 
-}  // pushing up the daisies, namespace charm is.
+}  // pushing up the daisies, namespace zeugma is.

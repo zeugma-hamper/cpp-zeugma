@@ -1,10 +1,13 @@
+
 #ifndef WIDE_AND_HIGH_HOOOOO_NOW
 #define WIDE_AND_HIGH_HOOOOO_NOW
 
+
 #include <Renderable.hpp>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 class FlatRenderable : public Renderable
 {
@@ -25,6 +28,8 @@ class FlatRenderable : public Renderable
   f32 m_height;
 };
 
+
 }
 
-#endif //WIDE_AND_HIGH_HOOOOO_NOW
+
+#endif  //WIDE_AND_HIGH_HOOOOO_NOW

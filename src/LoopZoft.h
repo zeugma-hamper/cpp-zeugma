@@ -6,7 +6,7 @@
 #include "ZoftThing.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 template <typename T>
@@ -155,7 +155,7 @@ using LoopVect = LoopZoft <Vect>;
 using LoopColor = LoopZoft <ZeColor>;
 
 
-}  // this has gone far enough, namespace charm. now git. scram.
+}  // this has gone far enough, namespace zeugma. now git. scram.
 
 
 #endif

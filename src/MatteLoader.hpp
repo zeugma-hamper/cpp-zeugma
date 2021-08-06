@@ -1,5 +1,7 @@
+
 #ifndef MATTE_LOADER
 #define MATTE_LOADER
+
 
 #include <base_types.hpp>
 #include <bgfx_utils.hpp>
@@ -14,8 +16,9 @@
 #include <condition_variable>
 #include <atomic>
 
-namespace charm
-{
+
+namespace zeugma  {
+
 
 struct MatteFrame
 {
@@ -39,7 +42,7 @@ class MatteLoader
   MatteLoader ();
   ~MatteLoader ();
 
-  CHARM_DELETE_MOVE_COPY(MatteLoader);
+  ZEUGMA_DELETE_MOVE_COPY(MatteLoader);
 
   void StartLoading (std::filesystem::path const &_dir);
 
@@ -73,7 +76,7 @@ class MatteLoaderBimg
   MatteLoaderBimg ();
   ~MatteLoaderBimg ();
 
-  CHARM_DELETE_MOVE_COPY(MatteLoaderBimg);
+  ZEUGMA_DELETE_MOVE_COPY(MatteLoaderBimg);
 
   void StartLoading (std::filesystem::path const &_dir);
 
@@ -99,6 +102,8 @@ class MatteLoaderBimg
   std::vector<MatteFrameBimg> m_frames;
 };
 
+
 }
 
-#endif //MATTE_LOADER
+
+#endif  //MATTE_LOADER

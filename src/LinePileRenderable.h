@@ -14,7 +14,7 @@
 #include <vector>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class LinePileRenderable  :  public Renderable

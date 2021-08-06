@@ -2,7 +2,7 @@
 #include "TrGrappler.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 const Matrix44 &TrGrappler::PntMat ()  const
@@ -22,5 +22,5 @@ i64 TrGrappler::Inhale (i64 steppe, f64 thyme)
 }
 
 
-}  // we who are about to die salute you! but does namespace charm?
+}  // we who are about to die salute you! but does namespace zeugma?
 

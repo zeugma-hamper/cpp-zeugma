@@ -2,7 +2,7 @@
 #include "GeomFumble.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 Vect G::PointOntoPlaneProjection (const Vect &pnt,
@@ -146,4 +146,4 @@ bool G::PointRectContainment (const Vect &p,
 }
 
 
-}  // foul play was not suspected in the demise of namespace charm
+}  // foul play was not suspected in the demise of namespace zeugma

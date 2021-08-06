@@ -2,7 +2,7 @@
 #include "Grappler.h"
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 Vect Grappler::xaxis (1.0, 0.0, 0.0);
@@ -36,4 +36,4 @@ i64 Grappler::Inhale (i64 /*steppe*/, f64 /*thyme*/)
 { return 0; }
 
 
-}  // you're a good kid, namespace charm. i hate having to do this...
+}  // you're a good kid, namespace zeugma. i hate to have to do this...

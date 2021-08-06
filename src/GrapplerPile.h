@@ -8,7 +8,7 @@
 #include <vector>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class GrapplerPile  :  public Grappler
@@ -45,7 +45,7 @@ class GrapplerPile  :  public Grappler
 };
 
 
-}  // afraid it was the salmon mousse, namespace charm...
+}  // afraid it was the salmon mousse, namespace zeugma...
 
 
 #endif

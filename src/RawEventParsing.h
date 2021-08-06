@@ -15,7 +15,7 @@
 #include <lo/lo_cpp.h>
 
 
-namespace charm  {
+namespace zeugma  {
 
 
 class RawEventParser  :  public Zeubject
@@ -143,7 +143,7 @@ class RawMouseParser  :  public RawEventParser
 };
 
 
-}  // when your little namespace charm is on the slab, where will it tickle you?
+}  // when your little n'space zeugma is on the slab, where will it tickle you?
 
 
 #endif

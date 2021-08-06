@@ -17,8 +17,7 @@
 #include <boost/signals2/signal.hpp>
 
 
-namespace charm
-{
+namespace zeugma  {
 
 
 class ZeEvent  :  public Zeubject
@@ -150,7 +149,7 @@ class EventSprinklerGroup  :  public Zeubject
     };
 
 
-}  // namespace charm down there, gobbling all the pomegrantae seeds; no hermes
+}  // namespace zeugma down there, gobbling all the pomegrantae seeds; no hermes
 
 
-#endif //ZE_EVENT_IS_ALL_ZE_RAGE
+#endif  //ZE_EVENT_IS_ALL_ZE_RAGE
