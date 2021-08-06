@@ -282,7 +282,6 @@ endforeach
 
 lib_sources = ['src/application.cpp',
                'src/Alignifer.cpp',
-               'src/AudioMessenger.cpp',
                'src/Bolex.cpp',
                'src/CoGrappler.cpp',
                'src/CMVTrefoil.cpp',
@@ -341,8 +340,7 @@ lib_sources = ['src/application.cpp',
                'src/ZoftThing.cpp',
                'src/base_types.cpp',
                'src/bgfx_utils.cpp',
-               'src/conjure-from-toml.cpp',
-               'src/global-params.cpp']
+               'src/conjure-from-toml.cpp']
 
 font_sources = ['font/cube_atlas.cpp',
                 'font/font_manager.cpp',
@@ -379,7 +377,6 @@ zeugma_headers = ['src/Alignifer.h',
                   'src/class_utils.hpp',
                   'src/CMVTrefoil.h',
                   'src/CoGrappler.h',
-                  'src/Collage.hpp',
                   'src/conjure-from-toml.h',
                   'src/DecodePipeline.hpp',
                   'src/FlatRenderable.hpp',
@@ -447,126 +444,3 @@ zeugma_headers = ['src/Alignifer.h',
                   'src/ZoftThing.h']
 
 install_headers (zeugma_headers, subdir : 'zeugma')
-
-
-##### SHADERS #####
-
-# [type, input file, varying file, output file]
-shaders = [
-  # the very most basicest
-  ['vertex',   'src/shaders/primal_vs.sc',
-               'src/shaders/primal_varying.def.sc',
-                'primal_vs.bin'],
-  ['fragment', 'src/shaders/primal_fs.sc',
-               'src/shaders/primal_varying.def.sc',
-                'primal_fs.bin'],
-  # quad
-  ['vertex',   'src/shaders/quad_vs.sc', 'src/shaders/quad_varying.def.sc', 'quad_vs.bin'],
-  ['fragment', 'src/shaders/quad_fs.sc', 'src/shaders/quad_varying.def.sc', 'quad_fs.bin'],
-  # video
-  ['vertex',   'src/shaders/video_vs.sc', 'src/shaders/video_varying.def.sc', 'video_vs.bin'],
-  ['fragment', 'src/shaders/video_fs.sc', 'src/shaders/video_varying.def.sc', 'video_fs.bin'],
-  # matte video
-  ['vertex',   'src/shaders/matte_video_vs.sc',
-   'src/shaders/video_varying.def.sc', 'matte_video_vs.bin'],
-  ['fragment', 'src/shaders/matte_video_fs.sc',
-   'src/shaders/video_varying.def.sc', 'matte_video_fs.bin'],
-  # collage background for demo
-  ['vertex',   'src/shaders/collage_bg_vs.sc',
-   'src/shaders/collage_bg_varying.def.sc', 'collage_bg_vs.bin'],
-  ['fragment', 'src/shaders/collage_bg_fs.sc',
-   'src/shaders/collage_bg_varying.def.sc', 'collage_bg_fs.bin'],
-  # tex-quaddish object
-  ['vertex',   'src/shaders/textured_renderable.vs.sc',
-   'src/shaders/basic_varying.def.sc', 'textured_renderable.vs.bin'],
-  ['fragment', 'src/shaders/textured_renderable.fs.sc',
-   'src/shaders/basic_varying.def.sc', 'textured_renderable.fs.bin'],
-  # gridularness
-  ['vertex',   'src/shaders/grid_vs.sc',
-   'src/shaders/grid_varying.def.sc', 'grid_vs.bin'],
-  ['fragment', 'src/shaders/grid_fs.sc',
-   'src/shaders/grid_varying.def.sc', 'grid_fs.bin'],
-  # overlay testing
-  ['vertex',   'src/shaders/overlay_vs.sc',
-   'src/shaders/overlay_varying.def.sc', 'overlay_vs.bin'],
-  ['fragment', 'src/shaders/overlay_fs.sc',
-   'src/shaders/overlay_varying.def.sc', 'overlay_fs.bin'],
-  # overlay testing
-  ['vertex',   'src/shaders/overlay_instance_vs.sc',
-   'src/shaders/overlay_varying.def.sc', 'overlay_instance_vs.bin'],
-  ['fragment', 'src/shaders/overlay_instance_fs.sc',
-   'src/shaders/overlay_varying.def.sc', 'overlay_instance_fs.bin'],
-]
-
-foreach shader : shaders
-  custom_target (shader[3],
-                 input : [shader[1], shader[2]],
-                 output : [shader[3]],
-                 command : [shaderc_prog,
-                            '-i', meson.source_root () + '/bgfx/src',
-                            '-i', meson.source_root () + '/src/shaders/include',
-                            '-f', '@INPUT0@',
-                            '-o', '@OUTPUT0@',
-                            '--type', shader[0],
-                            '--varyingdef', '@INPUT1@',
-                            '--profile', '460'],
-                 build_by_default : true)
-endforeach
-
-
-
-##### EXECUTABLES #####
-bgfx_test_exec = executable ('bgfx_test',
-                             sources : ['src/bgfx_test.cpp'],
-                             dependencies : [zeugma_dep])
-
-dead_zone_exec = executable ('dead_zone',
-                             sources : ['src/dead_zone.cpp'],
-                             dependencies : [zeugma_dep])
-
-text_zone_exec = executable ('text_zone',
-                             sources : ['src/text_zone.cpp'],
-                             dependencies : [zeugma_dep])
-
-overlay_zone_exec = executable ('overlay_zone',
-                                sources : ['src/overlay_zone.cpp'],
-                                dependencies : [zeugma_dep])
-
-config_parser_exec = executable ('config_parser',
-                                 sources : ['src/config_parser.cpp'],
-                                 dependencies : [zeugma_dep])
-
-chud_zone_exec = executable ('chud-zone',
-                             sources : ['src/chud-zone.cpp'],
-                             dependencies : [zeugma_dep])
-
-tri_demo_exec = executable ('tri_demo',
-                            sources : ['src/tri_demo.cpp',
-                                       'src/Collage.cpp',
-                                       'src/TriBand.cpp'],
-                            dependencies : [zeugma_dep, glu_dep])
-
-tample_exec = executable ('tample',
-                           sources : ['src/AtomicFreezone.cpp',
-                                      'src/GraumanPalace.cpp',
-                                      'src/Jigglegon.cpp',
-                                      'src/OeuvreAfterlife.cpp',
-                                      'src/Orksur.cpp',
-                                      'src/SilverScreen.cpp',
-                                      'src/SonoChoosist.cpp',
-                                      'src/SpectacleCauseway.cpp',
-                                      'src/Ticato.cpp',
-                                      'src/Timeline.cpp',
-                                      'src/gallimaufry.cpp',
-                                      'src/tamparams.cpp',
-                                      'src/tample.cpp'
-                                     ],
-                           dependencies : [zeugma_dep, glu_dep])
-
-scan_mattes_exec = executable ('scan_mattes',
-                               sources : ['src/scan_mattes.cpp'],
-                               dependencies : [zeugma_dep])
-
-audio_runthrough_exec = executable ('audio_runthrough',
-                                    sources : ['src/audio_runthrough.cpp'],
-                                    dependencies : [zeugma_dep])
