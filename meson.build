@@ -2,6 +2,10 @@
 # (c) treadle & loam, provisioners llc
 #
 
+# don't forget to do [git submodule update --init --recursive] from
+# the top level directory (i.e. this file's) right from the git-go;
+# that's how you get bx, bimg, and bgfx...
+
 # NOTE: run `install_bgfx_tools.sh <BIN_DIR>` before running meson;
 # see also README.md
 # note upon note: that <BIN_DIR> should be /opt/trelopro/bin in the
@@ -44,6 +48,10 @@ install_subdir ('toml11', install_dir : 'include')
 
 #### nlohmann : header-only json. crisp and clean and psychotic.
 install_subdir ('nlohmann', install_dir : 'include')
+
+#### glm: you're also going to need to have this installed, but it
+#### doesn't get a 'dependency' yodel here in meson because it's
+#### a header-only thing...
 
 #### here comes, then, all the bgfx gubbish
 

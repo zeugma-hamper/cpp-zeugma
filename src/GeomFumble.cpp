@@ -64,7 +64,10 @@ bool G::RayRectIntersection (const Vect &frm, const Vect &aim,
   if (t >= -wid  &&  t<= wid)
     {t = 2.0 * p . Dot (upp);
       if (t >= -hei  &&  t <= hei)
-        { *hit_pnt = pee;  return true; }
+        { if (hit_pnt)
+            *hit_pnt = pee;
+          return true;
+        }
     }
   return false;
 }
