@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef SORRY_SEA_SIDE
 #define SORRY_SEA_SIDE
 

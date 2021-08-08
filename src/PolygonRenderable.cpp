@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include "PolygonRenderable.h"
 
 #include "Node.hpp"

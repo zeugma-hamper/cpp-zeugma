@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef VIDEO_RENDERABLE
 #define VIDEO_RENDERABLE
 

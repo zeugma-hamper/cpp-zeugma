@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef BUFFERS_SAMPLES_WIKY_WIKY_WAAAAHHHHH
 #define BUFFERS_SAMPLES_WIKY_WIKY_WAAAAHHHHH
 

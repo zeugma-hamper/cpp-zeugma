@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef VAST_TRACTS_OF_LAND
 #define VAST_TRACTS_OF_LAND
 

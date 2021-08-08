@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include <Frontier.hpp>
 
 #include <Node.hpp>

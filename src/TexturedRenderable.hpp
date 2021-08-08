@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef A_BIT_OF_FLAVOR
 #define A_BIT_OF_FLAVOR
 

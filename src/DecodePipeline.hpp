@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef GIMME_THE_RAW_BITS_TIMELY
 #define GIMME_THE_RAW_BITS_TIMELY
 

@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef HASSELBLAD_EVEN_THOUGH_YOU_ARE_NOT_AN_ASTRONAUT
 #define HASSELBLAD_EVEN_THOUGH_YOU_ARE_NOT_AN_ASTRONAUT
 

@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef TR_GRAPPLER_SHIMMIES_HITHER_AND_THITHER
 #define TR_GRAPPLER_SHIMMIES_HITHER_AND_THITHER
 

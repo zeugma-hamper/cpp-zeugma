@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef GEOM_FUMBLE_IS_THE_UNDOING_OF_MANY_A_SENATOR
 #define GEOM_FUMBLE_IS_THE_UNDOING_OF_MANY_A_SENATOR
 

@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef LATCH_ZOFT_LOCKS_IN_FRESHNESS_AND_ALSO_IMPRISONS_YOUR_SOUL
 #define LATCH_ZOFT_LOCKS_IN_FRESHNESS_AND_ALSO_IMPRISONS_YOUR_SOUL
 

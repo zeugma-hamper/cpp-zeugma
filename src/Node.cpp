@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include "Node.hpp"
 
 #include <Layer.hpp>

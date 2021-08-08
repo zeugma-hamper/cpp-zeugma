@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef WANT_TO_USE_MOTHER_TIME
 #define WANT_TO_USE_MOTHER_TIME
 

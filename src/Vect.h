@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef VECTITUDINOUSNESS
 #define VECTITUDINOUSNESS
 

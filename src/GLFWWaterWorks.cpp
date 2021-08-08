@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include <GLFWWaterWorks.hpp>
 
 #include <Bolex.h>

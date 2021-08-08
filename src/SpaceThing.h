@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef SPATIAL_THING_IS_BUSTING_OUT_OF_ITS_DIMENSIONAL_SLACKS
 #define SPATIAL_THING_IS_BUSTING_OUT_OF_ITS_DIMENSIONAL_SLACKS
 

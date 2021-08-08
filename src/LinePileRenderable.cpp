@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include "LinePileRenderable.h"
 
 #include "Node.hpp"

@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef RECTANGLE_RENDERABLE
 #define RECTANGLE_RENDERABLE
 

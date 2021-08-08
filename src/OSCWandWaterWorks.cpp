@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include <OSCWandWaterWorks.hpp>
 
 #include <GraphicsApplication.hpp>

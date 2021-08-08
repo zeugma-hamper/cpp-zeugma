@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef SCALE_ZOFT_WITH_AN_IDENTIFIED_THUMB_ON_THE_PAN
 #define SCALE_ZOFT_WITH_AN_IDENTIFIED_THUMB_ON_THE_PAN
 

@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef PIXELS_DANCE_A_SOFT_RHUMBA
 #define PIXELS_DANCE_A_SOFT_RHUMBA
 

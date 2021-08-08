@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include <TampVideoTerminus.hpp>
 
 #include <DecodePipeline.hpp>

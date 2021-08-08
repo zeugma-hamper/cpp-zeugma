@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef MOTHER_TIME_PULLS_ALL_THE_STRINGS
 #define MOTHER_TIME_PULLS_ALL_THE_STRINGS
 

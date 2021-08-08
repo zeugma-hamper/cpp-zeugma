@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef INTERP_ZOFT_IS_NEITHER_HERE_NOR_THERE_EXCEPT_FOR_VERY_BRIEFLY
 #define INTERP_ZOFT_IS_NEITHER_HERE_NOR_THERE_EXCEPT_FOR_VERY_BRIEFLY
 

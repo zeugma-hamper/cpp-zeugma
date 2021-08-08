@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef DRAINING_THE_DESERT
 #define DRAINING_THE_DESERT
 

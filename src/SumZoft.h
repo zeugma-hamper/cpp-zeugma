@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef SUM_ZOFT_IS_QUITE_LIKELY_LESS_THAN_ITSELF
 #define SUM_ZOFT_IS_QUITE_LIKELY_LESS_THAN_ITSELF
 

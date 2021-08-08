@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include "ZEBulletinEvent.h"
 
 #include <MultiSprinkler.hpp>

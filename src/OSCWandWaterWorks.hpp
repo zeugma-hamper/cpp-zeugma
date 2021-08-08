@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef THE_MIGHTY_OSC_RIVER
 #define THE_MIGHTY_OSC_RIVER
 

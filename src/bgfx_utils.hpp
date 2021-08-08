@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef BGFX_IS_AWFULLY_CLOSE_TO_BUGFIX
 #define BGFX_IS_AWFULLY_CLOSE_TO_BUGFIX
 

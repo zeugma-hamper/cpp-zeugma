@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef WIDE_AND_HIGH_HOOOOO_NOW
 #define WIDE_AND_HIGH_HOOOOO_NOW
 

@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef THE_GEOMETRY_FOR_NOW
 #define THE_GEOMETRY_FOR_NOW
 

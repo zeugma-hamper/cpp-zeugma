@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef RAND_ZOFT_KNOWS_EXACTLY_WHERE_IT_WILL_BE
 #define RAND_ZOFT_KNOWS_EXACTLY_WHERE_IT_WILL_BE
 

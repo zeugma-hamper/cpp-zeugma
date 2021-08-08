@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef SLAPPY_TYPES_LEAVE_A_RED_MARK
 #define SLAPPY_TYPES_LEAVE_A_RED_MARK
 

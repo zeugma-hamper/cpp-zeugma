@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include <VideoRenderable.hpp>
 
 #include <charm_glm.hpp>

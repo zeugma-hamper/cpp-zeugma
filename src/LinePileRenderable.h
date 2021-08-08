@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef LINE_PILE_RENDERABLE_STREWS_STRAW_ON_THE_BAARN_FLOOR
 #define LINE_PILE_RENDERABLE_STREWS_STRAW_ON_THE_BAARN_FLOOR
 

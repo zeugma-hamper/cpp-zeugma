@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef RO_GRAPPLER_SPINS_YOU_RIGHT_ROUND_BABY_RIGHT_OR_LEFT
 #define RO_GRAPPLER_SPINS_YOU_RIGHT_ROUND_BABY_RIGHT_OR_LEFT
 

@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef ALL_ABOARD_NIGHT_TRAIN
 #define ALL_ABOARD_NIGHT_TRAIN
 

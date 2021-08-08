@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include <CMVTrefoil.h>
 
 #include <Bolex.h>

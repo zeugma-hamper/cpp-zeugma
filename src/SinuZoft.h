@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef SINU_ZOFT_WIGGLES_IN_THE_CONGA_LINE_OF_LIFE
 #define SINU_ZOFT_WIGGLES_IN_THE_CONGA_LINE_OF_LIFE
 

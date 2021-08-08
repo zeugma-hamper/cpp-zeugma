@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef TAMP_HAS_NEEDS_YA_KNOW
 #define TAMP_HAS_NEEDS_YA_KNOW
 

@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef CONJURE_FROM_TOML_IS_AN_EXCEEDINGLY_SHABBY_MAGE
 #define CONJURE_FROM_TOML_IS_AN_EXCEEDINGLY_SHABBY_MAGE
 

@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef GRAPPLER_GRAPPLES_WITH_THAT_WHICH_NEEDS_GRAPPLING
 #define GRAPPLER_GRAPPLES_WITH_THAT_WHICH_NEEDS_GRAPPLING
 

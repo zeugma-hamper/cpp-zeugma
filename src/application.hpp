@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include <class_utils.hpp>
 
 #include "base_types.hpp"

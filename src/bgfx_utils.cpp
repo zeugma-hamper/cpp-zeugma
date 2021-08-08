@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include <bgfx_utils.hpp>
 
 #include <base_types.hpp>

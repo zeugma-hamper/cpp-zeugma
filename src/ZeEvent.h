@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef ZE_EVENT_IS_ALL_ZE_RAGE
 #define ZE_EVENT_IS_ALL_ZE_RAGE
 

@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef ALIGNIFER_KEEPS_ITS_AXES_PRIMLY_ORIENTED
 #define ALIGNIFER_KEEPS_ITS_AXES_PRIMLY_ORIENTED
 

@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef ZOFT_MAY_OR_MAY_NOT_BE_THE_NEW_SOFT
 #define ZOFT_MAY_OR_MAY_NOT_BE_THE_NEW_SOFT
 

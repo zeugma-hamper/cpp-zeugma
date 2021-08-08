@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef ZE_YOWL_EVENT_CAN_BE_HEARD_ALL_THE_WAY_IN_ZE_RESTROOMS_OF_ATLANTIS
 #define ZE_YOWL_EVENT_CAN_BE_HEARD_ALL_THE_WAY_IN_ZE_RESTROOMS_OF_ATLANTIS
 

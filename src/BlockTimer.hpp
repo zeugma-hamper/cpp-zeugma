@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef THYME_IS_ON_MY_SIDE
 #define THYME_IS_ON_MY_SIDE
 

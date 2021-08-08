@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef BORING_NAME_MAKE_FUN_LATER
 #define BORING_NAME_MAKE_FUN_LATER
 

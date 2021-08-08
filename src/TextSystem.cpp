@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include <TextSystem.hpp>
 
 #include <font_manager.h>

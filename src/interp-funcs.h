@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef INTERP_FUNCS_GET_YOU_WHERE_YOU_GO
 #define INTERP_FUNCS_GET_YOU_WHERE_YOU_GO
 

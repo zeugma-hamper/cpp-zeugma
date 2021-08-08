@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef THIRD_TIME
 #define THIRD_TIME
 

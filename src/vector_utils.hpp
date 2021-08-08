@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef VECTOR_CAN_BE_TERRIBLY_ANNOYING
 #define VECTOR_CAN_BE_TERRIBLY_ANNOYING
 

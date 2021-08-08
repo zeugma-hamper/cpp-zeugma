@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef ZEUBJECT_IS_NO_SYLLEPTICAL_WALK_IN_THE_PORK
 #define ZEUBJECT_IS_NO_SYLLEPTICAL_WALK_IN_THE_PORK
 

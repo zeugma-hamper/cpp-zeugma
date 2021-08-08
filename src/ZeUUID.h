@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef ZE_UUID_IS_EACH_ONE_THE_ONE_AND_ONLY
 #define ZE_UUID_IS_EACH_ONE_THE_ONE_AND_ONLY
 

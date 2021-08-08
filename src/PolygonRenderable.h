@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef POLYGON_RENDERABLE_LIVES_NEXT_DOOR_TO_MISTER_A_SQUARE
 #define POLYGON_RENDERABLE_LIVES_NEXT_DOOR_TO_MISTER_A_SQUARE
 

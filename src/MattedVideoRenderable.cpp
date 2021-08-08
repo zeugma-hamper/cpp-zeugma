@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include <MattedVideoRenderable.hpp>
 
 #include <BlockTimer.hpp>

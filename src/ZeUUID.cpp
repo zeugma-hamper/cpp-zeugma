@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include "ZeUUID.h"
 
 #include <boost/uuid/uuid.hpp>

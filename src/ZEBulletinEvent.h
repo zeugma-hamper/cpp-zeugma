@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef ZE_BULLETIN_EVENT_MAY_OR_MAY_NOT_BE_ALL_POINTS
 #define ZE_BULLETIN_EVENT_MAY_OR_MAY_NOT_BE_ALL_POINTS
 

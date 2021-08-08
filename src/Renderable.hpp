@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef BASE_RENDERABLE_DOESNT_DO_MUCH
 #define BASE_RENDERABLE_DOESNT_DO_MUCH
 

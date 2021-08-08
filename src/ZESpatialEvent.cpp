@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include "ZESpatialEvent.h"
 
 #include <MultiSprinkler.hpp>

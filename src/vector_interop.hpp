@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef CROSS_BUT_NOT_THE_USEFUL_ONE
 #define CROSS_BUT_NOT_THE_USEFUL_ONE
 

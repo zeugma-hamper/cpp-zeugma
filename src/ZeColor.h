@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef ZE_COLOR_OF_POMEGRANATES
 #define ZE_COLOR_OF_POMEGRANATES
 

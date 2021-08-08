@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef YOUR_FINGER_IS_IN_MY_EYE
 #define YOUR_FINGER_IS_IN_MY_EYE
 

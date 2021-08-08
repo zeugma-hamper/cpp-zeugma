@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include "Alignifer.h"
 
 #include "CoGrappler.h"

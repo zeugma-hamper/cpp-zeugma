@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef WHERE_WORLDS_COLLIDE
 #define WHERE_WORLDS_COLLIDE
 

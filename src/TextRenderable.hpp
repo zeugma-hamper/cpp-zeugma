@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef GLYPH_GLYPH_GLYPH
 #define GLYPH_GLYPH_GLYPH
 

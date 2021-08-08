@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef SC_GRAPPLER_HAS_ITS_THUMB_ON_THE_PAN
 #define SC_GRAPPLER_HAS_ITS_THUMB_ON_THE_PAN
 

@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include <TexturedRenderable.hpp>
 
 #include <Node.hpp>

@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef MATTED_VIDEO_RENDERABLE
 #define MATTED_VIDEO_RENDERABLE
 

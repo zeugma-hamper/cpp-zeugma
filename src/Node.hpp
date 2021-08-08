@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef NODULAR_BITS
 #define NODULAR_BITS
 

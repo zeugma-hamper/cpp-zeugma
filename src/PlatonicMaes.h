@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef PLATONIC_MAES_IS_A_GREAT_IDEA_BUT_IN_NO_WAY_PRACTICAL
 #define PLATONIC_MAES_IS_A_GREAT_IDEA_BUT_IN_NO_WAY_PRACTICAL
 

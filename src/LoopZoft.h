@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef LOOP_ZOFT_PLAYS_ENDLESSLY_BUT_IRRITATES_NOBODY
 #define LOOP_ZOFT_PLAYS_ENDLESSLY_BUT_IRRITATES_NOBODY
 

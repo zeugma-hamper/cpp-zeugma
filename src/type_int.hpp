@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef THIS_IS_INTERESTING
 #define THIS_IS_INTERESTING
 

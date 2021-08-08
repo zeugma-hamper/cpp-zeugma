@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef MATTE_LOADER_POOL_HAS_A_SHALLOW_END
 #define MATTE_LOADER_POOL_HAS_A_SHALLOW_END
 

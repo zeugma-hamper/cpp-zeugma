@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #ifndef OMNIHIL_IS_EVERYTHING_AND_NOTHING
 #define OMNIHIL_IS_EVERYTHING_AND_NOTHING
 

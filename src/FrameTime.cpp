@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include "FrameTime.hpp"
 
 #include <chrono>

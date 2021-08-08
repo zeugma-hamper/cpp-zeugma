@@ -1,4 +1,8 @@
 
+//
+// (c) treadle & loam, provisioners llc
+//
+
 #include "PipelineTerminus.hpp"
 
 #include <DecodePipeline.hpp>
