@@ -79,8 +79,7 @@ AABB RectangleFrontier::GetGlobalAABB () const
 }
 
 bool RectangleFrontier::CheckHit (G::Ray const &_ray, Vect *_hit_pt) const
-{
-  if (! m_node)
+{ if (! m_node)
     return false;
 
   GrapplerPile *const pl = m_node->UnsecuredGrapplerPile();
@@ -94,9 +93,23 @@ bool RectangleFrontier::CheckHit (G::Ray const &_ray, Vect *_hit_pt) const
   Vect const over = 0.5 * (diag_norm + tmp);
   Vect const up = 0.5 * (diag_norm - tmp);
 
-  return G::RayRectIntersection(_ray.orig, _ray.dir,
-                                0.5 * (t_tr + t_bl), over, up,
-                                diag.Dot (over), diag.Dot (up), _hit_pt);
+  return G::RayRectIntersection (_ray.orig, _ray.dir,
+                                 0.5 * (t_tr + t_bl), over, up,
+                                 diag.Dot (over), diag.Dot (up), _hit_pt);
+}
+
+bool RectangleFrontier::CheckPlaneHit (G::Ray const &_ray,
+                                       Vect *_hit_pt)  const
+{ if (! m_node)
+    return false;
+
+  GrapplerPile *const pl = m_node->UnsecuredGrapplerPile();
+  Vect const t_bl = pl  ?  pl->pnt_mat . TransformVect (m_bl)  :  m_bl;
+  Vect const t_tr = pl  ?  pl->pnt_mat . TransformVect (m_tr)  :  m_tr;
+  Vect const t_norm = pl  ?  pl->nrm_mat . TransformVect (m_norm)  :  m_norm;
+
+  return G::RayPlaneIntersection (_ray.orig, _ray.dir,
+                                  0.5 * (t_tr + t_bl), t_norm, _hit_pt);
 }
 
 
@@ -175,6 +188,21 @@ bool RectRenderableFrontier::CheckHit (G::Ray const &_ray, Vect *_hit_pt) const
   // return G::RayRectIntersection(_ray.orig, _ray.dir,
   //                               0.5 * (t_tr + t_bl), over, up,
   //                               diag.Dot (over), diag.Dot (up), _hit_pt);
+}
+
+bool RectRenderableFrontier::CheckPlaneHit (G::Ray const &_ray,
+                                            Vect *_hit_pt)  const
+{
+  if (! m_node  ||  ! m_renderable)
+    return false;
+
+  Matrix44 const m = from_glm (m_node -> GetAbsoluteTransformation ().model);
+  Vect p = m . TransformVect (m_pos);
+  Vect z = m . TransformVect (Vect::zerov);
+  Vect o = m . TransformVect (m_wid * m_renderable -> Over ())  -  z;
+  Vect u = m . TransformVect (m_hei * m_renderable -> Up ())  -  z;
+  Vect n = o . Cross (u);
+  return G::RayPlaneIntersection (_ray.orig, _ray.dir, p, n, _hit_pt);
 }
 
 
