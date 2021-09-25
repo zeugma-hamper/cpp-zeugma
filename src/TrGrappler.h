@@ -52,7 +52,7 @@ class TrGrappler  :  public Grappler
     { trans . BecomeLike (t_zft);  return *this; }
 
   const Matrix44 &PntMat ()  const  override;
-  const Matrix44 &NrmMat ()  const  override;
+  const Matrix44 &InvPntMat ()  const  override;
 
   i64 Inhale (i64 steppe, f64 thyme)  override;
 };

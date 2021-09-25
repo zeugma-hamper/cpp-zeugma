@@ -56,8 +56,8 @@ class Alignifer  :  public Zeubject, public Node
       return NULL;
     }
 
-  bool InstallScaleGrapplerZoft (ZoftVect &sgz);
   bool InstallLocGrapplerZoft (ZoftVect &lgz);
+  bool InstallScaleGrapplerZoft (ZoftVect &sgz);
 
   Vect CurScale ()  const
     { return sca.val; }

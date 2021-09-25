@@ -25,6 +25,7 @@ class Zeubject  :  public OmNihil
 { public:
 
   ZeSac *sac;
+  i64 rat_fresh;
 
   Zeubject ();
   Zeubject (const std::string &nm);
@@ -40,6 +41,14 @@ class Zeubject  :  public OmNihil
   void SetBreather (IronLung *br);
 
   // empty implementation for the moment, returns 0
+  bool OughtToInhale (i64 ratch)
+    { if (ratch < 0)
+        return true;
+      if (rat_fresh >= ratch)
+        return false;
+      rat_fresh = ratch;
+      return true;
+    }
   virtual i64 Inhale (i64 ratch, f64 thyme);
 };
 

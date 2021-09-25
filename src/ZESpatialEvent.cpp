@@ -95,7 +95,7 @@ u64 ZESpatialEvent::NthPressureID (i64 ind)  const
   return it->first;
 }
 
-u64 ZESpatialEvent::NthPressure (i64 ind)  const
+f64 ZESpatialEvent::NthPressure (i64 ind)  const
 { if (ind < 0  ||  ind >= (int)pressures . size ())
     throw;
   auto it = pressures . begin ();

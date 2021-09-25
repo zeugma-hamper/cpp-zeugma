@@ -13,7 +13,7 @@ const Matrix44 &TrGrappler::PntMat ()  const
 { return pm; }
 
 
-const Matrix44 &TrGrappler::NrmMat ()  const
+const Matrix44 &TrGrappler::InvPntMat ()  const
 { return ipm; }
 
 

@@ -24,15 +24,19 @@ class CoGrappler  :  public Grappler
   CoGrappler (const Matrix44 &fwd_m)
      :  Grappler (), pm (fwd_m), nm (fwd_m)
     { }  // must-do: install inverted fwd_m on other two
+  // uh... shouldn't that just be the transpose of the forward matrix?
 
   CoGrappler (const Matrix44 &fwd_m, const Matrix44 &bck_m)
      :  Grappler (), pm (fwd_m), ipm (bck_m), nm (fwd_m), inm (bck_m)
     { }
+  // ... which, if true (the comment foregoing), makes this form either
+  // dangerous or redundant.
 
   CoGrappler (const Matrix44 &fwd_pm, const Matrix44 &bck_pm,
               const Matrix44 &fwd_nm, const Matrix44 &bck_nm)
      :  Grappler (), pm (fwd_pm), ipm (bck_pm), nm (fwd_nm), inm (bck_nm)
     { }
+  // ... and, correspondingly, makes this one radically overconstrained.
 
 
   void SetViaNormalizedBasisVectors (const Vect &e0, const Vect &e1,
