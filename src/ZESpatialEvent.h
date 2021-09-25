@@ -54,7 +54,7 @@ class ZESpatialEvent  :  public ZeEvent
   f64  PressureForID (u64 id)  const;
   i64  NumPressures ()  const;
   u64  NthPressureID (i64 ind)  const;
-  u64  NthPressure (i64 ind)  const;
+  f64  NthPressure (i64 ind)  const;
 };
 
 

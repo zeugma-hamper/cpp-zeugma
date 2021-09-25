@@ -11,11 +11,13 @@
 namespace zeugma  {
 
 
-Zeubject::Zeubject ()  :  OmNihil (), sac (NULL)
+Zeubject::Zeubject ()  :  OmNihil (), sac (NULL), rat_fresh (-1)
 { }
 
-Zeubject::Zeubject (const std::string &nm)  :  OmNihil (), sac (NULL)
+Zeubject::Zeubject (const std::string &nm)  :  OmNihil (),
+                                               sac (NULL), rat_fresh (-1)
 { SetName (nm); }
+
 
 Zeubject::~Zeubject ()
 { if (IronLung *br = Breather ())

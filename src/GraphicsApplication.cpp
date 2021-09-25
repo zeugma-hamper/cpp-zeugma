@@ -264,8 +264,9 @@ bool GraphicsApplication::RunOneCycle ()
   for (ZePublicWaterWorks *ww : m_event_drainage)
     ww->Drain (&m_event_sprinkler);
 
+  VelvetLung *vl = NULL;
   if (ProtoZoftThingGuts::IsMassBreathing ())
-    ProtoZoftThingGuts::MassBreather ()
+    (vl = ProtoZoftThingGuts::MassBreather ())
       -> Inhale (m_global_ratchet, global_frame_thyme);
 
   for (IronLung *irlu  :  IronLung::GlobalLungs ())

@@ -60,7 +60,7 @@ i64 IronLung::Inhale (i64 ratch, f64 thyme)
   for (Zeubject *z  :  breathees)
     if (z)
       z -> Inhale (ratch, thyme);
-  return 0;
+  return 0;  // uh... ahem: wouldn't this want to go last?
 
   IRON_LUNG_TIDY_AROUND_ACTUAL_INHALATION ();
 }
