@@ -19,7 +19,7 @@ i64 ScGrappler::Inhale (i64 steppe, f64 thyme)
                         s.y == 0  ?  1.0  :  1.0 / s.y,
                         s.z == 0  ?  1.0  :  1.0 / s.z,
                         c);
-  Vect n (s.y * s.z, s.x * s.z, s.x * s.y);
+/*  Vect n (s.y * s.z, s.x * s.z, s.x * s.y);
   n . NormSelf ();
   nm . LoadScale (n.x, n.y, n.z);
   // blergh... what to do about the inverse in the face of singularities?
@@ -28,6 +28,7 @@ i64 ScGrappler::Inhale (i64 steppe, f64 thyme)
            n.z == 0.0  ?  1.0  :  1.0 / n.z);
   n . NormSelf ();
   inm . LoadScale (n.x, n.y, n.z);
+*/
   return 0;
 }
 

@@ -78,12 +78,12 @@ class ScGrappler  :  public Grappler
 
   const Matrix44 &PntMat ()  const  override
     { return pm; }
-  const Matrix44 &NrmMat ()  const  override
-    { return nm; }
+  // const Matrix44 &NrmMat ()  const  override
+  //   { return nm; }
   const Matrix44 &InvPntMat ()  const  override
     { return ipm; }
-  const Matrix44 &InvNrmMat ()  const  override
-    { return inm; }
+  // const Matrix44 &InvNrmMat ()  const  override
+  //   { return inm; }
 
   i64 Inhale (i64 steppe, f64 thyme)  override;
 };
