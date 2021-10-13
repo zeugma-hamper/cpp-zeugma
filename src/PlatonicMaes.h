@@ -9,6 +9,8 @@
 
 #include "SpaceThing.h"
 
+#include "GeomFumble.h"
+
 
 namespace zeugma  {
 
@@ -111,6 +113,34 @@ class PlatonicMaes  :  public SpaceThing
 
 
   i64 Inhale (i64 ratch, f64 thyme);
+//
+///
+//
+
+  struct MaesAndHit
+    { PlatonicMaes *maes;  Vect hit;
+      MaesAndHit (PlatonicMaes *m, const Vect &h)
+        { maes = m;  hit = h; }
+    };
+
+  template <class T>
+   static MaesAndHit ClosestAmong (std::vector <T *> &mcoll, Vect frm, Vect aim)
+    { Vect hit, cls_hit;
+      PlatonicMaes *cls_maes = NULL;
+      f64 cls_dst = -1.0;
+      for (PlatonicMaes *ma  :  mcoll)
+        if (ma  &&  G::RayRectIntersection (frm, aim, ma->loc.val,
+                                            ma->ovr.val, ma->upp.val,
+                                            ma->wid.val, ma->hei.val, &hit))
+          { double d = (hit - frm) . AutoDot ();
+            if (cls_dst < 0.0  ||  d < cls_dst)
+              { cls_dst = d;
+                cls_hit = hit;
+                cls_maes = ma;
+              }
+          }
+      return MaesAndHit (cls_maes, cls_hit);
+    }
 };
 
 
