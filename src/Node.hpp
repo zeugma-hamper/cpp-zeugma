@@ -14,6 +14,7 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include <vector>
+#include <array>
 
 #include "GrapplerPile.h"
 
