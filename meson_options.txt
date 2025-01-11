@@ -1,2 +1,2 @@
-option('shaderc-path', type : 'string', value : '/usr/bin', description : 'shaderc binary')
+option('shaderc-path', type : 'string', value : '/opt/trelopro/bin', description : 'shaderc binary')
 option('bgfx-msgs', type : 'feature', value : 'disabled', description : 'enables bgfx debug messages')
